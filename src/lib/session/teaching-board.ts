@@ -32,7 +32,7 @@ export const INITIAL_BOARD_STATE: BoardState = {
   emphasizedId: null,
 };
 
-const MAX_BOARD_ITEMS = 6;
+const MAX_BOARD_ITEMS = 15;
 const MAX_TITLE_LENGTH = 80;
 const MAX_ITEM_LENGTH = 180;
 
@@ -108,8 +108,7 @@ export function teachingBoardReducer(
       if (state.items.some((item) => item.id === event.id)) return state;
 
       const replacedEmphasizedTitle =
-        state.title?.id === state.emphasizedId &&
-        state.title.id !== event.id;
+        state.title?.id === state.emphasizedId && state.title.id !== event.id;
 
       return {
         ...state,

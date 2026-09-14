@@ -1,0 +1,657 @@
+@import "./tokens.css";
+@import "tailwindcss";
+
+/* الوضع الداكن بسمة صريحة لا بتفضيل النظام — الموقع فاتح، الجلسة داكنة. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* -------------------------------------------------------------
+   ربط Tailwind بالتوكنات.
+
+   `inline` يجعل كل أداة تُصدِر `var(--bcn-…)` مباشرة بدل نسخ
+   القيمة، فيبقى tokens.css المصدر الوحيد: تغيير توكن واحد يسري
+   على كل الأدوات وفي الوضعين معًا.
+   ------------------------------------------------------------- */
+@theme inline {
+  /* الباذنجاني — المسرح */
+  --color-aubergine-deep: var(--bcn-aubergine-deep);
+  --color-aubergine-base: var(--bcn-aubergine-base);
+  --color-aubergine-mid: var(--bcn-aubergine-mid);
+  --color-aubergine-soft: var(--bcn-aubergine-soft);
+  --color-aubergine-tint: var(--bcn-aubergine-tint);
+
+  /* الأسطح والنص */
+  --color-ground: var(--bcn-ground);
+  --color-surface: var(--bcn-surface);
+  --color-line: var(--bcn-line);
+  --color-ink: var(--bcn-ink);
+  --color-ink-2: var(--bcn-ink-2);
+  --color-ink-3: var(--bcn-ink-3);
+
+  /* الفعل — الكهرماني */
+  --color-pressable: var(--bcn-pressable);
+  --color-on-pressable: var(--bcn-on-pressable);
+  --color-on-dominant: var(--bcn-on-dominant);
+
+  /* الدفء — الجوزي */
+  --color-warmth: var(--bcn-warmth);
+
+  /* الحالات */
+  --color-success: var(--bcn-success);
+  --color-error: var(--bcn-error);
+  --color-live: var(--bcn-live);
+
+  /* تدرّجات الأسطح — خلفيات بطاقات فقط */
+  --color-tint-aubergine: var(--bcn-tint-aubergine);
+  --color-tint-amber: var(--bcn-tint-amber);
+  --color-tint-walnut: var(--bcn-tint-walnut);
+
+  /* حركات الجلسة — بمدد بريف الشاشة 7 حرفيًا */
+  --animate-speak: bcn-speak 2600ms ease-in-out infinite;
+  --animate-caret: bcn-caret 1000ms step-end infinite;
+  --animate-wave: bcn-wave 900ms ease-in-out infinite;
+
+  /* ظهور سطر السبورة — التأخير يُمرَّر بـ animationDelay لكل سطر.
+     `both` يُبقي حالة البداية قبل انقضاء التأخير وحالة النهاية بعده،
+     فالحركة تكتمل بلا جافاسكربت. */
+  --animate-board-in: bcn-board-in 300ms cubic-bezier(0, 0, 0.2, 1) both;
+
+  /* لمحة اللاندينج تعيد نفسها بلا توقّف — 11ث للدورة الكاملة */
+  --animate-board-loop: bcn-board-loop 11000ms ease-in-out infinite both;
+
+  /* إيماءة هادئة تشدّ العين إلى زرّ البدء — 1.8ث للدورة، أبطأ من
+     أن تُقلق وأوضح من أن تُهمَل. */
+  --animate-nudge: bcn-nudge 1800ms ease-in-out infinite;
+
+  /* سطر «يسمع منك ويتكلم معك» — دورة واحدة (5.2ث) تتناوب بين
+     نصفَي الجملة: نصفها الميكروفون فاعل، ونصفها الموجة. المدّة
+     واحدة للاثنتين فيبقى تناوبهما مضمونًا بلا مؤقّتات. */
+  --animate-voice-hear: bcn-voice-hear 5200ms ease-in-out infinite both;
+  --animate-voice-talk: bcn-voice-talk 5200ms ease-in-out infinite both;
+
+  /* تحوّل الشعار إلى الوجه — سبع حركات على مدّة واحدة (12ث) فلا
+     تفترق، والتفاوت بينها في مفاتيحها لا في مدّتها.
+     المنحنى جيبيّ التسارع: أنعم منحنى متماثل. */
+  --animate-morph-shell: bcn-morph-shell 5500ms cubic-bezier(0.37, 0, 0.63, 1)
+    infinite both;
+  --animate-morph-mouth: bcn-morph-mouth 5500ms cubic-bezier(0.37, 0, 0.63, 1)
+    infinite both;
+  --animate-morph-eye-a: bcn-morph-eye-a 5500ms cubic-bezier(0.37, 0, 0.63, 1)
+    infinite both;
+  --animate-morph-eye-b: bcn-morph-eye-b 5500ms cubic-bezier(0.37, 0, 0.63, 1)
+    infinite both;
+  --animate-morph-cap: bcn-morph-cap 5500ms cubic-bezier(0.37, 0, 0.63, 1)
+    infinite both;
+
+  /* بطاقات الشهادات — انسياب رأسيّ لا دوران. القائمة مكرّرة مرّتين
+     والإزاحة نصفُ ارتفاعها، فالعودة إلى الصفر تقع على صورة مطابقة
+     ولا تُرى. و`linear` شرط: أي تسارع يكشف حدّ الدورة. */
+  --animate-marquee: bcn-marquee 32000ms linear infinite;
+
+  /* فم بيكان أثناء الكلام — إيقاع نطق لا نبضة زينة */
+  --animate-talk: bcn-talk 1600ms ease-in-out infinite;
+
+  /* قلب الجهاز في تنبيه الوضع الرأسي */
+  --animate-flip: bcn-flip 2600ms ease-in-out infinite;
+
+  /* حياة الوجه قبل البدء — بمدد BecanFace نفسها */
+  --animate-blink: bcn-blink 5200ms ease-in-out infinite;
+  --animate-wink: bcn-wink 5200ms ease-in-out infinite;
+  --animate-face-tilt: bcn-face-tilt 7500ms ease-in-out infinite;
+
+  /* حلقة التركيز */
+  --color-ring: var(--bcn-ring);
+
+  /* الأسطح الثانوية والظلال وخط العرض */
+  --color-panel: var(--bcn-panel);
+  --color-surface-2: var(--bcn-surface-2);
+  --color-surface-3: var(--bcn-surface-3);
+  --color-highlight: var(--bcn-highlight);
+  --color-chalkboard: var(--bcn-chalkboard);
+  --color-chalkboard-edge: var(--bcn-chalkboard-edge);
+  --color-olive-tint: var(--bcn-olive-tint);
+  --color-olive-soft: var(--bcn-olive-soft);
+  --color-olive: var(--bcn-olive);
+  --color-olive-dark: var(--bcn-olive-dark);
+  --color-olive-deep: var(--bcn-olive-deep);
+  --color-amber-bright: var(--bcn-amber-bright);
+  --font-display: var(--bcn-font-display);
+  --shadow-soft: var(--bcn-shadow-soft);
+  --shadow-lift: var(--bcn-shadow-lift);
+
+  /* الاستدارة */
+  --radius-sm: var(--bcn-radius-sm);
+  --radius-md: var(--bcn-radius-md);
+  --radius-lg: var(--bcn-radius-lg);
+  --radius-xl: var(--bcn-radius-xl);
+  --radius-pill: var(--bcn-radius-pill);
+
+  /* الخط */
+  --font-sans: var(--bcn-font-sans);
+
+  --font-weight-normal: var(--bcn-weight-regular);
+  --font-weight-medium: var(--bcn-weight-medium);
+  --font-weight-semibold: var(--bcn-weight-semibold);
+  --font-weight-bold: var(--bcn-weight-bold);
+
+  --tracking-tight: var(--bcn-tracking-tight);
+  --leading-base: var(--bcn-leading-base);
+
+  /* المقاسات — قاعدة 4px بوحدة rem كي تتوسّع مع خط المتصفح */
+  --spacing: 0.25rem;
+
+  /* نقاط التوقّف — 390 أولًا ثم 768 ثم 1120 */
+  --breakpoint-xl: 70rem; /* 1120px — بوحدة rem كي يبقى ترتيب نقاط التوقّف صحيحًا */
+  --container-page: 70rem; /* 1120px */
+  --container-measure: var(--bcn-measure);
+}
+
+/* لوح الطباشير — لون القاع وصورة الخامة معًا.
+
+   سطرا background-image متتاليان لا خطأ: الأول بديل بصيغة url
+   عادية، والثاني image-set. المتصفّح الذي لا يعرف image-set يُسقط
+   السطر الثاني كقيمة غير صالحة فيبقى الأول — وهو ما لا يتحقّق لو
+   وُضع التفرّع داخل توكن، لأن الخصائص المخصّصة لا تُتحقَّق قيمتها. */
+@utility chalkboard {
+  background-color: var(--bcn-chalkboard);
+  /* الكشّاف طبقة ضوء فوق صورة اللوح: الضوء يسقط على سطح السبورة
+     نفسها، ويُقصّ بحوافّها المستديرة تلقائيًا لأنه من خلفيّتها لا
+     طبقةً معلّقة فوقها. ويبقى تحت النصّ — والطباشير يُكتب فوق
+     الضوء لا تحته. */
+  background-image: var(--bcn-lamp), var(--bcn-chalk-fallback);
+  background-image: var(--bcn-lamp), var(--bcn-chalk-image);
+  background-size: auto, auto, cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* تمرير بلا مؤشّر — كومة الشرائح تُمرَّر ولا يظهر لها شريط. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes bcn-speak {
+  0% {
+    transform: scale(0.55);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.12;
+  }
+}
+
+@keyframes bcn-wave {
+  0%,
+  100% {
+    transform: scaleY(0.25);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+/* النطق — إيقاع غير منتظم عمدًا.
+
+   الحركة الواحدة المتكرّرة تُقرأ آلةً لا كلامًا: الكلام مقاطع
+   متفاوتة الاتّساع والمدّة. المفاتيح هنا غير متساوية المسافات ولا
+   الأحجام، والدورة طويلة (1.6ث) كي لا يلتقط النظر تكرارها. */
+@keyframes bcn-talk {
+  0% {
+    transform: scaleY(0.5) scaleX(1);
+  }
+  7% {
+    transform: scaleY(1.35) scaleX(0.96);
+  }
+  15% {
+    transform: scaleY(0.7) scaleX(1.02);
+  }
+  23% {
+    transform: scaleY(1.65) scaleX(0.93);
+  }
+  31% {
+    transform: scaleY(0.45) scaleX(1.04);
+  }
+  39% {
+    transform: scaleY(1.05) scaleX(0.99);
+  }
+  48% {
+    transform: scaleY(0.6) scaleX(1.01);
+  }
+  57% {
+    transform: scaleY(1.5) scaleX(0.95);
+  }
+  66% {
+    transform: scaleY(0.85) scaleX(1);
+  }
+  74% {
+    transform: scaleY(1.2) scaleX(0.97);
+  }
+  83% {
+    transform: scaleY(0.5) scaleX(1.03);
+  }
+  91% {
+    transform: scaleY(1.4) scaleX(0.94);
+  }
+  100% {
+    transform: scaleY(0.5) scaleX(1);
+  }
+}
+
+/* الرمشة والغمزة والميلة — بمدد BecanFace نفسها ومفاتيحها،
+   فلا يفترق الوجهان في إيقاعهما كما لم يفترقا في شكلهما. */
+@keyframes bcn-blink {
+  0%,
+  6%,
+  100% {
+    transform: scaleY(1);
+  }
+  3% {
+    transform: scaleY(0.08);
+  }
+}
+
+@keyframes bcn-wink {
+  0%,
+  6%,
+  50%,
+  57%,
+  100% {
+    transform: scaleY(1);
+  }
+  3%,
+  53% {
+    transform: scaleY(0.08);
+  }
+}
+
+@keyframes bcn-face-tilt {
+  0%,
+  50%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-3deg);
+  }
+  75% {
+    transform: rotate(2deg);
+  }
+}
+
+/* الجهاز ينقلب من الرأسي إلى الأفقي ويعود — وقفة عند كل طرف كي
+   تُقرأ الحركة إرشادًا لا دورانًا مستمرًّا. */
+/* شبكة نقاط خلفية — تُقنَّع بتدرّج شعاعي فتخفت عند الحواف. */
+@utility dotgrid {
+  background-image: var(--bcn-dotgrid);
+  background-size: 22px 22px;
+  mask-image: var(--bcn-dotgrid-fade);
+  -webkit-mask-image: var(--bcn-dotgrid-fade);
+}
+
+@keyframes bcn-flip {
+  0%,
+  18% {
+    transform: rotate(0deg);
+  }
+  46%,
+  72% {
+    transform: rotate(-90deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes bcn-nudge {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+/* ————— تناوب سطر الصوت —————
+
+   مفتاحان متعاكسان تمامًا على مدّة واحدة: النصف الفاعل بلونه كاملًا
+   والآخر عند 0.4. والخفوت على الأيقونتين وحدهما لا على النصّ، فلا
+   يمسّ تباين الكلام.
+
+   0–46%   الميكروفون فاعل — «يسمع منك»
+   54–96%  الموجة فاعلة — «يتكلم معك»
+   والانتقال بينهما 8% من الدورة (≈420ms) فلا يومض. */
+
+@keyframes bcn-voice-hear {
+  0%,
+  46% {
+    opacity: 1;
+  }
+  54%,
+  96% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes bcn-voice-talk {
+  0%,
+  46% {
+    opacity: 0.4;
+  }
+  54%,
+  96% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.4;
+  }
+}
+
+/* ————— تحوّل الشعار إلى الوجه —————
+
+   القوسان الجوزيّان داخل البيكانة **هما نفسهما ملامح الوجه** — وكلاهما
+   `--warmth` في الهوية، فالعلاقة قائمة أصلًا لا مخترَعة. القوس الأيسر
+   يدور فيصير الفم، والأيمن ينقسم نصفين يصيران العينين، والقبّعة تكبر
+   وتهبط فتُلبَس. والقشرة والخطّ الأوسط وحدهما يذوبان.
+
+   **لا تحويل لـ`d` بل `transform` و`stroke-width` وحدهما.** تحريك
+   `d` غير مضمون بين المتصفّحات، والخطّان هنا هلالان: هلالٌ رأسيّ
+   مُدارٌ ربعَ دورة هو ابتسامة، ونصفُ هلالٍ مضغوطٌ هو عين.
+
+   ————— الخطّان يتبادلان موضعيهما —————
+
+   الفم يُتمّ دورةً كاملة فيحطّ **مكان القوس الأيمن**، والعينان تلتئمان
+   وتحطّان **مكان القوس الأيسر**. فنهاية المفاتيح شعارٌ متبادل القوسين،
+   وبدايتها الشعار الأصلي — **والتطابق بينهما 99.03% مقيسًا**، فالقفزة
+   عند حدّ الدورة غير مرئية.
+
+   ولماذا دورة كاملة لا نصف؟ لأن **العلاقة بين القوسين انعكاسٌ لا
+   دوران**: مرآة حول `x = 59.401`، ومحدّدها سالب فلا يُبلَغ بالدوران
+   وحده. والصيغة `R(θ)∘S` تساوي المرآة في حالتين فقط:
+
+   - `θ ≡ 0` مع قلب `sx` — فينبسط **التقوّس** (3.5 وحدة) ثم ينعكس.
+     الخطّ يمرّ مستقيمًا: نظيف.
+   - `θ ≡ 180` مع قلب `sy` — فينكمش **الوتر** (43.7 وحدة) إلى الصفر.
+     الخطّ يمرّ نقطةً: قرصة مرئية.
+
+   فاختيرت الأولى، ومعها دورة كاملة كي يبقى الدوران متّجهًا للأمام.
+
+   **و270° الزائدة وُضعت في الذهاب لا في العودة**: مجموع الدوران لا
+   بدّ أن ينتهي عند مضاعف 360°، والابتسامة تقع عند 90° — فالباقي 270°
+   يقع في أحد الشوطين. وضعُه في الذهاب يجعل التحوّل إلى الوجه هو
+   المشهد، والعودةَ ربعَ دورةٍ يدخل بها الخطّ شعارَه مباشرة.
+   وجُرّب نصف الدورة وحده (بلا قلب) فأعطى تطابقًا **52.6% فقط**: القوس
+   غير متماثل رأسيًّا (‏`P1 = P0` في الأصل) فنصف الدورة يقلبه ولا
+   يطابقه بأخيه — والقفزة تُرى. لا تُعِد تجربته.
+
+   ————— السُّمك: `non-scaling-stroke` ومقاسٌ ثابت —————
+
+   قلبُ المحور يمرّ بتحجيمٍ صفريّ، وعنده يتلاشى الحدّ إن كان يتبع
+   التحجيم. فـ`non-scaling-stroke` شرطٌ لا خيار.
+
+   لكنه يحسب السُّمك في **نظام إحداثيات الإطار — أي بالبكسل** لا بوحدات
+   الصندوق. فلو تغيّر مقاس الرسم اختلّت النسبة بين الخطّين وقشرتهما
+   (قيست فجوة 32% حين كان المقاس متغيّرًا بنقاط التوقّف).
+
+   العلاج: **المشهد بمقاس ثابت 160px** في كل العروض، فالوحدة تساوي
+   1.3333px دائمًا، وكل سُمك هنا مكتوب بالبكسل مضروبًا بها:
+
+   | | بوحدات الصندوق | بالبكسل |
+   |---|---|---|
+   | الشعار (القشرة والخطّان) | 3.775 | **5.033** |
+   | الفم في الوجه | 7.5 | **10** |
+   | العين في الوجه | 7.5 | **10** |
+   | العين مغلقة | 2 | **2.667** |
+
+   **تغيير مقاس `BecanMorph` يوجب إعادة حساب هذا الجدول كلّه.**
+
+   ————— الإيقاع —————
+
+   الدورة 5.5ث بمنحنى `cubic-bezier(.37,0,.63,1)` — جيبيّ التسارع.
+
+   **النوافذ متداخلة لا متعاقبة**، وهذا هو الفرق بين تحوّلٍ واحد
+   وثلاثة أشياء يتحرّك كلٌّ منها لحاله:
+
+   | | ذهابًا | إيابًا |
+   |---|---|---|
+   | الخطوط | 8% → 34% | 66% → 92% |
+   | القبّعة | 12% → 30% | 68% → 84% |
+   | القشرة | تذوب 8 → 20% | تعود 72 → 86% |
+
+   - القشرة تذوب **مبكرًا وسريعًا**: بقاؤها بينما تكبر القبّعة يعطي
+     قبّعةً ضخمة فوق بيكانة شبح.
+   - وتعود **قبل** أن يصل الخطّان (86% مقابل 92%) فيستقرّان داخلها:
+     الخطّان هما ما يُكمل الشعار.
+   - والقبّعة أسرع قليلًا لا كثيرًا، وتبدأ وتنتهي **داخل** نافذة
+     الخطوط فلا تنفصل عنها.
+
+   وقفة الوجه 34%→66% — 1.76ث يرمش فيها ويغمز. والرمشة 1.5% ذهابًا
+   ومثلها إيابًا، أي 82ms لكلٍّ — مدّة رمشةٍ حقيقية. */
+
+@keyframes bcn-morph-shell {
+  0%,
+  8% {
+    opacity: 1;
+  }
+  20%,
+  72% {
+    opacity: 0;
+  }
+  86%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes bcn-morph-mouth {
+  0%,
+  8% {
+    transform: translate(0px, 0px) rotate(0deg) scale(1, 1);
+    stroke-width: 5.033;
+  }
+  34%,
+  66% {
+    transform: translate(10.026px, 12.106px) rotate(270deg)
+      scale(1.9925, 1.1909);
+    stroke-width: 10;
+  }
+  /* دورة كاملة مع قلب محور التقوّس — يحطّ مكان القوس الأيمن مطابقًا له */
+  92%,
+  100% {
+    transform: translate(18.854px, 0px) rotate(360deg) scale(-1, 1);
+    stroke-width: 5.033;
+  }
+}
+
+/* النصفان يدوران في اتجاهين متعاكسين: الحالة النهائية واحدة والمسار
+   إليها مختلف — وهو ما يجعل الانقسام مقروءًا. ويحطّان معًا مكان
+   القوس الأيسر فيلتئمان قوسًا واحدًا. */
+@keyframes bcn-morph-eye-a {
+  0%,
+  8% {
+    transform: translate(0px, 0px) rotate(0deg) scale(1, 1);
+    stroke-width: 5.033;
+  }
+  34%,
+  44% {
+    transform: translate(-24.883px, 0.521px) rotate(180deg)
+      scale(0.2455, 0.2455);
+    stroke-width: 10;
+  }
+  /* الرمشة: انضغاط الوتر وحده يترك العين قرصًا لأن الحدّ ثابت —
+     فيُنحَّف الحدّ معه، ويُوسَّع التقوّس ليعوّض العرض. 10 × 2.4. */
+  45.5% {
+    transform: translate(-24.883px, 0.521px) rotate(180deg) scale(1.5041, 0.018);
+    stroke-width: 2.667;
+  }
+  47%,
+  66% {
+    transform: translate(-24.883px, 0.521px) rotate(180deg)
+      scale(0.2455, 0.2455);
+    stroke-width: 10;
+  }
+  92%,
+  100% {
+    transform: translate(-22.964px, 0px) rotate(360deg) scale(-1, 1);
+    stroke-width: 5.033;
+  }
+}
+
+@keyframes bcn-morph-eye-b {
+  0%,
+  10% {
+    transform: translate(0px, 0px) rotate(0deg) scale(1, 1);
+    stroke-width: 5.033;
+  }
+  36%,
+  44% {
+    transform: translate(3.117px, -21.31px) rotate(-180deg)
+      scale(0.2455, 0.2455);
+    stroke-width: 10;
+  }
+  /* ترمش مع أختها… */
+  45.5% {
+    transform: translate(3.117px, -21.31px) rotate(-180deg) scale(1.5041, 0.018);
+    stroke-width: 2.667;
+  }
+  47%,
+  56% {
+    transform: translate(3.117px, -21.31px) rotate(-180deg)
+      scale(0.2455, 0.2455);
+    stroke-width: 10;
+  }
+  /* …ثم تغمز وحدها، كما في BecanFace حرفيًا */
+  57.5% {
+    transform: translate(3.117px, -21.31px) rotate(-180deg) scale(1.5041, 0.018);
+    stroke-width: 2.667;
+  }
+  59%,
+  66% {
+    transform: translate(3.117px, -21.31px) rotate(-180deg)
+      scale(0.2455, 0.2455);
+    stroke-width: 10;
+  }
+  94%,
+  100% {
+    transform: translate(-22.964px, 0px) rotate(-360deg) scale(-1, 1);
+    stroke-width: 5.033;
+  }
+}
+
+/* القبّعة تُلبَس: تكبر 1.5 وتهبط 15.7 وتميل 4° — فيرتفع طرف
+   الشرّابة وينزل الطرف المقابل، وهي الميلة التي تجعلها ملبوسة لا
+   موضوعة. حافّتها السفلى تستقرّ على بُعد 3.5 فوق العينين.
+
+   ولا تتبادل موضعًا: القبّعة واحدة، فمفتاحها الأخير هو الأوّل.
+   وهي وحدها بلا `non-scaling-stroke`: تحجيمها منتظم، وسماكةُ حدٍّ
+   تكبر معها هي ما يجعلها قبّعةً أكبر لا رسمَ قبّعةٍ بخطّ رفيع. */
+@keyframes bcn-morph-cap {
+  0%,
+  12% {
+    transform: translate(0px, 0px) rotate(0deg) scale(1);
+  }
+  30%,
+  66% {
+    transform: translate(0px, 15.7px) rotate(-4deg) scale(1.5);
+  }
+  84%,
+  100% {
+    transform: translate(0px, 0px) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes bcn-marquee {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes bcn-board-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* دورة السبورة في لمحة اللاندينج — تُكتب ثم تُمسح ثم تُعاد.
+
+   كل سطر بالمدّة نفسها وبتأخير مختلف، فتبقى فروقهما ثابتة مهما
+   تكرّرت الدورة: تُكتب السطور بالتتابع، تثبت معظم الدورة، ثم تُمسح
+   بالتتابع نفسه — كسبورة حقيقية لا كوميض. */
+@keyframes bcn-board-loop {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  4%,
+  86% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  92%,
+  100% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes bcn-caret {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@layer base {
+  :where(
+    a,
+    button,
+    input,
+    select,
+    textarea,
+    summary,
+    [tabindex]
+  ):focus-visible {
+    outline: 2px solid var(--bcn-ring);
+    outline-offset: 2px;
+  }
+
+  body {
+    background: var(--bcn-ground);
+    color: var(--bcn-ink);
+    font-family: var(--bcn-font-sans);
+    line-height: var(--bcn-leading-base);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    /* التأخير يُصفَّر مع المدّة، وإلا بقيت الحركات المتدرّجة تُظهر
+       المحتوى متأخّرًا سطرًا بعد سطر لمن طلب تقليل الحركة. */
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* الشريط المنساب يستقرّ على أوّله لا على آخره: تصفيرُ المدّة
+     يقفز به إلى translateY(-50%)، وهو موضع النسخة الثانية. */
+  .marquee-track {
+    transform: none !important;
+  }
+}

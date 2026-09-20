@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion } from "motion/react";
 import { Dialog } from "radix-ui";
 import {
   ChatIcon,
@@ -20,7 +19,6 @@ import {
   Waveform,
 } from "@/components/becan/icons";
 import { BecanGlyph } from "@/components/becan/becan-face";
-import type { BoardItem, BoardState } from "@/lib/session/teaching-board";
 import type { Checkpoint } from "@/lib/session/session-reducer";
 
 /* أجزاء شاشة الجلسة — تصميم becan-design (الشاشة 7) على محرّك حقيقي.
@@ -462,144 +460,6 @@ export function RotateNotice() {
         >
           تمام
         </button>
-      </div>
-    </div>
-  );
-}
-
-/* ————— السبورة —————
-   ما يكتبه الوكيل بـ board_* يُرسم بكتل التصميم:
-   العنوان رأس · الخطوة مربّع مرقّم · النقطة سطر بعلامة · النصّ مثال.
-   اللوح الفارغ أو المخفيّ يحمل مقدّمة الفصل بدل الفراغ. */
-
-const markClass = "rounded-sm bg-tint-amber px-1.5 font-semibold text-ground";
-
-function BoardLine({
-  item,
-  n,
-  marked,
-  reduce,
-}: {
-  item: BoardItem;
-  n: number;
-  marked: boolean;
-  reduce: boolean;
-}) {
-  const anim = reduce
-    ? {}
-    : {
-        initial: { opacity: 0, y: 7 },
-        animate: { opacity: 1, y: 0 },
-        transition: { duration: 0.25, ease: [0, 0, 0.2, 1] as const },
-      };
-
-  /* لون النصّ يُبنى شرطيًا لا بالتكديس (مزلق 8) */
-  if (item.type === "title") {
-    return (
-      <motion.p {...anim} className="text-xl leading-base font-bold text-ink md:text-2xl">
-        <span dir="auto" className={marked ? markClass : undefined}>
-          {item.text}
-        </span>
-      </motion.p>
-    );
-  }
-
-  if (item.type === "step") {
-    return (
-      <motion.p {...anim} className="flex items-baseline gap-3">
-        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm bg-aubergine-mid text-xs font-bold text-on-dominant">
-          {n}
-        </span>
-        <span dir="auto" className={`min-w-0 ${marked ? markClass : "font-semibold text-ink"}`}>
-          {item.text}
-        </span>
-      </motion.p>
-    );
-  }
-
-  if (item.type === "bullet") {
-    return (
-      <motion.p {...anim} className="flex items-baseline gap-3">
-        <span aria-hidden="true" className="flex h-5 w-5 shrink-0 items-center justify-center">
-          <span className="h-1.5 w-1.5 rounded-pill bg-ink-2" />
-        </span>
-        <span dir="auto" className={`min-w-0 ${marked ? markClass : "text-ink"}`}>
-          {item.text}
-        </span>
-      </motion.p>
-    );
-  }
-
-  return (
-    <motion.p {...anim} dir="auto" className={marked ? `${markClass} self-start` : "text-ink-2"}>
-      {item.text}
-    </motion.p>
-  );
-}
-
-export function Board({
-  board,
-  speaking,
-  intro,
-  reduce,
-}: {
-  board: BoardState;
-  speaking: boolean;
-  intro: React.ReactNode;
-  reduce: boolean;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const count = board.items.length + (board.title ? 1 : 0);
-  const empty = !board.visible || count === 0;
-
-  useEffect(() => {
-    ref.current?.scrollTo({
-      top: ref.current.scrollHeight,
-      behavior: reduce ? "auto" : "smooth",
-    });
-  }, [count, reduce]);
-
-  if (empty) {
-    return (
-      <div className="chalkboard flex flex-1 flex-col justify-center overflow-y-auto rounded-xl border border-chalkboard-edge px-6 pt-8 pb-20 md:px-10">
-        <div className="mx-auto w-full max-w-measure">{intro}</div>
-      </div>
-    );
-  }
-
-  const steps = new Map<string, number>();
-  board.items
-    .filter((it) => it.type === "step")
-    .forEach((it, i) => steps.set(it.id, i + 1));
-
-  return (
-    <div
-      ref={ref}
-      tabIndex={0}
-      role="region"
-      aria-label="السبورة"
-      className="chalkboard flex-1 overflow-y-auto rounded-xl border border-chalkboard-edge px-5 pt-6 pb-20 md:px-8 md:pt-8"
-    >
-      <div aria-live="polite" className="mx-auto flex max-w-measure flex-col gap-4">
-        {board.title ? (
-          <BoardLine
-            key={board.title.id}
-            item={board.title}
-            n={0}
-            marked={board.emphasizedId === board.title.id}
-            reduce={reduce}
-          />
-        ) : null}
-        {board.items.map((item) => (
-          <BoardLine
-            key={item.id}
-            item={item}
-            n={steps.get(item.id) ?? 0}
-            marked={board.emphasizedId === item.id}
-            reduce={reduce}
-          />
-        ))}
-        {speaking ? <Caret /> : null}
       </div>
     </div>
   );

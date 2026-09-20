@@ -379,3 +379,82 @@ export function StarIcon({
     </svg>
   );
 }
+
+/* ————— أيقونات السبورة —————
+   واحدة لكل نوع نداء (callout) وواحدة لحالة التنبيه، فلا يعتمد
+   التمييز على اللون وحده. كلها 24×24 بنفس الحدّ. */
+
+/** «يضيّع درجات» — أعلى بند قيمةً على السبورة */
+export function LosesMarksIcon({ className = "h-5 w-5" }: P) {
+  return (
+    <svg {...base} viewBox="0 0 24 24" className={className}>
+      <path d="M10.3 3.9 2.6 17.2a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
+      <path d="M12 9v4.5" />
+      <path d="M12 17.2h.01" />
+    </svg>
+  );
+}
+
+/** تنبيه — وزن استراتيجيّ في الاختبار، لا خطأ */
+export function WarningIcon({ className = "h-5 w-5" }: P) {
+  return (
+    <svg {...base} viewBox="0 0 24 24" className={className}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7.5V13" />
+      <path d="M12 16.4h.01" />
+    </svg>
+  );
+}
+
+/** غلط شائع */
+export function MistakeIcon({ className = "h-5 w-5" }: P) {
+  return (
+    <svg {...base} viewBox="0 0 24 24" className={className}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m9 9 6 6m0-6-6 6" />
+    </svg>
+  );
+}
+
+/** حيلة للحفظ */
+export function MnemonicIcon({ className = "h-5 w-5" }: P) {
+  return (
+    <svg {...base} viewBox="0 0 24 24" className={className}>
+      <path d="M9 18h6" />
+      <path d="M10 21h4" />
+      <path d="M12 3a6 6 0 0 0-3.6 10.8c.5.4.8 1 .9 1.6l.1.6h5.2l.1-.6c.1-.6.4-1.2.9-1.6A6 6 0 0 0 12 3Z" />
+    </svg>
+  );
+}
+
+/** تعريف */
+export function BookIcon({ className = "h-5 w-5" }: P) {
+  return (
+    <svg {...base} viewBox="0 0 24 24" className={className}>
+      <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v14H6.5A2.5 2.5 0 0 0 4 19.5Z" />
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H19v4H6.5A2.5 2.5 0 0 1 4 19.5Z" />
+    </svg>
+  );
+}
+
+/** مثال محلول — أسطرٌ متمركزة فلا تفترض اتجاه نصّ */
+export function ExampleIcon({ className = "h-5 w-5" }: P) {
+  return (
+    <svg {...base} viewBox="0 0 24 24" className={className}>
+      <path d="M5 5h14M5 10h14M7.5 15h9" />
+      <path d="m8.5 19.5 2.5 2.5 4.5-5" />
+    </svg>
+  );
+}
+
+/** يجي في الاختبار */
+export function ExamIcon({ className = "h-5 w-5" }: P) {
+  return (
+    <svg {...base} viewBox="0 0 24 24" className={className}>
+      <path d="M9 3h6v2.5a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1Z" />
+      <path d="M15 4.2h2.5a2 2 0 0 1 2 2V19a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2V6.2a2 2 0 0 1 2-2H9" />
+      {/* متمركزة فلا تفترض اتجاه نصّ */}
+      <path d="M7.5 12h9M9 16h6" />
+    </svg>
+  );
+}

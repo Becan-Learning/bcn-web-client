@@ -22,8 +22,8 @@ import {
   type Lesson,
 } from "@/lib/session/session-reducer";
 import { CHAT_TOPIC, UI_CONTROL_TOPIC } from "@/lib/session/ui-control";
+import { Board } from "./board/board";
 import {
-  Board,
   ChatPanel,
   EndSessionDialog,
   LanguageChoice,
@@ -425,7 +425,13 @@ function SessionScreen({
 
         {/* السبورة — الثلثان، والشريط يسبح فوقها */}
         <main className="relative flex min-w-0 flex-[2] flex-col">
-          <Board board={state.board} speaking={phase === "live"} intro={intro} reduce={reduce} />
+          <Board
+            board={state.board}
+            speaking={phase === "live"}
+            intro={intro}
+            reduce={reduce}
+            language={language}
+          />
 
           {chat && inRoom ? (
             <ChatPanel

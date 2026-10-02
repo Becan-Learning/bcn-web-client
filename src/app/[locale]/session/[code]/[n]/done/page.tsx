@@ -1,3 +1,4 @@
+import { localize } from "@/i18n/localized";
 import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
 import { setRequestLocale } from "next-intl/server";
@@ -97,7 +98,7 @@ export default async function SummaryPage(
             </Link>
           ) : (
             <p className="inline-flex items-center rounded-lg bg-tint-amber px-4 py-2.5 font-semibold text-ink">
-              باقي {DAYS_LEFT} أيام على اختبار {course.name}
+              باقي {DAYS_LEFT} أيام على اختبار {localize(course.name, locale)}
             </p>
           )}
 
@@ -108,7 +109,7 @@ export default async function SummaryPage(
               : cut
               ? `غطّيت ${COVERED.topics} من ${COVERED.of} موضوع`
               : last
-                ? `خلّصت ${course.name} كاملة`
+                ? `خلّصت ${localize(course.name, locale)} كاملة`
                 : `خلّصت الفصل ${chapter.n}`}
           </h1>
 

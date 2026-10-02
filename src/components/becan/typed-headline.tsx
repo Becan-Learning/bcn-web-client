@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale } from "next-intl";
 import { useEffect } from "react";
 import {
   animate,
@@ -13,8 +14,8 @@ import { HighlightSvg, highlightBox } from "./kit";
 /* العنوان يُكتب كأنه رسالة، ثم تُرسم مسحة الفرشاة تحت الكلمة.
 
    الكشف بالقصّ لا بإظهار الحروف واحدًا واحدًا: الخط العربي متّصل،
-   وإخفاء حرف يكسر وصلته بجاره. القصّ من اليمين لليسار يوافق اتجاه
-   القراءة ويُبقي الوصلات سليمة.
+   وإخفاء حرف يكسر وصلته بجاره. القصّ يبدأ من بداية السطر بحسب
+   لغة الواجهة ويُبقي الوصلات سليمة.
 
    كل شيء مقود بقيمتَي حركة لا بحالة React — فلا إعادة رسم أثناء
    التشغيل ولا تحديث حالة داخل التأثير. */
@@ -41,6 +42,7 @@ export function TypedHeadline({
   className?: string;
   size?: keyof typeof HEADLINE_SIZE;
 }) {
+  const arabic = useLocale() === "ar";
   const reduce = useReducedMotion();
 
   const typing = useMotionValue(0);
@@ -48,7 +50,11 @@ export function TypedHeadline({
 
   /* عند 1 يُرفع القصّ تمامًا، وإلا قصّ المسحة المتجاوزة لحدّ الكلمة */
   const clipPath = useTransform(typing, (p) =>
-    p >= 1 ? "none" : `inset(0 0 0 ${(1 - p) * 100}%)`,
+    p >= 1
+      ? "none"
+      : arabic
+        ? `inset(0 0 0 ${(1 - p) * 100}%)`
+        : `inset(0 ${(1 - p) * 100}% 0 0)`,
   );
   const caretStart = useTransform(typing, (p) => `${p * 100}%`);
   const caretOpacity = useTransform(typing, (p) => (p >= 1 ? 0 : 1));
@@ -83,7 +89,7 @@ export function TypedHeadline({
         <span className="relative isolate inline-block">
           <motion.span
             aria-hidden="true"
-            className={`${highlightBox} origin-right`}
+            className={`${highlightBox} rtl:origin-right ltr:origin-left`}
             style={{ scaleX: drawing, opacity: drawing }}
           >
             <HighlightSvg />

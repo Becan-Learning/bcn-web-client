@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
 import { motion, useReducedMotion, useSpring } from "motion/react";
 
@@ -131,6 +132,7 @@ export function BecanFace({
   className?: string;
   lookAt?: LookPoint;
 }) {
+  const t = useTranslations("Brand");
   const reduce = useReducedMotion();
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -196,7 +198,7 @@ export function BecanFace({
     <motion.svg
       ref={svgRef}
       role="img"
-      aria-label="بيكان"
+      aria-label={t("name")}
       viewBox="0 0 100 58"
       className={className}
       animate={tilt}

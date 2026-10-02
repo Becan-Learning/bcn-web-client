@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
@@ -18,6 +20,7 @@ import { ErrorText, FieldLabel, PrimaryButton, TextField } from "@/components/be
 const NEXT_KEY = "becan:next";
 
 export function JoinForm({ next }: { next: string }) {
+  const t = useTranslations("Join.Form");
   const router = useRouter();
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
@@ -53,12 +56,12 @@ export function JoinForm({ next }: { next: string }) {
     const isPhone = /^0\d{9}$/.test(v.replace(/[\s-]/g, ""));
 
     if (!v) {
-      setError("اكتب بريدك أو رقم جوالك");
+      setError(t("contactRequired"));
       document.getElementById("join-id")?.focus();
       return;
     }
     if (!isEmail && !isPhone) {
-      setError("تأكد من البريد أو من أن الرقم 10 أرقام يبدأ بـ 05");
+      setError(t("contactInvalid"));
       document.getElementById("join-id")?.focus();
       return;
     }
@@ -71,17 +74,16 @@ export function JoinForm({ next }: { next: string }) {
     <div className="mt-6 w-full">
       {/* الأساسي — الكهرماني الوحيد في الشاشة */}
       <PrimaryButton onClick={proceed} className="w-full">
-        متابعة بحساب Google
-      </PrimaryButton>
+        {t("google")}</PrimaryButton>
 
       <div className="my-6 flex items-center gap-4" aria-hidden="true">
         <span className="h-px flex-1 bg-line" />
-        <span className="text-sm font-semibold text-ink-2">أو</span>
+        <span className="text-sm font-semibold text-ink-2">{t("or")}</span>
         <span className="h-px flex-1 bg-line" />
       </div>
 
       <form onSubmit={submit} noValidate>
-        <FieldLabel htmlFor="join-id">البريد أو رقم الجوال</FieldLabel>
+        <FieldLabel htmlFor="join-id">{t("contact")}</FieldLabel>
         <TextField
           id="join-id"
           name="identifier"
@@ -94,7 +96,7 @@ export function JoinForm({ next }: { next: string }) {
             setValue(e.target.value);
             setError("");
           }}
-          placeholder="name@example.com"
+          placeholder={t("emailPlaceholder")}
         />
         {error ? <ErrorText id="join-err">{error}</ErrorText> : null}
 
@@ -102,25 +104,14 @@ export function JoinForm({ next }: { next: string }) {
           type="submit"
           className="mt-4 inline-flex h-14 w-full items-center justify-center rounded-pill border border-aubergine-mid px-8 text-lg font-semibold text-aubergine-base"
         >
-          متابعة
-        </button>
+          {t("continue")}</button>
       </form>
 
       <p className="mt-6 text-sm text-ink-2">
-        بالمتابعة أنت توافق على{" "}
-        <Link
-          href="/terms"
-          className="text-pressable underline underline-offset-4"
-        >
-          الشروط
-        </Link>{" "}
-        و
-        <Link
-          href="/privacy"
-          className="text-pressable underline underline-offset-4"
-        >
-          سياسة الخصوصية
-        </Link>
+        {t.rich("agreement", {
+          terms: (chunks) => <Link href="/terms" className="text-pressable underline underline-offset-4">{chunks}</Link>,
+          privacy: (chunks) => <Link href="/privacy" className="text-pressable underline underline-offset-4">{chunks}</Link>,
+        })}
       </p>
     </div>
   );

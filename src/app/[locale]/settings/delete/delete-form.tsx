@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { ErrorText, FieldLabel, TextField } from "@/components/becan/kit";
@@ -12,19 +14,19 @@ import { ErrorText, FieldLabel, TextField } from "@/components/becan/kit";
    **الزرّ ليس أحمر**: `--error` للخطأ وحده في هذي الهوية، والحذف قرار
    الطالب لا خطؤه. الحارس هو الجملة المكتوبة لا لون الزرّ. */
 
-const PHRASE = "احذف حسابي";
-
 export function DeleteForm({ activeUntil }: { activeUntil: string | null }) {
+  const t = useTranslations("Settings.Delete");
+  const phrase = t("phrase");
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
 
-  const matches = value.trim() === PHRASE;
+  const matches = value.trim() === phrase;
 
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
     if (!matches) {
-      setError(`اكتب «${PHRASE}» بالضبط عشان يتأكّد إنك قاصد`);
+      setError(t("phraseInvalid", { phrase }));
       document.getElementById("del-confirm")?.focus();
       return;
     }
@@ -39,11 +41,10 @@ export function DeleteForm({ activeUntil }: { activeUntil: string | null }) {
         className="rounded-xl bg-tint-amber p-5 md:p-6"
       >
         <h2 className="text-lg font-bold text-ink md:text-xl">
-          استلمنا طلب الحذف
+          {t("receivedTitle")}
         </h2>
         <p className="mt-2 max-w-measure leading-base text-ink-2">
-          حسابك أُقفل الحين، وبياناتك تُحذف خلال 30 يومًا. أرسلنا لك تأكيدًا على
-          بريدك، وفيه رابط تلغي فيه الطلب خلال 7 أيام لو غيّرت رأيك.
+          {t("receivedBody")}
         </p>
 
         <p className="mt-4">
@@ -51,7 +52,7 @@ export function DeleteForm({ activeUntil }: { activeUntil: string | null }) {
             href="/"
             className="font-semibold text-pressable underline underline-offset-4"
           >
-            ارجع للصفحة الرئيسية
+            {t("home")}
           </Link>
         </p>
       </div>
@@ -66,24 +67,16 @@ export function DeleteForm({ activeUntil }: { activeUntil: string | null }) {
     >
       {activeUntil ? (
         <p className="mb-5 max-w-measure leading-base text-ink-2">
-          عندك اشتراك مدفوع شغّال حتى{" "}
-          <span className="font-semibold text-ink">{activeUntil}</span>. الحذف
-          يوقفه من الحين، وما نرجّع قيمة المدة المتبقية —{" "}
-          <Link
-            href="/settings/subscription"
-            className="font-semibold text-pressable underline underline-offset-4"
-          >
-            الإلغاء بدون حذف
-          </Link>{" "}
-          يخلّيك تستفيد منها لآخرها.
+          {t.rich("activeSubscription", { date: activeUntil, strong: (chunks) => <span className="font-semibold text-ink">{chunks}</span>, cancel: (chunks) => <Link href="/settings/subscription" className="font-semibold text-pressable underline underline-offset-4">{chunks}</Link> })}
         </p>
       ) : null}
 
-      <FieldLabel htmlFor="del-confirm" hint={`اكتبها بالضبط: ${PHRASE}`}>
-        اكتب الجملة عشان نتأكّد
+      <FieldLabel htmlFor="del-confirm" hint={t("phraseHint", { phrase })}>
+        {t("confirmLabel")}
       </FieldLabel>
       <TextField
         id="del-confirm"
+        dir="auto"
         name="confirm"
         autoComplete="off"
         value={value}
@@ -101,14 +94,14 @@ export function DeleteForm({ activeUntil }: { activeUntil: string | null }) {
           type="submit"
           className="inline-flex h-14 items-center justify-center rounded-pill border border-ink px-8 text-lg font-semibold text-ink"
         >
-          احذف حسابي نهائيًا
+          {t("delete")}
         </button>
 
         <Link
           href="/settings/data"
           className="inline-flex min-h-11 items-center px-2 font-semibold text-ink"
         >
-          تراجع
+          {t("cancel")}
         </Link>
       </div>
     </form>

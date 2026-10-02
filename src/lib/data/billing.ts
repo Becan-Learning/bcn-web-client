@@ -1,3 +1,4 @@
+import type { Localized } from "@/i18n/localized";
 import { breakdown, planById, PLANS, type Plan } from "./plans";
 
 /* بيانات الفوترة — الاشتراك والفواتير ووسائل الدفع.
@@ -18,22 +19,22 @@ export type MethodId = "mada" | "applepay" | "card";
 
 export type Method = {
   id: MethodId;
-  label: string;
+  label: Localized;
   /** يُكتب بعد الاسم — ما يحتاجه الطالب ليقرّر، لا وصف تسويقي */
-  note: string;
+  note: Localized;
   /** الاسم اللاتيني يُلَفّ بـ dir="ltr" في الواجهة */
-  latin?: string;
+  latin?: Localized;
 };
 
 export const METHODS: Method[] = [
-  { id: "mada", label: "مدى", note: "بطاقة بنكك المحلية" },
+  { id: "mada", label: { ar: "مدى", en: "mada" }, note: { ar: "بطاقة بنكك المحلية", en: "Your local bank card" } },
   {
     id: "applepay",
-    label: "Apple Pay",
-    latin: "Apple Pay",
-    note: "من جوالك بلا كتابة أرقام",
+    label: { ar: "Apple Pay", en: "Apple Pay" },
+    latin: { ar: "Apple Pay", en: "Apple Pay" },
+    note: { ar: "من جوالك بلا كتابة أرقام", en: "Pay from your phone without entering numbers" },
   },
-  { id: "card", label: "بطاقة ائتمانية", note: "فيزا أو ماستركارد" },
+  { id: "card", label: { ar: "بطاقة ائتمانية", en: "Credit card" }, note: { ar: "فيزا أو ماستركارد", en: "Visa or Mastercard" } },
 ];
 
 /* ————— الاشتراك الحالي —————
@@ -44,7 +45,7 @@ export const METHODS: Method[] = [
 export type Subscription = {
   planId: Plan["id"];
   /** تاريخ التجديد القادم، أو تاريخ الانتهاء بعد الإلغاء */
-  renewsOn: string;
+  renewsOn: Localized;
   /** الدقائق المستهلكة من حصّة الشهر */
   used: number;
   /** ألغى الطالب التجديد — يبقى مفعّلًا حتى `renewsOn` */
@@ -56,7 +57,7 @@ export type Subscription = {
 
 export const SUBSCRIPTION: Subscription = {
   planId: "pro",
-  renewsOn: "14 يناير 2027",
+  renewsOn: { ar: "14 يناير 2027", en: "14 January 2027" },
   used: 312,
   canceled: false,
   method: "mada",
@@ -79,15 +80,15 @@ export function whatYouLose(planId: Plan["id"]) {
 
 export type Invoice = {
   id: string;
-  date: string;
+  date: Localized;
   planId: Plan["id"];
   gross: number;
 };
 
 export const INVOICES: Invoice[] = [
-  { id: "BCN-2026-0412", date: "14 ديسمبر 2026", planId: "pro", gross: 149 },
-  { id: "BCN-2026-0311", date: "14 نوفمبر 2026", planId: "pro", gross: 149 },
-  { id: "BCN-2026-0208", date: "14 أكتوبر 2026", planId: "lite", gross: 90 },
+  { id: "BCN-2026-0412", date: { ar: "14 ديسمبر 2026", en: "14 December 2026" }, planId: "pro", gross: 149 },
+  { id: "BCN-2026-0311", date: { ar: "14 نوفمبر 2026", en: "14 November 2026" }, planId: "pro", gross: 149 },
+  { id: "BCN-2026-0208", date: { ar: "14 أكتوبر 2026", en: "14 October 2026" }, planId: "lite", gross: 90 },
 ];
 
 /** سطر فاتورة جاهز للعرض — الصافي والضريبة مفصولان. */

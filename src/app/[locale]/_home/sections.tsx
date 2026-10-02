@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import {
   ArrowForward,
@@ -40,36 +41,6 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
    السطح بل من الختم الباهت الذي كان خلفها — حُذف، والقرص الفاتح
    يحمل الأيقونة فوقها لا تحتها. */
 
-const POINTS = [
-  {
-    claim: "يفهمك",
-    why: "بدون ما يكثر كلام",
-    Icon: SmileChatIcon,
-    fill: "bg-aubergine-base",
-    edge: "border-aubergine-mid",
-    mark: "bg-aubergine-tint text-aubergine-base",
-    body: "text-aubergine-tint",
-  },
-  {
-    claim: "ما يخرف",
-    why: "لأنه مدرَّب على مقررك",
-    Icon: BadgeCheckIcon,
-    fill: "bg-aubergine-deep",
-    edge: "border-aubergine-mid",
-    mark: "bg-tint-walnut text-warmth",
-    body: "text-aubergine-tint",
-  },
-  {
-    claim: "سهل جدًا",
-    why: "بضغطة زر تبدأ مذاكرة",
-    Icon: SparkIcon,
-    fill: "bg-olive-dark",
-    edge: "border-olive",
-    mark: "bg-olive-tint text-olive-deep",
-    body: "text-olive-soft",
-  },
-];
-
 /* البطاقة تستجيب للمؤشّر: ترتفع بظلّ ويكبر قرص أيقونتها. حركة
    واحدة مقودة بفعل المستخدم لا دورة تعمل من نفسها.
 
@@ -87,7 +58,37 @@ const POINTS = [
    والمقاسات تصغر على الجوال: القرص 48px بدل 64، والكلمة 24px بدل 48 —
    وإلا خرجت البطاقة عن نصف عرض 390px. */
 
-export function ThreePoints({ cta }: { cta: string }) {
+export async function ThreePoints({ cta }: { cta: string }) {
+  const t = await getTranslations("Landing.Sections");
+  const POINTS = [
+    {
+      claim: t("understandClaim"),
+      why: t("understandWhy"),
+      Icon: SmileChatIcon,
+      fill: "bg-aubergine-base",
+      edge: "border-aubergine-mid",
+      mark: "bg-aubergine-tint text-aubergine-base",
+      body: "text-aubergine-tint",
+    },
+    {
+      claim: t("groundedClaim"),
+      why: t("groundedWhy"),
+      Icon: BadgeCheckIcon,
+      fill: "bg-aubergine-deep",
+      edge: "border-aubergine-mid",
+      mark: "bg-tint-walnut text-warmth",
+      body: "text-aubergine-tint",
+    },
+    {
+      claim: t("easyClaim"),
+      why: t("easyWhy"),
+      Icon: SparkIcon,
+      fill: "bg-olive-dark",
+      edge: "border-olive",
+      mark: "bg-olive-tint text-olive-deep",
+      body: "text-olive-soft",
+    },
+  ];
   return (
     <Section className="pt-4 pb-16 md:pb-20">
       <ul className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
@@ -131,8 +132,7 @@ export function ThreePoints({ cta }: { cta: string }) {
               {cta}
             </span>
             <span className="mt-2 leading-base md:mt-3 md:text-lg">
-              بلا بطاقة ولا اشتراك
-            </span>
+              {t("freeNote")}</span>
           </Link>
         </li>
       </ul>
@@ -158,7 +158,8 @@ export function ThreePoints({ cta }: { cta: string }) {
    و`prefers-reduced-motion` يثبّتها على أوّل مفتاح: الاثنتان
    ظاهرتان، فلا يضيع شيء. */
 
-export function TwoWayVoice() {
+export async function TwoWayVoice() {
+  const t = await getTranslations("Landing.Sections");
   return (
     <Section className="pb-16 md:pb-24">
       <div className="flex flex-col items-center justify-center gap-6 md:flex-row md:gap-12 xl:gap-16">
@@ -169,23 +170,27 @@ export function TwoWayVoice() {
             يجمعهما فيضيع تقابلهما. `block` على كل نصف يفرض القسمة
             في كل عرض بدل تركها لالتفاف النصّ. */}
         <p className="text-center font-display text-3xl leading-tight font-bold text-ink md:text-start md:text-4xl xl:text-5xl">
-          <span className="flex items-center justify-center gap-3 md:justify-start">
-            {/* الميكروفون لا ينعكس مع الاتجاه */}
-            <MicIcon
-              aria-hidden="true"
-              className="animate-voice-hear h-[0.9em] w-[0.9em] shrink-0 text-aubergine-mid"
-            />
-            يسمع منك
-          </span>{" "}
-          {/* المسافة صريحة: العنصران متجاوران، وبلاها يقرأ القارئ
-              الصوتي «منكويتكلم» كلمةً واحدة. */}
-          <span className="mt-2 flex items-center justify-center gap-3 md:justify-start">
-            ويتكلم معك
-            <Waveform
-              className="animate-voice-talk h-[0.62em] shrink-0 text-live"
-              bars={9}
-            />
-          </span>
+          {t.rich("voice", {
+            hears: (chunks) => (
+              <span className="flex items-center justify-center gap-3 md:justify-start">
+                {/* الميكروفون لا ينعكس مع الاتجاه */}
+                <MicIcon
+                  aria-hidden="true"
+                  className="animate-voice-hear h-[0.9em] w-[0.9em] shrink-0 text-aubergine-mid"
+                />
+                {chunks}
+              </span>
+            ),
+            speaks: (chunks) => (
+              <span className="mt-2 flex items-center justify-center gap-3 md:justify-start">
+                {chunks}
+                <Waveform
+                  className="animate-voice-talk h-[0.62em] shrink-0 text-live"
+                  bars={9}
+                />
+              </span>
+            ),
+          })}
         </p>
       </div>
     </Section>
@@ -196,25 +201,25 @@ export function TwoWayVoice() {
    الترقيم مستحقّ هنا لا زخرفة: التسلسل نفسه هو المعلومة — لا تبدأ
    الشرح قبل اختيار الفصل. وسطر تحت كل خطوة يقول ماذا يحدث فيها. */
 
-const STEPS = [
-  {
-    step: "اختر مقررك",
-    detail: "برمزه أو باسمه — تلقاه جاهزًا بفصوله",
-    Icon: SearchIcon,
-  },
-  {
-    step: "اختر الفصل",
-    detail: "ترى مواضيعه ومدّته قبل ما تبدأ",
-    Icon: LayersIcon,
-  },
-  {
-    step: "ابدأ الشرح",
-    detail: "يشرح على السبورة ويسألك ليتأكّد إنك فهمت",
-    Icon: PlayIcon,
-  },
-];
-
-export function HowItWorks({ cta }: { cta: string }) {
+export async function HowItWorks({ cta }: { cta: string }) {
+  const t = await getTranslations("Landing.Sections");
+  const STEPS = [
+    {
+      step: t("chooseCourse"),
+      detail: t("chooseCourseDetail"),
+      Icon: SearchIcon,
+    },
+    {
+      step: t("chooseChapter"),
+      detail: t("chooseChapterDetail"),
+      Icon: LayersIcon,
+    },
+    {
+      step: t("start"),
+      detail: t("startDetail"),
+      Icon: PlayIcon,
+    },
+  ];
   return (
     <section id="how" className="relative overflow-hidden bg-aubergine-deep">
       {/* رسم خلفي — شبكة نقاط باهتة تعطي القسم عمقًا بلا أن تزاحم
@@ -226,8 +231,7 @@ export function HowItWorks({ cta }: { cta: string }) {
 
       <div className="relative mx-auto w-full max-w-page px-4 py-16 md:px-8 md:py-20 xl:px-10">
         <h2 className="font-display text-3xl leading-tight font-bold text-on-dominant md:text-4xl xl:text-5xl">
-          كيف يعمل
-        </h2>
+          {t("howTitle")}</h2>
 
         <ol className="mt-10 grid gap-8 md:grid-cols-3 md:gap-6">
           {STEPS.map(({ step, detail, Icon }, i) => (
@@ -247,7 +251,7 @@ export function HowItWorks({ cta }: { cta: string }) {
 
               <div className="md:mt-5">
                 <p className="text-sm font-semibold text-aubergine-soft">
-                  الخطوة {i + 1}
+                  {t("stepNumber", { step: String(i + 1) })}
                 </p>
                 <h3 className="mt-1 text-xl font-bold text-on-dominant">
                   {step}
@@ -310,42 +314,16 @@ export function HowItWorks({ cta }: { cta: string }) {
 
 const RATING = 4.12;
 
-const VOICES = [
-  {
-    quote:
-      "ساعدني في الوقت الضيق، وركّز على المهم، وفعلًا جاء في الاختبار النهائي.",
-    stats: [
-      { value: "28", label: "جلسة" },
-      { value: "216", label: "دقيقة مذاكرة" },
-      { value: "5.0", label: "تقييمه من 5" },
-    ],
-    fill: "bg-tint-amber",
-  },
-  {
-    quote: "بذاكر منه مرة ثانية لاختبار الإعادة.",
-    stats: [
-      { value: "82", label: "دقيقة" },
-      { value: "21", label: "دقيقة متوسط الجلسة" },
-    ],
-    fill: "bg-tint-aubergine",
-  },
-  {
-    quote: "الشرح واضح وسلس وساعدني أفهم كثير.",
-    /* بلا بيانات سلوك: من استبيان مجهول، فمصدره هو دليله */
-    note: "من استبيان الاختبار الميداني",
-    fill: "bg-tint-walnut",
-  },
-];
-
 /** خمس نجوم، والتعبئة بالنسبة لا بالتقريب.
     والبطاقات بلا نجوم كما يشترط الملفّ: نجمةٌ فوق شهادةٍ تزاحم رقمها. */
-function Stars({ value }: { value: number }) {
+async function Stars({ value }: { value: number }) {
+  const t = await getTranslations("Landing.Sections");
   const pct = (value / 5) * 100;
   return (
     <span
       className="relative inline-flex"
       role="img"
-      aria-label={`${value} من 5`}
+      aria-label={t("ratingLabel", { rating: String(value) })}
     >
       <span aria-hidden="true" className="inline-flex gap-1 text-line">
         {Array.from({ length: 5 }).map((_, i) => (
@@ -369,7 +347,7 @@ function Stars({ value }: { value: number }) {
   );
 }
 
-function VoiceCard({ voice }: { voice: (typeof VOICES)[number] }) {
+function VoiceCard({ voice }: { voice: { quote: string; fill: string; stats?: { value: string; label: string }[]; note?: string } }) {
   return (
     <li className={`mb-4 rounded-xl p-6 ${voice.fill}`}>
       {/* بلا علامة تنصيص زخرفية — الحاصرتان جزء من النصّ */}
@@ -400,12 +378,39 @@ function VoiceCard({ voice }: { voice: (typeof VOICES)[number] }) {
 /** التلاشي عند الحافّتين — قناعٌ على البكسل لا طبقةٌ فوق البطاقات. */
 const FADE = {
   maskImage:
-    "linear-gradient(to bottom, transparent, #000 9%, #000 91%, transparent)",
+    "linear-gradient(to bottom, transparent, var(--ink) 9%, var(--ink) 91%, transparent)",
   WebkitMaskImage:
-    "linear-gradient(to bottom, transparent, #000 9%, #000 91%, transparent)",
+    "linear-gradient(to bottom, transparent, var(--ink) 9%, var(--ink) 91%, transparent)",
 } as const;
 
-export function Proof() {
+export async function Proof() {
+  const t = await getTranslations("Landing.Sections");
+  const VOICES = [
+    {
+      quote:
+        t("quoteOne"),
+      stats: [
+        { value: "28", label: t("sessions", { count: 28 }) },
+        { value: "216", label: t("studyMinutes", { count: 216 }) },
+        { value: "5.0", label: t("studentRating") },
+      ],
+      fill: "bg-tint-amber",
+    },
+    {
+      quote: t("quoteTwo"),
+      stats: [
+        { value: "82", label: t("minutes", { count: 82 }) },
+        { value: "21", label: t("sessionAverage", { count: 21 }) },
+      ],
+      fill: "bg-tint-aubergine",
+    },
+    {
+      quote: t("quoteThree"),
+      /* بلا بيانات سلوك: من استبيان مجهول، فمصدره هو دليله */
+      note: t("surveySource"),
+      fill: "bg-tint-walnut",
+    },
+  ];
   return (
     <Section className="py-16 md:py-20">
       <div className="grid items-center gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] md:gap-12 xl:gap-16">
@@ -416,24 +421,20 @@ export function Proof() {
               92%
             </span>
             <span className="mt-5 block max-w-measure text-2xl leading-snug md:text-3xl xl:text-4xl">
-              من الطلاب قالوا إن بيكان صار مصدرهم الأساسي للمذاكرة{" "}
-              <span aria-hidden="true" className="text-[0.8em]">
-                🫡
-              </span>
+              {t("proofTitle")}{" "}
+              <span aria-hidden="true" className="text-[0.8em]">🫡</span>
             </span>
           </h2>
 
           <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2">
             <Stars value={RATING} />
             <p className="text-ink-2">
-              <span className="font-semibold text-ink">{RATING}</span> من 5 ·
-              تقييم الجلسات
+              {t.rich("rating", { rating: String(RATING), strong: (chunks) => <span className="font-semibold text-ink">{chunks}</span> })}
             </p>
           </div>
 
           <p className="mt-6 max-w-measure text-sm text-ink-2">
-            الأرقام من الاختبار الميداني — جلسات فعلية لا تسجيلات اهتمام.
-          </p>
+            {t("proofNote")}</p>
         </div>
 
         {/* ————— الشهادات تنساب ————— */}
@@ -486,14 +487,14 @@ export function Proof() {
    **عدد الفصول محذوف من البطاقة** بطلب صريح، وباقٍ في جدول `/plans`.
    والدقائق وترجمتها إلى ساعات باقيتان — البريف يشترط الترجمة. */
 
-export function Pricing() {
+export async function Pricing() {
+  const t = await getTranslations("Landing.Sections");
   return (
     <Section id="pricing" className="py-16 md:py-20">
-      <SectionTitle>اشترك الآن</SectionTitle>
+      <SectionTitle>{t("pricingTitle")}</SectionTitle>
 
       <p className="mt-4 max-w-measure text-lg leading-base text-ink-2">
-        تاخذ فايدة المدرّس الخصوصي —{" "}
-        <span className="font-semibold text-ink">بسعر حصة واحدة منه</span>.
+        {t.rich("pricingBody", { strong: (chunks) => <span className="font-semibold text-ink">{chunks}</span> })}
       </p>
 
       {/* `pt` يترك مجالًا لارتفاع البطاقة المميّزة فلا تُقصّ */}
@@ -506,13 +507,7 @@ export function Pricing() {
       </ul>
 
       <p className="mt-8 text-sm text-ink-2">
-        الأسعار شهرية وشاملة ضريبة القيمة المضافة ·{" "}
-        <Link
-          href="/refunds"
-          className="font-semibold text-pressable underline underline-offset-4"
-        >
-          تلغي في أي وقت
-        </Link>
+        {t.rich("pricingNote", { refunds: (chunks) => <Link href="/refunds" className="font-semibold text-pressable underline underline-offset-4">{chunks}</Link> })}
       </p>
     </Section>
   );
@@ -532,31 +527,22 @@ export function Pricing() {
    وموضعه **قبل شريط الالتقاط مباشرة**: الاعتراض يُرفع من الطريق في
    اللحظة التي تسبق الطلب، لا بعده. */
 
-const LANDING_FAQ = [
-  "وش الفرق بينك وبين ChatGPT؟",
-  "مقرري مو موجود، وش أسوي؟",
-  "بيكان يغنيني عن المحاضرة؟",
-  "وش يصير لو خلصت دقائقي؟",
-  "كيف ألغي الاشتراك؟",
-].map((q) => {
-  const found = FAQ.flatMap((g) => g.questions).find((item) => item.q === q);
-  if (!found) throw new Error(`سؤال غير موجود في faq-data: ${q}`);
-  return found;
-});
+const LANDING_FAQ = [FAQ[0].questions[0], FAQ[1].questions[0], FAQ[0].questions[1], FAQ[3].questions[1], FAQ[3].questions[0]];
 
-export function LandingFaq() {
+export async function LandingFaq() {
+  const t = await getTranslations("Landing.Sections");
   return (
     <Section className="pb-16 md:pb-20">
-      <SectionTitle>أسئلة قبل ما تبدأ</SectionTitle>
+      <SectionTitle>{t("faqTitle")}</SectionTitle>
 
       <div className="mt-8 max-w-measure overflow-hidden rounded-xl border border-line bg-surface">
         {LANDING_FAQ.map((item) => (
-          <FaqItem key={item.q} item={item} />
+          <FaqItem key={item.q.ar} item={item} />
         ))}
       </div>
 
       <div className="mt-6">
-        <QuietLink href="/faq">شوف كل الأسئلة</QuietLink>
+        <QuietLink href="/faq">{t("faqLink")}</QuietLink>
       </div>
     </Section>
   );

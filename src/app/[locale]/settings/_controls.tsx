@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CheckIcon } from "@/components/becan/icons";
 
@@ -34,6 +36,7 @@ export function useSaveNotice() {
 
 /** الإشعار الخفيف — يظهر بلا أن يزيح ما تحته. */
 export function SaveNotice({ saved }: { saved: boolean }) {
+  const t = useTranslations("Settings");
   return (
     <p
       role="status"
@@ -43,8 +46,7 @@ export function SaveNotice({ saved }: { saved: boolean }) {
       {saved ? (
         <>
           <CheckIcon className="h-4 w-4" />
-          انحفظ
-        </>
+          {t("saved")}</>
       ) : null}
     </p>
   );
@@ -86,9 +88,8 @@ export function Toggle({
       >
         <span
           className={`h-5 w-5 rounded-pill bg-surface transition-transform duration-200 ${
-            /* -translate-x يتحرّك يسارًا دائمًا، والمفتاح في RTL يبدأ
-               من اليمين — فالتشغيل إزاحة إلى اليسار. */
-            checked ? "-translate-x-5" : "translate-x-0"
+            /* التشغيل ينقل القرص إلى نهاية السطر في لغة الواجهة. */
+            checked ? "rtl:-translate-x-5 ltr:translate-x-5" : "translate-x-0"
           }`}
         />
       </span>

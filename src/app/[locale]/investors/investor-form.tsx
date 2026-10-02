@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useState } from "react";
 import { ErrorText, FieldLabel, PrimaryButton, TextField } from "@/components/becan/kit";
 
@@ -11,6 +13,7 @@ import { ErrorText, FieldLabel, PrimaryButton, TextField } from "@/components/be
 type Errors = Partial<Record<"name" | "org" | "email", string>>;
 
 export function InvestorForm() {
+  const t = useTranslations("Investors.Form");
   const [name, setName] = useState("");
   const [org, setOrg] = useState("");
   const [email, setEmail] = useState("");
@@ -21,10 +24,10 @@ export function InvestorForm() {
     event.preventDefault();
     const e: Errors = {};
 
-    if (!name.trim()) e.name = "اكتب اسمك";
-    if (!org.trim()) e.org = "اكتب اسم الجهة أو الصندوق";
+    if (!name.trim()) e.name = t("nameRequired");
+    if (!org.trim()) e.org = t("orgRequired");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      e.email = "تأكد من صيغة البريد";
+      e.email = t("emailInvalid");
     }
 
     setErrors(e);
@@ -44,10 +47,9 @@ export function InvestorForm() {
         aria-live="polite"
         className="rounded-xl bg-tint-aubergine p-5 md:p-6"
       >
-        <h3 className="text-lg font-bold text-ink md:text-xl">وصلنا طلبك</h3>
+        <h3 className="text-lg font-bold text-ink md:text-xl">{t("sentTitle")}</h3>
         <p className="mt-2 max-w-measure leading-base text-ink-2">
-          نرسل الـ<span dir="ltr">Deck</span> على بريدك خلال يوم عمل واحد، ومعه
-          موعد مقترح لمكالمة قصيرة إن رغبت.
+          {t.rich("sentBody", { latin: (chunks) => <span dir="ltr">{chunks}</span> })}
         </p>
       </div>
     );
@@ -57,9 +59,10 @@ export function InvestorForm() {
     <form onSubmit={submit} noValidate>
       <div className="flex flex-col gap-4">
         <div>
-          <FieldLabel htmlFor="inv-name">الاسم</FieldLabel>
+          <FieldLabel htmlFor="inv-name">{t("name")}</FieldLabel>
           <TextField
             id="inv-name"
+            dir="auto"
             name="name"
             autoComplete="name"
             value={name}
@@ -76,9 +79,10 @@ export function InvestorForm() {
         </div>
 
         <div>
-          <FieldLabel htmlFor="inv-org">الجهة</FieldLabel>
+          <FieldLabel htmlFor="inv-org">{t("organization")}</FieldLabel>
           <TextField
             id="inv-org"
+            dir="auto"
             name="organization"
             autoComplete="organization"
             value={org}
@@ -95,14 +99,14 @@ export function InvestorForm() {
         </div>
 
         <div>
-          <FieldLabel htmlFor="inv-email">البريد</FieldLabel>
+          <FieldLabel htmlFor="inv-email">{t("email")}</FieldLabel>
           <TextField
             id="inv-email"
             name="email"
             type="email"
             dir="ltr"
             autoComplete="email"
-            placeholder="name@fund.com"
+            placeholder={t("emailPlaceholder")}
             value={email}
             invalid={!!errors.email}
             aria-describedby={errors.email ? "inv-err-email" : undefined}
@@ -119,7 +123,7 @@ export function InvestorForm() {
 
       {/* الفعل الوحيد في الصفحة */}
       <PrimaryButton type="submit" className="mt-6 w-full sm:w-fit">
-        اطلب الـ<span dir="ltr">Deck</span>
+        {t.rich("submit", { latin: (chunks) => <span dir="ltr">{chunks}</span> })}
       </PrimaryButton>
     </form>
   );

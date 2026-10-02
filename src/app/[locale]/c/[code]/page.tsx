@@ -1,6 +1,7 @@
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { hasLocale } from "next-intl";
+import { localize } from "@/i18n/localized";
 import { routing } from "@/i18n/routing";
-import { setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CourseView, type ViewState } from "./course-view";
@@ -20,12 +21,14 @@ export function generateStaticParams() {
 export async function generateMetadata(
   props: PageProps<"/[locale]/c/[code]">,
 ): Promise<Metadata> {
-  const { code } = await props.params;
+  const { code, locale } = await props.params;
+  if (!hasLocale(routing.locales, locale)) notFound();
+  const t = await getTranslations({ locale, namespace: "Course" });
   const course = courseBySlug(code);
-  if (!course) return { title: "المقرر غير موجود — بيكان" };
+  if (!course) return { title: t("notFoundTitle") };
   return {
-    title: `${course.name} — بيكان`,
-    description: `${course.university} · ${readyCount(course.code)} فصول جاهزة.`,
+    title: t("metadataTitle", { course: localize(course.name, locale) }),
+    description: t("metadataDescription", { university: localize(course.university, locale), count: readyCount(course.code), countLabel: String(readyCount(course.code)) }),
   };
 }
 
@@ -47,7 +50,9 @@ export default async function CoursePage(props: PageProps<"/[locale]/c/[code]">)
      لأن لغة ar تعطي أرقامًا هندية في بعض البيئات. */
   const exam = new Date();
   exam.setDate(exam.getDate() + 21);
-  const examDate = new Intl.DateTimeFormat("ar-u-nu-latn-ca-gregory", {
+  const examDate = new Intl.DateTimeFormat(locale === "ar" ? "ar-u-nu-latn-ca-gregory" : "en", {
+    numberingSystem: "latn",
+    calendar: "gregory",
     day: "numeric",
     month: "long",
   }).format(exam);

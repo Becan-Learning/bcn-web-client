@@ -1,22 +1,28 @@
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import { BecanFace } from "@/components/becan/becan-face";
 import { TypedHeadline } from "@/components/becan/typed-headline";
 import { JoinForm } from "./join-form";
 import { PageShell, SiteHeader } from "@/components/becan/kit";
 
-export const metadata: Metadata = {
-  title: "سجّل دخولك — بيكان",
-  description: "ادخل وارجع إلى نفس الفصل الذي كنت فيه.",
-};
+export async function generateMetadata({ params }: PageProps<"/[locale]/join">): Promise<Metadata> {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) notFound();
+  const t = await getTranslations({ locale, namespace: "Join" });
+  return { title: t("metadataTitle"), description: t("metadataDescription") };
+}
 
 export default async function JoinPage(props: PageProps<"/[locale]/join">) {
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  const t = await getTranslations("Join");
+  const [headlinePrefix, headlineWord, headlineSuffix] = t.markup("title", {
+    word: (chunks) => `\0${chunks}\0`,
+  }).split("\0");
 
   const sp = await props.searchParams;
   const one = (v: string | string[] | undefined) =>
@@ -28,7 +34,7 @@ export default async function JoinPage(props: PageProps<"/[locale]/join">) {
 
   /* سطر السياق إلزامي في البريف — يبقى ظاهرًا حتى بلا معاملات،
      فلو دخل الطالب مباشرة عرف ماذا يفتح له التسجيل. */
-  const unlocks = [course, chapter && `الفصل ${chapter}`]
+  const unlocks = [course, chapter && t("chapter", { chapter })]
     .filter(Boolean)
     .join(" · ");
 
@@ -48,8 +54,8 @@ export default async function JoinPage(props: PageProps<"/[locale]/join">) {
                 فالالتفاف يقطعهما بلا داعٍ. */}
             <TypedHeadline
               size="card"
-              prefix="سجّل"
-              word="دخولك"
+              prefix={headlinePrefix.trimEnd()}
+              word={headlineWord} suffix={headlineSuffix}
               className="mt-0 whitespace-nowrap"
             />
           </div>
@@ -57,13 +63,11 @@ export default async function JoinPage(props: PageProps<"/[locale]/join">) {
           <p className="mt-5 rounded-xl border border-aubergine-mid bg-tint-aubergine px-4 py-3 text-ink">
             {unlocks ? (
               <>
-                <span className="font-semibold">تسجيلك يفتح: </span>
-                {unlocks}
+                <span className="font-semibold">{t.rich("unlocks", { unlocks, context: (chunks) => <span dir="auto">{chunks}</span> })}</span>
               </>
             ) : (
               <span className="font-semibold">
-                تسجيلك يفتح مقررك من حيث وقفت
-              </span>
+                {t("unlocksDefault")}</span>
             )}
           </p>
 

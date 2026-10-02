@@ -1,15 +1,19 @@
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { hasLocale } from "next-intl";
+import { localize } from "@/i18n/localized";
 import { routing } from "@/i18n/routing";
-import { setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PageShell, Section, SiteHeader } from "@/components/becan/kit";
 import { planById } from "@/lib/data/plans";
 import { CheckoutForm } from "./checkout-form";
 
-export const metadata: Metadata = {
-  title: "الدفع — بيكان",
-};
+export async function generateMetadata({ params }: PageProps<"/[locale]/checkout">): Promise<Metadata> {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) notFound();
+  const t = await getTranslations({ locale, namespace: "Checkout" });
+  return { title: t("metadataTitle") };
+}
 
 /* P2 — الدفع.
 
@@ -23,6 +27,7 @@ export default async function CheckoutPage(props: PageProps<"/[locale]/checkout"
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  const t = await getTranslations("Checkout");
 
   const sp = await props.searchParams;
   const raw = Array.isArray(sp.plan) ? sp.plan[0] : sp.plan;
@@ -39,10 +44,10 @@ export default async function CheckoutPage(props: PageProps<"/[locale]/checkout"
       <Section className="pt-10 pb-16 md:pt-14">
         <div className="mx-auto w-full max-w-[34rem]">
           <h1 className="font-display text-4xl leading-tight font-bold text-ink md:text-5xl">
-            الدفع
+            {t("title")}
           </h1>
           <p className="mt-3 leading-base text-ink-2">
-            خطة {plan.name} — {plan.minutes} دقيقة شهريًا، {plan.courses}.
+            {t("planSummary", { plan: localize(plan.name, locale), minutes: plan.minutes, minutesLabel: String(plan.minutes), courses: localize(plan.courses, locale) })}
           </p>
 
           <CheckoutForm planId={plan.id} />

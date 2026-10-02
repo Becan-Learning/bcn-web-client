@@ -8,9 +8,9 @@ export const DEFAULT_EXPERIENCE: ExperienceMode = "relaxed";
 const CHANGE_EVENT = "becan:experience-change";
 
 export const EXPERIENCE_OPTIONS = [
-  { id: "quick", label: "مستعجل" },
-  { id: "relaxed", label: "عندي وقت" },
-] as const satisfies readonly { id: ExperienceMode; label: string }[];
+  { id: "quick" },
+  { id: "relaxed" },
+] as const satisfies readonly { id: ExperienceMode }[];
 
 export function getExperience(): ExperienceMode {
   try {

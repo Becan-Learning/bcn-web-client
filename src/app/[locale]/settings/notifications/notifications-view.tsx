@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useState } from "react";
 import { SaveNotice, Toggle, useSaveNotice } from "../_controls";
 import { SettingsCard } from "../_shell";
@@ -25,34 +27,34 @@ type Kind = {
   channels: ChannelId[];
 };
 
-const CHANNEL_LABEL: Record<ChannelId, string> = {
-  whatsapp: "واتساب",
-  email: "بريد",
-  inapp: "داخل التطبيق",
-};
+const CHANNEL_LABEL = {
+  whatsapp: "whatsapp",
+  email: "email",
+  inapp: "inapp",
+} as const;
 
-const KINDS: Kind[] = [
+const KINDS = [
   {
     id: "exam",
-    title: "تذكير قبل الاختبار",
+    title: "examTitle",
     effect:
-      "يوصلك قبل اختبارك بأسبوع وبيومين، وفيه الفصول اللي باقية عليك في المقرر.",
+      "examEffect",
     channels: ["whatsapp", "email"],
   },
   {
     id: "ready",
-    title: "مقررك جاهز",
-    effect: "يوصلك أول ما يجهز مقرر طلبته ولم يكن موجودًا وقتها.",
+    title: "readyTitle",
+    effect: "readyEffect",
     channels: ["whatsapp", "email"],
   },
   {
     id: "quota",
-    title: "اقتراب نفاد الدقائق",
+    title: "quotaTitle",
     effect:
-      "ينبّهك داخل التطبيق لما يبقى أقل من 20٪ من دقائق شهرك — ما نرسله واتساب ولا بريد.",
+      "quotaEffect",
     channels: ["inapp"],
   },
-];
+] as const satisfies readonly Kind[];
 
 /* واتساب مفعّل افتراضيًا، والبريد مطفأ — لا نرسل على قناتين لنفس الخبر. */
 const START: Record<string, Partial<Record<ChannelId, boolean>>> = {
@@ -62,6 +64,7 @@ const START: Record<string, Partial<Record<ChannelId, boolean>>> = {
 };
 
 export function NotificationsView() {
+  const t = useTranslations("Settings.Notifications");
   const { saved, ping } = useSaveNotice();
   const [state, setState] = useState(START);
 
@@ -78,9 +81,9 @@ export function NotificationsView() {
       <SaveNotice saved={saved} />
 
       {KINDS.map((k) => (
-        <SettingsCard key={k.id} title={k.title}>
+        <SettingsCard key={k.id} title={t(k.title)}>
           <p className="mt-2 max-w-measure text-sm leading-base text-ink-2">
-            {k.effect}
+            {t(k.effect)}
           </p>
 
           <ul className="mt-4 flex flex-col">
@@ -93,14 +96,14 @@ export function NotificationsView() {
                   className="flex items-center justify-between gap-4 border-t border-line py-2 first:border-0"
                 >
                   <label htmlFor={id} className="font-semibold text-ink">
-                    {CHANNEL_LABEL[c]}
+                    {t(CHANNEL_LABEL[c])}
                   </label>
 
                   <Toggle
                     id={id}
                     checked={on}
                     onChange={(next) => flip(k.id, c, next)}
-                    label={`${k.title} على ${CHANNEL_LABEL[c]}`}
+                    label={t("channelLabel", { kind: t(k.title), channel: t(CHANNEL_LABEL[c]) })}
                   />
                 </li>
               );
@@ -110,7 +113,7 @@ export function NotificationsView() {
       ))}
 
       <p className="text-sm leading-base text-ink-2">
-        رسائل الفواتير وتأكيد الدفع تُرسل دائمًا — تخصّ فلوسك، فما نطفيها.
+        {t("billingAlways")}
       </p>
     </div>
   );

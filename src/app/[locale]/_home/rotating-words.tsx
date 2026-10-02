@@ -92,17 +92,20 @@ export function RotatingWords({ words }: { words: readonly Word[] }) {
     );
   }
 
-  /* العمود = الكلمات ثم نسخة من الأولى، فالنهاية تطابق البداية */
+  /* أطول كلمة تحجز ارتفاع الخانة حتى إن التفّت في الإنجليزية.
+     العمود = الكلمات ثم نسخة من الأولى، فالنهاية تطابق البداية. */
   const reel = [...words, words[0]];
 
   return (
     <span
       className="relative block overflow-hidden"
-      style={{ height: `${LINE}em` }}
     >
+      <span aria-hidden="true" className="invisible grid" style={{ lineHeight: `${LINE}em` }}>
+        {words.map((w) => <span key={w.word} className="col-start-1 row-start-1 flex items-center"><Cell {...w} /></span>)}
+      </span>
       <span
-        className={`block ${animate ? "transition-transform duration-[800ms] ease-out" : ""}`}
-        style={{ transform: `translateY(${-i * LINE}em)` }}
+        className={`absolute inset-0 ${animate ? "transition-transform duration-[800ms] ease-out" : ""}`}
+        style={{ transform: `translateY(${-i * 100}%)` }}
       >
         {reel.map((w, n) => (
           <span
@@ -113,10 +116,9 @@ export function RotatingWords({ words }: { words: readonly Word[] }) {
                الكلمة عند حافّة القناع بل تذوب وهي تصعد.
                والنسخة الأخيرة تأخذ لون الأولى — الصورتان
                متطابقتان فلا تُرى القفزة. */
-            className={`flex items-center ${TONE[n % words.length]} ${
-              animate ? "transition-opacity duration-200 ease-out" : ""
-            } ${n === i ? "opacity-100" : "opacity-0"}`}
-            style={{ height: `${LINE}em` }}
+            className={`flex items-center ${TONE[n % words.length]} ${animate ? "transition-opacity duration-200 ease-out" : ""
+              } ${n === i ? "opacity-100" : "opacity-0"}`}
+            style={{ height: "100%", lineHeight: `${LINE}em` }}
           >
             <Cell {...w} />
           </span>

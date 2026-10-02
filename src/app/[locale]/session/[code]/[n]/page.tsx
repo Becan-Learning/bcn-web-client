@@ -1,3 +1,4 @@
+import { localize } from "@/i18n/localized";
 import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
 import { setRequestLocale } from "next-intl/server";
@@ -11,11 +12,12 @@ import { getLessons } from "@/lib/session/lessons";
 export async function generateMetadata(
   props: PageProps<"/[locale]/session/[code]/[n]">,
 ): Promise<Metadata> {
-  const { code, n } = await props.params;
+  const { code, n, locale } = await props.params;
+  if (!hasLocale(routing.locales, locale)) notFound();
   const course = courseBySlug(code);
   const chapter = chaptersOf(course?.code ?? "").find((c) => String(c.n) === n);
   if (!course || !chapter) return { title: "الجلسة — بيكان" };
-  return { title: `${chapter.title} — ${course.name} — بيكان` };
+  return { title: `${localize(chapter.title, locale)} — ${localize(course.name, locale)} — بيكان` };
 }
 
 export default async function SessionPage(
@@ -39,10 +41,10 @@ export default async function SessionPage(
 
   return (
     <SessionView
-      courseName={course.name}
+      courseName={localize(course.name, locale)}
       courseSlug={slugOf(course.code)}
       chapterNo={chapter.n}
-      chapterTitle={chapter.title}
+      chapterTitle={localize(chapter.title, locale)}
       minutes={chapter.minutes}
       content={content}
       pdfUrl={slidesUrl(content)}

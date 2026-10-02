@@ -1,5 +1,7 @@
+import { getTranslations } from "next-intl/server";
+
 import { Link } from "@/i18n/navigation";
-import { ArrowForward } from "@/components/becan/icons";
+import { ArrowBack } from "@/components/becan/icons";
 import { PageShell, Section, SiteHeader } from "@/components/becan/kit";
 
 /* تخطيط الإعدادات الموحَّد — الاشتراك والفواتير معه في نفس القشرة.
@@ -17,48 +19,34 @@ export type SectionId =
 export const SETTINGS_SECTIONS: {
   id: SectionId;
   href: string;
-  label: string;
-  hint: string;
 }[] = [
   {
     id: "account",
     href: "/settings/account",
-    label: "الحساب",
-    hint: "اسمك وبريدك وجامعتك",
   },
   {
     id: "study",
     href: "/settings/study",
-    label: "تفضيلات المذاكرة",
-    hint: "سرعة الشرح وشكل الاختبار",
   },
   {
     id: "notifications",
     href: "/settings/notifications",
-    label: "الإشعارات",
-    hint: "واتساب والبريد، كل نوع بمفتاحه",
   },
   {
     id: "subscription",
     href: "/settings/subscription",
-    label: "الاشتراك",
-    hint: "خطتك ودقائقك والتجديد",
   },
   {
     id: "invoices",
     href: "/settings/invoices",
-    label: "الفواتير",
-    hint: "سجل مدفوعاتك بالضريبة مفصولة",
   },
   {
     id: "data",
     href: "/settings/data",
-    label: "بياناتك",
-    hint: "تنزيل بياناتك أو حذف حسابك",
   },
 ];
 
-export function SettingsShell({
+export async function SettingsShell({
   active,
   title,
   lede,
@@ -69,6 +57,7 @@ export function SettingsShell({
   lede?: string;
   children: React.ReactNode;
 }) {
+  const t = await getTranslations("Settings");
   return (
     <PageShell>
       <SiteHeader />
@@ -79,14 +68,14 @@ export function SettingsShell({
           href="/settings"
           className="inline-flex min-h-11 items-center gap-2 font-semibold text-ink-2 md:hidden"
         >
-          <ArrowForward className="h-4 w-4 rotate-180" />
-          الإعدادات
+          <ArrowBack className="h-4 w-4" />
+          {t("title")}
         </Link>
 
         <div className="md:grid md:grid-cols-[14rem_minmax(0,1fr)] md:gap-10">
-          <nav aria-label="أقسام الإعدادات" className="hidden md:block">
+          <nav aria-label={t("sections")} className="hidden md:block">
             <p className="font-display text-2xl font-bold text-ink">
-              الإعدادات
+              {t("title")}
             </p>
 
             <ul className="mt-4 flex flex-col gap-1">
@@ -102,7 +91,7 @@ export function SettingsShell({
                         on ? "bg-tint-aubergine text-ink" : "text-ink-2"
                       }`}
                     >
-                      {s.label}
+                      {t(s.id)}
                     </Link>
                   </li>
                 );

@@ -1,5 +1,8 @@
 "use client";
 
+import { useTranslations, useLocale } from "next-intl";
+import { localize } from "@/i18n/localized";
+
 import {
   useEffect,
   useMemo,
@@ -23,7 +26,6 @@ import {
   COURSES,
   TONES,
   UNIVERSITIES,
-  countLabel,
   type College,
   type Course,
 } from "@/lib/data/catalog";
@@ -72,24 +74,26 @@ function Select({
 }
 
 /* موضع مؤشّر الكتابة بإحداثيات الشاشة: نقيس عرض النص المكتوب حتى
-   المؤشّر ثم نطرحه من حافة البداية. في RTL البداية هي الحافة اليمنى. */
+   المؤشّر ثم نزيحه عن حافة البداية بحسب اتجاه الحقل. */
 let measureCtx: CanvasRenderingContext2D | null = null;
 
 function caretPoint(input: HTMLInputElement): LookPoint {
   const box = input.getBoundingClientRect();
   const cs = getComputedStyle(input);
   const y = box.top + box.height / 2;
+  const rtl = cs.direction === "rtl";
 
   measureCtx ??= document.createElement("canvas").getContext("2d");
-  if (!measureCtx) return { x: box.right - 56, y };
+  if (!measureCtx) return { x: rtl ? box.right - 56 : box.left + 56, y };
 
   measureCtx.font = [cs.fontWeight, cs.fontSize, cs.fontFamily].join(" ");
   const upToCaret = input.value.slice(
     0,
     input.selectionStart ?? input.value.length,
   );
-  const padStart = parseFloat(cs.paddingInlineStart || cs.paddingRight || "0");
-  const x = box.right - padStart - measureCtx.measureText(upToCaret).width;
+  const padStart = parseFloat(cs.paddingInlineStart || "0");
+  const offset = padStart + measureCtx.measureText(upToCaret).width;
+  const x = rtl ? box.right - offset : box.left + offset;
 
   return { x: Math.max(box.left, Math.min(box.right, x)), y };
 }
@@ -131,6 +135,7 @@ function CourseCard({
   reduce: boolean;
   touch: boolean;
 }) {
+  const locale = useLocale();
   const tone = TONES[course.tone];
   const ref = useRef<HTMLAnchorElement>(null);
   const inView = useInViewport(ref, 0.6);
@@ -208,16 +213,18 @@ function CourseCard({
           <h3
             className={`line-clamp-2 font-display text-[15px] leading-snug font-semibold ${tone.title}`}
           >
-            {course.name}
+            {localize(course.name, locale)}
           </h3>
         </div>
-        <p className={`mt-1.5 text-[11px] ${tone.meta}`}>{course.university}</p>
+        <p className={`mt-1.5 text-[11px] ${tone.meta}`}>{localize(course.university, locale)}</p>
       </div>
     </MotionLink>
   );
 }
 
 export function Finder() {
+  const t = useTranslations("Courses");
+  const locale = useLocale();
   const [query, setQuery] = useState("");
   const [college, setCollege] = useState<College | "all">("all");
   const [university, setUniversity] = useState("all");
@@ -236,32 +243,35 @@ export function Finder() {
     const q = query.trim().toLowerCase();
     return COURSES.filter((c) => {
       const byCollege = college === "all" || c.college === college;
-      const byUniversity = university === "all" || c.university === university;
+      const byUniversity = university === "all" || c.university.ar === university;
       const byQuery =
         !q ||
-        c.name.toLowerCase().includes(q) ||
+        localize(c.name, locale).toLowerCase().includes(q) ||
         c.code.toLowerCase().includes(q) ||
         c.code.replace(" ", "").toLowerCase().includes(q.replace(" ", ""));
       return byCollege && byUniversity && byQuery;
     });
-  }, [query, college, university]);
+  }, [query, college, university, locale]);
 
   const empty = results.length === 0;
+  const [headlinePrefix, headlineWord, headlineSuffix] = t.markup("title", {
+    word: (chunks) => `\0${chunks}\0`,
+  }).split("\0");
 
   return (
     <>
       <section className="mx-auto w-full max-w-page px-4 pt-12 pb-8 md:px-8 md:pt-20 xl:px-10">
-        <p className="text-sm font-semibold text-ink-2">اختيار المقرر</p>
+        <p className="text-sm font-semibold text-ink-2">{t("eyebrow")}</p>
 
         {/* الأفتار بجانب العنوان — يرمش ويغمز ويميل */}
         <div className="mt-3 flex items-center gap-4">
           <BecanFace className="w-24 shrink-0 md:w-32 xl:w-36" lookAt={look} />
-          <TypedHeadline prefix="وش" word="مقررك" suffix="؟" className="mt-0" />
+          <TypedHeadline prefix={headlinePrefix.trimEnd()} word={headlineWord} suffix={headlineSuffix} className="mt-0" />
         </div>
 
         <div className="relative mt-9 max-w-measure">
           <label htmlFor="finder" className="sr-only">
-            ابحث عن مقررك
+            {t("search")}
           </label>
           <span className="pointer-events-none absolute inset-y-0 start-5 flex items-center text-ink-2">
             <SearchIcon />
@@ -269,6 +279,7 @@ export function Finder() {
           <input
             ref={inputRef}
             id="finder"
+            dir="auto"
             type="search"
             autoComplete="off"
             value={query}
@@ -280,7 +291,7 @@ export function Finder() {
             onSelect={trackCaret}
             onKeyUp={trackCaret}
             onBlur={() => setLook(null)}
-            placeholder="ابحث باسم المقرر أو رمزه"
+            placeholder={t("searchPlaceholder")}
             className="h-16 w-full rounded-xl border border-aubergine-deep bg-surface ps-14 pe-5 text-lg text-ink shadow-soft placeholder:text-ink-2"
           />
         </div>
@@ -288,28 +299,28 @@ export function Finder() {
         <div className="mt-4 grid max-w-measure grid-cols-2 gap-3">
           <Select
             id="f-university"
-            label="الجامعة"
+            label={t("university")}
             value={university}
             onChange={setUniversity}
           >
-            <option value="all">كل الجامعات</option>
+            <option value="all">{t("allUniversities")}</option>
             {UNIVERSITIES.map((u) => (
-              <option key={u} value={u}>
-                {u}
+              <option key={u.ar} value={u.ar}>
+                {localize(u, locale)}
               </option>
             ))}
           </Select>
 
           <Select
             id="f-college"
-            label="الكلية / التخصص"
+            label={t("college")}
             value={college}
             onChange={(v) => setCollege(v as College | "all")}
           >
-            <option value="all">كل الكليات</option>
+            <option value="all">{t("allColleges")}</option>
             {COLLEGES.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.label}
+                {localize(c.label, locale)}
               </option>
             ))}
           </Select>
@@ -318,24 +329,22 @@ export function Finder() {
 
       <section className="mx-auto w-full max-w-page px-4 pb-16 md:px-8 xl:px-10">
         <p aria-live="polite" className="text-sm text-ink-2">
-          {empty ? "لا نتائج" : countLabel(results.length)}
+          {empty ? t("noResults") : t("count", { count: results.length, countLabel: String(results.length) })}
         </p>
 
         {empty ? (
           <div className="mt-4 max-w-measure rounded-xl border border-aubergine-deep bg-surface p-8 shadow-soft">
             <p className="font-display text-3xl leading-snug font-bold text-ink">
-              ما لقينا <span className="text-warmth">{query.trim()}</span>
+              {t.rich("emptyTitle", { search: query.trim(), query: (chunks) => <span dir="auto" className="text-warmth">{chunks}</span> })}
             </p>
             <p className="mt-3 text-ink-2">
-              نجهّز المقررات حسب الطلب، وكل طلب يرفع أولوية مقرره في قائمة
-              الإنتاج.
+              {t("requestBody")}
             </p>
             <Link
               href="/request"
               className="mt-7 inline-flex h-12 items-center gap-3 rounded-pill bg-pressable px-6 text-lg font-semibold text-on-pressable"
             >
-              اطلب هذا المقرر
-              <ArrowForward />
+              {t("requestThis")}<ArrowForward />
             </Link>
           </div>
         ) : (
@@ -359,19 +368,17 @@ export function Finder() {
           <div className="mx-auto flex w-full max-w-page flex-col gap-7 px-4 py-14 md:flex-row md:items-center md:justify-between md:px-8 xl:px-10">
             <div>
               <h2 className="font-display text-3xl leading-snug font-bold text-ink md:text-4xl">
-                ما لقيت مقررك؟
+                {t("notFound")}
               </h2>
               <p className="mt-3 max-w-measure text-ink-2">
-                نجهّز المقررات حسب الطلب، وكل طلب يرفع أولوية مقرره في قائمة
-                الإنتاج.
+                {t("requestBody")}
               </p>
             </div>
             <Link
               href="/request"
               className="inline-flex h-14 shrink-0 items-center gap-3 rounded-pill bg-pressable px-8 text-lg font-semibold text-on-pressable"
             >
-              اطلب مقررك
-              <ArrowForward className="h-5 w-5" />
+              {t("request")}<ArrowForward className="h-5 w-5" />
             </Link>
           </div>
         </section>

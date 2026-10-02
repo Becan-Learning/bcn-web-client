@@ -1,15 +1,19 @@
-import { notFound } from "next/navigation";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { hasLocale } from "next-intl";
+import { localize } from "@/i18n/localized";
+import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
-import { setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import { Link } from "@/i18n/navigation";
 import { SettingsCard, SettingsShell } from "../_shell";
 import { INVOICES, invoiceRow } from "@/lib/data/billing";
 
-export const metadata: Metadata = {
-  title: "الفواتير — بيكان",
-};
+export async function generateMetadata({ params }: PageProps<"/[locale]/settings/invoices">): Promise<Metadata> {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) notFound();
+  const t = await getTranslations({ locale, namespace: "Settings.Invoices" });
+  return { title: t("metadataTitle") };
+}
 
 /* P5 — الفواتير.
 
@@ -28,19 +32,20 @@ export default async function InvoicesPage(props: PageProps<"/[locale]/settings/
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  const t = await getTranslations("Settings.Invoices");
 
   const rows = INVOICES.map(invoiceRow);
 
   return (
     <SettingsShell
       active="invoices"
-      title="الفواتير"
-      lede="كل مبلغ دفعته، والضريبة مفصولة عن الصافي."
+      title={t("title")}
+      lede={t("lede")}
     >
       {rows.length === 0 ? (
-        <SettingsCard title="ما فيه فواتير بعد">
+        <SettingsCard title={t("emptyTitle")}>
           <p className="mt-2 max-w-measure leading-base text-ink-2">
-            أول فاتورة تظهر هنا بعد أول اشتراك مدفوع.
+            {t("emptyBody")}
           </p>
         </SettingsCard>
       ) : (
@@ -53,18 +58,18 @@ export default async function InvoicesPage(props: PageProps<"/[locale]/settings/
                 className="rounded-xl border border-line bg-surface p-5"
               >
                 <div className="flex items-baseline justify-between gap-3">
-                  <p className="font-semibold text-ink">{r.date}</p>
-                  <p className="text-lg font-bold text-ink">{r.gross} ريال</p>
+                  <p className="font-semibold text-ink">{localize(r.date, locale)}</p>
+                  <p className="text-lg font-bold text-ink">{t("amount", { amount: String(r.gross) })}</p>
                 </div>
 
-                <p className="mt-1 text-sm text-ink-2">خطة {r.plan.name}</p>
+                <p className="mt-1 text-sm text-ink-2">{t("planName", { plan: localize(r.plan.name, locale) })}</p>
 
                 <dl className="mt-3 flex flex-col gap-1 text-sm">
-                  <Line term="الصافي" value={`${r.net.toFixed(2)} ريال`} />
-                  <Line term="الضريبة" value={`${r.vat.toFixed(2)} ريال`} />
+                  <Line term={t("net")} value={t("amount", { amount: r.net.toFixed(2) })} />
+                  <Line term={t("vat")} value={t("amount", { amount: r.vat.toFixed(2) })} />
                 </dl>
 
-                <OpenLink id={r.id} date={r.date} className="mt-4" />
+                <OpenLink id={r.id} date={localize(r.date, locale)} className="mt-4" />
               </li>
             ))}
           </ul>
@@ -72,16 +77,16 @@ export default async function InvoicesPage(props: PageProps<"/[locale]/settings/
           {/* ————— الديسكتوب: جدول ————— */}
           <div className="hidden overflow-hidden rounded-xl border border-line bg-surface md:block">
             <table className="w-full text-start text-sm">
-              <caption className="sr-only">سجل فواتيرك</caption>
+              <caption className="sr-only">{t("caption")}</caption>
               <thead>
                 <tr className="border-b border-line">
-                  <Th>التاريخ</Th>
-                  <Th>الخطة</Th>
-                  <Th numeric>الصافي</Th>
-                  <Th numeric>الضريبة</Th>
-                  <Th numeric>الإجمالي</Th>
+                  <Th>{t("date")}</Th>
+                  <Th>{t("plan")}</Th>
+                  <Th numeric>{t("net")}</Th>
+                  <Th numeric>{t("vat")}</Th>
+                  <Th numeric>{t("total")}</Th>
                   <Th>
-                    <span className="sr-only">الفاتورة</span>
+                    <span className="sr-only">{t("invoice")}</span>
                   </Th>
                 </tr>
               </thead>
@@ -89,15 +94,15 @@ export default async function InvoicesPage(props: PageProps<"/[locale]/settings/
               <tbody>
                 {rows.map((r) => (
                   <tr key={r.id} className="border-b border-line last:border-0">
-                    <Td>{r.date}</Td>
-                    <Td>{r.plan.name}</Td>
+                    <Td>{localize(r.date, locale)}</Td>
+                    <Td>{localize(r.plan.name, locale)}</Td>
                     <Td numeric>{r.net.toFixed(2)}</Td>
                     <Td numeric>{r.vat.toFixed(2)}</Td>
                     <Td numeric>
                       <span className="font-semibold text-ink">{r.gross}</span>
                     </Td>
                     <Td>
-                      <OpenLink id={r.id} date={r.date} />
+                      <OpenLink id={r.id} date={localize(r.date, locale)} />
                     </Td>
                   </tr>
                 ))}
@@ -106,15 +111,7 @@ export default async function InvoicesPage(props: PageProps<"/[locale]/settings/
           </div>
 
           <p className="mt-4 text-sm text-ink-2">
-            كل المبالغ بالريال السعودي وشاملة ضريبة القيمة المضافة. تحتاج فاتورة
-            باسم جهة؟{" "}
-            <Link
-              href="/contact"
-              className="font-semibold text-pressable underline underline-offset-4"
-            >
-              راسلنا
-            </Link>
-            .
+            {t.rich("note", { contact: (chunks) => <Link href="/contact" className="font-semibold text-pressable underline underline-offset-4">{chunks}</Link> })}
           </p>
         </>
       )}
@@ -123,7 +120,7 @@ export default async function InvoicesPage(props: PageProps<"/[locale]/settings/
 }
 
 /** فتح الفاتورة كصفحة قابلة للطباعة — لا زرّ تحميل بلا ملف خلفه. */
-function OpenLink({
+async function OpenLink({
   id,
   date,
   className = "",
@@ -132,13 +129,13 @@ function OpenLink({
   date: string;
   className?: string;
 }) {
+  const t = await getTranslations("Settings.Invoices");
   return (
     <Link
       href={`/settings/invoices/${id}`}
       className={`inline-flex min-h-11 items-center font-semibold text-pressable underline underline-offset-4 ${className}`}
     >
-      افتح الفاتورة
-      <span className="sr-only"> — {date}</span>
+      {t("open")}<span className="sr-only"> — {date}</span>
     </Link>
   );
 }

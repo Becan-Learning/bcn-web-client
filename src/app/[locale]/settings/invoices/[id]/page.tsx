@@ -1,10 +1,11 @@
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { hasLocale } from "next-intl";
+import { localize } from "@/i18n/localized";
 import { routing } from "@/i18n/routing";
-import { setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import { Link } from "@/i18n/navigation";
 import { notFound } from "next/navigation";
-import { ArrowForward } from "@/components/becan/icons";
+import { ArrowBack } from "@/components/becan/icons";
 import { PageShell, Section, SiteHeader } from "@/components/becan/kit";
 import {
   INVOICES,
@@ -18,8 +19,10 @@ import { PrintButton } from "./print-button";
 export async function generateMetadata(
   props: PageProps<"/[locale]/settings/invoices/[id]">,
 ): Promise<Metadata> {
-  const { id } = await props.params;
-  return { title: `فاتورة ${id} — بيكان` };
+  const { id, locale } = await props.params;
+  if (!hasLocale(routing.locales, locale)) notFound();
+  const t = await getTranslations({ locale, namespace: "Settings.Invoice" });
+  return { title: t("metadataTitle", { id }) };
 }
 
 /* P5 — الفاتورة الواحدة، صفحة قابلة للطباعة.
@@ -36,6 +39,7 @@ export default async function InvoicePage(
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  const t = await getTranslations("Settings.Invoice");
 
   const { id } = await props.params;
   const found = INVOICES.find((i) => i.id === id);
@@ -55,21 +59,21 @@ export default async function InvoicePage(
             href="/settings/invoices"
             className="inline-flex min-h-11 items-center gap-2 font-semibold text-ink-2 print:hidden"
           >
-            <ArrowForward className="h-4 w-4 rotate-180" />
-            الفواتير
+            <ArrowBack className="h-4 w-4" />
+            {t("invoices")}
           </Link>
 
           <article className="mt-4 rounded-xl border border-line bg-surface p-6 md:p-8">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p className="font-display text-2xl font-bold text-ink">
-                  بيكان
+                  {t("brand")}
                 </p>
-                <p className="mt-1 text-sm text-ink-2">فاتورة اشتراك</p>
+                <p className="mt-1 text-sm text-ink-2">{t("subscriptionInvoice")}</p>
               </div>
 
               <div className="text-end">
-                <p className="text-sm text-ink-2">رقم الفاتورة</p>
+                <p className="text-sm text-ink-2">{t("number")}</p>
                 <p className="font-semibold text-ink" dir="ltr">
                   {inv.id}
                 </p>
@@ -77,16 +81,16 @@ export default async function InvoicePage(
             </div>
 
             <dl className="mt-8 flex flex-col gap-2 text-sm">
-              <Row term="التاريخ" value={inv.date} />
-              <Row term="الوصف" value={`خطة ${inv.plan.name} — شهر واحد`} />
+              <Row term={t("date")} value={localize(inv.date, locale)} />
+              <Row term={t("description")} value={t("planMonth", { plan: localize(inv.plan.name, locale) })} />
               <Row
-                term="وسيلة الدفع"
+                term={t("method")}
                 value={
                   <>
                     {method.latin ? (
-                      <span dir="ltr">{method.latin}</span>
+                      <span dir="ltr">{localize(method.latin, locale)}</span>
                     ) : (
-                      method.label
+                      localize(method.label, locale)
                     )}{" "}
                     · <span dir="ltr">•••• {SUBSCRIPTION.last4}</span>
                   </>
@@ -96,23 +100,23 @@ export default async function InvoicePage(
 
             <div className="mt-8 border-t border-line pt-5">
               <dl className="flex flex-col gap-2 text-sm">
-                <Row term="الصافي" value={`${inv.net.toFixed(2)} ريال`} />
+                <Row term={t("net")} value={t("amount", { amount: inv.net.toFixed(2) })} />
                 <Row
-                  term={`ضريبة القيمة المضافة ${VAT * 100}٪`}
-                  value={`${inv.vat.toFixed(2)} ريال`}
+                  term={t("vatRate", { rate: String(VAT * 100) })}
+                  value={t("amount", { amount: inv.vat.toFixed(2) })}
                 />
               </dl>
 
               <div className="mt-4 flex items-baseline justify-between gap-3 border-t border-line pt-4">
-                <span className="font-semibold text-ink">الإجمالي المدفوع</span>
+                <span className="font-semibold text-ink">{t("totalPaid")}</span>
                 <span className="text-2xl font-bold text-ink">
-                  {inv.gross} ريال
+                  {t("amount", { amount: String(inv.gross) })}
                 </span>
               </div>
             </div>
 
             <p className="mt-6 text-sm text-ink-2">
-              مدفوعة · المبالغ بالريال السعودي.
+              {t("paid")}
             </p>
           </article>
 

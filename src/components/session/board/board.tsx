@@ -1,3 +1,4 @@
+import { BAND_LABEL, BOARD_LABEL } from "./labels";
 import { useCallback, useEffect, useRef } from "react";
 import type {
   BoardGroup,
@@ -5,7 +6,10 @@ import type {
   BoardRegion,
   BoardState,
 } from "@/lib/session/teaching-board";
-import { Caret, type SessionLanguage } from "../parts";
+import { Caret } from "../parts";
+import type { ExplanationLanguage } from "../explanation-language";
+import { boardFrame } from "./frame";
+import { useLocale } from "next-intl";
 import { BoardItemView } from "./item";
 
 /* ————— السبورة —————
@@ -23,11 +27,6 @@ import { BoardItemView } from "./item";
 
    السعة يفرضها الخادم (§3) فلا سياسة فيضٍ هنا — لكن العمود يمرّر،
    لأن اثني عشر بندًا مع شريطٍ مثبَّت لا تسع شاشة جوّال رأسية. */
-
-const BAND_LABEL = {
-  pinned: { Arabic: "مرجع", English: "Reference" },
-  temporary: { Arabic: "جانبيّ", English: "Aside" },
-} as const;
 
 type Block =
   | { type: "item"; item: BoardItem }
@@ -88,7 +87,7 @@ function Region({
   items: BoardItem[];
   groups: BoardGroup[];
   region: BoardRegion;
-  language: SessionLanguage;
+  language: ExplanationLanguage;
   reduce: boolean;
   className?: string;
 }) {
@@ -157,8 +156,9 @@ export function Board({
   speaking: boolean;
   intro: React.ReactNode;
   reduce: boolean;
-  language: SessionLanguage;
+  language: ExplanationLanguage;
 }) {
+  const locale = useLocale();
   const ref = useRef<HTMLDivElement>(null);
   /* يتبع القاع ما دام الطالب عنده. التعديلات تصل متأخّرة عشرات
      الثواني (§6)، فانتزاعه من فراغٍ يقرؤه أسوأ من تمريرة فائتة. */
@@ -192,17 +192,18 @@ export function Board({
 
   if (empty) {
     return (
-      <div className="chalkboard flex flex-1 flex-col justify-center overflow-y-auto rounded-xl border border-chalkboard-edge px-6 pt-8 pb-20 md:px-10">
-        <div className="mx-auto w-full max-w-measure">{intro}</div>
+      <div {...boardFrame(language)} className="chalkboard font-sans leading-base flex flex-1 flex-col justify-center overflow-y-auto rounded-xl border border-chalkboard-edge px-6 pt-8 pb-20 md:px-10">
+        <div lang={locale} dir={locale === "ar" ? "rtl" : "ltr"} className="mx-auto w-full max-w-measure font-sans leading-base">{intro}</div>
       </div>
     );
   }
 
   return (
     <section
-      aria-label="السبورة"
+      aria-label={BOARD_LABEL[language]}
+      {...boardFrame(language)}
       data-diverged={board.diverged ? "" : undefined}
-      className="chalkboard flex min-h-0 flex-1 flex-col rounded-xl border border-chalkboard-edge px-5 pt-6 pb-20 md:px-8 md:pt-8"
+      className="chalkboard font-sans leading-base flex min-h-0 flex-1 flex-col rounded-xl border border-chalkboard-edge px-5 pt-6 pb-20 md:px-8 md:pt-8"
     >
       <div className="mx-auto flex min-h-0 w-full max-w-measure flex-1 flex-col gap-4">
         {board.title && board.title.kind === "title" ? (

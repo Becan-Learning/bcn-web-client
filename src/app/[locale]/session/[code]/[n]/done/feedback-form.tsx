@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { StarIcon } from "@/components/becan/icons";
 
@@ -9,9 +10,10 @@ import { StarIcon } from "@/components/becan/icons";
    محدَّد الإطار لا كهرماني: الكهرماني الوحيد في الملخّص هو فعله
    الأساسي. والملاحظة اختيارية بلا نجمة ولا تحذير (البريف). */
 
-const RATING_LABELS = ["سيئة", "ضعيفة", "مقبولة", "جيدة", "ممتازة"];
+const RATINGS = ["bad", "poor", "acceptable", "good", "excellent"] as const;
 
 export function FeedbackForm({ room }: { room: string }) {
+  const t = useTranslations("SessionFeedback");
   const [rating, setRating] = useState(0);
   const [notes, setNotes] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
@@ -35,7 +37,7 @@ export function FeedbackForm({ room }: { room: string }) {
   if (status === "sent") {
     return (
       <p role="status" className="mt-10 rounded-xl border border-line bg-surface px-5 py-4 text-ink">
-        وصل تقييمك. نقرأ كل ملاحظة.
+        {t("sent")}
       </p>
     );
   }
@@ -43,9 +45,10 @@ export function FeedbackForm({ room }: { room: string }) {
   return (
     <form onSubmit={submit} className="mt-10 rounded-xl border border-line bg-surface p-5 md:p-6">
       <fieldset>
-        <legend className="font-semibold text-ink">كيف كانت الجلسة؟</legend>
+        <legend className="font-semibold text-ink">{t("title")}</legend>
         <div className="mt-3 flex flex-wrap gap-1">
-          {RATING_LABELS.map((label, i) => {
+          {RATINGS.map((id, i) => {
+            const label = t(`rating.${id}`);
             const value = i + 1;
             const on = value <= rating;
             return (
@@ -72,12 +75,12 @@ export function FeedbackForm({ room }: { room: string }) {
           })}
         </div>
         <p aria-hidden="true" className="mt-1 min-h-6 text-sm font-semibold text-ink-2">
-          {rating ? RATING_LABELS[rating - 1] : ""}
+          {rating ? t(`rating.${RATINGS[rating - 1]}`) : ""}
         </p>
       </fieldset>
 
       <label htmlFor="feedback-notes" className="mt-5 block font-semibold text-ink">
-        وش نحسّن؟
+        {t("notes")}
       </label>
       <textarea
         id="feedback-notes"
@@ -91,7 +94,7 @@ export function FeedbackForm({ room }: { room: string }) {
 
       {status === "error" ? (
         <p role="alert" className="mt-3 text-sm font-semibold text-error">
-          ما وصل التقييم. تأكّد من اتصالك وجرّب مرة ثانية.
+          {t("error")}
         </p>
       ) : null}
 
@@ -100,7 +103,7 @@ export function FeedbackForm({ room }: { room: string }) {
         aria-disabled={!rating || status === "sending" ? true : undefined}
         className="mt-4 inline-flex h-12 items-center justify-center rounded-pill border border-aubergine-mid px-6 font-semibold text-aubergine-base"
       >
-        {status === "sending" ? "يُرسل…" : "أرسل التقييم"}
+        {status === "sending" ? t("sending") : t("submit")}
       </button>
     </form>
   );

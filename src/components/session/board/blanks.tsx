@@ -1,5 +1,6 @@
+import { BLANK_LABEL } from "./labels";
 import type { BlanksPayload, SlotValue } from "@/lib/session/teaching-board";
-import type { SessionLanguage } from "../parts";
+import type { ExplanationLanguage } from "../explanation-language";
 
 /* املأ الفراغ (§5.9).
 
@@ -15,7 +16,6 @@ const PLACEHOLDER = "___";
 
 /* الخطّ التحتي وحده لا يُنطق، فالجملة تُقرأ منقوصة بلا إشارة إلى
    موضع الفراغ. يُنطق بكلمة مخفية بصريًا. */
-const BLANK_LABEL = { Arabic: "فراغ", English: "blank" } as const;
 
 export function BlanksItem({
   payload,
@@ -24,7 +24,7 @@ export function BlanksItem({
 }: {
   payload: BlanksPayload;
   slots: Record<string, SlotValue>;
-  language: SessionLanguage;
+  language: ExplanationLanguage;
 }) {
   const parts = payload.template.split(PLACEHOLDER);
 

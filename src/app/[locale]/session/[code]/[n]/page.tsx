@@ -1,7 +1,7 @@
 import { localize } from "@/i18n/localized";
 import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { SessionView } from "@/components/session/session-view";
@@ -14,10 +14,11 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { code, n, locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
+  const t = await getTranslations({ locale, namespace: "Session" });
   const course = courseBySlug(code);
   const chapter = chaptersOf(course?.code ?? "").find((c) => String(c.n) === n);
-  if (!course || !chapter) return { title: "الجلسة — بيكان" };
-  return { title: `${localize(chapter.title, locale)} — ${localize(course.name, locale)} — بيكان` };
+  if (!course || !chapter) return { title: t("metadataFallback")};
+  return { title: t("metadata", { chapter: localize(chapter.title, locale), course: localize(course.name, locale) }) };
 }
 
 export default async function SessionPage(

@@ -281,3 +281,9 @@
   --bcn-leading-base: 1.55;
   --bcn-font-display: var(--bcn-font-sans);
 }
+
+/* جزيرة شرح عربية داخل واجهة إنجليزية تستعيد توكناتها. */
+:lang(ar) {
+  --bcn-leading-base: 1.75;
+  --bcn-font-display: var(--font-el-messiri), Georgia, serif;
+}

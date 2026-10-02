@@ -1,14 +1,21 @@
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
-import { setRequestLocale } from "next-intl/server";
+import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
 import { DocPage, P, Points, type DocSection } from "@/components/becan/doc-page";
+import { ArabicVersionLink } from "@/components/becan/arabic-version-link";
 
-export const metadata: Metadata = {
-  title: "ملفات تعريف الارتباط — بيكان",
-};
+export async function generateMetadata(
+  { params }: PageProps<"/[locale]/cookies">,
+): Promise<Metadata> {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) notFound();
+  const t = await getTranslations({ locale, namespace: "Legal.Cookies" });
+  return { title: t("metadataTitle"), description: t("metadataDescription") };
+}
 
 /* L4 — ملفات تعريف الارتباط.
 
@@ -16,93 +23,105 @@ export const metadata: Metadata = {
    تُضاف لاحقًا يجب أن تُضاف إلى هذه الصفحة في نفس الدفعة — صفحة
    ارتباطات لا تطابق ما يحمّله الموقع أسوأ من غيابها. */
 
-const SECTIONS: DocSection[] = [
-  {
-    id: "what",
-    title: "وش هي",
-    body: (
-      <P>
-        ملفات صغيرة يحفظها متصفّحك عشان يتذكّر إنك داخل على حسابك، ويتذكّر
-        تفضيلاتك بين الزيارات. بلاها تحتاج تسجّل دخول من جديد كل مرة تفتح فيها
-        صفحة.
-      </P>
-    ),
-  },
-  {
-    id: "kinds",
-    title: "وش نستعمل منها",
-    body: (
-      <>
-        <P>ثلاثة أنواع فقط، وكلها ضرورية لتشغيل الخدمة:</P>
-        <Points
-          items={[
-            "جلسة الدخول: تبقيك مسجّلًا حتى تخرج بنفسك. تنتهي بعد 30 يومًا من آخر استعمال.",
-            "تفضيلاتك: سرعة الشرح وشكل الاختبار وآخر مقرر فتحته، عشان ما تعيد ضبطها كل مرة.",
-            "الأمان: تمنع إرسال طلبات من مواقع ثانية باسمك، وتنتهي بانتهاء الجلسة.",
-          ]}
-        />
-        <P>
-          <span className="font-semibold text-ink">
-            ما نستعمل ارتباطات إعلانية ولا تتبّعًا عبر المواقع
-          </span>
-          ، وما نبيع بياناتك لأحد. عشان كذا ما تشوف عندنا نافذة موافقة تلاحقك في
-          كل صفحة.
-        </P>
-      </>
-    ),
-  },
-  {
-    id: "control",
-    title: "كيف تتحكّم فيها",
-    body: (
-      <>
-        <P>
-          تقدر تحذفها أو تمنعها من إعدادات متصفّحك في أي وقت. لكن منع ارتباطات
-          الدخول يعني إنك ما تقدر تسجّل دخول ولا تكمّل جلسة — الخدمة نفسها
-          تحتاجها.
-        </P>
-        <P>
-          وإذا تبي تمسح كل شيء يخصّك عندنا، فذلك من{" "}
-          <Link
-            href="/settings/data"
-            className="font-semibold text-pressable underline underline-offset-4"
-          >
-            بياناتك
-          </Link>{" "}
-          لا من المتصفّح.
-        </P>
-      </>
-    ),
-  },
-  {
-    id: "more",
-    title: "المزيد",
-    body: (
-      <P>
-        تفاصيل ما نجمعه عنك وكيف نستعمله في{" "}
-        <Link
-          href="/privacy"
-          className="font-semibold text-pressable underline underline-offset-4"
-        >
-          سياسة الخصوصية
-        </Link>
-        .
-      </P>
-    ),
-  },
-];
-
 export default async function CookiesPage(props: PageProps<"/[locale]/cookies">) {
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  const [t, format] = await Promise.all([
+    getTranslations("Legal.Cookies"),
+    getFormatter({ locale }),
+  ]);
+  const updated = format.dateTime(new Date(t("updated")), {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    calendar: "gregory",
+    numberingSystem: "latn",
+    timeZone: "UTC",
+  });
+  const richValues = {
+    data: (chunks: ReactNode) => (
+      <Link
+        href="/settings/data"
+        className="font-semibold text-pressable underline underline-offset-4"
+      >
+        {chunks}
+      </Link>
+    ),
+    privacy: (chunks: ReactNode) => (
+      <Link
+        href="/privacy"
+        className="font-semibold text-pressable underline underline-offset-4"
+      >
+        {chunks}
+      </Link>
+    ),
+    strong: (chunks: ReactNode) => (
+      <span className="font-semibold text-ink">{chunks}</span>
+    ),
+  };
+  const content = [
+    {
+      key: "what",
+      id: "what",
+      body: (
+        <P>{t.rich("sections.what.paragraph1", richValues)}</P>
+      ),
+    },
+    {
+      key: "kinds",
+      id: "kinds",
+      body: (
+        <>
+          <P>{t.rich("sections.kinds.paragraph1", richValues)}</P>
+          <Points
+            items={(["item1", "item2", "item3"] as const).map((item) =>
+              t(`sections.kinds.points1.${item}`),
+            )}
+          />
+          <P>{t.rich("sections.kinds.paragraph2", richValues)}</P>
+        </>
+      ),
+    },
+    {
+      key: "control",
+      id: "control",
+      body: (
+        <>
+          <P>{t.rich("sections.control.paragraph1", richValues)}</P>
+          <P>{t.rich("sections.control.paragraph2", richValues)}</P>
+        </>
+      ),
+    },
+    {
+      key: "more",
+      id: "more",
+      body: (
+        <P>{t.rich("sections.more.paragraph1", richValues)}</P>
+      ),
+    },
+  ] as const;
+  const sections: DocSection[] = content.map((section) => ({
+    id: section.id,
+    title: t(`sections.${section.key}.title`),
+    body: section.body,
+  }));
 
   return (
     <DocPage
-      title="ملفات تعريف الارتباط"
-      updated="23 أغسطس 2026"
-      lede="ثلاثة أنواع، كلها لتشغيل حسابك. ولا واحد منها للإعلانات."
-      sections={SECTIONS}
+      title={t("title")}
+      updated={updated}
+      lede={t("lede")}
+      notice={
+        locale === "en" ? (
+          <P>
+            {t.rich("translationNotice", {
+              arabic: (chunks) => <ArabicVersionLink>{chunks}</ArabicVersionLink>,
+            })}
+          </P>
+        ) : undefined
+      }
+      sections={sections}
     />
   );
 }

@@ -1,14 +1,21 @@
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
-import { setRequestLocale } from "next-intl/server";
+import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
 import { DocPage, P, Points, type DocSection } from "@/components/becan/doc-page";
+import { ArabicVersionLink } from "@/components/becan/arabic-version-link";
 
-export const metadata: Metadata = {
-  title: "الاسترجاع والإلغاء — بيكان",
-};
+export async function generateMetadata(
+  { params }: PageProps<"/[locale]/refunds">,
+): Promise<Metadata> {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) notFound();
+  const t = await getTranslations({ locale, namespace: "Legal.Refunds" });
+  return { title: t("metadataTitle"), description: t("metadataDescription") };
+}
 
 /* L3 — الاسترجاع والإلغاء.
 
@@ -21,136 +28,133 @@ export const metadata: Metadata = {
    من المؤسّس ومراجعة المستشار القانوني قبل النشر. مسجَّل في
    docs/STATE.md. */
 
-const SECTIONS: DocSection[] = [
-  {
-    id: "cancel",
-    title: "الإلغاء",
-    body: (
-      <>
-        <P>
-          تقدر تلغي اشتراكك في أي وقت من{" "}
-          <Link
-            href="/settings/subscription"
-            className="font-semibold text-pressable underline underline-offset-4"
-          >
-            صفحة الاشتراك
-          </Link>
-          ، بضغطة وخطوة تأكيد واحدة. ما نطلب منك سبب ولا نحوّلك على أحد.
-        </P>
-        <P>
-          الإلغاء يوقف التجديد القادم، وما يوقف خطتك الحالية: تبقى شغّالة
-          بدقائقها كاملة حتى نهاية المدة اللي دفعتها، والتاريخ مكتوب لك صراحة في
-          نفس الصفحة. بعد ذلك ترجع تلقائيًا للخطة المجانية، وبياناتك وتقدّمك
-          يبقيان كما هما.
-        </P>
-      </>
-    ),
-  },
-  {
-    id: "refund",
-    title: "متى ترجع لك فلوسك",
-    body: (
-      <>
-        <P>
-          <span className="font-semibold text-ink">
-            استرجاع كامل خلال 7 أيام
-          </span>{" "}
-          من أول عملية دفع لك في بيكان، بشرط ما تكون استهلكت أكثر من 20٪ من
-          دقائق خطتك. جرّب الخدمة بجدّ، وإذا ما نفعتك رجّعنا لك المبلغ كامل.
-        </P>
-        <P>ونرجّع لك المبلغ كذلك في هذي الحالات:</P>
-        <Points
-          items={[
-            "خصم مكرّر أو خصم بمبلغ غلط — نرجّعه كامل بلا شروط.",
-            "انقطاع من عندنا يمنعك من المذاكرة مدة طويلة — نرجّع لك قيمة المدة المتأثّرة أو نعوّضك بدقائق، وتختار أنت.",
-            "مقرر وعدناك بجاهزيته في تاريخ ثم تأخّر، وكان اشتراكك عشانه.",
-          ]}
-        />
-      </>
-    ),
-  },
-  {
-    id: "no-refund",
-    title: "متى ما يصير استرجاع",
-    body: (
-      <Points
-        items={[
-          "بعد مرور 7 أيام على الدفع، أو بعد استهلاك أكثر من 20٪ من دقائق الخطة — أيّهما أسبق. تقدر تلغي التجديد، والمدة المدفوعة تكمل معك.",
-          "التجديدات بعد الشهر الأول — الإلغاء يمنع التجديد اللي بعده، ما يرجّع اللي صار.",
-          "إيقاف الحساب بسبب مخالفة الشروط، مثل مشاركة الحساب أو إعادة نشر المحتوى.",
-        ]}
-      />
-    ),
-  },
-  {
-    id: "how",
-    title: "كيف تطلب الاسترجاع",
-    body: (
-      <>
-        <P>
-          راسلنا من{" "}
-          <Link
-            href="/contact"
-            className="font-semibold text-pressable underline underline-offset-4"
-          >
-            صفحة التواصل
-          </Link>{" "}
-          — واتساب أسرع — واكتب رقم الفاتورة، وتلقاه في{" "}
-          <Link
-            href="/settings/invoices"
-            className="font-semibold text-pressable underline underline-offset-4"
-          >
-            فواتيرك
-          </Link>
-          . ما نطلب منك أي رقم بطاقة.
-        </P>
-        <P>
-          نردّ على طلبك خلال يوم عمل واحد بقبول أو برفض مسبَّب — ما نتركك بلا
-          جواب.
-        </P>
-      </>
-    ),
-  },
-  {
-    id: "when",
-    title: "متى يوصلك المبلغ",
-    body: (
-      <>
-        <P>
-          المبلغ يرجع على نفس وسيلة الدفع اللي دفعت بها — ما نرجّعه على وسيلة
-          ثانية ولا كرصيد داخل بيكان إلا إذا طلبت أنت ذلك.
-        </P>
-        <P>
-          نُصدر الاسترجاع من عندنا خلال يوم إلى ثلاثة أيام عمل، وبعدها البنك
-          يحتاج من 5 إلى 10 أيام عمل عشان يظهر في حسابك. المدة الثانية على بنكك
-          لا علينا، ونعطيك رقم العملية عشان تسأل بها.
-        </P>
-        <P>
-          الضريبة تُرجَع مع المبلغ، وتُصدر لك فاتورة استرجاع تلقاها في{" "}
-          <Link
-            href="/settings/invoices"
-            className="font-semibold text-pressable underline underline-offset-4"
-          >
-            فواتيرك
-          </Link>
-          .
-        </P>
-      </>
-    ),
-  },
-];
-
 export default async function RefundsPage(props: PageProps<"/[locale]/refunds">) {
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  const [t, format] = await Promise.all([
+    getTranslations("Legal.Refunds"),
+    getFormatter({ locale }),
+  ]);
+  const updated = format.dateTime(new Date(t("updated")), {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    calendar: "gregory",
+    numberingSystem: "latn",
+    timeZone: "UTC",
+  });
+  const richValues = {
+    subscription: (chunks: ReactNode) => (
+      <Link
+        href="/settings/subscription"
+        className="font-semibold text-pressable underline underline-offset-4"
+      >
+        {chunks}
+      </Link>
+    ),
+    contact: (chunks: ReactNode) => (
+      <Link
+        href="/contact"
+        className="font-semibold text-pressable underline underline-offset-4"
+      >
+        {chunks}
+      </Link>
+    ),
+    invoices: (chunks: ReactNode) => (
+      <Link
+        href="/settings/invoices"
+        className="font-semibold text-pressable underline underline-offset-4"
+      >
+        {chunks}
+      </Link>
+    ),
+    strong: (chunks: ReactNode) => (
+      <span className="font-semibold text-ink">{chunks}</span>
+    ),
+  };
+  const content = [
+    {
+      key: "cancel",
+      id: "cancel",
+      body: (
+        <>
+          <P>{t.rich("sections.cancel.paragraph1", richValues)}</P>
+          <P>{t.rich("sections.cancel.paragraph2", richValues)}</P>
+        </>
+      ),
+    },
+    {
+      key: "refund",
+      id: "refund",
+      body: (
+        <>
+          <P>{t.rich("sections.refund.paragraph1", richValues)}</P>
+          <P>{t.rich("sections.refund.paragraph2", richValues)}</P>
+          <Points
+            items={(["item1", "item2", "item3"] as const).map((item) =>
+              t(`sections.refund.points1.${item}`),
+            )}
+          />
+        </>
+      ),
+    },
+    {
+      key: "noRefund",
+      id: "no-refund",
+      body: (
+        <>
+          <Points
+            items={(["item1", "item2", "item3"] as const).map((item) =>
+              t(`sections.noRefund.points1.${item}`),
+            )}
+          />
+        </>
+      ),
+    },
+    {
+      key: "how",
+      id: "how",
+      body: (
+        <>
+          <P>{t.rich("sections.how.paragraph1", richValues)}</P>
+          <P>{t.rich("sections.how.paragraph2", richValues)}</P>
+        </>
+      ),
+    },
+    {
+      key: "when",
+      id: "when",
+      body: (
+        <>
+          <P>{t.rich("sections.when.paragraph1", richValues)}</P>
+          <P>{t.rich("sections.when.paragraph2", richValues)}</P>
+          <P>{t.rich("sections.when.paragraph3", richValues)}</P>
+        </>
+      ),
+    },
+  ] as const;
+  const sections: DocSection[] = content.map((section) => ({
+    id: section.id,
+    title: t(`sections.${section.key}.title`),
+    body: section.body,
+  }));
 
   return (
     <DocPage
-      title="الاسترجاع والإلغاء"
-      updated="23 أغسطس 2026"
-      lede="تلغي متى ما تبي بضغطة، وتعرف من الحين متى ترجع لك فلوسك ومتى ما ترجع."
-      sections={SECTIONS}
+      title={t("title")}
+      updated={updated}
+      lede={t("lede")}
+      notice={
+        locale === "en" ? (
+          <P>
+            {t.rich("translationNotice", {
+              arabic: (chunks) => <ArabicVersionLink>{chunks}</ArabicVersionLink>,
+            })}
+          </P>
+        ) : undefined
+      }
+      sections={sections}
     />
   );
 }

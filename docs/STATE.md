@@ -69,6 +69,7 @@
 `useSyncExternalStore`، ولقطة الخادم بلا قيمة محفوظة لمنع اختلاف
 الترطيب. تُثبَّت اللغة عند البدء؛ القيم المرسلة للوكيل لم تتغيّر.
 
+English legal pages are convenience translations; Arabic governs.
 
 ---
 

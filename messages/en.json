@@ -859,5 +859,235 @@
       "good": "Good",
       "excellent": "Excellent"
     }
+  },
+  "Legal": {
+    "Privacy": {
+      "metadataTitle": "Privacy policy — Becan",
+      "title": "Privacy policy",
+      "lede": "Becan listens to your voice to explain your course — this page tells you exactly what happens to it.",
+      "sections": {
+        "summary": {
+          "title": "The summary in three lines",
+          "points1": {
+            "item1": "We collect only what we need: your identity, university and major, and study progress.",
+            "item2": "Your voice is processed so you can talk to Becan, and is automatically deleted after the session unless you allow us to keep it.",
+            "item3": "We do not sell your data to anyone or use it for advertising."
+          }
+        },
+        "voice": {
+          "title": "Your voice — how we process and store it",
+          "paragraph1": "Becan is a voice-based service, so this is the most important section on this page. When you talk to Becan during a session, this is what happens:",
+          "points1": {
+            "item1": "The microphone only turns on when you press the talk button — there is no continuous or background listening.",
+            "item2": "Your voice is encrypted as it travels to our servers, then converted to text so Becan can understand your question.",
+            "item3": "The audio recording itself is automatically deleted within 24 hours of the session ending.",
+            "item4": "The text extracted from it stays linked to your account so Becan knows where you struggled — you can delete it by deleting your account.",
+            "item5": "We do not use your voice to train models or share it with anyone other than the audio processing provider we use."
+          },
+          "paragraph2": "If you want Becan to keep your recordings longer so you can review them yourself, you can turn this option on in <study>Study preferences</study> — it is off by default."
+        },
+        "what": {
+          "title": "Other data we collect",
+          "points1": {
+            "item1": "Account data: your name, email or mobile number, university, and major.",
+            "item2": "Study data: the courses you chose, chapters you completed, your questions and answers, where you struggled, and how many minutes you used.",
+            "item3": "Payment data: your plan, renewal date, and the last four digits of your card. Your full card number never passes through us — it goes directly to the payment gateway.",
+            "item4": "Technical data: your device and browser type, and error logs, so we can understand why your session stopped."
+          }
+        },
+        "why": {
+          "title": "Why we collect it",
+          "points1": {
+            "item1": "To run the service: show your course, resume where you stopped, and count your minutes.",
+            "item2": "To improve explanations: identify topics most students struggle with and rebuild them.",
+            "item3": "To keep you informed: reminders before your exam and a notification when your course is ready — you choose the channels in Notifications.",
+            "item4": "To protect the service: detect misuse and account sharing."
+          }
+        },
+        "share": {
+          "title": "Who we share it with",
+          "paragraph1": "We do not sell your data. We only share it with service providers we need to run Becan, and only as much as they need:",
+          "points1": {
+            "item1": "The provider of audio processing and explanation models.",
+            "item2": "The payment gateway, which receives your card details directly, rather than through us.",
+            "item3": "The hosting and operational analytics provider.",
+            "item4": "Authorities that request it under the law."
+          },
+          "paragraph2": "<strong>Your university receives nothing from us</strong> — neither your grades nor where you struggled, nor even the fact that you have an account with us."
+        },
+        "rights": {
+          "title": "Your rights",
+          "paragraph1": "Saudi Arabia’s Personal Data Protection Law gives you rights over your data, including the right to:",
+          "points1": {
+            "item1": "Know what data we hold about you.",
+            "item2": "Download a copy — with one click in your data settings.",
+            "item3": "Correct any inaccurate information.",
+            "item4": "Request deletion of your data and delete your account yourself.",
+            "item5": "Withdraw your consent to any optional use, such as keeping recordings."
+          },
+          "paragraph2": "You can do all of this yourself in <data>Your data</data>. If you need help, contact us."
+        },
+        "keep": {
+          "title": "How long we keep it",
+          "points1": {
+            "item1": "Audio recordings: 24 hours, then they are automatically deleted.",
+            "item2": "Study data: for as long as your account exists.",
+            "item3": "Invoice records: kept after account deletion for as long as tax regulations require.",
+            "item4": "After you delete your account: we delete the remaining data within 30 days."
+          }
+        },
+        "kids": {
+          "title": "User ages",
+          "paragraph1": "Becan is designed for university students. If you are under 18, you need your guardian’s consent before using the service."
+        },
+        "cookies": {
+          "title": "Cookies",
+          "paragraph1": "You can find the details on the <cookies>Cookies page</cookies>."
+        },
+        "contact": {
+          "title": "Contact us",
+          "paragraph1": "For any question about your privacy or request about your data, contact us through the <contact>Contact page</contact>. We will reply within the time stated there."
+        }
+      },
+      "metadataDescription": "Becan listens to your voice to explain your course — this page tells you exactly what happens to it.",
+      "updated": "2026-08-23",
+      "translationNotice": "This is a translation for convenience. The Arabic version is the governing text. <arabic>Read the Arabic version</arabic>"
+    },
+    "Terms": {
+      "metadataTitle": "Terms and conditions — Becan",
+      "title": "Terms and conditions",
+      "lede": "Written in everyday language so you can actually read them. If anything is unclear, contact us and we will explain it.",
+      "sections": {
+        "who": {
+          "title": "Who we are and what we offer",
+          "paragraph1": "With Becan, you get spoken explanations of your university course on an interactive board, followed by questions to check that you understood. The service uses content we prepare — you do not upload content; you simply choose your course and chapter.",
+          "paragraph2": "Using the service means you agree to these terms. If you do not agree, do not use the service."
+        },
+        "account": {
+          "title": "Your account",
+          "paragraph1": "You register with your email or mobile number. Your account is for you alone — do not share it. You are responsible for everything that happens through your account. If you suspect someone has accessed it, tell us immediately.",
+          "paragraph2": "The information you enter must be accurate: your university and major determine which courses you see. Incorrect information will show you a course that is not yours."
+        },
+        "use": {
+          "title": "Permitted use",
+          "paragraph1": "The service is for your personal study. You must not:",
+          "points1": {
+            "item1": "Record, publish, or sell sessions, or republish the board and explanations.",
+            "item2": "Share your account or sell access to it.",
+            "item3": "Use automated tools to scrape content or overload the service.",
+            "item4": "Use Becan for cheating or plagiarism in an exam or graded assignment."
+          },
+          "paragraph2": "Breaking these rules means your account will be suspended. If your account is suspended for a violation, there is no refund for the remaining period."
+        },
+        "content": {
+          "title": "Content and ownership",
+          "paragraph1": "The explanations, board, questions, and audio belong to Becan. You may use them for your studies while your subscription is active. Course names, codes, and university cover images belong to their owners and appear here only for identification.",
+          "paragraph2": "Becan does not replace your instructor’s lectures or your course’s approved reference material. The content we prepare is based on your course sources and is reviewed, but remains supporting material. Your final grade is your responsibility and your instructor’s."
+        },
+        "money": {
+          "title": "Subscriptions and payment",
+          "paragraph1": "Prices shown on the <plans>Plans page</plans> include VAT. Your subscription renews automatically each month until you cancel it.",
+          "paragraph2": "Full details of cancellation and refunds are in the <refunds>Refunds and cancellation policy</refunds>.",
+          "paragraph3": "We may change prices. If we do, we will give you at least 30 days’ notice. The new price applies from the renewal after that notice — not partway through your current paid period."
+        },
+        "availability": {
+          "title": "Service availability",
+          "paragraph1": "We work to keep Becan running, but the service needs maintenance and sometimes has outages. System status and past outages are published on the <status>Status page</status>.",
+          "paragraph2": "If a prolonged outage is caused by us, we will compensate you with minutes or a refund as explained in the refunds policy."
+        },
+        "end": {
+          "title": "Account suspension",
+          "paragraph1": "You can delete your account at any time in <data>Your data settings</data>. We only suspend your account for breaking these terms or in response to a request under the law, and we tell you why."
+        },
+        "law": {
+          "title": "Applicable law",
+          "paragraph1": "These terms are subject to the laws of the Kingdom of Saudi Arabia. Any dispute will be heard by the competent judicial authority there."
+        },
+        "contact": {
+          "title": "Contact us",
+          "paragraph1": "For any question about these terms, contact us through the <contact>Contact page</contact>."
+        }
+      },
+      "metadataDescription": "Written in everyday language so you can actually read them. If anything is unclear, contact us and we will explain it.",
+      "updated": "2026-08-23",
+      "translationNotice": "This is a translation for convenience. The Arabic version is the governing text. <arabic>Read the Arabic version</arabic>"
+    },
+    "Refunds": {
+      "metadataTitle": "Refunds and cancellation — Becan",
+      "title": "Refunds and cancellation",
+      "lede": "Cancel whenever you want with one click, and know from the start when you can get your money back and when you cannot.",
+      "sections": {
+        "cancel": {
+          "title": "Cancellation",
+          "paragraph1": "You can cancel your subscription at any time on the <subscription>Subscription page</subscription>, with one click and one confirmation step. We do not ask for a reason or refer you to anyone.",
+          "paragraph2": "Cancellation stops your next renewal, not your current plan. It stays active with its full minute allowance until the end of the period you paid for. The date is clearly shown on the same page. You then return automatically to the free plan, and your data and progress stay as they are."
+        },
+        "refund": {
+          "title": "When you can get your money back",
+          "paragraph1": "<strong>A full refund within 7 days</strong> of your first payment to Becan, provided you have used no more than 20% of your plan’s minutes. Give the service a proper try. If it does not help you, we will refund the full amount.",
+          "paragraph2": "We also refund you in these cases:",
+          "points1": {
+            "item1": "A duplicate charge or an incorrect amount — we refund it in full, without conditions.",
+            "item2": "An outage caused by us that prevents you from studying for a prolonged period — we refund the value of the affected period or compensate you with minutes. You choose.",
+            "item3": "A course we promised would be ready by a certain date is delayed, and you subscribed for that course."
+          }
+        },
+        "noRefund": {
+          "title": "When a refund is not available",
+          "points1": {
+            "item1": "After 7 days from payment, or after you have used more than 20% of your plan’s minutes — whichever comes first. You can cancel renewal and keep using the period you paid for.",
+            "item2": "Renewals after the first month — cancellation prevents the next renewal; it does not refund one that has already happened.",
+            "item3": "Account suspension for breaking the terms, such as sharing your account or republishing content."
+          }
+        },
+        "how": {
+          "title": "How to request a refund",
+          "paragraph1": "Contact us through the <contact>Contact page</contact> — WhatsApp is faster — and include your invoice number, which you can find in <invoices>Your invoices</invoices>. We do not ask for any card number.",
+          "paragraph2": "We reply to your request within one business day with an approval or a rejection with reasons — we do not leave you without an answer."
+        },
+        "when": {
+          "title": "When you receive the money",
+          "paragraph1": "The money goes back to the same payment method you used. We do not refund it to another method or as credit in Becan unless you ask us to.",
+          "paragraph2": "We issue the refund within 1 to 3 business days. Your bank then needs 5 to 10 business days for it to appear in your account. That second period depends on your bank, not us. We give you the transaction number so you can ask about it.",
+          "paragraph3": "Tax is refunded with the amount. We issue a refund invoice, which you can find in <invoices>Your invoices</invoices>."
+        }
+      },
+      "metadataDescription": "Cancel whenever you want with one click, and know from the start when you can get your money back and when you cannot.",
+      "updated": "2026-08-23",
+      "translationNotice": "This is a translation for convenience. The Arabic version is the governing text. <arabic>Read the Arabic version</arabic>"
+    },
+    "Cookies": {
+      "metadataTitle": "Cookies — Becan",
+      "title": "Cookies",
+      "lede": "Three types, all to run your account. None for advertising.",
+      "sections": {
+        "what": {
+          "title": "What they are",
+          "paragraph1": "Small files your browser saves to remember that you are signed in and to keep your preferences between visits. Without them, you would need to sign in again every time you open a page."
+        },
+        "kinds": {
+          "title": "Which ones we use",
+          "paragraph1": "Only three types, all necessary to run the service:",
+          "points1": {
+            "item1": "Sign-in session: keeps you signed in until you sign out yourself. It expires 30 days after your last use.",
+            "item2": "Preferences: explanation speed, quiz format, and the last course you opened, so you do not have to set them again each time.",
+            "item3": "Security: prevents other sites from sending requests in your name. These expire when the session ends."
+          },
+          "paragraph2": "<strong>We do not use advertising cookies or track you across sites</strong>, and we do not sell your data to anyone. That is why you do not see a consent pop-up following you on every page."
+        },
+        "control": {
+          "title": "How to control them",
+          "paragraph1": "You can delete or block them in your browser settings at any time. But blocking sign-in cookies means you cannot sign in or continue a session — the service itself needs them.",
+          "paragraph2": "If you want to erase everything we hold about you, do that in <data>Your data</data>, rather than in your browser."
+        },
+        "more": {
+          "title": "More information",
+          "paragraph1": "Details of what we collect about you and how we use it are in the <privacy>Privacy policy</privacy>."
+        }
+      },
+      "metadataDescription": "Three types, all to run your account. None for advertising.",
+      "updated": "2026-08-23",
+      "translationNotice": "This is a translation for convenience. The Arabic version is the governing text. <arabic>Read the Arabic version</arabic>"
+    }
   }
 }

@@ -1,14 +1,21 @@
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
-import { setRequestLocale } from "next-intl/server";
+import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
 import { DocPage, P, Points, type DocSection } from "@/components/becan/doc-page";
+import { ArabicVersionLink } from "@/components/becan/arabic-version-link";
 
-export const metadata: Metadata = {
-  title: "الشروط والأحكام — بيكان",
-};
+export async function generateMetadata(
+  { params }: PageProps<"/[locale]/terms">,
+): Promise<Metadata> {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) notFound();
+  const t = await getTranslations({ locale, namespace: "Legal.Terms" });
+  return { title: t("metadataTitle"), description: t("metadataDescription") };
+}
 
 /* L1 — الشروط والأحكام.
 
@@ -16,195 +23,174 @@ export const metadata: Metadata = {
    الصياغة النهائية تحتاج المستشار القانوني. البنود التي تحتاج قرار
    المؤسّس (السنّ، حدود الاستعمال) معلَّمة في docs/STATE.md. */
 
-const SECTIONS: DocSection[] = [
-  {
-    id: "who",
-    title: "من نحن وما نقدّمه",
-    body: (
-      <>
-        <P>
-          بيكان خدمة تشرح لك مقررك الجامعي بالصوت على سبورة تفاعلية، وتسألك
-          أسئلة تتأكد فيها إنك فهمت. الخدمة تشتغل على المحتوى اللي نجهّزه إحنا —
-          أنت ما ترفع محتوى، وتختار مقررك وفصلك وبس.
-        </P>
-        <P>
-          استعمالك للخدمة يعني إنك موافق على هالشروط. إذا ما وافقت عليها، لا
-          تستعمل الخدمة.
-        </P>
-      </>
-    ),
-  },
-  {
-    id: "account",
-    title: "حسابك",
-    body: (
-      <>
-        <P>
-          تسجّل ببريدك أو رقم جوالك، والحساب لك أنت وحدك — ما تشاركه مع غيرك.
-          أنت مسؤول عن كل شيء يصير من حسابك، وإذا شكّيت إن أحد دخل عليه بلّغنا
-          فورًا.
-        </P>
-        <P>
-          البيانات اللي تكتبها لازم تكون صحيحة: جامعتك وتخصصك يحدّدان المقررات
-          اللي تشوفها، والمعلومة الغلط تعطيك مقررًا مو مقررك.
-        </P>
-      </>
-    ),
-  },
-  {
-    id: "use",
-    title: "الاستعمال المسموح",
-    body: (
-      <>
-        <P>الخدمة لمذاكرتك الشخصية. وممنوع عليك:</P>
-        <Points
-          items={[
-            "تسجيل الجلسات أو نشرها أو بيعها أو إعادة نشر السبورة والشرح.",
-            "مشاركة حسابك أو بيع الدخول عليه.",
-            "استعمال أدوات آلية تسحب المحتوى أو تحمّل الخدمة فوق طاقتها.",
-            "استعمال بيكان في غش أو انتحال داخل اختبار أو واجب مرصود عليه درجة.",
-          ]}
-        />
-        <P>
-          مخالفة هذي البنود تعني إيقاف الحساب، ومع الإيقاف بسبب مخالفة ما فيه
-          استرجاع للمدة المتبقية.
-        </P>
-      </>
-    ),
-  },
-  {
-    id: "content",
-    title: "المحتوى والملكية",
-    body: (
-      <>
-        <P>
-          الشرح والسبورة والأسئلة والصوت ملك بيكان، ولك حق استعمالها لمذاكرتك
-          طول ما اشتراكك شغّال. أسماء المقررات ورموزها وأغلفة الجامعات تعود
-          لأصحابها، وذكرها هنا للتعريف لا أكثر.
-        </P>
-        <P>
-          بيكان مو بديلًا عن محاضرات أستاذك ولا عن مرجع مقررك المعتمد، والمحتوى
-          اللي نجهّزه مبني على مصادر مقرّرك ويُراجَع، لكنه يبقى مادة مساندة.
-          الدرجة النهائية مسؤوليتك أنت وأستاذك.
-        </P>
-      </>
-    ),
-  },
-  {
-    id: "money",
-    title: "الاشتراك والدفع",
-    body: (
-      <>
-        <P>
-          الأسعار المعروضة في{" "}
-          <Link
-            href="/plans"
-            className="font-semibold text-pressable underline underline-offset-4"
-          >
-            صفحة الخطط
-          </Link>{" "}
-          شاملة ضريبة القيمة المضافة، والاشتراك يتجدّد شهريًا تلقائيًا إلى أن
-          تلغيه.
-        </P>
-        <P>
-          تفاصيل الإلغاء والاسترجاع كاملة في{" "}
-          <Link
-            href="/refunds"
-            className="font-semibold text-pressable underline underline-offset-4"
-          >
-            سياسة الاسترجاع والإلغاء
-          </Link>
-          .
-        </P>
-        <P>
-          نقدر نغيّر الأسعار، وإذا صار ذلك نبلّغك قبلها بثلاثين يومًا على الأقل،
-          والسعر الجديد يبدأ من التجديد اللي بعد التبليغ — مو من نصّ مدتك
-          الحالية.
-        </P>
-      </>
-    ),
-  },
-  {
-    id: "availability",
-    title: "توفّر الخدمة",
-    body: (
-      <>
-        <P>
-          نشتغل على إبقاء بيكان شغّالة، لكن الخدمة تحتاج صيانة وأحيانًا يصير
-          عطل. حالة النظام والأعطال السابقة منشورة في{" "}
-          <Link
-            href="/status"
-            className="font-semibold text-pressable underline underline-offset-4"
-          >
-            صفحة الحالة
-          </Link>
-          .
-        </P>
-        <P>
-          إذا صار انقطاع طويل من عندنا، عوّضناك بدقائق أو باسترجاع حسب ما توضّحه
-          سياسة الاسترجاع.
-        </P>
-      </>
-    ),
-  },
-  {
-    id: "end",
-    title: "إيقاف الحساب",
-    body: (
-      <>
-        <P>
-          تقدر تحذف حسابك في أي وقت من{" "}
-          <Link
-            href="/settings/data"
-            className="font-semibold text-pressable underline underline-offset-4"
-          >
-            إعدادات بياناتك
-          </Link>
-          . ومن جهتنا ما نوقف حسابك إلا لمخالفة هالشروط أو لطلب نظامي، ونبلّغك
-          بالسبب.
-        </P>
-      </>
-    ),
-  },
-  {
-    id: "law",
-    title: "النظام المطبَّق",
-    body: (
-      <P>
-        تخضع هذه الشروط لأنظمة المملكة العربية السعودية، وأي خلاف ينظر أمام
-        الجهة القضائية المختصة فيها.
-      </P>
-    ),
-  },
-  {
-    id: "contact",
-    title: "تواصل معنا",
-    body: (
-      <P>
-        أي سؤال عن هالشروط، راسلنا من{" "}
-        <Link
-          href="/contact"
-          className="font-semibold text-pressable underline underline-offset-4"
-        >
-          صفحة التواصل
-        </Link>
-        .
-      </P>
-    ),
-  },
-];
-
 export default async function TermsPage(props: PageProps<"/[locale]/terms">) {
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  const [t, format] = await Promise.all([
+    getTranslations("Legal.Terms"),
+    getFormatter({ locale }),
+  ]);
+  const updated = format.dateTime(new Date(t("updated")), {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    calendar: "gregory",
+    numberingSystem: "latn",
+    timeZone: "UTC",
+  });
+  const richValues = {
+    plans: (chunks: ReactNode) => (
+      <Link
+        href="/plans"
+        className="font-semibold text-pressable underline underline-offset-4"
+      >
+        {chunks}
+      </Link>
+    ),
+    refunds: (chunks: ReactNode) => (
+      <Link
+        href="/refunds"
+        className="font-semibold text-pressable underline underline-offset-4"
+      >
+        {chunks}
+      </Link>
+    ),
+    status: (chunks: ReactNode) => (
+      <Link
+        href="/status"
+        className="font-semibold text-pressable underline underline-offset-4"
+      >
+        {chunks}
+      </Link>
+    ),
+    data: (chunks: ReactNode) => (
+      <Link
+        href="/settings/data"
+        className="font-semibold text-pressable underline underline-offset-4"
+      >
+        {chunks}
+      </Link>
+    ),
+    contact: (chunks: ReactNode) => (
+      <Link
+        href="/contact"
+        className="font-semibold text-pressable underline underline-offset-4"
+      >
+        {chunks}
+      </Link>
+    ),
+  };
+  const content = [
+    {
+      key: "who",
+      id: "who",
+      body: (
+        <>
+          <P>{t.rich("sections.who.paragraph1", richValues)}</P>
+          <P>{t.rich("sections.who.paragraph2", richValues)}</P>
+        </>
+      ),
+    },
+    {
+      key: "account",
+      id: "account",
+      body: (
+        <>
+          <P>{t.rich("sections.account.paragraph1", richValues)}</P>
+          <P>{t.rich("sections.account.paragraph2", richValues)}</P>
+        </>
+      ),
+    },
+    {
+      key: "use",
+      id: "use",
+      body: (
+        <>
+          <P>{t.rich("sections.use.paragraph1", richValues)}</P>
+          <Points
+            items={(["item1", "item2", "item3", "item4"] as const).map((item) =>
+              t(`sections.use.points1.${item}`),
+            )}
+          />
+          <P>{t.rich("sections.use.paragraph2", richValues)}</P>
+        </>
+      ),
+    },
+    {
+      key: "content",
+      id: "content",
+      body: (
+        <>
+          <P>{t.rich("sections.content.paragraph1", richValues)}</P>
+          <P>{t.rich("sections.content.paragraph2", richValues)}</P>
+        </>
+      ),
+    },
+    {
+      key: "money",
+      id: "money",
+      body: (
+        <>
+          <P>{t.rich("sections.money.paragraph1", richValues)}</P>
+          <P>{t.rich("sections.money.paragraph2", richValues)}</P>
+          <P>{t.rich("sections.money.paragraph3", richValues)}</P>
+        </>
+      ),
+    },
+    {
+      key: "availability",
+      id: "availability",
+      body: (
+        <>
+          <P>{t.rich("sections.availability.paragraph1", richValues)}</P>
+          <P>{t.rich("sections.availability.paragraph2", richValues)}</P>
+        </>
+      ),
+    },
+    {
+      key: "end",
+      id: "end",
+      body: (
+        <P>{t.rich("sections.end.paragraph1", richValues)}</P>
+      ),
+    },
+    {
+      key: "law",
+      id: "law",
+      body: (
+        <P>{t.rich("sections.law.paragraph1", richValues)}</P>
+      ),
+    },
+    {
+      key: "contact",
+      id: "contact",
+      body: (
+        <P>{t.rich("sections.contact.paragraph1", richValues)}</P>
+      ),
+    },
+  ] as const;
+  const sections: DocSection[] = content.map((section) => ({
+    id: section.id,
+    title: t(`sections.${section.key}.title`),
+    body: section.body,
+  }));
 
   return (
     <DocPage
-      title="الشروط والأحكام"
-      updated="23 أغسطس 2026"
-      lede="مكتوبة بلغة عادية عشان تقرأها فعلًا. أي بند فيه غموض، راسلنا ونوضّحه."
-      sections={SECTIONS}
+      title={t("title")}
+      updated={updated}
+      lede={t("lede")}
+      notice={
+        locale === "en" ? (
+          <P>
+            {t.rich("translationNotice", {
+              arabic: (chunks) => <ArabicVersionLink>{chunks}</ArabicVersionLink>,
+            })}
+          </P>
+        ) : undefined
+      }
+      sections={sections}
     />
   );
 }

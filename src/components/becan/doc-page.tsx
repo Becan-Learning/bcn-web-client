@@ -22,12 +22,14 @@ export async function DocPage({
   title,
   updated,
   lede,
+  notice,
   sections,
 }: {
   title: string;
   /** تاريخ آخر تحديث — ظاهر في الأعلى، شرط في البريف */
   updated: string;
   lede?: string;
+  notice?: React.ReactNode;
   sections: DocSection[];
 }) {
   const t = await getTranslations("DocPage");
@@ -36,6 +38,12 @@ export async function DocPage({
       <SiteHeader />
 
       <Section className="pt-10 pb-16 md:pt-14">
+        {notice ? (
+          <div className="mb-6 max-w-measure rounded-xl border border-line bg-surface-2 p-4">
+            {notice}
+          </div>
+        ) : null}
+
         <h1 className="font-display text-4xl leading-tight font-bold text-ink md:text-5xl">
           {title}
         </h1>

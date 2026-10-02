@@ -6,5 +6,136 @@
   "Metadata": {
     "title": "بيكان — مدرّسك الخصوصي لمقررك",
     "description": "بيكان يشرح لك مقررك بصوته، ويسألك عشان يتأكد إنك فهمت، ويعرف وين تنكسر درجتك في الاختبار."
+  },
+  "SiteHeader": {
+    "login": "دخول"
+  },
+  "Brand": {
+    "name": "بيكان"
+  },
+  "SiteFooter": {
+    "how": "كيف يعمل",
+    "pricing": "الأسعار",
+    "faq": "الأسئلة الشائعة",
+    "contact": "تواصل معنا",
+    "status": "حالة النظام",
+    "ambassadors": "السفراء",
+    "login": "دخول",
+    "terms": "الشروط والأحكام",
+    "privacy": "سياسة الخصوصية",
+    "refunds": "الاسترجاع والإلغاء",
+    "cookies": "ملفات تعريف الارتباط",
+    "contactInfo": "معلومات التواصل",
+    "emailLabel": "البريد الإلكتروني: ",
+    "phoneLabel": "هاتف: ",
+    "addressLabel": "العنوان: ",
+    "address": "الخرج، حي النهضة، عبد الرحمن الناصر 16439",
+    "businessLabel": "رقم المنشأة الموحد: ",
+    "email": "support@chapter14.net",
+    "phone": "+966508337658",
+    "businessNumber": "7051848427",
+    "siteLinks": "روابط الموقع",
+    "policies": "السياسات"
+  },
+  "OfflineBar": {
+    "title": "ما في اتصال",
+    "body": "الصفحة اللي قدامك تشتغل، ونرجّع الباقي أول ما يرجع."
+  },
+  "SupportButton": {
+    "ariaLabel": "تواصل مع الدعم على واتساب",
+    "help": "محتاج مساعدة؟",
+    "context": "السلام عليكم، عندي سؤال عن بيكان"
+  },
+  "DocPage": {
+    "updated": "آخر تحديث: {updated}",
+    "contentsLabel": "محتويات الصفحة",
+    "contents": "المحتويات"
+  },
+  "Settings": {
+    "Account": {
+      "interfaceLanguage": "لغة الواجهة"
+    }
+  },
+  "Quota": {
+    "title": "خلّصت دقائق هذا الشهر",
+    "progress": "ذاكرت <strong>{studied, plural, zero {{studiedLabel} دقيقة} one {دقيقة واحدة} two {دقيقتان} few {{studiedLabel} دقائق} many {{studiedLabel} دقيقة} other {{studiedLabel} دقيقة}}</strong> — وباقي لك <strong>{chaptersLeft, plural, zero {{chaptersLabel} فصل} one {فصل واحد} two {فصلان} few {{chaptersLabel} فصول} many {{chaptersLabel} فصلًا} other {{chaptersLabel} فصل}}</strong> قبل الاختبار.",
+    "continue": "كمّل بـ {price} ريال/شهر",
+    "plans": "شوف الخطط",
+    "allowance": "{minutes, plural, zero {{minutesLabel} دقيقة} one {دقيقة واحدة} two {دقيقتان} few {{minutesLabel} دقائق} many {{minutesLabel} دقيقة} other {{minutesLabel} دقيقة}} شهريًا · كل مقرراتك"
+  },
+  "Error": {
+    "title": "الصفحة ما فتحت",
+    "body": "وقف شيء عندنا وإحنا نحمّل الصفحة — مو من جهازك ولا من اتصالك، وما ضاع من تقدّمك شيء.",
+    "retry": "حاول مرة ثانية",
+    "courses": "ارجع لمقرراتك",
+    "help": "تكرّر معك؟ <contact>راسلنا</contact> وشوف <status>حالة النظام</status>.",
+    "digest": "لو راسلتنا، أرفق هذا الرمز ويوصلنا سجل العطل مباشرة: <code>{digest}</code>"
+  },
+  "NotFound": {
+    "metadataTitle": "الصفحة مو موجودة — بيكان",
+    "title": "الصفحة مو موجودة",
+    "body": "الرابط اللي فتحته قديم، أو العنوان فيه حرف ناقص.",
+    "waysLabel": "مخارج",
+    "courses": "مقرراتي",
+    "search": "ابحث عن مقرر",
+    "home": "الصفحة الرئيسية"
+  },
+  "Maintenance": {
+    "metadataTitle": "صيانة — بيكان",
+    "title": "بيكان تحت الصيانة",
+    "body": "نحدّث الخوادم اللي تشغّل الشرح الصوتي. الخدمة موقوفة كاملة خلال التحديث، وحسابك ودقائقك واشتراكك ما تأثّر منها شيء.",
+    "backLabel": "نرجع الساعة",
+    "backAt": "2:00 صباحًا",
+    "backIn": "بعد ساعة ونصف من الآن تقريبًا.",
+    "status": "تابع حالة النظام",
+    "contact": "راسلنا لو أمرك مستعجل"
+  },
+  "Status": {
+    "metadataTitle": "حالة النظام — بيكان",
+    "title": "حالة النظام",
+    "checked": "آخر فحص: 23 أغسطس 2026 · 4:20 مساءً · نفحص كل دقيقة.",
+    "partsTitle": "أجزاء الخدمة",
+    "historyTitle": "الأعطال السابقة",
+    "historyBody": "كل عطل صار عندنا، ومدته، ووش سوّينا عشان ما يتكرّر.",
+    "incident": "{title} · {minutes, plural, zero {{minutesLabel} دقيقة} one {دقيقة واحدة} two {دقيقتان} few {{minutesLabel} دقائق} many {{minutesLabel} دقيقة} other {{minutesLabel} دقيقة}}",
+    "report": "تشوف مشكلة مو مذكورة هنا؟ <contact>بلّغنا</contact> — أول بلاغ يوصلنا يفتح لنا العطل.",
+    "faq": "الأسئلة الشائعة",
+    "levels": {
+      "ok": {
+        "label": "كل شيء يشتغل",
+        "note": "ما فيه عطل معروف الحين."
+      },
+      "partial": {
+        "label": "متأثر جزئيًا",
+        "note": "جزء من الخدمة أبطأ من المعتاد أو متعطّل."
+      },
+      "down": {
+        "label": "متوقف",
+        "note": "الخدمة موقوفة، وإحنا نشتغل عليها."
+      }
+    },
+    "parts": {
+      "voice": "الشرح الصوتي",
+      "board": "السبورة والشرائح",
+      "auth": "الدخول والتسجيل",
+      "billing": "الدفع والاشتراك"
+    },
+    "history": {
+      "voice": {
+        "date": "11 أغسطس 2026",
+        "title": "الشرح الصوتي متقطّع",
+        "what": "مزوّد المعالجة الصوتية تعطّل عنده تحديث. الجلسات المتأثرة رجعت من نفس الموضوع، وما انخصمت دقائقها."
+      },
+      "slides": {
+        "date": "2 أغسطس 2026",
+        "title": "بطء في فتح الشرائح",
+        "what": "ضغط على خادم الملفات وقت الاختبارات النهائية. زدنا السعة ووضعنا حدًّا يمنع تكراره."
+      },
+      "maintenance": {
+        "date": "19 يوليو 2026",
+        "title": "صيانة مجدولة",
+        "what": "تحديث الخوادم، وكان معلَنًا قبلها بيومين."
+      }
+    }
   }
 }

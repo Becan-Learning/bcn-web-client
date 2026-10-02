@@ -1,3 +1,4 @@
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ArrowForward, Chevron } from "./icons";
 import { BecanLogo } from "./logo";
@@ -50,8 +51,8 @@ export function HighlightSvg() {
         </filter>
         {/* قناع يحفر خطوطًا أفقية جافة داخل المسحة */}
         <mask id="bcn-brush-mask">
-          <rect x="-12" y="-12" width="264" height="98" fill="#fff" />
-          <g stroke="#000" strokeLinecap="round" filter="url(#bcn-brush)">
+          <rect x="-12" y="-12" width="264" height="98" fill="white" />
+          <g stroke="black" strokeLinecap="round" filter="url(#bcn-brush)">
             <path d="M2 22h236" strokeWidth="2.6" opacity="0.8" />
             <path d="M2 33h236" strokeWidth="1.5" opacity="0.5" />
             <path d="M2 44h236" strokeWidth="2.2" opacity="0.7" />
@@ -132,19 +133,27 @@ export function Scribbled({ children }: { children: React.ReactNode }) {
    في النصّ المكتوب في JSX يُلَفّ باليد، لكن نصوص البيانات (أجوبة
    الأسئلة الشائعة مثلًا) تصل سلاسلَ لا عناصر — فتُلَفّ هنا.
 
+   في الإنجليزية يُعزل الركض العربي بـ`dir="rtl" lang="ar"`.
    الرَّكض اللاتيني يشمل الكلمات المتتالية: «Apple Pay» ركض واحد لا
    ركضان، وإلا انقلب ترتيب كلمتيه. */
+const ARABIC_RUN =
+  /([\p{Script=Arabic}][\p{Script=Arabic}\u064B-\u065F\u06700-9]*(?:\s+[\p{Script=Arabic}0-9][\p{Script=Arabic}\u064B-\u065F\u06700-9]*)*)/gu;
 const LATIN_RUN =
   /([A-Za-z][A-Za-z0-9.&/+'’-]*(?:\s+[A-Za-z][A-Za-z0-9.&/+'’-]*)*)/g;
 
 export function Copy({ children }: { children: string }) {
-  const parts = children.split(LATIN_RUN);
+  const arabic = useLocale() === "ar";
+  const parts = children.split(arabic ? LATIN_RUN : ARABIC_RUN);
   return (
     <>
       {parts.map((part, i) =>
-        /* الأجزاء الفردية هي المُلتقَطة من التعبير — أي اللاتينية */
+        /* الأجزاء الفردية هي ركض اللغة المخالفة للواجهة */
         i % 2 === 1 ? (
-          <span key={i} dir="ltr">
+          <span
+            key={i}
+            dir={arabic ? "ltr" : "rtl"}
+            lang={arabic ? undefined : "ar"}
+          >
             {part}
           </span>
         ) : (
@@ -164,21 +173,21 @@ export function Plain({ children }: { children: React.ReactNode }) {
    الشاشات الفاتحة وحدها، والجلسة لا تستعملها — ولها حالة انقطاعها
    الخاصة داخلها، فلا يجتمع شريطان على شاشة واحدة. */
 const FOOTER_LINKS = [
-  { href: "/#how", label: "كيف يعمل" },
-  { href: "/#pricing", label: "الأسعار" },
-  { href: "/faq", label: "الأسئلة الشائعة" },
-  { href: "/contact", label: "تواصل معنا" },
-  { href: "/status", label: "حالة النظام" },
-  { href: "/ambassadors", label: "السفراء" },
-  { href: "/join", label: "دخول" },
-];
+  { href: "/#how", label: "how" },
+  { href: "/#pricing", label: "pricing" },
+  { href: "/faq", label: "faq" },
+  { href: "/contact", label: "contact" },
+  { href: "/status", label: "status" },
+  { href: "/ambassadors", label: "ambassadors" },
+  { href: "/join", label: "login" },
+] as const;
 
 const LEGAL_LINKS = [
-  { href: "/terms", label: "الشروط والأحكام" },
-  { href: "/privacy", label: "سياسة الخصوصية" },
-  { href: "/refunds", label: "الاسترجاع والإلغاء" },
-  { href: "/cookies", label: "ملفات تعريف الارتباط" },
-];
+  { href: "/terms", label: "terms" },
+  { href: "/privacy", label: "privacy" },
+  { href: "/refunds", label: "refunds" },
+  { href: "/cookies", label: "cookies" },
+] as const;
 
 export function PageShell({
   children,
@@ -198,6 +207,7 @@ export function PageShell({
 }
 
 export function SiteFooter() {
+  const t = useTranslations("SiteFooter");
   return (
     <footer data-theme="dark" className="bg-aubergine-deep">
       <div className="mx-auto w-full max-w-page px-4 py-12 md:px-8 xl:px-10">
@@ -206,47 +216,47 @@ export function SiteFooter() {
 
           <div className="grid gap-8 sm:grid-cols-2 md:min-w-[34rem] md:grid-cols-[1fr_auto]">
             <address className="not-italic text-sm leading-base text-ink-2">
-              <p className="font-semibold text-ink">معلومات التواصل</p>
+              <p className="font-semibold text-ink">{t("contactInfo")}</p>
               <dl className="mt-3 flex flex-col gap-2">
                 <div>
-                  <dt className="inline">البريد الإلكتروني: </dt>
+                  <dt className="inline">{t("emailLabel")}</dt>
                   <dd className="inline" dir="ltr">
                     <a
                       href="mailto:support@chapter14.net"
                       className="underline underline-offset-4"
                     >
-                      support@chapter14.net
+                      {t("email")}
                     </a>
                   </dd>
                 </div>
                 <div>
-                  <dt className="inline">هاتف: </dt>
+                  <dt className="inline">{t("phoneLabel")}</dt>
                   <dd className="inline" dir="ltr">
                     <a
                       href="tel:+966508337658"
                       className="underline underline-offset-4"
                     >
-                      +966508337658
+                      {t("phone")}
                     </a>
                   </dd>
                 </div>
                 <div>
-                  <dt className="inline">العنوان: </dt>
+                  <dt className="inline">{t("addressLabel")}</dt>
                   <dd className="inline">
-                    الخرج، حي النهضة، عبد الرحمن الناصر 16439
+                    {t("address")}
                   </dd>
                 </div>
                 <div>
-                  <dt className="inline">رقم المنشأة الموحد: </dt>
+                  <dt className="inline">{t("businessLabel")}</dt>
                   <dd className="inline" dir="ltr">
-                    7051848427
+                    {t("businessNumber")}
                   </dd>
                 </div>
               </dl>
             </address>
 
             <nav
-              aria-label="روابط الموقع"
+              aria-label={t("siteLinks")}
               className="flex flex-wrap content-start gap-x-2 gap-y-1"
             >
               {FOOTER_LINKS.map((link) => (
@@ -255,7 +265,7 @@ export function SiteFooter() {
                   href={link.href}
                   className="inline-flex min-h-11 items-center px-2 text-ink-2"
                 >
-                  {link.label}
+                  {t(link.label)}
                 </Link>
               ))}
             </nav>
@@ -263,7 +273,7 @@ export function SiteFooter() {
         </div>
 
         <nav
-          aria-label="السياسات"
+          aria-label={t("policies")}
           className="mt-8 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-line pt-4"
         >
           {LEGAL_LINKS.map((link) => (
@@ -272,7 +282,7 @@ export function SiteFooter() {
               href={link.href}
               className="inline-flex min-h-11 items-center px-2 text-sm text-ink-2"
             >
-              {link.label}
+              {t(link.label)}
             </Link>
           ))}
           <LanguageSwitcher />
@@ -295,6 +305,7 @@ export function SiteHeader({
   nav?: readonly { href: string; label: string }[];
   loginAsButton?: boolean;
 }) {
+  const t = useTranslations("SiteHeader");
   return (
     <header className="border-b border-line">
       {/* الحشو الرأسي خفّ مع تكبير الشعار: الشعار تركيبة سطرين
@@ -334,7 +345,7 @@ export function SiteHeader({
                   : "inline-flex min-h-11 min-w-11 items-center justify-center px-2 font-semibold text-ink-2"
               }
             >
-              دخول
+              {t("login")}
             </Link>
           )}
           <LanguageSwitcher />
@@ -393,12 +404,12 @@ export function PrimaryButton({
   return href ? (
     <Link href={href} className={cls}>
       {children}
-      <ArrowForward className="h-5 w-5 transition-transform duration-200 group-hover:-translate-x-1" />
+      <ArrowForward className="h-5 w-5 transition-transform duration-200 rtl:group-hover:-translate-x-1 ltr:group-hover:translate-x-1" />
     </Link>
   ) : (
     <button type={type ?? "button"} onClick={onClick} className={cls}>
       {children}
-      <ArrowForward className="h-5 w-5 transition-transform duration-200 group-hover:-translate-x-1" />
+      <ArrowForward className="h-5 w-5 transition-transform duration-200 rtl:group-hover:-translate-x-1 ltr:group-hover:translate-x-1" />
     </button>
   );
 }
@@ -419,7 +430,7 @@ export function QuietLink({
       className={`group inline-flex min-h-11 items-center gap-2 font-semibold text-ink ${className}`}
     >
       {children}
-      <ArrowForward className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1" />
+      <ArrowForward className="h-4 w-4 transition-transform duration-200 rtl:group-hover:-translate-x-1 ltr:group-hover:translate-x-1" />
     </Link>
   );
 }
@@ -487,6 +498,7 @@ export function TextField({
 }) {
   return (
     <input
+      dir="auto"
       {...rest}
       aria-invalid={invalid || undefined}
       className={`${controlCls} ${borderCls(invalid)} ${className}`}

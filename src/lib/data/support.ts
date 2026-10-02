@@ -1,3 +1,5 @@
+import type { Localized } from "@/i18n/localized";
+
 /* بيانات الدعم — مصدر واحد لصفحة التواصل ولزرّ واتساب الطافي.
 
    ⚠️ **رقم عرض** — يُستبدل بالرقم الحقيقي قبل الإطلاق، وإلا فتح
@@ -14,15 +16,25 @@ export const whatsappHref = (context?: string) =>
 
 /* أوقات الرد — صريحة ولا وعد بـ«24/7»: الوعد الذي لا نفي به يكلّف
    ثقةً أكثر مما يكسبه. */
-export const HOURS = [
+export const HOURS: {
+  id: string;
+  channel: Localized;
+  when: Localized;
+  reply: Localized;
+}[] = [
   {
-    channel: "واتساب",
-    when: "كل يوم 10 صباحًا – 10 مساءً",
-    reply: "خلال ساعتين",
+    id: "whatsapp",
+    channel: { ar: "واتساب", en: "WhatsApp" },
+    when: {
+      ar: "كل يوم 10 صباحًا – 10 مساءً",
+      en: "Every day, 10 AM – 10 PM",
+    },
+    reply: { ar: "خلال ساعتين", en: "Within two hours" },
   },
   {
-    channel: "البريد والنموذج",
-    when: "أيام العمل",
-    reply: "خلال يوم عمل واحد",
+    id: "email",
+    channel: { ar: "البريد والنموذج", en: "Email and contact form" },
+    when: { ar: "أيام العمل", en: "Business days" },
+    reply: { ar: "خلال يوم عمل واحد", en: "Within one business day" },
   },
 ];

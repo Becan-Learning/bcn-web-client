@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
   PageShell,
@@ -26,6 +27,7 @@ export default function ErrorScreen({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations("Error");
   return (
     <PageShell>
       <SiteHeader />
@@ -34,49 +36,53 @@ export default function ErrorScreen({
         <div className="max-w-measure">
           {/* ماذا حدث */}
           <h1 className="font-display text-4xl leading-tight font-bold text-ink md:text-5xl">
-            الصفحة ما فتحت
+            {t("title")}
           </h1>
 
           {/* لماذا */}
           <p className="mt-4 leading-base text-ink-2">
-            وقف شيء عندنا وإحنا نحمّل الصفحة — مو من جهازك ولا من اتصالك، وما
-            ضاع من تقدّمك شيء.
+            {t("body")}
           </p>
 
           {/* ماذا تفعل الآن */}
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             <PrimaryButton onClick={reset} className="w-full sm:w-fit">
-              حاول مرة ثانية
+              {t("retry")}
             </PrimaryButton>
 
-            <QuietLink href="/home">ارجع لمقرراتك</QuietLink>
+            <QuietLink href="/home">{t("courses")}</QuietLink>
           </div>
 
           <p className="mt-8 text-sm text-ink-2">
-            تكرّر معك؟{" "}
-            <Link
-              href="/contact"
-              className="font-semibold text-pressable underline underline-offset-4"
-            >
-              راسلنا
-            </Link>{" "}
-            وشوف{" "}
-            <Link
-              href="/status"
-              className="font-semibold text-pressable underline underline-offset-4"
-            >
-              حالة النظام
-            </Link>
-            .
+            {t.rich("help", {
+              contact: (chunks) => (
+                <Link
+                  href="/contact"
+                  className="font-semibold text-pressable underline underline-offset-4"
+                >
+                  {chunks}
+                </Link>
+              ),
+              status: (chunks) => (
+                <Link
+                  href="/status"
+                  className="font-semibold text-pressable underline underline-offset-4"
+                >
+                  {chunks}
+                </Link>
+              ),
+            })}
           </p>
 
           {/* الرمز بعد شرحه لا قبله — ولمن يفيده */}
           {error.digest ? (
             <p className="mt-4 text-sm text-ink-2">
-              لو راسلتنا، أرفق هذا الرمز ويوصلنا سجل العطل مباشرة:{" "}
-              <span dir="ltr" className="font-semibold text-ink">
-                {error.digest}
-              </span>
+              {t.rich("digest", {
+                digest: error.digest,
+                code: (chunks) => (
+                  <span dir="ltr" className="font-semibold text-ink">{chunks}</span>
+                ),
+              })}
             </p>
           ) : null}
         </div>

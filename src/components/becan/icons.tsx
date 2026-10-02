@@ -29,11 +29,20 @@ export function Chevron({ className = "h-4 w-4" }: P) {
   );
 }
 
-/** سهم يشير إلى نهاية السطر — في RTL يتّجه يسارًا. */
+/** سهم إلى نهاية السطر: يسارًا في RTL ويمينًا في LTR. */
 export function ArrowForward({ className = "h-4 w-4" }: P) {
   return (
-    <svg {...base} viewBox="0 0 24 24" className={className}>
+    <svg {...base} viewBox="0 0 24 24" className={`ltr:-scale-x-100 ${className}`}>
       <path d="M19 12H5m0 0 6-6m-6 6 6 6" />
+    </svg>
+  );
+}
+
+/** سهم الرجوع إلى بداية السطر، بعكس سهم التقدّم. */
+export function ArrowBack({ className = "h-4 w-4" }: P) {
+  return (
+    <svg {...base} viewBox="0 0 24 24" className={`ltr:-scale-x-100 ${className}`}>
+      <path d="M5 12h14m0 0-6-6m6 6-6 6" />
     </svg>
   );
 }

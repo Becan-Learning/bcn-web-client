@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 
 /* ————— شعار بيكان —————
@@ -38,10 +39,11 @@ export function BecanLogo({
   className?: string;
   priority?: boolean;
 }) {
+  const t = useTranslations("Brand");
   return (
     <Image
       src={onDark ? "/brand/becan-logo-light.png" : "/brand/becan-logo.png"}
-      alt="بيكان"
+      alt={t("name")}
       width={Math.round(height * RATIO)}
       height={height}
       priority={priority}

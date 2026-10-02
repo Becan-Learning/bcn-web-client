@@ -3,26 +3,11 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
-import { El_Messiri, IBM_Plex_Sans_Arabic } from "next/font/google";
+import { elMessiri, ibmPlexSansArabic } from "@/app/fonts";
 import { DirectionProvider } from "@/components/direction-provider";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "@/styles/globals.css";
-
-/* الخط ليس متغيّرًا؛ الأوزان صريحة، والتوكن --bcn-font-sans يقرأ متغيّره. */
-const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
-  variable: "--font-ibm-plex-arabic",
-  subsets: ["arabic", "latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
-
-/* خط العرض — El Messiri، خط الشعار، للعناوين وحدها. */
-const elMessiri = El_Messiri({
-  variable: "--font-el-messiri",
-  subsets: ["arabic", "latin"],
-  display: "swap",
-});
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));

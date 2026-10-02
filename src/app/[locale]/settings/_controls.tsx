@@ -86,9 +86,8 @@ export function Toggle({
       >
         <span
           className={`h-5 w-5 rounded-pill bg-surface transition-transform duration-200 ${
-            /* -translate-x يتحرّك يسارًا دائمًا، والمفتاح في RTL يبدأ
-               من اليمين — فالتشغيل إزاحة إلى اليسار. */
-            checked ? "-translate-x-5" : "translate-x-0"
+            /* التشغيل ينقل القرص إلى نهاية السطر في لغة الواجهة. */
+            checked ? "rtl:-translate-x-5 ltr:translate-x-5" : "translate-x-0"
           }`}
         />
       </span>

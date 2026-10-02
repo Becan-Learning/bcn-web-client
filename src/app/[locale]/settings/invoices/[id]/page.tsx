@@ -4,7 +4,7 @@ import { setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import { Link } from "@/i18n/navigation";
 import { notFound } from "next/navigation";
-import { ArrowForward } from "@/components/becan/icons";
+import { ArrowBack } from "@/components/becan/icons";
 import { PageShell, Section, SiteHeader } from "@/components/becan/kit";
 import {
   INVOICES,
@@ -55,7 +55,7 @@ export default async function InvoicePage(
             href="/settings/invoices"
             className="inline-flex min-h-11 items-center gap-2 font-semibold text-ink-2 print:hidden"
           >
-            <ArrowForward className="h-4 w-4 rotate-180" />
+            <ArrowBack className="h-4 w-4" />
             الفواتير
           </Link>
 

@@ -72,24 +72,26 @@ function Select({
 }
 
 /* موضع مؤشّر الكتابة بإحداثيات الشاشة: نقيس عرض النص المكتوب حتى
-   المؤشّر ثم نطرحه من حافة البداية. في RTL البداية هي الحافة اليمنى. */
+   المؤشّر ثم نزيحه عن حافة البداية بحسب اتجاه الحقل. */
 let measureCtx: CanvasRenderingContext2D | null = null;
 
 function caretPoint(input: HTMLInputElement): LookPoint {
   const box = input.getBoundingClientRect();
   const cs = getComputedStyle(input);
   const y = box.top + box.height / 2;
+  const rtl = cs.direction === "rtl";
 
   measureCtx ??= document.createElement("canvas").getContext("2d");
-  if (!measureCtx) return { x: box.right - 56, y };
+  if (!measureCtx) return { x: rtl ? box.right - 56 : box.left + 56, y };
 
   measureCtx.font = [cs.fontWeight, cs.fontSize, cs.fontFamily].join(" ");
   const upToCaret = input.value.slice(
     0,
     input.selectionStart ?? input.value.length,
   );
-  const padStart = parseFloat(cs.paddingInlineStart || cs.paddingRight || "0");
-  const x = box.right - padStart - measureCtx.measureText(upToCaret).width;
+  const padStart = parseFloat(cs.paddingInlineStart || "0");
+  const offset = padStart + measureCtx.measureText(upToCaret).width;
+  const x = rtl ? box.right - offset : box.left + offset;
 
   return { x: Math.max(box.left, Math.min(box.right, x)), y };
 }

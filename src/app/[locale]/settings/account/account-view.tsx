@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { COLLEGES, UNIVERSITIES } from "@/lib/data/catalog";
 import {
@@ -31,6 +32,7 @@ const START = {
 };
 
 export function AccountView() {
+  const t = useTranslations("Settings.Account");
   const { saved, ping } = useSaveNotice();
 
   const [name, setName] = useState(START.name);
@@ -45,7 +47,7 @@ export function AccountView() {
       {/* الإشعار فوق البطاقات: يخصّ الصفحة كلها لا حقلًا بعينه */}
       <SaveNotice saved={saved} />
 
-      <SettingsCard title="لغة الواجهة">
+      <SettingsCard title={t("interfaceLanguage")}>
         <div className="mt-4">
           <LanguageSwitcher />
         </div>

@@ -1,5 +1,5 @@
 import { Link } from "@/i18n/navigation";
-import { ArrowForward } from "@/components/becan/icons";
+import { ArrowBack } from "@/components/becan/icons";
 import { PageShell, Section, SiteHeader } from "@/components/becan/kit";
 
 /* تخطيط الإعدادات الموحَّد — الاشتراك والفواتير معه في نفس القشرة.
@@ -79,7 +79,7 @@ export function SettingsShell({
           href="/settings"
           className="inline-flex min-h-11 items-center gap-2 font-semibold text-ink-2 md:hidden"
         >
-          <ArrowForward className="h-4 w-4 rotate-180" />
+          <ArrowBack className="h-4 w-4" />
           الإعدادات
         </Link>
 

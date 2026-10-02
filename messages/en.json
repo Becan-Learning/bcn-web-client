@@ -6,5 +6,136 @@
   "Metadata": {
     "title": "Becan — Your personal course tutor",
     "description": "Becan explains your course by voice, asks questions to check your understanding, and identifies where you lose marks in exams."
+  },
+  "SiteHeader": {
+    "login": "Sign in"
+  },
+  "Brand": {
+    "name": "Becan"
+  },
+  "SiteFooter": {
+    "how": "How it works",
+    "pricing": "Pricing",
+    "faq": "FAQs",
+    "contact": "Contact us",
+    "status": "System status",
+    "ambassadors": "Ambassadors",
+    "login": "Sign in",
+    "terms": "Terms and conditions",
+    "privacy": "Privacy policy",
+    "refunds": "Refunds and cancellations",
+    "cookies": "Cookies",
+    "contactInfo": "Contact information",
+    "emailLabel": "Email: ",
+    "phoneLabel": "Phone: ",
+    "addressLabel": "Address: ",
+    "address": "Abdulrahman Al Nasser, Al Nahdah, Al Kharj 16439",
+    "businessLabel": "Unified establishment number: ",
+    "email": "support@chapter14.net",
+    "phone": "+966508337658",
+    "businessNumber": "7051848427",
+    "siteLinks": "Site links",
+    "policies": "Policies"
+  },
+  "OfflineBar": {
+    "title": "You’re offline",
+    "body": "This page still works. The rest will return when you’re back online."
+  },
+  "SupportButton": {
+    "ariaLabel": "Contact support on WhatsApp",
+    "help": "Need help?",
+    "context": "Hello, I have a question about Becan"
+  },
+  "DocPage": {
+    "updated": "Last updated: {updated}",
+    "contentsLabel": "Page contents",
+    "contents": "Contents"
+  },
+  "Settings": {
+    "Account": {
+      "interfaceLanguage": "Interface language"
+    }
+  },
+  "Quota": {
+    "title": "You’ve used this month’s minutes",
+    "progress": "You studied <strong>{studied, plural, one {{studiedLabel} minute} other {{studiedLabel} minutes}}</strong> — you have <strong>{chaptersLeft, plural, one {{chaptersLabel} chapter} other {{chaptersLabel} chapters}}</strong> left before your exam.",
+    "continue": "Keep studying for SAR {price}/month",
+    "plans": "See plans",
+    "allowance": "{minutes, plural, one {{minutesLabel} minute} other {{minutesLabel} minutes}} per month · Your courses"
+  },
+  "Error": {
+    "title": "The page didn’t open",
+    "body": "Something stopped on our end while loading the page. Your device and connection are fine, and your progress is safe.",
+    "retry": "Try again",
+    "courses": "Back to your courses",
+    "help": "Keeps happening? <contact>Contact us</contact> and check the <status>system status</status>.",
+    "digest": "If you contact us, include this code so we can find the error log: <code>{digest}</code>"
+  },
+  "NotFound": {
+    "metadataTitle": "Page not found — Becan",
+    "title": "This page isn’t here",
+    "body": "The link may be old, or a character is missing from the address.",
+    "waysLabel": "Where to go next",
+    "courses": "My courses",
+    "search": "Find a course",
+    "home": "Home"
+  },
+  "Maintenance": {
+    "metadataTitle": "Maintenance — Becan",
+    "title": "Becan is under maintenance",
+    "body": "We’re updating the servers that run voice explanations. The service is paused during the update. Your account, minutes and subscription are unaffected.",
+    "backLabel": "We expect to be back at",
+    "backAt": "2:00 AM",
+    "backIn": "About an hour and a half from now.",
+    "status": "Follow the system status",
+    "contact": "Contact us if you need help now"
+  },
+  "Status": {
+    "metadataTitle": "System status — Becan",
+    "title": "System status",
+    "checked": "Last checked: 23 August 2026 · 4:20 PM · We check every minute.",
+    "partsTitle": "Service components",
+    "historyTitle": "Past incidents",
+    "historyBody": "What happened, how long it lasted, and what we did to prevent it from happening again.",
+    "incident": "{title} · {minutes, plural, one {{minutesLabel} minute} other {{minutesLabel} minutes}}",
+    "report": "See a problem that isn’t listed here? <contact>Let us know</contact> — your report helps us start investigating.",
+    "faq": "FAQs",
+    "levels": {
+      "ok": {
+        "label": "Everything is working",
+        "note": "No known issues right now."
+      },
+      "partial": {
+        "label": "Partially affected",
+        "note": "Some parts of the service are slower than usual or unavailable."
+      },
+      "down": {
+        "label": "Unavailable",
+        "note": "The service is down. We’re working on it."
+      }
+    },
+    "parts": {
+      "voice": "Voice explanations",
+      "board": "Board and slides",
+      "auth": "Sign in and registration",
+      "billing": "Payments and subscriptions"
+    },
+    "history": {
+      "voice": {
+        "date": "11 August 2026",
+        "title": "Voice explanations interrupted",
+        "what": "An update failed at our audio processing provider. You could resume affected sessions from the same topic, and those minutes weren’t deducted."
+      },
+      "slides": {
+        "date": "2 August 2026",
+        "title": "Slides slow to open",
+        "what": "The file server was overloaded during final exams. We increased capacity and added a limit to prevent it from happening again."
+      },
+      "maintenance": {
+        "date": "19 July 2026",
+        "title": "Scheduled maintenance",
+        "what": "A server update, announced two days in advance."
+      }
+    }
   }
 }

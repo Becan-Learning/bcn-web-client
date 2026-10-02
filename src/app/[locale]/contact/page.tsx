@@ -1,3 +1,4 @@
+import { localize } from "@/i18n/localized";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
@@ -64,12 +65,12 @@ export default async function ContactPage(props: PageProps<"/[locale]/contact">)
           <dl className="mt-8 flex flex-col gap-3">
             {HOURS.map((h) => (
               <div
-                key={h.channel}
+                key={h.id}
                 className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-t border-line pt-3 first:border-0 first:pt-0"
               >
-                <dt className="font-semibold text-ink">{h.channel}</dt>
+                <dt className="font-semibold text-ink">{localize(h.channel, locale)}</dt>
                 <dd className="text-ink-2">
-                  {h.when} · نردّ {h.reply}
+                  {localize(h.when, locale)} · نردّ {localize(h.reply, locale)}
                 </dd>
               </div>
             ))}

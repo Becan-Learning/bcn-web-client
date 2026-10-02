@@ -1,4 +1,4 @@
-import type { IconKey } from "@/app/courses/subject-icon";
+import type { IconKey } from "@/app/[locale]/courses/subject-icon";
 
 /* كتالوج عرض. ACCT 101 وحدها من docs/design-brief.md — البقية بيانات
    عرض حتى يصل الكتالوج الحقيقي. */

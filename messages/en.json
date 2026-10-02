@@ -1,0 +1,10 @@
+{
+  "LanguageSwitcher": {
+    "label": "عربي",
+    "ariaLabel": "Switch interface language to Arabic"
+  },
+  "Metadata": {
+    "title": "Becan — Your personal course tutor",
+    "description": "Becan explains your course by voice, asks questions to check your understanding, and identifies where you lose marks in exams."
+  }
+}

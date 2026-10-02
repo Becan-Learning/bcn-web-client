@@ -21,13 +21,18 @@ Next.js 16 · TypeScript · Tailwind 4 · Motion (الحزمة `motion`، الا
 
 | المسار | المحتوى |
 |---|---|
-| `src/app/` | كل الشاشات (بيانات عرض) + `api/` (رمز LiveKit · وسيط Bunny · تقييم Langfuse) |
+| `src/app/[locale]/` | كل الشاشات (بيانات عرض) |
+| `src/app/api/` | رمز LiveKit · وسيط Bunny · تقييم Langfuse — خارج `[locale]` |
+| `src/i18n/` | `routing` · `navigation` · `request` |
+| `messages/` | `ar.json` · `en.json` — شجرة مفاتيح واحدة |
 | `src/components/becan/` | عُدّة التصميم: `kit` · `icons` · `logo` · `becan-face` … |
 | `src/components/session/` | الجلسة الحقيقية: `session-view` · `parts` · `slides-pdf` |
 | `src/lib/data/` | بيانات العرض: الكتالوج · الخطط · الفوترة · الأسئلة · الدعم |
 | `src/lib/session/` | عقد الوكيل (`ui-control` · `teaching-board`) · `session-reducer` · `content` |
 | `src/styles/` | `tokens.css` + `globals.css` |
 
+- نصوص الصفحات في `messages/` — **ممنوع نصّ ظاهر للطالب ثابت في المكوّنات** (عربي أو إنجليزي).
+  التنقّل بـ`Link` و`useRouter` من `@/i18n/navigation`؛ **ممنوع `next/link`**.
 - **عقد الوكيل لا يُغيَّر من طرف واحد:** الوكيل ينشر على موضوع `ui-control`
   (`scroll` · `set_lesson` · `set_topic` · `topic_done` · `session_ending` · `board_*`)،
   والطالب يكتب على `lk.chat`. سمات المشارك في `api/get-lk-token`.
@@ -52,12 +57,20 @@ Next.js 16 · TypeScript · Tailwind 4 · Motion (الحزمة `motion`، الا
 `--error` النبيذي = خطأ فقط — **ممنوع للوقت أو الإلحاح**
 `--aubergine-soft` ممنوع بجوار `--error` في نفس السياق
 
-## RTL — إلزامي
+## الاتجاه — من لغة الواجهة
+لغة الواجهة تضبط `lang` و`dir`: العربية RTL (أساسية، مسارات بلا بادئة)، والإنجليزية LTR تحت `/en`.
+اتجاه أغلفة التخطيط من لغة الواجهة في المسار — **ممنوع تثبيت `dir="rtl"` أو `dir="ltr"` عليها**.
+
 - خصائص منطقية فقط. في Tailwind: `ms-` `me-` `ps-` `pe-` `start-` `end-`
 - **ممنوع** `ml-` `mr-` `pl-` `pr-` `left-` `right-` وأي `margin-left/right` في CSS
 - رمز لاتيني داخل نص عربي يُلَفّ بـ `<span dir="ltr">` وإلا انقلب
-- الأسهم والشيفرونات تنعكس · الساعة والميكروفون لا تنعكس
+- رمز عربي داخل نص إنجليزي يُلَفّ بـ `<span dir="rtl" lang="ar">`
+- الأسهم والشيفرونات تنعكس مع الاتجاه · الساعة والميكروفون لا تنعكس
 - **أرقام إنجليزية (0–9)** في كل الواجهة — لا أرقام هندية
+
+لغات الواجهة · الشرح · المحتوى مستقلة — راجع [GLOSSARY.md](GLOSSARY.md)،
+و[ADR 0001](docs/adr/0001-interface-and-explanation-language-are-separate.md)
+و[ADR 0002](docs/adr/0002-arabic-unprefixed-no-browser-detection.md).
 
 ## Mobile-first
 390px أولًا → 768 → 1120. أهداف اللمس ≥ 44×44px.
@@ -116,3 +129,19 @@ Next.js 16 · TypeScript · Tailwind 4 · Motion (الحزمة `motion`، الا
 
 **القاعدة الحاكمة: الدفء في الخارج، التقشّف في الداخل.**
 الموقع التسويقي غنيّ ودافئ. الجلسة داكنة صامتة خالية من أي زينة.
+
+## Agent skills
+
+### Branches & PRs
+
+- **`main` is off-limits.** Only the repo owner touches it. Never check it out to work on, commit to it, push to it, rebase onto it, or merge into it.
+- **Every piece of work starts on a new branch cut from the latest `dev`**: `git switch dev && git pull && git switch -c <branch>`.
+- **PRs never target `main`.** The base is `dev` by default, or another branch when the situation calls for it (e.g. a stacked PR onto its parent branch). Always pass the base explicitly, since `gh` defaults to `main`: `gh pr create --base dev`.
+
+### Issue tracker
+
+Issues live in GitHub Issues on `Becan-Learning/bcn-web-client` (via `gh`). See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Single-context: one `GLOSSARY.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.

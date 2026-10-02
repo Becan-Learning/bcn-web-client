@@ -1,8 +1,9 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { ArrowForward, Chevron } from "./icons";
 import { BecanLogo } from "./logo";
 import { OfflineBar } from "./offline-bar";
 import { SupportButton } from "./support-button";
+import { LanguageSwitcher } from "./language-switcher";
 
 /* عناصر التصميم المعتمد. كل شاشة جديدة تُبنى منها فلا تعيد اختراعها. */
 
@@ -274,6 +275,7 @@ export function SiteFooter() {
               {link.label}
             </Link>
           ))}
+          <LanguageSwitcher />
         </nav>
       </div>
     </footer>
@@ -306,7 +308,7 @@ export function SiteHeader({
           <BecanLogo height={64} priority className="h-13 w-auto md:h-16" />
         </Link>
 
-        <div className="flex items-center gap-1">
+        <div className="flex flex-wrap items-center justify-end gap-1">
           {/* الروابط ظاهرة على الجوال أيضًا: المشروع mobile-first عند
               390px، وطيّها خلف نقطة توقّف يترك الهيدر بلا محتواه */}
           {nav?.length ? (
@@ -335,6 +337,7 @@ export function SiteHeader({
               دخول
             </Link>
           )}
+          <LanguageSwitcher />
         </div>
       </div>
     </header>

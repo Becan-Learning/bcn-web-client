@@ -1,8 +1,8 @@
+import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
+import { hasLocale } from "next-intl";
 import { localize } from "@/i18n/localized";
 import { notFound } from "next/navigation";
-import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
-import { setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import { Link } from "@/i18n/navigation";
 import {
@@ -16,9 +16,12 @@ import {
 import { resumePoint } from "@/lib/data/home";
 import { planById } from "@/lib/data/plans";
 
-export const metadata: Metadata = {
-  title: "نتيجة الدفع — بيكان",
-};
+export async function generateMetadata({ params }: PageProps<"/[locale]/checkout/result">): Promise<Metadata> {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) notFound();
+  const t = await getTranslations({ locale, namespace: "Checkout.Result" });
+  return { title: t("metadataTitle") };
+}
 
 /* P3 — نتيجة الدفع.
 
@@ -40,24 +43,24 @@ const isState = (v: unknown): v is ResultState =>
 
 /* أسباب الرفض التي تصل من بوابات الدفع — كلٌّ بفعله الممكن.
    `unknown` ليس «حدث خطأ»: يقول ما يعرفه ويحيل إلى البنك. */
-const REASONS: Record<string, { why: string; fix: string }> = {
+const REASONS = {
   declined: {
-    why: "بنكك رفض العملية.",
-    fix: "تواصل مع بنكك أو جرّب بطاقة ثانية — الرفض من عندهم لا من بيكان.",
+    why: "declinedWhy",
+    fix: "declinedFix",
   },
   funds: {
-    why: "الرصيد لا يكفي المبلغ.",
-    fix: "اشحن الحساب أو جرّب وسيلة ثانية، والخطة تبقى محجوزة لك.",
+    why: "fundsWhy",
+    fix: "fundsFix",
   },
   expired: {
-    why: "البطاقة منتهية الصلاحية.",
-    fix: "استخدم بطاقة سارية، أو ادفع من جوالك بلا كتابة أرقام.",
+    why: "expiredWhy",
+    fix: "expiredFix",
   },
   online: {
-    why: "الشراء عبر الإنترنت غير مفعّل على بطاقتك.",
-    fix: "فعّله من تطبيق بنكك — عادةً تحت «إعدادات البطاقة» — ثم أعد المحاولة.",
+    why: "onlineWhy",
+    fix: "onlineFix",
   },
-};
+} as const;
 
 const FALLBACK = REASONS.declined;
 
@@ -73,7 +76,7 @@ export default async function ResultPage(props: PageProps<"/[locale]/checkout/re
 
   const state: ResultState = isState(rawState) ? rawState : "success";
   const plan = planById(rawPlan ?? "") ?? planById("pro")!;
-  const reason = REASONS[rawReason ?? ""] ?? FALLBACK;
+  const reason = Object.hasOwn(REASONS, rawReason ?? "") ? REASONS[rawReason as keyof typeof REASONS] : FALLBACK;
   const resume = resumePoint();
 
   return (
@@ -97,7 +100,7 @@ export default async function ResultPage(props: PageProps<"/[locale]/checkout/re
 
 /* ————— نجاح ————— */
 
-function Success({
+async function Success({
   plan,
   minutes,
   resume,
@@ -106,43 +109,43 @@ function Success({
   minutes: number;
   resume: ReturnType<typeof resumePoint>;
 }) {
+  const t = await getTranslations("Checkout.Result");
+  const locale = await getLocale();
   return (
     <div>
       {/* رقم واحد بارز: الحصّة الجديدة — لا لوحة إحصائيات */}
       <h1 className="font-display text-4xl leading-tight font-bold text-ink md:text-5xl">
-        تمت الترقية
+        {t("successTitle")}
       </h1>
 
       <p className="mt-4 leading-base text-ink-2">
-        صرت على خطة {plan} — {minutes} دقيقة شهريًا، وكل مقرراتك مفتوحة. وصلتك
-        الفاتورة على بريدك.
+        {t("successBody", { plan, minutes, minutesLabel: String(minutes) })}
       </p>
 
       {/* الفعل الوحيد: يرجعه إلى الفصل الذي كان فيه، لا إلى الرئيسية */}
       {resume ? (
         <div className="mt-8">
-          <p className="text-sm font-semibold text-ink-2">كنت في</p>
+          <p className="text-sm font-semibold text-ink-2">{t("resumeLabel")}</p>
           <p className="mt-1 text-lg font-bold text-ink">
-            {resume.courseName} · الفصل {resume.chapterNo} —{" "}
-            {resume.chapterTitle}
+            {t("resumeChapter", { course: localize(resume.courseName, locale), number: String(resume.chapterNo), title: localize(resume.chapterTitle, locale) })}
           </p>
 
           <PrimaryButton
             href={`/session/${resume.slug}/${resume.chapterNo}`}
             className="mt-5 w-full sm:w-fit"
           >
-            كمّل من وين وقفت
+            {t("resume")}
           </PrimaryButton>
         </div>
       ) : (
         <PrimaryButton href="/home" className="mt-8 w-full sm:w-fit">
-          ارجع لمقرراتك
+          {t("home")}
         </PrimaryButton>
       )}
 
       <div className="mt-6 flex flex-wrap items-center gap-x-6">
-        <QuietLink href="/settings/invoices">شوف فاتورتك</QuietLink>
-        <QuietLink href="/settings/subscription">إدارة الاشتراك</QuietLink>
+        <QuietLink href="/settings/invoices">{t("invoice")}</QuietLink>
+        <QuietLink href="/settings/subscription">{t("subscription")}</QuietLink>
       </div>
     </div>
   );
@@ -150,28 +153,29 @@ function Success({
 
 /* ————— فشل ————— */
 
-function Failed({
+async function Failed({
   planId,
   reason,
 }: {
   planId: string;
-  reason: { why: string; fix: string };
+  reason: (typeof REASONS)[keyof typeof REASONS];
 }) {
+  const t = await getTranslations("Checkout.Result");
   return (
     <div>
       {/* ماذا حدث */}
       <h1 className="font-display text-4xl leading-tight font-bold text-ink md:text-5xl">
-        ما تمّ الدفع
+        {t("failedTitle")}
       </h1>
 
       {/* لماذا — سبب محدّد، والأحمر لدلالة الخطأ وحدها */}
-      <p className="mt-4 text-lg font-semibold text-error">{reason.why}</p>
+      <p className="mt-4 text-lg font-semibold text-error">{t(reason.why)}</p>
 
       {/* ماذا تفعل الآن */}
-      <p className="mt-3 leading-base text-ink-2">{reason.fix}</p>
+      <p className="mt-3 leading-base text-ink-2">{t(reason.fix)}</p>
 
       <p className="mt-4 leading-base text-ink-2">
-        ما انخصم منك شيء، وخطتك ما تغيّرت.
+        {t("unchanged")}
       </p>
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -179,23 +183,16 @@ function Failed({
           href={`/checkout?plan=${planId}`}
           className="w-full sm:w-fit"
         >
-          حاول مرة ثانية
+          {t("retry")}
         </PrimaryButton>
 
         <GhostButton href={`/checkout?plan=${planId}`}>
-          جرّب وسيلة ثانية
+          {t("anotherMethod")}
         </GhostButton>
       </div>
 
       <p className="mt-6 text-sm text-ink-2">
-        تكرّر معك؟{" "}
-        <Link
-          href="/contact"
-          className="font-semibold text-pressable underline underline-offset-4"
-        >
-          راسلنا على واتساب
-        </Link>{" "}
-        ونتابعها معك.
+        {t.rich("help", { contact: (chunks) => <Link href="/contact" className="font-semibold text-pressable underline underline-offset-4">{chunks}</Link> })}
       </p>
     </div>
   );
@@ -203,26 +200,27 @@ function Failed({
 
 /* ————— معلّق ————— */
 
-function Pending({ resume }: { resume: ReturnType<typeof resumePoint> }) {
+async function Pending({ resume }: { resume: ReturnType<typeof resumePoint> }) {
+  const t = await getTranslations("Checkout.Result");
+  const locale = await getLocale();
   return (
     <div>
       {/* ماذا حدث · لماذا — بلا لون خطأ: هذه ليست حالة خطأ */}
       <h1 className="font-display text-4xl leading-tight font-bold text-ink md:text-5xl">
-        الدفع قيد المعالجة
+        {t("pendingTitle")}
       </h1>
 
       <p className="mt-4 leading-base text-ink-2">
-        بنكك يراجع العملية، وهذا يستغرق دقائق. نبلّغك على واتساب وعلى بريدك أول
-        ما تكتمل، وما تحتاج تعيد المحاولة.
+        {t("pendingBody")}
       </p>
 
       {/* ماذا تفعل الآن — ما يستطيع فعله بخطته الحالية، لا انتظارًا فارغًا */}
       <section className="mt-8 rounded-xl bg-tint-amber p-5">
-        <h2 className="text-lg font-bold text-ink">تقدر تكمّل الحين</h2>
+        <h2 className="text-lg font-bold text-ink">{t("continueTitle")}</h2>
         <p className="mt-2 leading-base text-ink-2">
           {resume
-            ? `دقائق خطتك الحالية باقية، وتقدر تكمّل ${resume.courseName} — الفصل ${resume.chapterNo} إلى أن يكتمل الدفع.`
-            : "دقائق خطتك الحالية باقية، وتقدر تذاكر بها إلى أن يكتمل الدفع."}
+            ? t("pendingResume", { course: localize(resume.courseName, locale), number: String(resume.chapterNo) })
+            : t("pendingDefault")}
         </p>
       </section>
 
@@ -231,16 +229,16 @@ function Pending({ resume }: { resume: ReturnType<typeof resumePoint> }) {
           href={`/session/${resume.slug}/${resume.chapterNo}`}
           className="mt-6 w-full sm:w-fit"
         >
-          كمّل من وين وقفت
+          {t("resume")}
         </PrimaryButton>
       ) : (
         <PrimaryButton href="/home" className="mt-6 w-full sm:w-fit">
-          ارجع لمقرراتك
+          {t("home")}
         </PrimaryButton>
       )}
 
       <div className="mt-6">
-        <QuietLink href="/settings/subscription">تابع حالة الاشتراك</QuietLink>
+        <QuietLink href="/settings/subscription">{t("status")}</QuietLink>
       </div>
     </div>
   );

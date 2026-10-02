@@ -1,5 +1,8 @@
 "use client";
 
+import { useTranslations, useLocale } from "next-intl";
+import { localize } from "@/i18n/localized";
+
 import { useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { ArrowForward, StatusIcon } from "@/components/becan/icons";
@@ -13,9 +16,9 @@ import { TONES } from "@/lib/data/catalog";
    وجدار التسجيل عند الضغط على فصل فقط. */
 
 const TABS = [
-  { id: "chapters", label: "الفصول", ready: true },
-  { id: "checks", label: "اختبارات التحقق", ready: false },
-  { id: "sources", label: "مصادر أخرى", ready: false },
+  { id: "chapters", label: "chapters", ready: true },
+  { id: "checks", label: "checks", ready: false },
+  { id: "sources", label: "sources", ready: false },
 ] as const;
 
 export type ViewState = "guest" | "new" | "progress";
@@ -40,12 +43,12 @@ const SKINS = {
 
 type Status = "none" | "next" | "almost" | "done";
 
-const STATUS_LABEL: Record<Status, string> = {
-  none: "ما بدأت",
-  next: "الخطوة الجاية",
-  almost: "باقي له شوي",
-  done: "أنجزته",
-};
+const STATUS_LABEL = {
+  none: "notStarted",
+  next: "nextStatus",
+  almost: "almost",
+  done: "done",
+} as const;
 
 const skinOf = (tone: Course["tone"]) =>
   tone === "olive" || tone === "oliveDark" ? SKINS.olive : SKINS.purple;
@@ -58,6 +61,7 @@ function MasteryBar({
   percent: number;
   skin: { meta: string; bar: string };
 }) {
+  const t = useTranslations("Course");
   return (
     <div className="flex items-center gap-2">
       <span
@@ -70,7 +74,7 @@ function MasteryBar({
         />
       </span>
       <span className={`shrink-0 text-xs ${skin.meta}`}>
-        {percent > 0 ? `${percent}% إتقان` : "لم تبدأ"}
+        {percent > 0 ? t("mastery", { percent: String(percent) }) : t("notStartedMastery")}
       </span>
     </div>
   );
@@ -91,11 +95,12 @@ function MiniDashboard({
   examDate: string;
   action: { href: string; label: string; next: string };
 }) {
+  const t = useTranslations("Course");
   return (
     <div className="mt-8 rounded-xl border border-line bg-surface p-5 shadow-soft md:p-6">
       <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-ink-2">تقدّمك في المقرر</p>
+          <p className="text-sm font-semibold text-ink-2">{t("progress")}</p>
 
           {/* الرقم البارز الوحيد */}
           <p className="mt-1 font-display text-5xl leading-none font-bold text-ink md:text-6xl">
@@ -108,7 +113,7 @@ function MiniDashboard({
             aria-valuenow={percent}
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-label="تقدّمك في المقرر"
+            aria-label={t("progress")}
             className="mt-4 h-2.5 max-w-measure overflow-hidden rounded-pill bg-line"
           >
             <span
@@ -119,10 +124,10 @@ function MiniDashboard({
 
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <p className="text-ink-2">
-              أنجزت {done} من {total} فصول
+              {t("completed", { doneLabel: String(done), total, totalLabel: String(total) })}
             </p>
             <span className="inline-flex items-center gap-2 rounded-pill border border-aubergine-mid bg-tint-aubergine px-3 py-1 text-sm text-ink">
-              اختبارك المتوقّع
+              {t("exam")}
               <span className="font-semibold">{examDate}</span>
             </span>
           </div>
@@ -138,7 +143,7 @@ function MiniDashboard({
             {/* الحافة أخضر سولد، والخلفية نفس الأخضر بشفافية خفيفة.
                 النص عائد إلى ink: على الخليط الفاتح يعطي 12.5:1. */}
             <span className="inline-block rounded-md border-s-4 border-s-success bg-success/15 px-3 py-1.5 text-sm font-semibold text-ink">
-              الخطوة التالية: {action.next}
+              {t("nextStep", { next: action.next })}
             </span>
           </p>
         </div>
@@ -164,6 +169,8 @@ function ChapterCard({
   resume: boolean;
   status: Status;
 }) {
+  const t = useTranslations("Course");
+  const locale = useLocale();
   const skin = skinOf(course.tone);
   const fill = skin.fills[(chapter.n - 1) % skin.fills.length];
 
@@ -189,7 +196,7 @@ function ChapterCard({
       <div className="relative z-10">
         <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
           <h3 className="font-display text-lg font-semibold text-on-dominant">
-            {chapter.title}
+            {localize(chapter.title, locale)}
           </h3>
           {chapter.ready ? (
             <span
@@ -200,12 +207,12 @@ function ChapterCard({
               }`}
             >
               <StatusIcon kind={status} />
-              {STATUS_LABEL[status]}
+              {t(STATUS_LABEL[status])}
             </span>
           ) : null}
         </div>
 
-        <p className={`mt-1 text-sm ${skin.meta}`}>{chapter.topics} موضوع</p>
+        <p className={`mt-1 text-sm ${skin.meta}`}>{t("topics", { count: chapter.topics, countLabel: String(chapter.topics) })}</p>
 
         {chapter.ready && state !== "guest" ? (
           <div className="mt-3">
@@ -220,14 +227,14 @@ function ChapterCard({
             href={href}
             className={`inline-flex h-11 items-center gap-2 rounded-pill border px-5 font-semibold transition-colors hover:bg-pressable hover:text-on-pressable ${skin.arrow}`}
           >
-            {resume ? "أكمل" : "ابدأ الشرح"}
+            {resume ? t("resume") : t("start")}
             <ArrowForward />
           </Link>
         ) : (
           <span
             className={`rounded-pill border px-4 py-2 text-xs font-semibold ${skin.arrow}`}
           >
-            قريبًا
+            {t("soon")}
           </span>
         )}
       </div>
@@ -248,6 +255,8 @@ export function CourseView({
   state: ViewState;
   examDate: string;
 }) {
+  const t = useTranslations("Course");
+  const locale = useLocale();
   const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("chapters");
   const tone = TONES[course.tone];
   const slug = course.code.replace(" ", "-").toLowerCase();
@@ -277,7 +286,7 @@ export function CourseView({
      الجلسة مباشرةً. */
   const linkFor = (n: number) =>
     state === "guest"
-      ? `/join?course=${encodeURIComponent(course.name)}&chapter=${n}&next=${encodeURIComponent(`/c/${slug}`)}`
+      ? `/join?course=${encodeURIComponent(localize(course.name, locale))}&chapter=${n}&next=${encodeURIComponent(`/c/${slug}`)}`
       : `/session/${slug}/${n}`;
 
   const statusOf = (n: number): Status => {
@@ -303,13 +312,13 @@ export function CourseView({
 
         <div className="min-w-0">
           <h1 className="font-display text-3xl leading-tight font-bold text-ink md:text-5xl">
-            {course.name} ·{" "}
+            {localize(course.name, locale)} ·{" "}
             <span dir="ltr" className="text-ink-2">
               {course.code}
             </span>
           </h1>
           <p className="mt-2 text-ink-2">
-            {course.university} · {readyCount} فصول
+            {t("courseSummary", { university: localize(course.university, locale), count: readyCount, countLabel: String(readyCount) })}
           </p>
         </div>
       </div>
@@ -321,39 +330,39 @@ export function CourseView({
         examDate={examDate}
         action={{
           href: linkFor(resumeCh.n),
-          label: "كمّل مذاكرة",
-          next: `الفصل ${resumeCh.n} · ${resumeCh.title}`,
+          label: t("continue"),
+          next: t("nextChapter", { number: String(resumeCh.n), title: localize(resumeCh.title, locale) }),
         }}
       />
 
       {/* ————— التبويبات ————— */}
       <div
         role="tablist"
-        aria-label="محتوى المقرر"
+        aria-label={t("content")}
         className="mt-9 flex gap-1 overflow-x-auto border-b border-line"
       >
-        {TABS.map((t) => {
-          const selected = tab === t.id;
+        {TABS.map((item) => {
+          const selected = tab === item.id;
           return (
             <button
-              key={t.id}
+              key={item.id}
               role="tab"
               type="button"
-              id={`tab-${t.id}`}
+              id={`tab-${item.id}`}
               aria-selected={selected}
-              aria-controls={`panel-${t.id}`}
-              disabled={!t.ready}
-              onClick={() => t.ready && setTab(t.id)}
+              aria-controls={`panel-${item.id}`}
+              disabled={!item.ready}
+              onClick={() => item.ready && setTab(item.id)}
               className={`inline-flex min-h-11 shrink-0 items-center gap-2 border-b-2 px-4 font-semibold whitespace-nowrap ${
                 selected
                   ? "border-pressable text-ink"
                   : "border-transparent text-ink-2"
-              } ${t.ready ? "" : "opacity-60"}`}
+              } ${item.ready ? "" : "opacity-60"}`}
             >
-              {t.label}
-              {t.ready ? null : (
+              {t(item.label)}
+              {item.ready ? null : (
                 <span className="rounded-pill border border-ink-3 px-2 py-0.5 text-[11px] font-semibold">
-                  قريبًا
+                  {t("soon")}
                 </span>
               )}
             </button>

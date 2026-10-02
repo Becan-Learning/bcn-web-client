@@ -1,3 +1,4 @@
+import type { Localized } from "@/i18n/localized";
 import {
   chaptersOf,
   COURSES,
@@ -20,16 +21,16 @@ export type Enrollment = {
   /** الفصول التي أنجزها الطالب */
   done: number;
   /** تاريخ أقرب حدث، أو null إن لم يُحدَّد بعد */
-  examLabel: string | null;
+  examLabel: Localized | null;
   daysLeft: number | null;
 };
 
 const ENROLLED: Enrollment[] = [
-  { code: "ACCT 101", done: 3, examLabel: "12 ديسمبر", daysLeft: 9 },
-  { code: "MATH 101", done: 5, examLabel: "18 ديسمبر", daysLeft: 15 },
+  { code: "ACCT 101", done: 3, examLabel: { ar: "12 ديسمبر", en: "12 December" }, daysLeft: 9 },
+  { code: "MATH 101", done: 5, examLabel: { ar: "18 ديسمبر", en: "18 December" }, daysLeft: 15 },
   { code: "CHEM 101", done: 1, examLabel: null, daysLeft: null },
   /* بلا فصول جاهزة — الحالة ٧، تظهر بوسم «قريبًا» ولا تُخفى */
-  { code: "EE 201", done: 0, examLabel: "20 ديسمبر", daysLeft: 17 },
+  { code: "EE 201", done: 0, examLabel: { ar: "20 ديسمبر", en: "20 December" }, daysLeft: 17 },
 ];
 
 /* الحالة ٧ تُصنَع هنا لا في الكتالوج: EE 201 فصولها جاهزة فيه،

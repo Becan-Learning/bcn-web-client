@@ -1,7 +1,8 @@
-import { notFound } from "next/navigation";
-import { hasLocale } from "next-intl";
-import { routing } from "@/i18n/routing";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { hasLocale } from "next-intl";
+import { localize } from "@/i18n/localized";
+import { notFound } from "next/navigation";
+import { routing } from "@/i18n/routing";
 import type { Metadata } from "next";
 import { UNIVERSITIES } from "@/lib/data/catalog";
 import { BecanFace } from "@/components/becan/becan-face";
@@ -36,10 +37,8 @@ export default async function RequestSentPage(
 
   const course = one(sp.course);
   const universityValue = one(sp.university);
-  const universityT = await getTranslations("Universities");
-  const universityKeys = ["kingSaud", "kingAbdulaziz", "imam"] as const;
-  const universityKey = universityKeys[UNIVERSITIES.indexOf(universityValue)];
-  const university = universityKey ? universityT(universityKey) : universityValue;
+  const universityRecord = UNIVERSITIES.find((u) => u.ar === universityValue || u.en === universityValue);
+  const university = universityRecord ? localize(universityRecord, locale) : universityValue;
   const subject = [course, university].filter(Boolean).join(" — ");
 
   return (
@@ -70,7 +69,8 @@ export default async function RequestSentPage(
             والمشاركة تحته لأنها فعل مؤجَّل. */}
         <div className="mt-9 flex max-w-measure flex-col gap-4">
           <PrimaryButton href="/courses" className="w-full sm:w-fit">
-            {t("tryAnother")}</PrimaryButton>
+            {t("tryAnother")}
+          </PrimaryButton>
           <ShareButton
             text={
               subject

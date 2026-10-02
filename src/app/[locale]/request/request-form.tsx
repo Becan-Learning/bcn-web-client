@@ -1,6 +1,8 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+
+import { localize } from "@/i18n/localized";
 
 import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
@@ -27,8 +29,7 @@ type Errors = Partial<
 export function RequestForm() {
   const t = useTranslations("Request.Form");
   const router = useRouter();
-  const universityT = useTranslations("Universities");
-  const universityLabels = [universityT("kingSaud"), universityT("kingAbdulaziz"), universityT("imam")];
+  const locale = useLocale();
   const [university, setUniversity] = useState("");
   const [otherName, setOtherName] = useState("");
   const [course, setCourse] = useState("");
@@ -108,9 +109,9 @@ export function RequestForm() {
           }}
         >
           <option value="">{t("chooseUniversity")}</option>
-          {UNIVERSITIES.map((u, index) => (
-            <option key={u} value={u}>
-              {universityLabels[index]}
+          {UNIVERSITIES.map((u) => (
+            <option key={u.ar} value={u.ar}>
+              {localize(u, locale)}
             </option>
           ))}
           <option value="other">{t("other")}</option>
@@ -164,7 +165,7 @@ export function RequestForm() {
         {/* اقتراح تلقائي من الطلبات السابقة */}
         <datalist id="req-course-suggestions">
           {COURSES.map((c) => (
-            <option dir="auto" key={c.code} value={`${c.name} — ${c.code}`} />
+            <option dir="auto" key={c.code} value={`${localize(c.name, locale)} — ${c.code}`} />
           ))}
         </datalist>
         {errors.course ? (
@@ -210,14 +211,16 @@ export function RequestForm() {
       {/* اختياري — بلا نجمة، بلا تحذير، ولا يعطّل الإرسال */}
       <div className="mt-8 rounded-xl border border-line bg-surface p-4 shadow-soft">
         <FieldLabel htmlFor="req-files" hint={t("optional")}>
-          {t("files")}</FieldLabel>
+          {t("files")}
+        </FieldLabel>
         <label
           htmlFor="req-files"
           className="mt-3 flex min-h-28 cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-aubergine-mid bg-tint-aubergine p-4 text-center"
         >
           <UploadIcon className="h-7 w-7 text-aubergine-base" />
           <span className="text-sm font-semibold text-aubergine-base">
-            {t("chooseFiles")}</span>
+            {t("chooseFiles")}
+          </span>
         </label>
         <input
           id="req-files"
@@ -245,7 +248,8 @@ export function RequestForm() {
       </p>
 
       <PrimaryButton type="submit" className="w-full md:w-auto">
-        {t("submit")}</PrimaryButton>
+        {t("submit")}
+      </PrimaryButton>
     </form>
   );
 }

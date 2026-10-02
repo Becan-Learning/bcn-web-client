@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CheckIcon } from "@/components/becan/icons";
 
@@ -34,6 +36,7 @@ export function useSaveNotice() {
 
 /** الإشعار الخفيف — يظهر بلا أن يزيح ما تحته. */
 export function SaveNotice({ saved }: { saved: boolean }) {
+  const t = useTranslations("Settings");
   return (
     <p
       role="status"
@@ -43,8 +46,7 @@ export function SaveNotice({ saved }: { saved: boolean }) {
       {saved ? (
         <>
           <CheckIcon className="h-4 w-4" />
-          انحفظ
-        </>
+          {t("saved")}</>
       ) : null}
     </p>
   );

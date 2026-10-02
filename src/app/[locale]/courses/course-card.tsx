@@ -1,3 +1,5 @@
+import { getLocale, getTranslations } from "next-intl/server";
+import { localize } from "@/i18n/localized";
 import { ArrowForward } from "@/components/becan/icons";
 import { SubjectIcon } from "./subject-icon";
 import { TONES, type Course } from "@/lib/data/catalog";
@@ -12,7 +14,7 @@ import { TONES, type Course } from "@/lib/data/catalog";
    التمرير فصارت CSS لا Motion — حركة ثابتة لا مقودة بحدث وقت
    تشغيل، وهي قاعدة CLAUDE.md. */
 
-export function CourseCardBody({
+export async function CourseCardBody({
   course,
   progress,
 }: {
@@ -20,6 +22,7 @@ export function CourseCardBody({
   /** التقدّم في المقرر — يظهر حين يكون الطالب مسجَّلًا فيها */
   progress?: { done: number; total: number };
 }) {
+  const locale = await getLocale();
   const tone = TONES[course.tone];
 
   return (
@@ -57,7 +60,7 @@ export function CourseCardBody({
           <h3
             className={`line-clamp-2 font-display text-[15px] leading-snug font-semibold ${tone.title}`}
           >
-            {course.name}
+            {localize(course.name, locale)}
           </h3>
         </div>
 
@@ -65,7 +68,7 @@ export function CourseCardBody({
           <CardProgress {...progress} tone={tone} />
         ) : (
           <p className={`mt-1.5 text-[11px] ${tone.meta}`}>
-            {course.university}
+            {localize(course.university, locale)}
           </p>
         )}
       </div>
@@ -79,7 +82,7 @@ export function CourseCardBody({
    ملوّنة، وشريط رمادي عليها يُقرأ غريبًا عنها. والأخضر ممنوع —
    حالة لا سطح. */
 
-function CardProgress({
+async function CardProgress({
   done,
   total,
   tone,
@@ -88,6 +91,7 @@ function CardProgress({
   total: number;
   tone: (typeof TONES)[keyof typeof TONES];
 }) {
+  const t = await getTranslations("CourseCard");
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
 
   return (
@@ -97,7 +101,7 @@ function CardProgress({
         aria-valuenow={pct}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-label={`أنجزت ${done} من ${total} فصول`}
+        aria-label={t("completed", { doneLabel: String(done), total, totalLabel: String(total) })}
         className="h-1.5 w-full overflow-hidden rounded-pill bg-ground/55"
       >
         <div
@@ -106,7 +110,7 @@ function CardProgress({
         />
       </div>
       <p className={`mt-1.5 text-[11px] ${tone.meta}`}>
-        أنجزت {done} من {total} فصول
+        {t("completed", { doneLabel: String(done), total, totalLabel: String(total) })}
       </p>
     </div>
   );

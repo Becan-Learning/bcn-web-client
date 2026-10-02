@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useState, useSyncExternalStore } from "react";
 import {
   DEFAULT_EXPERIENCE,
@@ -28,21 +30,22 @@ import { SettingsCard } from "../_shell";
    فتغييره هنا يلزم تغييرها هناك. */
 
 const SPEEDS = [
-  { id: "slow", label: "بطيء" },
-  { id: "normal", label: "طبيعي" },
-  { id: "fast", label: "سريع" },
+  { id: "slow", label: "slow" },
+  { id: "normal", label: "normal" },
+  { id: "fast", label: "fast" },
 ] as const;
 
 const FORMATS = [
-  { id: "mcq", label: "اختيار من متعدد" },
-  { id: "essay", label: "مقالي" },
-  { id: "problems", label: "مسائل" },
+  { id: "mcq", label: "mcq" },
+  { id: "essay", label: "essay" },
+  { id: "problems", label: "problems" },
 ] as const;
 
 type Speed = (typeof SPEEDS)[number]["id"];
 type Format = (typeof FORMATS)[number]["id"];
 
 export function StudyView() {
+  const t = useTranslations("Settings.Study");
   const { saved, ping } = useSaveNotice();
 
   const [speed, setSpeed] = useState<Speed>("normal");
@@ -63,13 +66,13 @@ export function StudyView() {
       <SettingsCard>
         <div className="flex flex-col">
           <PrefRow
-            title="وقتك للمذاكرة"
-            effect="«مستعجل» يعطيك المختصر ويركّز على الأهم. «عندي وقت» يشرح بهدوء بأمثلة ويتأكد إنك فهمت. يسري من الجلسة الجاية."
+            title={t("time")}
+            effect={t("timeEffect")}
           >
             <Choice
               name="experience"
               value={experience}
-              options={EXPERIENCE_OPTIONS}
+              options={EXPERIENCE_OPTIONS.map((o) => ({ ...o, label: t(o.id) }))}
               onChange={(v) => {
                 setExperience(v);
                 ping();
@@ -78,21 +81,21 @@ export function StudyView() {
           </PrefRow>
 
           <PrefRow
-            title="سرعة الشرح الافتراضية — قريبًا"
-            effect="الشرح اليوم بسرعة واحدة. هذا الخيار يُفعَّل مع دعم السرعة في الجلسة."
+            title={t("speed")}
+            effect={t("speedEffect")}
           >
             {/* لا ping ولا وعد بأثر: السرعة معطّلة في الجلسة نفسها */}
-            <Choice name="speed" value={speed} options={SPEEDS} onChange={setSpeed} />
+            <Choice name="speed" value={speed} options={SPEEDS.map((o) => ({ ...o, label: t(o.label) }))} onChange={setSpeed} />
           </PrefRow>
 
           <PrefRow
-            title="شكل الاختبار الافتراضي"
-            effect="يحدّد شكل الأسئلة اللي تجاوب عليها بعد كل موضوع — وتقدر تحدّد شكلًا مختلفًا لكل مقرر من صفحته."
+            title={t("format")}
+            effect={t("formatEffect")}
           >
             <Choice
               name="format"
               value={format}
-              options={FORMATS}
+              options={FORMATS.map((o) => ({ ...o, label: t(o.label) }))}
               onChange={(v) => {
                 setFormat(v);
                 ping();
@@ -102,15 +105,14 @@ export function StudyView() {
         </div>
       </SettingsCard>
 
-      <SettingsCard title="تسجيلاتك الصوتية">
+      <SettingsCard title={t("recordings")}>
         <div className="mt-4 flex items-start justify-between gap-4">
           <label htmlFor="pref-audio" className="block">
             <span className="font-semibold text-ink">
-              احتفظ بتسجيلات أسئلتي
+              {t("keepAudio")}
             </span>
             <span className="mt-1 block max-w-measure text-sm leading-base text-ink-2">
-              مطفأ افتراضيًا: صوتك يُحذف خلال 24 ساعة من نهاية الجلسة. بتشغيله
-              يبقى 30 يومًا تقدر تسمعه فيها من صفحة الجلسة.
+              {t("recordingsEffect")}
             </span>
           </label>
 
@@ -121,7 +123,7 @@ export function StudyView() {
               setKeepAudio(v);
               ping();
             }}
-            label="احتفظ بتسجيلات أسئلتي"
+            label={t("keepAudio")}
           />
         </div>
       </SettingsCard>

@@ -1,6 +1,8 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+
+import { localize } from "@/i18n/localized";
 
 import { useState } from "react";
 import { UNIVERSITIES } from "@/lib/data/catalog";
@@ -22,8 +24,7 @@ type Errors = Partial<Record<"name" | "university" | "contact", string>>;
 export function AmbassadorForm() {
   const t = useTranslations("Ambassadors.Form");
   const [name, setName] = useState("");
-  const universityT = useTranslations("Universities");
-  const universityLabels = [universityT("kingSaud"), universityT("kingAbdulaziz"), universityT("imam")];
+  const locale = useLocale();
   const [university, setUniversity] = useState("");
   const [otherName, setOtherName] = useState("");
   const [contact, setContact] = useState("");
@@ -71,7 +72,8 @@ export function AmbassadorForm() {
       >
         <h3 className="text-lg font-bold text-ink md:text-xl">{t("sentTitle")}</h3>
         <p className="mt-2 max-w-measure leading-base text-ink-2">
-          {t("sentBody")}</p>
+          {t("sentBody")}
+        </p>
       </div>
     );
   }
@@ -113,9 +115,9 @@ export function AmbassadorForm() {
             }}
           >
             <option value="">{t("chooseUniversity")}</option>
-            {UNIVERSITIES.map((u, index) => (
-              <option key={u} value={u}>
-                {universityLabels[index]}
+            {UNIVERSITIES.map((u) => (
+              <option key={u.ar} value={u.ar}>
+                {localize(u, locale)}
               </option>
             ))}
             <option value="other">{t("other")}</option>
@@ -167,7 +169,8 @@ export function AmbassadorForm() {
             htmlFor="amb-reach"
             hint={t("reachHint")}
           >
-            {t("reach")}</FieldLabel>
+            {t("reach")}
+          </FieldLabel>
           <TextField
             id="amb-reach"
             dir="auto"
@@ -181,7 +184,8 @@ export function AmbassadorForm() {
 
       {/* الفعل الوحيد في الصفحة */}
       <PrimaryButton type="submit" className="mt-6 w-full sm:w-fit">
-        {t("submit")}</PrimaryButton>
+        {t("submit")}
+      </PrimaryButton>
     </form>
   );
 }

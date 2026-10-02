@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useState } from "react";
 import { GhostButton, QuietLink } from "@/components/becan/kit";
 import { SettingsCard } from "../_shell";
@@ -11,14 +13,14 @@ import { SettingsCard } from "../_shell";
    أين يجده. */
 
 export function DataView() {
+  const t = useTranslations("Settings.Data");
   const [asked, setAsked] = useState(false);
 
   return (
     <div className="flex flex-col gap-4">
-      <SettingsCard title="نزّل بياناتك">
+      <SettingsCard title={t("downloadTitle")}>
         <p className="mt-2 max-w-measure leading-base text-ink-2">
-          ملف واحد فيه جلساتك وتقدّمك في كل مقرر، وأسئلتك وإجاباتك، ومواعيد
-          اختباراتك، وبيانات حسابك. بصيغة تفتحها في أي جدول.
+          {t("downloadBody")}
         </p>
 
         {asked ? (
@@ -27,27 +29,25 @@ export function DataView() {
             aria-live="polite"
             className="mt-4 rounded-md bg-tint-amber p-4 leading-base text-ink"
           >
-            نجهّز ملفك الحين، ويوصلك رابط تنزيله على بريدك خلال ساعة. الرابط
-            يشتغل 7 أيام.
+            {t("requested")}
           </p>
         ) : (
           <GhostButton
             onClick={() => setAsked(true)}
             className="mt-5 w-full sm:w-fit"
           >
-            نزّل بياناتي
+            {t("download")}
           </GhostButton>
         )}
       </SettingsCard>
 
-      <SettingsCard title="حذف الحساب">
+      <SettingsCard title={t("deleteTitle")}>
         <p className="mt-2 max-w-measure leading-base text-ink-2">
-          الحذف نهائي وما يترجع. قبل ما تقرّر، الصفحة الجاية تشرح لك بالضبط وش
-          ينحذف ووش يبقى وكم ياخذ.
+          {t("deleteBody")}
         </p>
 
         <div className="mt-4">
-          <QuietLink href="/settings/delete">اقرأ وش يصير قبل الحذف</QuietLink>
+          <QuietLink href="/settings/delete">{t("deleteLink")}</QuietLink>
         </div>
       </SettingsCard>
     </div>

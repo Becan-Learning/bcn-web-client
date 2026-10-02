@@ -1,3 +1,4 @@
+import { localize } from "@/i18n/localized";
 import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
 import { setRequestLocale } from "next-intl/server";
@@ -42,7 +43,7 @@ export default async function CheckoutPage(props: PageProps<"/[locale]/checkout"
             الدفع
           </h1>
           <p className="mt-3 leading-base text-ink-2">
-            خطة {plan.name} — {plan.minutes} دقيقة شهريًا، {plan.courses}.
+            خطة {localize(plan.name, locale)} — {plan.minutes} دقيقة شهريًا، {localize(plan.courses, locale)}.
           </p>
 
           <CheckoutForm planId={plan.id} />

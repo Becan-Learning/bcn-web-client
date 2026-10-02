@@ -1,3 +1,4 @@
+import { localize } from "@/i18n/localized";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
@@ -82,7 +83,7 @@ export default async function ResultPage(props: PageProps<"/[locale]/checkout/re
       <Section className="pt-12 pb-16 md:pt-16">
         <div className="mx-auto w-full max-w-[34rem]">
           {state === "success" ? (
-            <Success plan={plan.name} minutes={plan.minutes} resume={resume} />
+            <Success plan={localize(plan.name, locale)} minutes={plan.minutes} resume={resume} />
           ) : state === "failed" ? (
             <Failed planId={plan.id} reason={reason} />
           ) : (

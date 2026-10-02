@@ -1,3 +1,5 @@
+import { getTranslations, getLocale } from "next-intl/server";
+import { localize } from "@/i18n/localized";
 import {
   BOARD,
   SLIDE_OF_TOPIC,
@@ -31,7 +33,9 @@ const TOPICS = TOPICS_META.length;
 const STEP_MS = 750;
 const at = (i: number) => ({ animationDelay: `${350 + i * STEP_MS}ms` });
 
-export function SessionScene() {
+export async function SessionScene() {
+  const t = await getTranslations("Landing.Demo");
+  const locale = await getLocale();
   return (
     <figure
       data-theme="dark"
@@ -40,8 +44,7 @@ export function SessionScene() {
       className="overflow-hidden rounded-xl border border-line bg-ground text-ink shadow-lift"
     >
       <figcaption className="sr-only">
-        لمحة من جلسة شرح في بيكان — مسار المواضيع والسبورة والشرائح.
-      </figcaption>
+        {t("caption")}</figcaption>
 
       {/* ترويسة الجلسة */}
       <div className="flex items-center justify-between gap-3 border-b border-line px-3 py-2">
@@ -56,11 +59,9 @@ export function SessionScene() {
               className="h-1.5 w-1.5 rounded-pill bg-live"
             />
           </span>
-          يشرح الآن
-        </p>
+          {t("explaining")}</p>
         <p className="min-w-0 truncate text-xs text-ink-2">
-          مبادئ المحاسبة 1 · الفصل 3
-        </p>
+          {t("course")}</p>
       </div>
 
       {/* الأعمدة الثلاثة بترتيب الجلسة: المواضيع · السبورة · الشرائح */}
@@ -70,16 +71,18 @@ export function SessionScene() {
         <div className="chalkboard min-w-0 flex-[2] space-y-3 rounded-lg border border-chalkboard-edge px-4 py-4">
           {HEAD ? (
             <p
+              dir="auto"
               style={at(0)}
               className="animate-board-loop text-sm leading-base font-bold text-ink"
             >
-              {HEAD.text}
+              {localize(HEAD.text, locale)}
             </p>
           ) : null}
 
           {ITEMS.map((item, i) => (
             <p
               key={item.n}
+              dir="auto"
               style={at(i + 1)}
               className="animate-board-loop flex items-baseline gap-2 text-xs"
             >
@@ -96,22 +99,23 @@ export function SessionScene() {
                       : "font-semibold text-ink"
                   }
                 >
-                  {item.term}
+                  {localize(item.term, locale)}
                 </span>
-                <span className="text-ink-2"> — {item.gloss}</span>
+                <span className="text-ink-2"> — {localize(item.gloss, locale)}</span>
               </span>
             </p>
           ))}
 
           {PENALTY ? (
             <p
+              dir="auto"
               style={at(ITEMS.length + 1)}
               className="animate-board-loop rounded-md border-s-4 border-s-pressable bg-surface-2 px-3 py-2 text-xs text-ink"
             >
               <span className="font-semibold text-pressable">
-                ما يفقد الدرجة:{" "}
+                {t("penalty")}{" "}
               </span>
-              {PENALTY.text}
+              {localize(PENALTY.text, locale)}
             </p>
           ) : null}
         </div>
@@ -131,11 +135,10 @@ function TopicsRail() {
         {Array.from({ length: 5 }).map((_, i) => (
           <li key={i} className="flex flex-col items-center">
             <span
-              className={`flex h-4 w-4 items-center justify-center rounded-pill border text-[9px] font-bold ${
-                i === 0
-                  ? "border-transparent bg-ink text-ground"
-                  : "border-ink-3 text-ink-2"
-              }`}
+              className={`flex h-4 w-4 items-center justify-center rounded-pill border text-[9px] font-bold ${i === 0
+                ? "border-transparent bg-ink text-ground"
+                : "border-ink-3 text-ink-2"
+                }`}
             >
               {i + 1}
             </span>
@@ -151,15 +154,15 @@ function TopicsRail() {
 
 /** عمود الشرائح — الشريحة المفتوحة يؤطّرها الجوزيّ كما في الجلسة.
     الإطار مكبَّر عن غلافه ليُقصّ مؤشّرا تمرير عارض الـPDF. */
-function SlidesColumn() {
+async function SlidesColumn() {
+  const t = await getTranslations("Landing.Demo");
   return (
     <div className="hidden w-24 shrink-0 flex-col gap-2 md:flex">
       <span
-        dir="ltr"
         className="relative block aspect-[16/10] w-full overflow-hidden rounded-md border-2 border-warmth"
       >
         <iframe
-          title="شريحة من المقرر"
+          title={t("slideTitle")}
           loading="lazy"
           src={`/slides/slides.pdf#page=${SLIDE}&toolbar=0&navpanes=0&statusbar=0&view=FitH`}
           className="absolute top-0 start-0 h-[calc(100%+22px)] w-[calc(100%+22px)]"

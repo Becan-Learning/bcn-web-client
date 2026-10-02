@@ -1,3 +1,4 @@
+import { localize } from "@/i18n/localized";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
@@ -57,7 +58,7 @@ export default async function InvoicesPage(props: PageProps<"/[locale]/settings/
                   <p className="text-lg font-bold text-ink">{r.gross} ريال</p>
                 </div>
 
-                <p className="mt-1 text-sm text-ink-2">خطة {r.plan.name}</p>
+                <p className="mt-1 text-sm text-ink-2">خطة {localize(r.plan.name, locale)}</p>
 
                 <dl className="mt-3 flex flex-col gap-1 text-sm">
                   <Line term="الصافي" value={`${r.net.toFixed(2)} ريال`} />
@@ -90,7 +91,7 @@ export default async function InvoicesPage(props: PageProps<"/[locale]/settings/
                 {rows.map((r) => (
                   <tr key={r.id} className="border-b border-line last:border-0">
                     <Td>{r.date}</Td>
-                    <Td>{r.plan.name}</Td>
+                    <Td>{localize(r.plan.name, locale)}</Td>
                     <Td numeric>{r.net.toFixed(2)}</Td>
                     <Td numeric>{r.vat.toFixed(2)}</Td>
                     <Td numeric>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { getPathname } from "@/i18n/navigation";
 
 /* «شارك بيكان مع زملائك» — الخيار الثانوي في شاشة التأكيد.
@@ -11,14 +11,15 @@ import { getPathname } from "@/i18n/navigation";
    حيث لا تتوفّر. لا يترك المستخدم بلا استجابة في الحالتين. */
 
 export function ShareButton({ text }: { text: string }) {
+  const t = useTranslations("Request.Share");
   const locale = useLocale();
-  const [state, setState] = useState<"idle" | "copied">("idle");
+  const [state, setState] = useState<"idle" | "copied" | "failed">("idle");
 
   const share = async () => {
     const url = `${window.location.origin}${getPathname({ href: "/request", locale })}`;
     if (navigator.share) {
       try {
-        await navigator.share({ title: "بيكان", text, url });
+        await navigator.share({ title: t("title"), text, url });
         return;
       } catch {
         /* أغلق المستخدم لوحة المشاركة — ننتقل للنسخ */
@@ -29,7 +30,8 @@ export function ShareButton({ text }: { text: string }) {
       setState("copied");
       window.setTimeout(() => setState("idle"), 2500);
     } catch {
-      /* المتصفّح منع الحافظة — لا شيء نفعله */
+      /* المتصفّح منع الحافظة — نعرض سببًا يمكن تجاوزه. */
+      setState("failed");
     }
   };
 
@@ -40,10 +42,9 @@ export function ShareButton({ text }: { text: string }) {
         onClick={share}
         className="inline-flex h-14 w-full items-center justify-center rounded-pill border border-aubergine-mid px-8 text-lg font-semibold text-aubergine-base sm:w-auto"
       >
-        شارك بيكان مع زملائك
-      </button>
+        {t("share")}</button>
       <p role="status" className="mt-2 min-h-5 text-sm text-ink-2">
-        {state === "copied" ? "نُسخ الرابط" : ""}
+        {state === "copied" ? t("copied") : state === "failed" ? t("failed") : ""}
       </p>
     </div>
   );

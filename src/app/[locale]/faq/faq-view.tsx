@@ -1,5 +1,7 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
+import { localize } from "@/i18n/localized";
 import { useId, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { SearchIcon } from "@/components/becan/icons";
@@ -29,14 +31,10 @@ const normalize = (v: string) =>
     .replace(/ى/g, "ي");
 
 /* عدّ عربي سليم بدل «1 سؤال» — على نمط `countLabel` في الكتالوج. */
-const hitsLabel = (n: number) => {
-  if (n === 1) return "سؤال واحد يطابق بحثك.";
-  if (n === 2) return "سؤالان يطابقان بحثك.";
-  if (n <= 10) return `${n} أسئلة تطابق بحثك.`;
-  return `${n} سؤالًا يطابق بحثك.`;
-};
 
 export function FaqView() {
+  const t = useTranslations("Faq.Search");
+  const locale = useLocale();
   const uid = useId();
   const [query, setQuery] = useState("");
 
@@ -47,8 +45,8 @@ export function FaqView() {
     ...g,
     questions: filtering
       ? g.questions.filter((item) =>
-          normalize(item.q + " " + item.a.join(" ")).includes(q),
-        )
+        normalize(localize(item.q, locale) + " " + item.a.map((line) => localize(line, locale)).join(" ")).includes(q),
+      )
       : g.questions,
   })).filter((g) => g.questions.length > 0);
 
@@ -59,14 +57,13 @@ export function FaqView() {
       {/* ————— البحث ————— */}
       <div className="relative max-w-measure">
         <label htmlFor={`${uid}-q`} className="sr-only">
-          ابحث في الأسئلة
-        </label>
+          {t("label")}</label>
         <input
           id={`${uid}-q`}
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="ابحث — مثلًا: ميكروفون، إلغاء، مدى"
+          placeholder={t("placeholder")}
           className="h-14 w-full rounded-pill border border-aubergine-deep bg-surface ps-14 pe-5 text-ink shadow-soft placeholder:text-ink-2"
         />
         <span className="pointer-events-none absolute inset-y-0 start-5 flex items-center text-ink-2">
@@ -76,34 +73,27 @@ export function FaqView() {
 
       {filtering ? (
         <p role="status" aria-live="polite" className="mt-3 text-sm text-ink-2">
-          {hits === 0 ? "ما فيه سؤال يطابق بحثك." : hitsLabel(hits)}
+          {t("hits", { count: hits, countLabel: String(hits) })}
         </p>
       ) : null}
 
       {/* ————— الأقسام ————— */}
       {hits === 0 ? (
         <div className="mt-8 max-w-measure rounded-xl bg-tint-amber p-5">
-          <p className="font-semibold text-ink">سؤالك مو هنا؟</p>
+          <p className="font-semibold text-ink">{t("emptyTitle")}</p>
           <p className="mt-2 leading-base text-ink-2">
-            اسألنا مباشرة على واتساب من{" "}
-            <Link
-              href="/contact"
-              className="font-semibold text-pressable underline underline-offset-4"
-            >
-              صفحة التواصل
-            </Link>
-            ، ونضيف الجواب هنا لو تكرّر.
+            {t.rich("emptyBody", { contact: (chunks) => <Link href="/contact" className="font-semibold text-pressable underline underline-offset-4">{chunks}</Link> })}
           </p>
         </div>
       ) : (
         <div className="mt-10 flex max-w-measure flex-col gap-10">
           {groups.map((g) => (
             <section key={g.id}>
-              <h2 className="text-sm font-semibold text-ink-2">{g.title}</h2>
+              <h2 className="text-sm font-semibold text-ink-2">{localize(g.title, locale)}</h2>
 
               <div className="mt-3 overflow-hidden rounded-xl border border-line bg-surface">
                 {g.questions.map((item) => (
-                  <FaqItem key={item.q} item={item} open={filtering} />
+                  <FaqItem key={item.q.ar} item={item} open={filtering} />
                 ))}
               </div>
             </section>

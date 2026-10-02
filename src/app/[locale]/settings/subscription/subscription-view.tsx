@@ -1,5 +1,8 @@
 "use client";
 
+import { useLocale } from "next-intl";
+import { localize } from "@/i18n/localized";
+
 import { useCallback, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { GhostButton, PrimaryButton, QuietLink } from "@/components/becan/kit";
@@ -23,6 +26,7 @@ export function SubscriptionView({
 }: {
   startCanceled: boolean;
 }) {
+  const locale = useLocale();
   const [canceled, setCanceled] = useState(startCanceled);
   const [confirming, setConfirming] = useState(false);
 
@@ -53,7 +57,7 @@ export function SubscriptionView({
             التجديد ملغى
           </h2>
           <p className="mt-2 max-w-measure leading-base text-ink-2">
-            خطة {plan.name} تبقى مفعّلة لك حتى{" "}
+            خطة {localize(plan.name, locale)} تبقى مفعّلة لك حتى{" "}
             <span className="font-semibold text-ink">
               {SUBSCRIPTION.renewsOn}
             </span>
@@ -72,7 +76,7 @@ export function SubscriptionView({
       {/* ————— خطتك ————— */}
       <SettingsCard title="خطتك">
         <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <p className="text-2xl font-bold text-ink">{plan.name}</p>
+          <p className="text-2xl font-bold text-ink">{localize(plan.name, locale)}</p>
           <p className="text-ink-2">{plan.price} ريال / شهر</p>
         </div>
 
@@ -146,7 +150,7 @@ export function SubscriptionView({
               className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-line p-4"
             >
               <span>
-                <span className="block font-semibold text-ink">{p.name}</span>
+                <span className="block font-semibold text-ink">{localize(p.name, locale)}</span>
                 <span className="mt-1 block text-sm text-ink-2">
                   {p.price === 0 ? "بلا رسوم" : `${p.price} ريال / شهر`} ·{" "}
                   {p.minutes} دقيقة
@@ -179,10 +183,10 @@ export function SubscriptionView({
                   في الشهر.
                 </li>
                 <li>
-                  مقرراتك ترجع من «{lose.courses.from}» إلى «{lose.courses.to}».
+                  مقرراتك ترجع من «{localize(lose.courses.from, locale)}» إلى «{localize(lose.courses.to, locale)}».
                 </li>
                 <li>
-                  خطة {plan.name} تبقى شغّالة حتى {SUBSCRIPTION.renewsOn}.
+                  خطة {localize(plan.name, locale)} تبقى شغّالة حتى {SUBSCRIPTION.renewsOn}.
                 </li>
               </ul>
 
@@ -228,6 +232,7 @@ export function SubscriptionView({
 
 /** ترقية أو تخفيض — الاسم يتبع اتجاه السعر لا يُكتب واحدًا للطرفين. */
 function ChangeAction({ plan, current }: { plan: Plan; current: Plan }) {
+  const locale = useLocale();
   const up = plan.price > current.price;
 
   return (
@@ -237,7 +242,7 @@ function ChangeAction({ plan, current }: { plan: Plan; current: Plan }) {
         up ? "border-aubergine-mid text-aubergine-base" : "border-line text-ink"
       }`}
     >
-      {up ? `ارقِ لـ${plan.name}` : `نزّل لـ${plan.name}`}
+      {up ? `ارقِ لـ${localize(plan.name, locale)}` : `نزّل لـ${localize(plan.name, locale)}`}
     </Link>
   );
 }

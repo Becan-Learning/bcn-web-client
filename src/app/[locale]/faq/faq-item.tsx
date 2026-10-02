@@ -1,3 +1,5 @@
+import { useLocale } from "next-intl";
+import { localize } from "@/i18n/localized";
 import { Chevron } from "@/components/becan/icons";
 import { Copy } from "@/components/becan/kit";
 import type { Question } from "@/lib/data/faq";
@@ -18,19 +20,20 @@ export function FaqItem({
   /** صفحة الأسئلة تفتحها كلها حين يرشّح البحث */
   open?: boolean;
 }) {
+  const locale = useLocale();
   return (
     <details open={open} className="group border-b border-line last:border-0">
       <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 p-4 font-semibold text-ink [&::-webkit-details-marker]:hidden">
         <span>
-          <Copy>{item.q}</Copy>
+          <Copy>{localize(item.q, locale)}</Copy>
         </span>
         <Chevron className="h-4 w-4 shrink-0 text-ink-2 transition-transform duration-200 group-open:rotate-180" />
       </summary>
 
       <div className="flex flex-col gap-3 px-4 pb-5">
         {item.a.map((line) => (
-          <p key={line} className="leading-base text-ink-2">
-            <Copy>{line}</Copy>
+          <p key={line.ar} className="leading-base text-ink-2">
+            <Copy>{localize(line, locale)}</Copy>
           </p>
         ))}
       </div>

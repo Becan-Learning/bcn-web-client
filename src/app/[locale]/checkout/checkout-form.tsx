@@ -1,5 +1,8 @@
 "use client";
 
+import { useLocale } from "next-intl";
+import { localize } from "@/i18n/localized";
+
 import { useId, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { ErrorText, FieldLabel, PrimaryButton, TextField } from "@/components/becan/kit";
@@ -33,6 +36,7 @@ const groupExpiry = (v: string) => {
 };
 
 export function CheckoutForm({ planId }: { planId: string }) {
+  const locale = useLocale();
   const router = useRouter();
   const uid = useId();
   const [method, setMethod] = useState<MethodId>("mada");
@@ -246,7 +250,7 @@ export function CheckoutForm({ planId }: { planId: string }) {
 
         <dl className="mt-3 flex flex-col gap-2 text-sm">
           <SumRow
-            term={`خطة ${plan.name} — شهر واحد`}
+            term={`خطة ${localize(plan.name, locale)} — شهر واحد`}
             value={`${sums.gross} ريال`}
           />
           <SumRow term="الصافي" value={`${sums.net.toFixed(2)} ريال`} />

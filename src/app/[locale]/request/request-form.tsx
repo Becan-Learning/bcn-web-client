@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { UNIVERSITIES, COURSES } from "@/lib/data/catalog";
@@ -23,7 +25,10 @@ type Errors = Partial<
 >;
 
 export function RequestForm() {
+  const t = useTranslations("Request.Form");
   const router = useRouter();
+  const universityT = useTranslations("Universities");
+  const universityLabels = [universityT("kingSaud"), universityT("kingAbdulaziz"), universityT("imam")];
   const [university, setUniversity] = useState("");
   const [otherName, setOtherName] = useState("");
   const [course, setCourse] = useState("");
@@ -46,18 +51,18 @@ export function RequestForm() {
     const e: Errors = {};
     const value = contact.trim();
 
-    if (!university) e.university = "اختر جامعتك من القائمة";
-    if (otherUniversity && !otherName.trim()) e.otherName = "اكتب اسم جامعتك";
-    if (!course.trim()) e.course = "اكتب اسم المقرر أو رمزه";
+    if (!university) e.university = t("universityRequired");
+    if (otherUniversity && !otherName.trim()) e.otherName = t("universityNameRequired");
+    if (!course.trim()) e.course = t("courseRequired");
 
     if (!value) {
-      e.contact = byEmail ? "اكتب بريدك" : "اكتب رقم جوالك";
+      e.contact = byEmail ? t("emailRequired") : t("phoneRequired");
     } else if (byEmail) {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-        e.contact = "تأكد من صيغة البريد";
+        e.contact = t("emailInvalid");
       }
     } else if (!/^0\d{9}$/.test(value.replace(/[\s-]/g, ""))) {
-      e.contact = "الرقم غير مكتمل — 10 أرقام تبدأ بـ 05";
+      e.contact = t("phoneInvalid");
     }
     return e;
   };
@@ -90,7 +95,7 @@ export function RequestForm() {
     <form className="mt-9 max-w-measure" onSubmit={submit} noValidate>
       {/* 1 — الجامعة */}
       <div>
-        <FieldLabel htmlFor="req-university">الجامعة</FieldLabel>
+        <FieldLabel htmlFor="req-university">{t("university")}</FieldLabel>
         <SelectField
           id="req-university"
           name="university"
@@ -102,13 +107,13 @@ export function RequestForm() {
             clear("university");
           }}
         >
-          <option value="">اختر جامعتك</option>
-          {UNIVERSITIES.map((u) => (
+          <option value="">{t("chooseUniversity")}</option>
+          {UNIVERSITIES.map((u, index) => (
             <option key={u} value={u}>
-              {u}
+              {universityLabels[index]}
             </option>
           ))}
-          <option value="other">أخرى</option>
+          <option value="other">{t("other")}</option>
         </SelectField>
         {errors.university ? (
           <ErrorText id="err-university">{errors.university}</ErrorText>
@@ -116,9 +121,10 @@ export function RequestForm() {
 
         {otherUniversity ? (
           <div className="mt-3">
-            <FieldLabel htmlFor="req-university-other">اسم جامعتك</FieldLabel>
+            <FieldLabel htmlFor="req-university-other">{t("universityName")}</FieldLabel>
             <TextField
               id="req-university-other"
+              dir="auto"
               name="universityOther"
               autoFocus
               value={otherName}
@@ -128,7 +134,7 @@ export function RequestForm() {
                 setOtherName(e.target.value);
                 clear("otherName");
               }}
-              placeholder="اكتب اسم الجامعة"
+              placeholder={t("universityPlaceholder")}
             />
             {errors.otherName ? (
               <ErrorText id="err-other">{errors.otherName}</ErrorText>
@@ -139,9 +145,10 @@ export function RequestForm() {
 
       {/* 2 — اسم المقرر أو رمزه */}
       <div className="mt-6">
-        <FieldLabel htmlFor="req-course">اسم المقرر أو رمزه</FieldLabel>
+        <FieldLabel htmlFor="req-course">{t("course")}</FieldLabel>
         <TextField
           id="req-course"
+          dir="auto"
           name="course"
           list="req-course-suggestions"
           autoComplete="off"
@@ -152,12 +159,12 @@ export function RequestForm() {
             setCourse(e.target.value);
             clear("course");
           }}
-          placeholder={"مثال: محاسبة 2 أو ⁦ACCT 201⁩"}
+          placeholder={t("coursePlaceholder")}
         />
         {/* اقتراح تلقائي من الطلبات السابقة */}
         <datalist id="req-course-suggestions">
           {COURSES.map((c) => (
-            <option key={c.code} value={`${c.name} — ${c.code}`} />
+            <option dir="auto" key={c.code} value={`${c.name} — ${c.code}`} />
           ))}
         </datalist>
         {errors.course ? (
@@ -167,7 +174,7 @@ export function RequestForm() {
 
       {/* 3 — قناة التبليغ */}
       <div className="mt-6">
-        <FieldLabel htmlFor="req-contact">نبلّغك أول ما تجهز:</FieldLabel>
+        <FieldLabel htmlFor="req-contact">{t("contact")}</FieldLabel>
         <TextField
           key={byEmail ? "email" : "phone"}
           id="req-contact"
@@ -182,7 +189,7 @@ export function RequestForm() {
             setContact(e.target.value);
             clear("contact");
           }}
-          placeholder={byEmail ? "name@example.com" : "05xxxxxxxx"}
+          placeholder={byEmail ? t("emailPlaceholder") : t("phonePlaceholder")}
         />
         {errors.contact ? (
           <ErrorText id="err-contact">{errors.contact}</ErrorText>
@@ -196,23 +203,21 @@ export function RequestForm() {
           }}
           className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-pressable underline underline-offset-4"
         >
-          {byEmail ? "أفضّل رقم الجوال" : "أفضّل البريد"}
+          {byEmail ? t("preferPhone") : t("preferEmail")}
         </button>
       </div>
 
       {/* اختياري — بلا نجمة، بلا تحذير، ولا يعطّل الإرسال */}
       <div className="mt-8 rounded-xl border border-line bg-surface p-4 shadow-soft">
-        <FieldLabel htmlFor="req-files" hint="اختياري">
-          عندك ملفات المقرر؟ ارفعها ويجهز أسرع
-        </FieldLabel>
+        <FieldLabel htmlFor="req-files" hint={t("optional")}>
+          {t("files")}</FieldLabel>
         <label
           htmlFor="req-files"
           className="mt-3 flex min-h-28 cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-aubergine-mid bg-tint-aubergine p-4 text-center"
         >
           <UploadIcon className="h-7 w-7 text-aubergine-base" />
           <span className="text-sm font-semibold text-aubergine-base">
-            اسحب الملفات أو اختر
-          </span>
+            {t("chooseFiles")}</span>
         </label>
         <input
           id="req-files"
@@ -227,7 +232,7 @@ export function RequestForm() {
         {files.length ? (
           <ul className="mt-3 flex flex-col gap-1">
             {files.map((f) => (
-              <li key={f} className="text-sm text-ink-2">
+              <li key={f} dir="auto" className="text-sm text-ink-2">
                 {f}
               </li>
             ))}
@@ -236,12 +241,11 @@ export function RequestForm() {
       </div>
 
       <p role="alert" className="mt-6 min-h-6 text-sm font-semibold text-error">
-        {hasErrors ? "أكمل الحقول المعلَّمة أعلاه ثم أرسل" : ""}
+        {hasErrors ? t("errors") : ""}
       </p>
 
       <PrimaryButton type="submit" className="w-full md:w-auto">
-        أرسل الطلب
-      </PrimaryButton>
+        {t("submit")}</PrimaryButton>
     </form>
   );
 }

@@ -1,7 +1,8 @@
+import { ANNOTATION_LABEL } from "./labels";
 import { motion } from "motion/react";
 import { CheckIcon, CloseIcon, WarningIcon } from "@/components/becan/icons";
 import type { AnnotationKind, BoardItem } from "@/lib/session/teaching-board";
-import type { SessionLanguage } from "../parts";
+import type { ExplanationLanguage } from "../explanation-language";
 import { BlanksItem } from "./blanks";
 import { CalloutItem } from "./callout";
 import { ChainItem } from "./chain";
@@ -45,12 +46,6 @@ const BADGES: Partial<Record<AnnotationKind, () => React.ReactElement>> = {
 /* الأيقونات كلها `aria-hidden`، فاللون والأيقونة يسقطان معًا عند
    قارئ الشاشة ولا يبقى فرقٌ بين «صحيح» و«خطأ». فيُنطق الحال نصًّا
    مخفيًا بصريًا — وهو ما يجعل §5.4 مستوفاةً فعلًا لا شكلًا. */
-const STATE_LABEL: Partial<Record<AnnotationKind, Record<SessionLanguage, string>>> = {
-  warning: { Arabic: "تنبيه", English: "Note" },
-  correct: { Arabic: "إجابة صحيحة", English: "Correct" },
-  wrong: { Arabic: "إجابة خاطئة", English: "Wrong" },
-  broken: { Arabic: "وصلة ملغاة", English: "Cancelled link" },
-};
 
 /* الحبر المخفوت: توكنٌ يُعاد توجيهه للشجرة كلها، فيتبعه كل ما
    تحته بلا أن تعرف المكوّنات شيئًا عن الحالة. */
@@ -63,7 +58,7 @@ function Body({
 }: {
   item: BoardItem;
   n: number;
-  language: SessionLanguage;
+  language: ExplanationLanguage;
 }) {
   switch (item.kind) {
     case "title":
@@ -104,7 +99,7 @@ export function BoardItemView({
 }: {
   item: BoardItem;
   n: number;
-  language: SessionLanguage;
+  language: ExplanationLanguage;
   reduce: boolean;
 }) {
   /* لا مباعدة بمؤقّتات جافاسكربت: الوكيل يوقّت كل عملية على الصوت
@@ -120,7 +115,7 @@ export function BoardItemView({
   const annotation = item.annotation;
   const frame = annotation ? FRAMES[annotation] : "";
   const badge = annotation ? BADGES[annotation] : undefined;
-  const label = annotation ? STATE_LABEL[annotation]?.[language] : undefined;
+  const label = annotation ? ANNOTATION_LABEL[annotation]?.[language] : undefined;
 
   return (
     <motion.li

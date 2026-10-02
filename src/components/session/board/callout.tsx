@@ -1,3 +1,4 @@
+import { CALLOUT_LABEL } from "./labels";
 import {
   BookIcon,
   ExamIcon,
@@ -7,7 +8,7 @@ import {
   MnemonicIcon,
 } from "@/components/becan/icons";
 import type { CalloutKind, CalloutPayload } from "@/lib/session/teaching-board";
-import type { SessionLanguage } from "../parts";
+import type { ExplanationLanguage } from "../explanation-language";
 
 /* النداءات الستّة (§5.11).
 
@@ -27,15 +28,6 @@ const ICONS: Record<CalloutKind, (p: { className?: string }) => React.ReactEleme
   definition: BookIcon,
   example: ExampleIcon,
   exam: ExamIcon,
-};
-
-const LABELS: Record<CalloutKind, Record<SessionLanguage, string>> = {
-  loses_marks: { Arabic: "يضيّع درجات", English: "Loses marks" },
-  mistake: { Arabic: "غلط شائع", English: "Common mistake" },
-  mnemonic: { Arabic: "حيلة للحفظ", English: "Mnemonic" },
-  definition: { Arabic: "تعريف", English: "Definition" },
-  example: { Arabic: "مثال", English: "Example" },
-  exam: { Arabic: "يجي في الاختبار", English: "In the exam" },
 };
 
 /* لكلٍّ حدُّه وتعبئته وأيقونته — فالتمييز لا يقع على اللون وحده.
@@ -61,11 +53,11 @@ export function CalloutItem({
   language,
 }: {
   payload: CalloutPayload;
-  language: SessionLanguage;
+  language: ExplanationLanguage;
 }) {
   const Icon = ICONS[payload.kind];
   const style = STYLES[payload.kind];
-  const label = LABELS[payload.kind][language];
+  const label = CALLOUT_LABEL[payload.kind][language];
   const loud = payload.kind === "loses_marks";
 
   return (

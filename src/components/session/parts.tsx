@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { useFormatter, useTranslations } from "next-intl";
+import type { ExplanationLanguage } from "./explanation-language";
 import { Dialog } from "radix-ui";
 import {
   ChatIcon,
@@ -36,16 +38,6 @@ export type Phase =
   | "cut";
 
 export type TopicState = "none" | "now" | "done";
-
-export type SessionLanguage = "Arabic" | "English";
-
-/** «درس واحد · درسان · 3 دروس · 11 درسًا» */
-export function lessonsLabel(n: number) {
-  if (n === 1) return "درس واحد";
-  if (n === 2) return "درسان";
-  if (n >= 3 && n <= 10) return `${n} دروس`;
-  return `${n} درسًا`;
-}
 
 /* ————— نافذة داخل سطح الجلسة —————
    Radix يرسم النافذة في بوابة خارج غلاف الجلسة، فتفقد سمتَي
@@ -92,17 +84,6 @@ function SessionDialog({
 
 /* ————— الشريط العلوي ————— */
 
-const PHASE_LABEL: Record<Phase, string> = {
-  idle: "",
-  connecting: "يجهّز الجلسة",
-  live: "يشرح الآن",
-  thinking: "يفكّر",
-  listening: "يسمعك",
-  question: "سؤال",
-  ending: "انتهت الجلسة",
-  cut: "انقطع الاتصال",
-};
-
 export function TopBar({
   phase,
   courseName,
@@ -117,6 +98,9 @@ export function TopBar({
   detail?: string;
   onExit: () => void;
 }) {
+  const t = useTranslations("Session");
+  const format = useFormatter();
+  const number = (value: number) => format.number(value, { numberingSystem: "latn" });
   const live = phase === "live";
   /* في السؤال تتوقف النبضة ويبقى النصّ «سؤال» (بريف الجلسة، الحالة 3) */
   const pulse = phase === "listening" || phase === "thinking";
@@ -140,20 +124,21 @@ export function TopBar({
             <span className="relative inline-block h-2 w-2 rounded-pill bg-ink" />
           </span>
         ) : null}
-        {PHASE_LABEL[phase]}
+        {t(`phase.${phase}`)}
       </p>
 
       <p className="min-w-0 truncate text-xs text-ink-2">
-        {courseName} · الفصل {chapterNo}
-        {detail ? ` · ${detail}` : ""}
+        {t(detail ? "courseChapterDetail" : "courseChapter", {
+          course: courseName, number: number(chapterNo), ...(detail ? { detail } : {}),
+        })}
       </p>
 
       {/* هدف اللمس 44px على الجوال، وأصغر على الديسكتوب حيث الإدخال فأرة */}
       <button
         type="button"
         onClick={onExit}
-        aria-label="خروج من الجلسة"
-        title="خروج من الجلسة"
+        aria-label={t("exit")}
+        title={t("exit")}
         className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill text-ink-2 hover:bg-panel pointer-fine:md:h-8 pointer-fine:md:w-8"
       >
         <CloseIcon className="h-4 w-4" />
@@ -163,12 +148,6 @@ export function TopBar({
 }
 
 /* ————— قائمة الدروس — مراحل بحالات ————— */
-
-const STATE_LABEL: Record<TopicState, string> = {
-  none: "لم يبدأ",
-  now: "يُشرح الآن",
-  done: "تم",
-};
 
 /** دائرة الدرس المرقّمة — تحمل حالته لونًا ورقمه نصًّا. */
 function TopicPip({
@@ -216,21 +195,22 @@ type TopicsProps = {
 
 /** القائمة الكاملة — تُستعمل في منسدلة الديسكتوب وفي ورقة الجوال. */
 export function TopicsList({ topics, stateOf, current, onPick }: TopicsProps) {
+  const t = useTranslations("Session");
   if (topics.length === 0) {
     return (
       <p className="p-4 text-sm leading-base text-ink-2">
-        ما وصلت قائمة الدروس. تقدر تبدأ الشرح من الدرس الأول مباشرة.
+        {t("noLessons")}
       </p>
     );
   }
 
   return (
     <ol className="no-scrollbar h-full overflow-y-auto p-1.5">
-      {topics.map((t, i) => {
+      {topics.map((topic, i) => {
         const st = stateOf(i);
         const active = i === current;
         return (
-          <li key={`${i}-${t}`}>
+          <li key={`${i}-${topic}`}>
             <button
               type="button"
               onClick={() => onPick(i)}
@@ -244,9 +224,9 @@ export function TopicsList({ topics, stateOf, current, onPick }: TopicsProps) {
               <TopicPip n={i + 1} state={st} active={false} />
               <span className="min-w-0 flex-1">
                 <span dir="auto" className="block truncate text-sm">
-                  {t}
+                  {topic}
                 </span>
-                <span className="block text-xs text-ink-2">{STATE_LABEL[st]}</span>
+                <span className="block text-xs text-ink-2">{t(`lessonState.${st}`)}</span>
               </span>
             </button>
           </li>
@@ -267,6 +247,9 @@ export function TopicsTrack({
   open,
   onToggle,
 }: TopicsProps & { open: boolean; onToggle: () => void }) {
+  const t = useTranslations("Session");
+  const format = useFormatter();
+  const number = (value: number) => format.number(value, { numberingSystem: "latn" });
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -281,23 +264,23 @@ export function TopicsTrack({
         type="button"
         onClick={onToggle}
         aria-expanded={open}
-        aria-label={open ? "أغلق قائمة الدروس" : "افتح قائمة الدروس"}
-        title={open ? "أغلق قائمة الدروس" : "افتح قائمة الدروس"}
+        aria-label={open ? t("closeLessonsList") : t("openLessonsList")}
+        title={open ? t("closeLessonsList") : t("openLessonsList")}
         className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill text-ink-2 transition-colors hover:bg-surface hover:text-ink"
       >
         <Chevron className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
 
       <div ref={ref} className="no-scrollbar flex min-w-0 flex-1 items-center overflow-x-auto">
-        {topics.map((t, i) => (
-          <div key={`${i}-${t}`} className="flex shrink-0 items-center">
+        {topics.map((topic, i) => (
+          <div key={`${i}-${topic}`} className="flex shrink-0 items-center">
             <button
               type="button"
               data-current={i === current ? "true" : undefined}
               onClick={() => onPick(i)}
               aria-current={i === current ? "step" : undefined}
-              aria-label={`${i + 1}. ${t} — ${STATE_LABEL[stateOf(i)]}`}
-              title={`${i + 1}. ${t}`}
+              aria-label={t("lessonAccessible", { number: number(i + 1), lesson: topic, state: t(`lessonState.${stateOf(i)}`) })}
+              title={t("lessonTitle", { number: number(i + 1), lesson: topic })}
               className="flex h-11 w-11 items-center justify-center"
             >
               <TopicPip n={i + 1} state={stateOf(i)} active={i === current} />
@@ -326,6 +309,9 @@ export function TopicsRail({
   open,
   onToggle,
 }: TopicsProps & { open: boolean; onToggle: () => void }) {
+  const t = useTranslations("Session");
+  const format = useFormatter();
+  const number = (value: number) => format.number(value, { numberingSystem: "latn" });
   const done = topics.filter((_, i) => stateOf(i) === "done").length;
 
   return (
@@ -335,8 +321,8 @@ export function TopicsRail({
           type="button"
           onClick={onToggle}
           aria-expanded={open}
-          aria-label={open ? "أغلق قائمة الدروس" : "افتح قائمة الدروس"}
-          title={open ? "أغلق قائمة الدروس" : "افتح قائمة الدروس"}
+          aria-label={open ? t("closeLessonsList") : t("openLessonsList")}
+          title={open ? t("closeLessonsList") : t("openLessonsList")}
           /* 44px للّمس (التابلت فوق md لمسٌ أيضًا)، و32px حين المؤشّر فأرة */
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill text-ink-2 transition-colors hover:bg-surface hover:text-ink pointer-fine:h-8 pointer-fine:w-8"
         >
@@ -350,20 +336,20 @@ export function TopicsRail({
           />
         </button>
 
-        <p className="mt-1 shrink-0 text-[10px] font-semibold text-ink-2">دروس</p>
+        <p className="mt-1 shrink-0 text-[10px] font-semibold text-ink-2">{t("lessonsShort")}</p>
         <p className="shrink-0 text-[10px] text-ink-2">
-          {done}/{topics.length}
+          {t("lessonProgress", { done: number(done), total: number(topics.length) })}
         </p>
 
         <ol className="no-scrollbar mt-2 flex min-h-0 flex-1 flex-col items-center overflow-y-auto">
-          {topics.map((t, i) => (
-            <li key={`${i}-${t}`} className="flex flex-col items-center">
+          {topics.map((topic, i) => (
+            <li key={`${i}-${topic}`} className="flex flex-col items-center">
               <button
                 type="button"
                 onClick={() => onPick(i)}
                 aria-current={i === current ? "step" : undefined}
-                aria-label={`${i + 1}. ${t} — ${STATE_LABEL[stateOf(i)]}`}
-                title={`${i + 1}. ${t}`}
+                aria-label={t("lessonAccessible", { number: number(i + 1), lesson: topic, state: t(`lessonState.${stateOf(i)}`) })}
+                title={t("lessonTitle", { number: number(i + 1), lesson: topic })}
                 className="flex h-6 w-6 items-center justify-center"
               >
                 <TopicPip n={i + 1} state={stateOf(i)} active={i === current} />
@@ -396,20 +382,21 @@ export function TopicsSheet({
   onClose,
   ...list
 }: TopicsProps & { open: boolean; onClose: () => void }) {
+  const t = useTranslations("Session");
   return (
     <SessionDialog
       open={open}
       onOpenChange={(o) => {
         if (!o) onClose();
       }}
-      title="الدروس"
+      title={t("lessons")}
       overlayClassName="fixed inset-0 z-40 bg-ground/80 backdrop-blur-sm md:hidden"
       contentClassName="fixed inset-x-0 bottom-0 z-50 flex max-h-[75dvh] flex-col rounded-t-xl border border-line bg-panel shadow-lift md:hidden"
     >
       <div className="flex shrink-0 items-center justify-between gap-2 px-4 py-1">
-        <p className="text-sm font-semibold text-ink">الدروس</p>
+        <p className="text-sm font-semibold text-ink">{t("lessons")}</p>
         <Dialog.Close
-          aria-label="أغلق الدروس"
+          aria-label={t("closeLessons")}
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill text-ink-2 transition-colors hover:bg-surface hover:text-ink"
         >
           <CloseIcon className="h-4 w-4" />
@@ -427,6 +414,7 @@ export function TopicsSheet({
    تُخفيها فور القلب بلا جافاسكربت ولا مستمع أحداث. */
 
 export function RotateNotice() {
+  const t = useTranslations("Session");
   const [shown, setShown] = useState(true);
   if (!shown) return null;
 
@@ -436,7 +424,7 @@ export function RotateNotice() {
       <button
         type="button"
         tabIndex={-1}
-        aria-label="إغلاق"
+        aria-label={t("close")}
         onClick={() => setShown(false)}
         className="absolute inset-0 bg-ground/85 backdrop-blur-sm"
       />
@@ -444,13 +432,13 @@ export function RotateNotice() {
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="اقلب الشاشة"
+        aria-label={t("rotate")}
         className="relative w-full max-w-xs rounded-xl border border-line bg-surface-3 p-6 text-center shadow-lift"
       >
         <RotateIcon spinning className="mx-auto h-12 w-12 text-ink-2" />
-        <p className="mt-4 text-xl font-bold text-ink">اقلب الشاشة</p>
+        <p className="mt-4 text-xl font-bold text-ink">{t("rotate")}</p>
         <p className="mx-auto mt-2 max-w-[22ch] text-sm leading-base text-ink-2">
-          عشان تاخذ أفضل تجربة
+          {t("rotateHint")}
         </p>
         {/* مقلوب لا كهرماني — الكهرماني الوحيد في الشاشة زرّ البدء */}
         <button
@@ -458,7 +446,7 @@ export function RotateNotice() {
           onClick={() => setShown(false)}
           className="mt-6 inline-flex h-11 w-full items-center justify-center rounded-pill bg-ink px-5 text-sm font-bold text-ground"
         >
-          تمام
+          {t("okay")}
         </button>
       </div>
     </div>
@@ -479,22 +467,24 @@ export function LanguageChoice({
   value,
   onChange,
 }: {
-  value: SessionLanguage;
-  onChange: (v: SessionLanguage) => void;
+  value: ExplanationLanguage;
+  onChange: (v: ExplanationLanguage) => void;
 }) {
-  const options: { id: SessionLanguage; label: string; latin?: boolean }[] = [
-    { id: "Arabic", label: "عربي" },
-    { id: "English", label: "English", latin: true },
-  ];
+  const t = useTranslations("Session");
+  const labelId = useId();
+  const options = [
+    { id: "Arabic", label: t("languageOptions.ar"), lang: "ar", dir: "rtl" },
+    { id: "English", label: t("languageOptions.en"), lang: "en", dir: "ltr" },
+  ] as const;
 
   return (
     <div className="mt-5 flex flex-wrap items-center gap-3">
-      <p id="lang-label" className="text-sm text-ink-2">
-        لغة الشرح
+      <p id={labelId} className="text-sm text-ink-2">
+        {t("explanationLanguage")}
       </p>
       <div
         role="group"
-        aria-labelledby="lang-label"
+        aria-labelledby={labelId}
         className="flex items-center gap-0.5 rounded-pill bg-surface p-0.5"
       >
         {options.map((o) => {
@@ -504,12 +494,14 @@ export function LanguageChoice({
               key={o.id}
               type="button"
               aria-pressed={on}
+              lang={o.lang}
+              dir={o.dir}
               onClick={() => onChange(o.id)}
               className={`inline-flex h-11 items-center rounded-pill px-4 text-sm font-semibold transition-colors md:h-8 ${
                 on ? "bg-ink text-ground" : "text-ink-2 hover:text-ink"
               }`}
             >
-              {o.latin ? <span dir="ltr">{o.label}</span> : o.label}
+              {o.label}
             </button>
           );
         })}
@@ -530,6 +522,7 @@ export function ChatPanel({
   onSend: (text: string) => Promise<boolean>;
   onClose: () => void;
 }) {
+  const t = useTranslations("Session");
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
 
@@ -555,7 +548,7 @@ export function ChatPanel({
       className="absolute inset-x-2 bottom-[4.25rem] z-20 rounded-xl border border-line bg-surface-2 p-4 animate-board-in"
     >
       <label htmlFor="ask" className="text-sm text-ink-2">
-        {listening ? "يسمعك — أو اكتب سؤالك" : "اكتب سؤالك"}
+        {listening ? t("chatListening") : t("chatQuestion")}
       </label>
       <div className="mt-2 flex gap-2">
         {/* التركيز بمرجع نداء لحظة التركيب — لا مؤقّت ولا rAF (مزلق 14ب) */}
@@ -566,20 +559,20 @@ export function ChatPanel({
           value={text}
           onChange={(e) => setText(e.target.value)}
           className="h-12 min-w-0 flex-1 rounded-lg border border-line bg-ground px-4 text-ink placeholder:text-ink-2"
-          placeholder="وش اللي ما وضح؟"
+          placeholder={t("chatPlaceholder")}
         />
         <button
           type="submit"
           aria-disabled={sending || !text.trim() ? true : undefined}
           className="inline-flex h-12 shrink-0 items-center justify-center rounded-pill border border-line px-5 text-sm font-semibold text-ink"
         >
-          أرسل
+          {t("send")}
         </button>
         <button
           type="button"
           onClick={onClose}
-          aria-label="أغلق الشات"
-          title="أغلق الشات"
+          aria-label={t("closeChat")}
+          title={t("closeChat")}
           className="flex h-12 w-12 shrink-0 items-center justify-center rounded-pill text-ink-2 transition-colors hover:bg-surface hover:text-ink"
         >
           <CloseIcon className="h-4 w-4" />
@@ -613,8 +606,9 @@ function IconBtn({
   hideOnMobile?: boolean;
   children: React.ReactNode;
 }) {
+  const t = useTranslations("Session");
   const inert = soon || disabled;
-  const name = soon ? `${label} — قريبًا` : label;
+  const name = soon ? t("soonLabel", { label }) : label;
   const skin = soon
     ? "border border-dashed border-ink-3 text-ink-2"
     : disabled
@@ -650,11 +644,12 @@ function IconBtn({
 /* فقاعة فوق زرّ البدء — مقلوبة لا كهرمانية، وتوسيطها بـ inset-x-0
    لا بـ start-1/2 مع إزاحة (تنقلب في RTL). */
 function StartHint() {
+  const t = useTranslations("Session");
   return (
     <span className="pointer-events-none absolute inset-x-0 bottom-full z-20 flex justify-center pb-2">
       <span className="flex flex-col items-center animate-nudge">
         <span className="whitespace-nowrap rounded-pill bg-ink px-3 py-1.5 text-xs font-bold text-ground shadow-lift">
-          اضغط هنا لتبدأ الشرح
+          {t("startHint")}
         </span>
         <span aria-hidden="true" className="-mt-1 h-2.5 w-2.5 rotate-45 rounded-[2px] bg-ink" />
       </span>
@@ -662,7 +657,7 @@ function StartHint() {
   );
 }
 
-const SPEEDS = ["بطيء", "طبيعي", "سريع"] as const;
+const SPEEDS = ["slow", "normal", "fast"] as const;
 
 export function Toolbar({
   phase,
@@ -691,8 +686,9 @@ export function Toolbar({
   onTopics: () => void;
   onEnd: () => void;
 }) {
+  const t = useTranslations("Session");
   const canStart = phase === "idle" || phase === "cut";
-  const primaryLabel = canStart ? "ابدأ الشرح" : "وقّف — قريبًا";
+  const primaryLabel = canStart ? t("start") : t("pauseSoon");
   /* الإنهاء لا معنى له قبل البدء ولا بعد الانقطاع — يبقى ظاهرًا معطّلًا
      كي لا يتزحزح الشريط لحظة البدء */
   const inSession = !canStart && phase !== "ending";
@@ -703,17 +699,17 @@ export function Toolbar({
         {/* إدخال الطالب */}
         <div className="flex items-center gap-1">
           <IconBtn
-            label={mic ? "أقفل المايك" : "افتح المايك"}
+            label={mic ? t("micOff") : t("micOn")}
             onClick={onMic}
             danger={!mic}
             active={mic}
           >
             {mic ? <MicIcon /> : <MicOffIcon />}
           </IconBtn>
-          <IconBtn label="الشات" onClick={onChat} active={chat}>
+          <IconBtn label={t("chat")} onClick={onChat} active={chat}>
             <ChatIcon />
           </IconBtn>
-          <IconBtn label="ما فهمت" soon>
+          <IconBtn label={t("confused")} soon>
             <ConfusedIcon />
           </IconBtn>
         </div>
@@ -760,14 +756,14 @@ export function Toolbar({
         {/* أدوات العرض */}
         <div className="flex items-center gap-1">
           {/* يُخفى على الجوال ليتّسع الشريط لزرّ الإنهاء */}
-          <IconBtn label="أعد السطر" soon hideOnMobile>
+          <IconBtn label={t("repeat")} soon hideOnMobile>
             <ReplayIcon />
           </IconBtn>
 
           <div
             role="group"
-            aria-label="سرعة الشرح — قريبًا"
-            title="قريبًا"
+            aria-label={t("speedSoon")}
+            title={t("comingSoon")}
             className="hidden items-center gap-0.5 rounded-pill border border-dashed border-ink-3 p-0.5 sm:flex"
           >
             {SPEEDS.map((s) => (
@@ -775,24 +771,24 @@ export function Toolbar({
                 key={s}
                 type="button"
                 aria-disabled
-                aria-pressed={s === "طبيعي"}
+                aria-pressed={s === "normal"}
                 className={`inline-flex h-11 items-center rounded-pill px-2.5 text-[11px] font-semibold md:h-8 ${
-                  s === "طبيعي" ? "bg-surface text-ink" : "text-ink-2"
+                  s === "normal" ? "bg-surface text-ink" : "text-ink-2"
                 }`}
               >
-                {s}
+                {t(`speed.${s}`)}
               </button>
             ))}
           </div>
 
-          <IconBtn label="الشرائح" onClick={onSlides} active={slides}>
+          <IconBtn label={t("slides")} onClick={onSlides} active={slides}>
             <SlidesIcon />
           </IconBtn>
-          <IconBtn label="الدروس" onClick={onTopics} active={topics}>
+          <IconBtn label={t("lessons")} onClick={onTopics} active={topics}>
             <ListIcon />
           </IconBtn>
           {/* لا أحمر: الإنهاء قرار الطالب لا خطأ، والتأكيد نافذة لا لون */}
-          <IconBtn label="إنهاء الجلسة" onClick={onEnd} disabled={!inSession}>
+          <IconBtn label={t("end")} onClick={onEnd} disabled={!inSession}>
             <StopIcon />
           </IconBtn>
         </div>
@@ -820,24 +816,25 @@ export function QuestionDialog({
   onChoose: (choice: string) => void;
   onDismiss: () => void;
 }) {
+  const t = useTranslations("Session");
   return (
     <SessionDialog
       open={open}
       onOpenChange={(o) => {
         if (!o) onDismiss();
       }}
-      title="سؤال الفهم"
+      title={t("questionTitle")}
       overlayClassName="fixed inset-0 z-40 bg-ground/80 backdrop-blur-sm"
       contentClassName="fixed inset-x-4 bottom-4 z-50 mx-auto max-h-[80dvh] max-w-measure overflow-y-auto rounded-xl border-2 border-ink-3 bg-surface-3 p-5 shadow-lift animate-board-in md:inset-x-0 md:top-1/2 md:bottom-auto md:-translate-y-1/2 md:p-6"
     >
       <Dialog.Close
-        aria-label="أجاوب بصوتي"
-        title="أجاوب بصوتي"
+        aria-label={t("answerVoice")}
+        title={t("answerVoice")}
         className="float-end -mt-1 -me-1 flex h-11 w-11 items-center justify-center rounded-pill text-ink-2 transition-colors hover:bg-ground hover:text-ink"
       >
         <CloseIcon className="h-4 w-4" />
       </Dialog.Close>
-      <p className="text-xs font-semibold text-ink-2">سؤال</p>
+      <p className="text-xs font-semibold text-ink-2">{t("question")}</p>
       <p dir="auto" className="mt-2 text-xl font-bold text-ink">
         {checkpoint?.question}
       </p>
@@ -856,7 +853,7 @@ export function QuestionDialog({
           ))}
         </ul>
       ) : (
-        <p className="mt-4 leading-base text-ink-2">جاوب بصوتك، أو اكتب جوابك في الشات.</p>
+        <p className="mt-4 leading-base text-ink-2">{t("answerHint")}</p>
       )}
     </SessionDialog>
   );
@@ -875,6 +872,7 @@ export function EndSessionDialog({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  const t = useTranslations("Session");
   const stayRef = useRef<HTMLButtonElement>(null);
 
   return (
@@ -883,7 +881,7 @@ export function EndSessionDialog({
       onOpenChange={(o) => {
         if (!o) onCancel();
       }}
-      title="تنهي الجلسة؟"
+      title={t("endTitle")}
       onOpenAutoFocus={(e) => {
         e.preventDefault();
         stayRef.current?.focus();
@@ -891,8 +889,8 @@ export function EndSessionDialog({
       overlayClassName="fixed inset-0 z-40 bg-ground/80 backdrop-blur-sm"
       contentClassName="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-sm rounded-xl border-2 border-ink-3 bg-surface-3 p-5 shadow-lift animate-board-in md:inset-x-0 md:top-1/2 md:bottom-auto md:-translate-y-1/2 md:p-6"
     >
-      <p className="text-xl font-bold text-ink">تنهي الجلسة؟</p>
-      <p className="mt-2 leading-base text-ink-2">تقدر ترجع لنفس الفصل بعدين.</p>
+      <p className="text-xl font-bold text-ink">{t("endTitle")}</p>
+      <p className="mt-2 leading-base text-ink-2">{t("endHint")}</p>
       <div className="mt-5 flex flex-col gap-3 sm:flex-row">
         <button
           ref={stayRef}
@@ -900,14 +898,14 @@ export function EndSessionDialog({
           onClick={onCancel}
           className="inline-flex h-12 items-center justify-center rounded-pill border border-ink-2 px-6 font-semibold text-ink"
         >
-          كمّل
+          {t("continue")}
         </button>
         <button
           type="button"
           onClick={onConfirm}
           className="inline-flex h-12 items-center justify-center rounded-pill border border-line px-6 font-semibold text-ink"
         >
-          أنهِ الجلسة
+          {t("confirmEnd")}
         </button>
       </div>
     </SessionDialog>

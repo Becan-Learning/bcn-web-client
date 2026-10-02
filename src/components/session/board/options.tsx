@@ -1,6 +1,7 @@
+import { ANNOTATION_LABEL, OPTION_LABELS } from "./labels";
 import { CheckIcon, CloseIcon } from "@/components/becan/icons";
 import type { OptionsPayload, SlotValue } from "@/lib/session/teaching-board";
-import type { SessionLanguage } from "../parts";
+import type { ExplanationLanguage } from "../explanation-language";
 
 /* الاختيار من متعدّد (§5.10).
 
@@ -13,18 +14,12 @@ import type { SessionLanguage } from "../parts";
 
    والصحّ والخطأ لا يُبلَّغان باللون وحده: مع كلٍّ أيقونته. */
 
-const LABELS = ["A", "B", "C", "D", "E", "F"];
-
 const STATE_STYLE = {
   correct: { tone: "text-live", ring: "border-live" },
   wrong: { tone: "text-error", ring: "border-error" },
 } as const;
 
 /* الأيقونة `aria-hidden` واللون لا يُنطق، فيُنطق الحال نصًّا مخفيًا */
-const STATE_LABEL = {
-  correct: { Arabic: "إجابة صحيحة", English: "Correct" },
-  wrong: { Arabic: "إجابة خاطئة", English: "Wrong" },
-} as const;
 
 export function OptionsItem({
   payload,
@@ -33,7 +28,7 @@ export function OptionsItem({
 }: {
   payload: OptionsPayload;
   slots: Record<string, SlotValue>;
-  language: SessionLanguage;
+  language: ExplanationLanguage;
 }) {
   return (
     <div className="flex flex-col gap-2.5">
@@ -49,11 +44,13 @@ export function OptionsItem({
           return (
             <li key={option.id} className="flex items-baseline gap-2.5">
               <span
+                dir="ltr"
+                lang="en"
                 className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border text-xs font-bold ${
                   style ? `${style.ring} ${style.tone}` : "border-ink-3 text-ink-2"
                 }`}
               >
-                {LABELS[i] ?? i + 1}
+                {OPTION_LABELS[language][i] ?? i + 1}
               </span>
               <span
                 dir="auto"
@@ -63,7 +60,7 @@ export function OptionsItem({
               </span>
               {state === "correct" || state === "wrong" ? (
                 <>
-                  <span className="sr-only">{STATE_LABEL[state][language]}</span>
+                  <span className="sr-only">{ANNOTATION_LABEL[state]?.[language]}</span>
                   {state === "correct" ? (
                     <CheckIcon className="h-4 w-4 shrink-0 text-live" />
                   ) : (

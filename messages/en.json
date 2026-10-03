@@ -1,0 +1,1093 @@
+{
+  "LanguageSwitcher": {
+    "label": "عربي",
+    "ariaLabel": "Switch interface language to Arabic"
+  },
+  "Metadata": {
+    "title": "Becan — Your personal course tutor",
+    "description": "Becan explains your course by voice, asks questions to check your understanding, and identifies where you lose marks in exams."
+  },
+  "SiteHeader": {
+    "login": "Sign in"
+  },
+  "Brand": {
+    "name": "Becan"
+  },
+  "SiteFooter": {
+    "how": "How it works",
+    "pricing": "Pricing",
+    "faq": "FAQs",
+    "contact": "Contact us",
+    "status": "System status",
+    "ambassadors": "Ambassadors",
+    "login": "Sign in",
+    "terms": "Terms and conditions",
+    "privacy": "Privacy policy",
+    "refunds": "Refunds and cancellations",
+    "cookies": "Cookies",
+    "contactInfo": "Contact information",
+    "emailLabel": "Email: ",
+    "phoneLabel": "Phone: ",
+    "addressLabel": "Address: ",
+    "address": "Abdulrahman Al Nasser, Al Nahdah, Al Kharj 16439",
+    "businessLabel": "Unified establishment number: ",
+    "email": "support@chapter14.net",
+    "phone": "+966508337658",
+    "businessNumber": "7051848427",
+    "siteLinks": "Site links",
+    "policies": "Policies"
+  },
+  "OfflineBar": {
+    "title": "You’re offline",
+    "body": "This page still works. The rest will return when you’re back online."
+  },
+  "SupportButton": {
+    "ariaLabel": "Contact support on WhatsApp",
+    "help": "Need help?",
+    "context": "Hello, I have a question about Becan"
+  },
+  "DocPage": {
+    "updated": "Last updated: {updated}",
+    "contentsLabel": "Page contents",
+    "contents": "Contents"
+  },
+  "Settings": {
+    "Account": {
+      "interfaceLanguage": "Interface language",
+      "metadataTitle": "Account — Becan",
+      "title": "Account",
+      "lede": "Changes save automatically when you leave a field.",
+      "data": "Your details",
+      "name": "Name",
+      "contactHint": "We use it for exam reminders and invoices",
+      "contact": "Email or phone number",
+      "universityAndMajor": "Your university and major",
+      "universityEffect": "They determine which courses appear in search. Update them if you transfer or change your major.",
+      "university": "University",
+      "major": "Major",
+      "password": "Password",
+      "passwordEffect": "Changing it requires confirmation. It doesn’t save automatically like the other fields.",
+      "changePassword": "Change password",
+      "currentRequired": "Enter your current password",
+      "newInvalid": "Your new password must have at least 8 characters",
+      "currentPassword": "Current password",
+      "passwordHint": "At least 8 characters",
+      "newPassword": "New password",
+      "savePassword": "Save password",
+      "cancel": "Cancel",
+      "exampleName": "Abdullah",
+      "exampleContact": "abdullah@example.com"
+    },
+    "metadataTitle": "Settings — Becan",
+    "title": "Settings",
+    "sections": "Settings sections",
+    "account": "Account",
+    "accountHint": "Your name, email and university",
+    "study": "Study preferences",
+    "studyHint": "Explanation speed and test format",
+    "notifications": "Notifications",
+    "notificationsHint": "WhatsApp and email, with a switch for each type",
+    "subscription": "Subscription",
+    "subscriptionHint": "Your plan, minutes and renewal",
+    "invoices": "Invoices",
+    "invoicesHint": "Your payment history with VAT shown separately",
+    "data": "Your data",
+    "dataHint": "Download your data or delete your account",
+    "saved": "Saved",
+    "Study": {
+      "metadataTitle": "Study preferences — Becan",
+      "title": "Study preferences",
+      "lede": "Defaults for each new session — you can change all of them during the explanation.",
+      "slow": "Slow",
+      "normal": "Normal",
+      "fast": "Fast",
+      "mcq": "Multiple choice",
+      "essay": "Essay",
+      "problems": "Problems",
+      "time": "Your study time",
+      "timeEffect": "“In a hurry” gives you a shorter explanation focused on what matters most. “I have time” explains at a steady pace with examples and checks your understanding. Applies from your next session.",
+      "speed": "Default explanation speed — coming soon",
+      "speedEffect": "Explanations currently use one speed. This option will be enabled when sessions support speed changes.",
+      "format": "Default test format",
+      "formatEffect": "Sets the format of questions you answer after each topic. You can choose a different format for each course on its page.",
+      "recordings": "Your voice recordings",
+      "keepAudio": "Keep recordings of my questions",
+      "recordingsEffect": "Off by default: your voice recordings are deleted within 24 hours of the session ending. Turn it on to keep them for 30 days and listen from the session page.",
+      "quick": "In a hurry",
+      "relaxed": "I have time"
+    },
+    "Notifications": {
+      "metadataTitle": "Notifications — Becan",
+      "title": "Notifications",
+      "lede": "Each type has its own switch. There’s no single switch that turns everything off.",
+      "whatsapp": "WhatsApp",
+      "email": "Email",
+      "inapp": "In the app",
+      "examTitle": "Exam reminder",
+      "examEffect": "Arrives one week and two days before your exam, with the chapters you still need to finish.",
+      "readyTitle": "Your course is ready",
+      "readyEffect": "Arrives when a course you requested becomes available.",
+      "quotaTitle": "Minutes running low",
+      "quotaEffect": "Alerts you in the app when less than 20% of your monthly minutes remain. We don’t send it by WhatsApp or email.",
+      "billingAlways": "Invoices and payment confirmations are always sent. They concern your money, so they stay on.",
+      "channelLabel": "{kind} via {channel}"
+    },
+    "Data": {
+      "metadataTitle": "Your data — Becan",
+      "title": "Your data",
+      "lede": "Your data is yours. Download or delete it whenever you want.",
+      "downloadTitle": "Download your data",
+      "downloadBody": "One file with your sessions, progress in each course, questions and answers, exam dates and account details. In a format you can open in any spreadsheet.",
+      "requested": "We’re preparing your file. A download link will reach your email within an hour. The link works for 7 days.",
+      "download": "Download my data",
+      "deleteTitle": "Delete account",
+      "deleteBody": "Deletion is permanent. Before you decide, the next page explains exactly what’s deleted, what’s kept and how long it takes.",
+      "deleteLink": "Read what happens before deleting"
+    },
+    "Delete": {
+      "metadataTitle": "Delete account — Becan",
+      "title": "Delete account",
+      "lede": "Read both sections below before deciding. Deletion can’t be undone.",
+      "deletedAccount": "Your account, name, email and phone number.",
+      "deletedSessions": "All your sessions: what Becan explained, your questions and answers, and where you struggled.",
+      "deletedProgress": "Your progress in each course and your saved exam dates.",
+      "deletedPreferences": "Your preferences and notification settings.",
+      "deletedAudio": "Any voice recordings we still have for you.",
+      "keptInvoices": "Your invoices and payment amounts — tax regulations require us to keep them. They contain no study content.",
+      "keptStats": "Aggregated statistics that can’t be traced back to you or identify you, such as how many students studied a particular chapter.",
+      "deletedTitle": "What’s deleted",
+      "keptTitle": "What’s kept",
+      "whenTitle": "When it happens",
+      "whenBody": "Your account closes as soon as you confirm the request. You can’t sign in after that. Your data is deleted from our systems within 30 days. During the first 7 days, you can cancel using the link we email you.",
+      "phrase": "Delete my account",
+      "receivedTitle": "We’ve received your deletion request",
+      "receivedBody": "Your account is now closed, and your data will be deleted within 30 days. We’ve emailed you confirmation with a link to cancel within 7 days if you change your mind.",
+      "home": "Back to the homepage",
+      "confirmLabel": "Type the phrase to confirm",
+      "delete": "Permanently delete my account",
+      "cancel": "Cancel",
+      "phraseInvalid": "Type “{phrase}” exactly to confirm this is intentional",
+      "phraseHint": "Type this exactly: {phrase}",
+      "activeSubscription": "You have a paid subscription active until <strong>{date}</strong>. Deleting your account stops it now, and we don’t refund the remaining period. <cancel>Canceling without deleting</cancel> lets you use it until the end."
+    },
+    "Invoices": {
+      "metadataTitle": "Invoices — Becan",
+      "title": "Invoices",
+      "lede": "Every payment you’ve made, with VAT separate from the net amount.",
+      "emptyTitle": "No invoices yet",
+      "emptyBody": "Your first invoice appears here after your first paid subscription.",
+      "net": "Net amount",
+      "vat": "VAT",
+      "caption": "Your invoice history",
+      "date": "Date",
+      "plan": "Plan",
+      "total": "Total",
+      "invoice": "Invoice",
+      "open": "Open invoice",
+      "amount": "SAR {amount}",
+      "planName": "{plan} plan",
+      "note": "All amounts are in Saudi riyals and include VAT. Need an invoice in an organization’s name? <contact>Contact us</contact>."
+    },
+    "Invoice": {
+      "invoices": "Invoices",
+      "brand": "Becan",
+      "subscriptionInvoice": "Subscription invoice",
+      "number": "Invoice number",
+      "date": "Date",
+      "description": "Description",
+      "method": "Payment method",
+      "net": "Net amount",
+      "totalPaid": "Total paid",
+      "paid": "Paid · Amounts in Saudi riyals.",
+      "print": "Save invoice",
+      "planMonth": "{plan} plan — one month",
+      "vatRate": "VAT {rate}%",
+      "amount": "SAR {amount}",
+      "metadataTitle": "Invoice {id} — Becan"
+    },
+    "Subscription": {
+      "metadataTitle": "Subscription — Becan",
+      "title": "Subscription",
+      "canceledTitle": "Renewal canceled",
+      "resume": "Resume subscription",
+      "plan": "Your plan",
+      "endsOn": "Ends on",
+      "renewsOn": "Next renewal",
+      "method": "Payment method",
+      "minutes": "This month’s minutes",
+      "change": "Change your plan",
+      "free": "No charge",
+      "cancelTitle": "Cancel subscription",
+      "confirmTitle": "Canceling returns you to the free plan",
+      "confirm": "Confirm cancellation",
+      "keep": "Keep my plan",
+      "cancelBody": "You can cancel renewal anytime. Your plan stays active until the end of your paid period.",
+      "cancel": "Cancel renewal",
+      "compare": "Compare all plans",
+      "canceledBody": "Your {plan} plan stays active until <strong>{date}</strong>, then you return to the free plan. You won’t be charged.",
+      "monthlyPrice": "SAR {price} / month",
+      "vatNote": "The price includes VAT. See the breakdown in <invoices>your invoices</invoices>.",
+      "remaining": "{count, plural, one {minute left} other {minutes left}}",
+      "used": "You used {usedLabel} of {total, plural, one {{totalLabel} minute} other {{totalLabel} minutes}}",
+      "usedRenewal": "You used {usedLabel} of {total, plural, one {{totalLabel} minute} other {{totalLabel} minutes}} · Renews on {date}",
+      "otherPlan": "{price} · {count, plural, one {{countLabel} minute} other {{countLabel} minutes}}",
+      "loseMinutes": "Your minutes go from {fromLabel} to {to, plural, one {{toLabel} minute} other {{toLabel} minutes}} a month.",
+      "loseCourses": "Your course allowance goes from “{from}” to “{to}”.",
+      "activeUntil": "Your {plan} plan stays active until {date}.",
+      "upgrade": "Upgrade to {plan}",
+      "downgrade": "Downgrade to {plan}"
+    }
+  },
+  "Quota": {
+    "title": "You’ve used this month’s minutes",
+    "progress": "You studied <strong>{studied, plural, one {{studiedLabel} minute} other {{studiedLabel} minutes}}</strong> — you have <strong>{chaptersLeft, plural, one {{chaptersLabel} chapter} other {{chaptersLabel} chapters}}</strong> left before your exam.",
+    "continue": "Keep studying for SAR {price}/month",
+    "plans": "See plans",
+    "allowance": "{minutes, plural, one {{minutesLabel} minute} other {{minutesLabel} minutes}} per month · Your courses"
+  },
+  "Error": {
+    "title": "The page didn’t open",
+    "body": "Something stopped on our end while loading the page. Your device and connection are fine, and your progress is safe.",
+    "retry": "Try again",
+    "courses": "Back to your courses",
+    "help": "Keeps happening? <contact>Contact us</contact> and check the <status>system status</status>.",
+    "digest": "If you contact us, include this code so we can find the error log: <code>{digest}</code>"
+  },
+  "NotFound": {
+    "metadataTitle": "Page not found — Becan",
+    "title": "This page isn’t here",
+    "body": "The link may be old, or a character is missing from the address.",
+    "waysLabel": "Where to go next",
+    "courses": "My courses",
+    "search": "Find a course",
+    "home": "Home"
+  },
+  "Maintenance": {
+    "metadataTitle": "Maintenance — Becan",
+    "title": "Becan is under maintenance",
+    "body": "We’re updating the servers that run voice explanations. The service is paused during the update. Your account, minutes and subscription are unaffected.",
+    "backLabel": "We expect to be back at",
+    "backAt": "2:00 AM",
+    "backIn": "About an hour and a half from now.",
+    "status": "Follow the system status",
+    "contact": "Contact us if you need help now"
+  },
+  "Status": {
+    "metadataTitle": "System status — Becan",
+    "title": "System status",
+    "checked": "Last checked: 23 August 2026 · 4:20 PM · We check every minute.",
+    "partsTitle": "Service components",
+    "historyTitle": "Past incidents",
+    "historyBody": "What happened, how long it lasted, and what we did to prevent it from happening again.",
+    "incident": "{title} · {minutes, plural, one {{minutesLabel} minute} other {{minutesLabel} minutes}}",
+    "report": "See a problem that isn’t listed here? <contact>Let us know</contact> — your report helps us start investigating.",
+    "faq": "FAQs",
+    "levels": {
+      "ok": {
+        "label": "Everything is working",
+        "note": "No known issues right now."
+      },
+      "partial": {
+        "label": "Partially affected",
+        "note": "Some parts of the service are slower than usual or unavailable."
+      },
+      "down": {
+        "label": "Unavailable",
+        "note": "The service is down. We’re working on it."
+      }
+    },
+    "parts": {
+      "voice": "Voice explanations",
+      "board": "Board and slides",
+      "auth": "Sign in and registration",
+      "billing": "Payments and subscriptions"
+    },
+    "history": {
+      "voice": {
+        "date": "11 August 2026",
+        "title": "Voice explanations interrupted",
+        "what": "An update failed at our audio processing provider. You could resume affected sessions from the same topic, and those minutes weren’t deducted."
+      },
+      "slides": {
+        "date": "2 August 2026",
+        "title": "Slides slow to open",
+        "what": "The file server was overloaded during final exams. We increased capacity and added a limit to prevent it from happening again."
+      },
+      "maintenance": {
+        "date": "19 July 2026",
+        "title": "Scheduled maintenance",
+        "what": "A server update, announced two days in advance."
+      }
+    }
+  },
+  "Ambassadors": {
+    "Form": {
+      "universityRequired": "Choose your university from the list",
+      "chooseUniversity": "Choose your university",
+      "universityName": "University name",
+      "other": "Other",
+      "phonePlaceholder": "05xxxxxxxx",
+      "contactInvalid": "Check your email, or enter a 10-digit number starting with 05",
+      "nameRequired": "Enter your name",
+      "sentTitle": "We’ve received your request",
+      "name": "Your name",
+      "university": "Your university",
+      "contactRequired": "Enter your phone number or email",
+      "contact": "Phone number or email",
+      "reachHint": "Optional — helps us prioritize applications",
+      "reach": "How do you reach your classmates?",
+      "reachPlaceholder": "Year group chat, Twitter account, college club…",
+      "submit": "Apply to be an ambassador",
+      "sentBody": "We review applications weekly and reply within five days. If accepted, you’ll receive your referral link and a dashboard to track sign-ups."
+    },
+    "metadataTitle": "Becan ambassadors",
+    "metadataDescription": "Share Becan with your classmates and earn a commission.",
+    "title": "Be a Becan <word>ambassador</word> at your university",
+    "intro": "Students listen to students. If Becan helped you, share it with your classmates and earn a commission.",
+    "commission": "20%",
+    "commissionBody": "of each subscription through your link",
+    "commissionNote": "Plus a free Pro subscription while you’re an ambassador.",
+    "doesTitle": "What you’ll do",
+    "getsTitle": "What you’ll get",
+    "applyTitle": "Apply",
+    "applyBody": "Four fields. We’ll review your application and reply within five days.",
+    "doesShare": "Share Becan with your year group — in a chat, on your account, or during a group study session.",
+    "doesTry": "Try new courses before release and tell us what’s missing.",
+    "doesRequest": "Tell us which courses your department needs so we can prepare them before next term.",
+    "getsProTitle": "Free Pro subscription",
+    "getsProBody": "While you’re an ambassador — 500 minutes a month and all your courses.",
+    "getsCommissionTitle": "Commission on each subscription",
+    "getsCommissionBody": "20% of each subscription through your link, including renewals during the first year.",
+    "getsBadgeTitle": "Ambassador badge",
+    "getsBadgeBody": "A badge on your account and profile, plus a certificate you can add to your CV."
+  },
+  "Investors": {
+    "Form": {
+      "emailInvalid": "Check your email address",
+      "emailPlaceholder": "name@fund.com",
+      "nameRequired": "Enter your name",
+      "sentTitle": "We’ve received your request",
+      "orgRequired": "Enter your organization or fund name",
+      "name": "Name",
+      "organization": "Organization",
+      "email": "Email",
+      "sentBody": "We’ll email you the <latin>deck</latin> within one business day, with a suggested time for a short call if you’d like.",
+      "submit": "Request the <latin>deck</latin>"
+    },
+    "metadataTitle": "For investors — Becan",
+    "metadataDescription": "Voice explanations, an interactive board and questions to check understanding. Built first for Saudi university students.",
+    "title": "Becan — for investors",
+    "intro": "An Arabic-first web product where university students study their course through voice explanations on an interactive board, then answer questions to check understanding. Our first market is Saudi university students.",
+    "metricsNote": "Operational figures as of 23 August 2026, from actual use rather than expressions of interest.",
+    "deckBody": "Includes the market, product, revenue model, team and financial plan. We’ll send it within one business day.",
+    "deckTitle": "Request the <latin>deck</latin>",
+    "Metrics": {
+      "students": {
+        "note": "Registered and active",
+        "amount": "{count, plural, one {<value>{countLabel}</value> <unit>student</unit>} other {<value>{countLabel}</value> <unit>students</unit>}}"
+      },
+      "sessions": {
+        "note": "Completed explanation sessions",
+        "amount": "{count, plural, one {<value>{countLabel}</value> <unit>session</unit>} other {<value>{countLabel}</value> <unit>sessions</unit>}}"
+      },
+      "hours": {
+        "note": "Study time in sessions",
+        "amount": "{count, plural, one {<value>{countLabel}</value> <unit>hour</unit>} other {<value>{countLabel}</value> <unit>hours</unit>}}"
+      },
+      "return": {
+        "note": "Return for a second session",
+        "amount": "<value>{countLabel}%</value> <unit>return</unit>"
+      },
+      "rating": {
+        "note": "Student session rating",
+        "amount": "<value>{countLabel}</value> <unit>out of 5</unit>"
+      }
+    }
+  },
+  "Join": {
+    "Form": {
+      "emailPlaceholder": "name@example.com",
+      "contactInvalid": "Check your email, or enter a 10-digit number starting with 05",
+      "contactRequired": "Enter your email or phone number",
+      "google": "Continue with Google",
+      "or": "or",
+      "contact": "Email or phone number",
+      "continue": "Continue",
+      "agreement": "By continuing, you agree to the <terms>terms</terms> and <privacy>privacy policy</privacy>"
+    },
+    "metadataTitle": "Sign in — Becan",
+    "metadataDescription": "Sign in and return to the chapter where you left off.",
+    "unlocksDefault": "Sign in to pick up your course where you left off",
+    "title": "Sign <word>in</word>",
+    "chapter": "Chapter {chapter}",
+    "unlocks": "Sign in to open: <context>{unlocks}</context>"
+  },
+  "Request": {
+    "Form": {
+      "universityRequired": "Choose your university from the list",
+      "chooseUniversity": "Choose your university",
+      "universityName": "University name",
+      "other": "Other",
+      "emailInvalid": "Check your email address",
+      "phonePlaceholder": "05xxxxxxxx",
+      "emailPlaceholder": "name@example.com",
+      "universityNameRequired": "Enter your university name",
+      "courseRequired": "Enter the course name or code",
+      "emailRequired": "Enter your email",
+      "phoneRequired": "Enter your phone number",
+      "phoneInvalid": "Enter a complete 10-digit number starting with 05",
+      "university": "University",
+      "universityPlaceholder": "Enter the university name",
+      "course": "Course name or code",
+      "coursePlaceholder": "For example: Accounting 2 or ACCT 201",
+      "contact": "Where should we notify you when it’s ready?",
+      "preferPhone": "Use my phone number",
+      "preferEmail": "Use my email",
+      "optional": "Optional",
+      "files": "Have course files? Upload them to get it ready faster",
+      "chooseFiles": "Drop files or choose them",
+      "errors": "Complete the highlighted fields above, then submit",
+      "submit": "Send request"
+    },
+    "metadataTitle": "Request your course — Becan",
+    "metadataDescription": "We prepare courses based on demand. Each request raises a course’s priority.",
+    "eyebrow": "Course request",
+    "intro": "We prepare courses based on demand. Each request raises the course’s priority in the production queue.",
+    "Sent": {
+      "metadataTitle": "Request received — Becan",
+      "metadataDescription": "We’ll notify you on WhatsApp when the course is ready.",
+      "tryAnother": "Try another course",
+      "title": "Got your <word>request</word>",
+      "body": "We’ll notify you on WhatsApp when the course is ready.<br></br>Each new request raises its priority in the production queue.",
+      "shareSubject": "I requested “{subject}” on Becan. Request it too to raise its priority.",
+      "shareDefault": "I requested my course on Becan. Request yours to raise its priority.",
+      "peers": "{count, plural, one {{countLabel} student requested this too} other {{countLabel} students requested this too}}"
+    },
+    "title": "Request your <word>course</word>",
+    "Share": {
+      "share": "Share Becan with classmates",
+      "title": "Becan",
+      "copied": "Link copied",
+      "failed": "Couldn’t copy the link. Copy the page address and share it with your classmates."
+    }
+  },
+  "Contact": {
+    "Form": {
+      "emailPlaceholder": "name@example.com",
+      "contactInvalid": "Check your email, or enter a 10-digit number starting with 05",
+      "sentTitle": "We’ve received your message",
+      "contactRequired": "Enter your email or phone number so we can reply",
+      "messageRequired": "Add more detail — at least 10 characters",
+      "sentBody": "We’ll reply within one business day using the contact details you gave us. If it’s urgent, message us on WhatsApp for a faster reply.",
+      "topic": "Topic",
+      "contact": "Email or phone number",
+      "messageHint": "For a session issue, include the course and chapter — it cuts our follow-up in half",
+      "message": "Your message",
+      "submit": "Send message",
+      "topicCourse": "Missing course or unfinished chapter",
+      "topicSession": "Session or microphone issue",
+      "topicBilling": "Payment, subscription or refund",
+      "topicAccount": "My account and data",
+      "topicOther": "Something else"
+    },
+    "metadataTitle": "Contact us — Becan",
+    "metadataDescription": "Contact Becan on WhatsApp or send a message using the form.",
+    "title": "Contact us",
+    "intro": "WhatsApp is the quickest way to reach us. You can also use the form below.",
+    "whatsappContext": "Hello, I have a question about Becan",
+    "whatsapp": "Message us on WhatsApp",
+    "formTitle": "Or write to us",
+    "formBody": "We’ll reply using the contact details you provide within one business day.",
+    "faq": "See FAQs",
+    "replyHours": "{when} · We reply {reply}",
+    "beforeContact": "Before you contact us, check the <faq>FAQs</faq> for an answer. If the service is down, check the <status>system status</status> — we may already be working on it."
+  },
+  "Universities": {
+    "kingSaud": "King Saud University",
+    "kingAbdulaziz": "King Abdulaziz University",
+    "imam": "Imam Mohammad Ibn Saud Islamic University"
+  },
+  "Faq": {
+    "metadataTitle": "FAQs — Becan",
+    "metadataDescription": "Find answers about courses, voice sessions, payments and subscriptions.",
+    "title": "FAQs",
+    "intro": "Search for your question. If it’s missing, message us and we’ll add it.",
+    "contact": "Still need an answer? Contact us",
+    "Search": {
+      "label": "Search FAQs",
+      "placeholder": "Search — microphone, cancellation, mada",
+      "emptyTitle": "Can’t find your question?",
+      "hits": "{count, plural, =0 {No questions match your search.} one {{countLabel} question matches your search.} other {{countLabel} questions match your search.}}",
+      "emptyBody": "Ask us on WhatsApp from the <contact>contact page</contact>. If others ask too, we’ll add the answer here."
+    }
+  },
+  "Plans": {
+    "metadataTitle": "Plans — Becan",
+    "metadataDescription": "Compare monthly study plans. Prices include VAT.",
+    "chapters": "Chapters per month",
+    "minutes": "Minutes",
+    "hours": "In hours",
+    "courses": "Courses",
+    "minuteCount": "{count, plural, one {{countLabel} minute} other {{countLabel} minutes}}",
+    "title": "Plans",
+    "comparisonCaption": "Compare plan allowances",
+    "comparison": "Comparison",
+    "sharedFeatures": "Explanations, board, questions and summaries",
+    "included": "Included",
+    "beforePaying": "Before you pay",
+    "tryFree": "Try the free plan first. No card needed.",
+    "cancel": "Cancel renewal in one click. Your plan stays active until your paid period ends.",
+    "refunds": "Refunds and cancellations",
+    "pricingFaq": "Pricing questions",
+    "vatTitle": "VAT is included",
+    "vatBody": "You pay the price shown. No fees are added at checkout, and your invoice separates the net amount from VAT.",
+    "intro": "You get the same explanations, board, questions and summaries on each plan. Plans differ in <strong>study time</strong> and <strong>number of courses</strong>.",
+    "paymentMethods": "mada, <latin>Apple Pay</latin> and credit cards.",
+    "taxBreakdown": "SAR {net} + SAR {vat} VAT = <strong>SAR {gross}</strong>",
+    "vatRate": "VAT: {rate}%."
+  },
+  "PlanCard": {
+    "current": "Your current plan",
+    "freeNote": "No card or subscription",
+    "vatIncluded": "VAT included",
+    "startFree": "Start free",
+    "choose": "Choose {plan}",
+    "price": "<unit>SAR</unit> <price>{priceLabel}</price> <unit>/ month</unit>",
+    "minutes": "{count, plural, one {<amount>{countLabel}</amount> <unit>minute per month</unit>} other {<amount>{countLabel}</amount> <unit>minutes per month</unit>}}"
+  },
+  "Landing": {
+    "metadataTitle": "Becan — Your personal course tutor",
+    "metadataDescription": "Study your course by voice, check your understanding with questions, and see which mistakes could cost you marks.",
+    "cta": "Choose your course for free",
+    "pricingNav": "Pricing",
+    "howNav": "How it works",
+    "heroTitle": "Stop studying in ways that",
+    "wrong": "don’t work",
+    "unclear": "leave you guessing",
+    "wasteful": "waste your time",
+    "distracting": "break your focus",
+    "name": "Becan",
+    "captureTitle": "Ready to start?",
+    "captureBody": "Choose your course and hear your first explanation now.",
+    "tutor": "Your personal <word>tutor</word>, powered by AI",
+    "Sections": {
+      "understandClaim": "Understand it",
+      "understandWhy": "Clear explanations, fewer words",
+      "groundedClaim": "Doesn’t make things up",
+      "groundedWhy": "Because it’s trained on your course",
+      "easyClaim": "Very easy",
+      "easyWhy": "One click to start studying",
+      "freeNote": "No card or subscription",
+      "chooseCourse": "Choose your course",
+      "chooseCourseDetail": "Find it by name or code, with chapters ready to study",
+      "chooseChapter": "Choose a chapter",
+      "chooseChapterDetail": "See its topics and duration before you start",
+      "start": "Start the explanation",
+      "startDetail": "Follow the board and answer questions to check your understanding",
+      "howTitle": "How it works",
+      "quoteOne": "It helped when I was short on time. I focused on the key topics, and they came up in the final.",
+      "quoteTwo": "I’ll use it again to study for my resit.",
+      "quoteThree": "The explanations were clear and easy to follow. They helped me understand a lot.",
+      "surveySource": "From the field-test survey",
+      "sessions": "{count, plural, one {session} other {sessions}}",
+      "studyMinutes": "{count, plural, one {study minute} other {study minutes}}",
+      "studentRating": "student rating out of 5",
+      "minutes": "{count, plural, one {minute} other {minutes}}",
+      "sessionAverage": "{count, plural, one {minute per session on average} other {minutes per session on average}}",
+      "proofTitle": "of students said Becan became their main study resource",
+      "proofNote": "Figures from the field test — actual sessions, not expressions of interest.",
+      "pricingTitle": "Subscribe now",
+      "faqTitle": "Questions before you start",
+      "faqLink": "See all questions",
+      "stepNumber": "Step {step}",
+      "ratingLabel": "{rating} out of 5",
+      "rating": "<strong>{rating}</strong> out of 5 · Session rating",
+      "pricingBody": "Get the value of a private tutor — <strong>for the price of a single lesson with one</strong>.",
+      "pricingNote": "Monthly prices include VAT · <refunds>Cancel anytime</refunds>",
+      "voice": "<hears>You can ask by voice</hears> <speaks>and hear the answer</speaks>"
+    },
+    "Demo": {
+      "caption": "A preview of a Becan study session — topics, board and slides.",
+      "explaining": "Explaining now",
+      "course": "Principles of Accounting 1 · Chapter 3",
+      "penalty": "What costs you marks:",
+      "slideTitle": "Course slide"
+    }
+  },
+  "Courses": {
+    "metadataTitle": "What’s your course? — Becan",
+    "metadataDescription": "Find your course by name or code and start with the first chapter.",
+    "eyebrow": "Choose a course",
+    "search": "Find your course",
+    "searchPlaceholder": "Search by course name or code",
+    "university": "University",
+    "allUniversities": "All universities",
+    "college": "College / Major",
+    "allColleges": "All colleges",
+    "noResults": "No results",
+    "requestBody": "We prepare courses based on demand. Each request raises the course’s priority in the production queue.",
+    "requestThis": "Request this course",
+    "notFound": "Can’t find your course?",
+    "request": "Request your course",
+    "title": "What’s your <word>course</word>?",
+    "count": "{count, plural, one {{countLabel} course} other {{countLabel} courses}}",
+    "emptyTitle": "We couldn’t find <query>{search}</query>"
+  },
+  "Course": {
+    "notFoundTitle": "Course not found — Becan",
+    "chapters": "Chapters",
+    "checks": "Understanding checks",
+    "sources": "Other resources",
+    "notStarted": "You haven’t started",
+    "nextStatus": "Your next step",
+    "almost": "You’re nearly there",
+    "done": "You finished it",
+    "notStartedMastery": "You haven’t started",
+    "progress": "Your course progress",
+    "exam": "Your expected exam date",
+    "resume": "Continue",
+    "start": "Start the explanation",
+    "soon": "Coming soon",
+    "continue": "Keep studying",
+    "content": "Course content",
+    "completed": "You finished {doneLabel} of {total, plural, one {{totalLabel} chapter} other {{totalLabel} chapters}}",
+    "metadataTitle": "{course} — Becan",
+    "metadataDescription": "{university} · {count, plural, one {{countLabel} ready chapter} other {{countLabel} ready chapters}}.",
+    "courseSummary": "{university} · {count, plural, one {{countLabel} chapter} other {{countLabel} chapters}}",
+    "topics": "{count, plural, one {{countLabel} topic} other {{countLabel} topics}}",
+    "mastery": "{percent}% mastery",
+    "nextStep": "Next step: {next}",
+    "nextChapter": "Chapter {number} · {title}"
+  },
+  "Home": {
+    "metadataTitle": "Your courses — Becan",
+    "greeting": "Good evening, Abdulrahman",
+    "settings": "Settings",
+    "title": "Your courses",
+    "add": "Add a course",
+    "soon": "Coming soon"
+  },
+  "Checkout": {
+    "metadataTitle": "Checkout — Becan",
+    "title": "Checkout",
+    "numberInvalid": "Your card number has 16 digits",
+    "expiryInvalid": "Enter the month and year — for example, 09/28",
+    "monthInvalid": "The month must be between 01 and 12",
+    "cvcInvalid": "The security code is 3 digits on the back of your card",
+    "nameRequired": "Enter the name as it appears on your card",
+    "method": "Payment method",
+    "number": "Card number",
+    "expiry": "Expiry",
+    "cvc": "Security code",
+    "name": "Name on card",
+    "phonePayment": "Complete payment from your phone without entering any numbers.",
+    "summary": "Order summary",
+    "net": "Net amount",
+    "total": "Total",
+    "security": "Payment goes through an approved payment gateway. Becan doesn’t store your card number. Your subscription renews monthly, and you can cancel anytime.",
+    "Result": {
+      "metadataTitle": "Payment result — Becan",
+      "declinedWhy": "Your bank declined the payment.",
+      "declinedFix": "Contact your bank or try another card — your bank declined it, not Becan.",
+      "fundsWhy": "Your balance doesn’t cover the amount.",
+      "fundsFix": "Add funds or try another payment method. Your plan stays reserved for you.",
+      "expiredWhy": "Your card has expired.",
+      "expiredFix": "Use a valid card, or pay from your phone without entering numbers.",
+      "onlineWhy": "Online purchases aren’t enabled on your card.",
+      "onlineFix": "Enable them in your bank’s app — usually under “Card settings” — then try again.",
+      "successTitle": "You’ve upgraded",
+      "resumeLabel": "You were studying",
+      "resume": "Continue where you left off",
+      "home": "Back to your courses",
+      "invoice": "View your invoice",
+      "subscription": "Manage subscription",
+      "failedTitle": "Payment didn’t go through",
+      "unchanged": "You haven’t been charged, and your plan hasn’t changed.",
+      "retry": "Try again",
+      "anotherMethod": "Try another payment method",
+      "pendingTitle": "Payment is being processed",
+      "pendingBody": "Your bank is reviewing the payment. This takes a few minutes. We’ll notify you on WhatsApp and by email when it’s complete. You don’t need to try again.",
+      "continueTitle": "You can keep studying now",
+      "pendingDefault": "Your current plan’s minutes are still available. You can study with them while payment is being processed.",
+      "status": "Check subscription status",
+      "successBody": "You’re on the {plan} plan — {minutes, plural, one {{minutesLabel} minute} other {{minutesLabel} minutes}} a month, with all your courses unlocked. Your invoice has been emailed to you.",
+      "resumeChapter": "{course} · Chapter {number} — {title}",
+      "help": "Happening again? <contact>Message us on WhatsApp</contact> and we’ll help you follow it up.",
+      "pendingResume": "Your current plan’s minutes are still available. You can continue {course} — Chapter {number} while payment is being processed."
+    },
+    "planSummary": "{plan} plan — {minutes, plural, one {{minutesLabel} minute} other {{minutesLabel} minutes}} a month, {courses}.",
+    "planMonth": "{plan} plan — one month",
+    "vatRate": "VAT {rate}%",
+    "amount": "SAR {amount}",
+    "pay": "Pay SAR {amount}",
+    "numberPlaceholder": "0000 0000 0000 0000",
+    "expiryPlaceholder": "MM/YY",
+    "cvcPlaceholder": "123"
+  },
+  "CourseCard": {
+    "completed": "You finished {doneLabel} of {total, plural, one {{totalLabel} chapter} other {{totalLabel} chapters}}"
+  },
+  "Session": {
+    "loadingSlides": "Preparing slides…",
+    "exit": "Exit session",
+    "lessons": "Lessons",
+    "lessonsShort": "Lessons",
+    "noLessons": "The lesson list hasn’t arrived. You can start the explanation from the first lesson.",
+    "closeLessonsList": "Close lesson list",
+    "openLessonsList": "Open lesson list",
+    "closeLessons": "Close lessons",
+    "close": "Close",
+    "rotate": "Rotate your screen",
+    "rotateHint": "For the best experience",
+    "okay": "Okay",
+    "explanationLanguage": "Explanation language",
+    "languageOptions": {
+      "ar": "عربي",
+      "en": "English"
+    },
+    "chatListening": "Listening to you — or type your question",
+    "chatQuestion": "Type your question",
+    "chatPlaceholder": "What’s unclear?",
+    "send": "Send",
+    "closeChat": "Close chat",
+    "comingSoon": "Coming soon",
+    "soonLabel": "{label} — Coming soon",
+    "startHint": "Press here to start the explanation",
+    "start": "Start explanation",
+    "pauseSoon": "Pause — Coming soon",
+    "micOff": "Turn microphone off",
+    "micOn": "Turn microphone on",
+    "chat": "Chat",
+    "confused": "I didn’t get it",
+    "repeat": "Repeat the line",
+    "speedSoon": "Explanation speed — Coming soon",
+    "speed": {
+      "slow": "Slow",
+      "normal": "Normal",
+      "fast": "Fast"
+    },
+    "slides": "Slides",
+    "end": "End session",
+    "questionTitle": "Understanding check",
+    "answerVoice": "Answer by voice",
+    "question": "Question",
+    "answerHint": "Answer by voice, or type your answer in chat.",
+    "endTitle": "End the session?",
+    "endHint": "You can return to the same chapter later.",
+    "continue": "Continue",
+    "confirmEnd": "End session",
+    "connectionCut": "Connection lost",
+    "connectionFailed": "We couldn’t connect to the explanation. Check your connection and try again.",
+    "resume": "Continue where you left off",
+    "retry": "Try again",
+    "backCourse": "Back to course",
+    "chooseLesson": "Or choose a lesson from the track to start there.",
+    "preparingExplanation": "Preparing the explanation…",
+    "boardHint": "The board is written as the explanation unfolds.",
+    "chapter": "Chapter {number}",
+    "courseChapter": "{course} · Chapter {number}",
+    "courseChapterDetail": "{course} · Chapter {number} · {detail}",
+    "lessonAccessible": "{number}. {lesson} — {state}",
+    "lessonTitle": "{number}. {lesson}",
+    "lessonProgress": "{done}/{total}",
+    "topicOf": "Topic {number} of {total}",
+    "topic": "Topic {number}",
+    "lastPosition": "You were in: <lesson>{lessonName}</lesson>",
+    "lastPositionDetail": "You were in: <lesson>{lessonName}</lesson> · {detail}",
+    "metadataFallback": "Session — Becan",
+    "metadata": "{chapter} — {course} — Becan",
+    "phase": {
+      "idle": "",
+      "connecting": "Preparing the session",
+      "live": "Explaining now",
+      "thinking": "Thinking",
+      "listening": "Listening to you",
+      "question": "Question",
+      "ending": "Session ended",
+      "cut": "Connection lost"
+    },
+    "lessonState": {
+      "none": "Not started",
+      "now": "Explaining now",
+      "done": "Done"
+    },
+    "duration": "{count, plural, one {<estimate>~{countLabel}</estimate> minute} other {<estimate>~{countLabel}</estimate> minutes}}",
+    "introStats": "{lessons, plural, one {{lessonsLabel} lesson} other {{lessonsLabel} lessons}} · {count, plural, one {<estimate>~{countLabel}</estimate> minute} other {<estimate>~{countLabel}</estimate> minutes}}",
+    "Slides": {
+      "loadError": "We couldn’t open the slides. Try refreshing the page.",
+      "slide": "Slide {number}",
+      "enlargeSlide": "Enlarge slide {number}",
+      "enlarge": "Enlarge",
+      "startHereSoon": "Start explanation here — Coming soon",
+      "slideOf": "Slide {number} of {total}",
+      "closeZoom": "Close enlarged view",
+      "previous": "Previous slide",
+      "next": "Next slide",
+      "pageOf": "{number} of {total}"
+    }
+  },
+  "SessionSummary": {
+    "metadata": "Session summary — Becan",
+    "setExamDate": "Set your exam date",
+    "courseFinished": "You finished the whole {course} course",
+    "limit": "Your session time is up. Rate your session below, then you can start a new one.",
+    "struggled": "You struggled with:",
+    "stumbleAsset": "The definition of an asset",
+    "stumbleControl": "The difference between control and ownership",
+    "penalty": "<strong>What loses marks: </strong>writing “own it” instead of “control it”",
+    "continueChapter": "Continue the chapter",
+    "plan": "See your plan",
+    "reviewStumbles": "Review what you struggled with",
+    "nextChapter": "Next chapter",
+    "daysLeft": "{count, plural, one {{countLabel} day left until your {course} exam} other {{countLabel} days left until your {course} exam}}",
+    "covered": "{total, plural, one {You covered {covered} of {totalLabel} topic} other {You covered {covered} of {totalLabel} topics}}",
+    "chapterFinished": "You finished chapter {number}",
+    "sessionEnded": "Your session in chapter {number} ended",
+    "progress": "{total, plural, one {You finished {doneLabel} of {totalLabel} chapter} other {You finished {doneLabel} of {totalLabel} chapters}}"
+  },
+  "SessionFeedback": {
+    "sent": "Your feedback has arrived. We read every note.",
+    "title": "How was the session?",
+    "notes": "What can we improve?",
+    "error": "Your feedback didn’t arrive. Check your connection and try again.",
+    "sending": "Sending…",
+    "submit": "Send feedback",
+    "rating": {
+      "bad": "Bad",
+      "poor": "Poor",
+      "acceptable": "Acceptable",
+      "good": "Good",
+      "excellent": "Excellent"
+    }
+  },
+  "Legal": {
+    "Privacy": {
+      "metadataTitle": "Privacy policy — Becan",
+      "title": "Privacy policy",
+      "lede": "Becan listens to your voice to explain your course — this page tells you exactly what happens to it.",
+      "sections": {
+        "summary": {
+          "title": "The summary in three lines",
+          "points1": {
+            "item1": "We collect only what we need: your identity, university and major, and study progress.",
+            "item2": "Your voice is processed so you can talk to Becan, and is automatically deleted after the session unless you allow us to keep it.",
+            "item3": "We do not sell your data to anyone or use it for advertising."
+          }
+        },
+        "voice": {
+          "title": "Your voice — how we process and store it",
+          "paragraph1": "Becan is a voice-based service, so this is the most important section on this page. When you talk to Becan during a session, this is what happens:",
+          "points1": {
+            "item1": "The microphone only turns on when you press the talk button — there is no continuous or background listening.",
+            "item2": "Your voice is encrypted as it travels to our servers, then converted to text so Becan can understand your question.",
+            "item3": "The audio recording itself is automatically deleted within 24 hours of the session ending.",
+            "item4": "The text extracted from it stays linked to your account so Becan knows where you struggled — you can delete it by deleting your account.",
+            "item5": "We do not use your voice to train models or share it with anyone other than the audio processing provider we use."
+          },
+          "paragraph2": "If you want Becan to keep your recordings longer so you can review them yourself, you can turn this option on in <study>Study preferences</study> — it is off by default."
+        },
+        "what": {
+          "title": "Other data we collect",
+          "points1": {
+            "item1": "Account data: your name, email or mobile number, university, and major.",
+            "item2": "Study data: the courses you chose, chapters you completed, your questions and answers, where you struggled, and how many minutes you used.",
+            "item3": "Payment data: your plan, renewal date, and the last four digits of your card. Your full card number never passes through us — it goes directly to the payment gateway.",
+            "item4": "Technical data: your device and browser type, and error logs, so we can understand why your session stopped."
+          }
+        },
+        "why": {
+          "title": "Why we collect it",
+          "points1": {
+            "item1": "To run the service: show your course, resume where you stopped, and count your minutes.",
+            "item2": "To improve explanations: identify topics most students struggle with and rebuild them.",
+            "item3": "To keep you informed: reminders before your exam and a notification when your course is ready — you choose the channels in Notifications.",
+            "item4": "To protect the service: detect misuse and account sharing."
+          }
+        },
+        "share": {
+          "title": "Who we share it with",
+          "paragraph1": "We do not sell your data. We only share it with service providers we need to run Becan, and only as much as they need:",
+          "points1": {
+            "item1": "The provider of audio processing and explanation models.",
+            "item2": "The payment gateway, which receives your card details directly, rather than through us.",
+            "item3": "The hosting and operational analytics provider.",
+            "item4": "Authorities that request it under the law."
+          },
+          "paragraph2": "<strong>Your university receives nothing from us</strong> — neither your grades nor where you struggled, nor even the fact that you have an account with us."
+        },
+        "rights": {
+          "title": "Your rights",
+          "paragraph1": "Saudi Arabia’s Personal Data Protection Law gives you rights over your data, including the right to:",
+          "points1": {
+            "item1": "Know what data we hold about you.",
+            "item2": "Download a copy — with one click in your data settings.",
+            "item3": "Correct any inaccurate information.",
+            "item4": "Request deletion of your data and delete your account yourself.",
+            "item5": "Withdraw your consent to any optional use, such as keeping recordings."
+          },
+          "paragraph2": "You can do all of this yourself in <data>Your data</data>. If you need help, contact us."
+        },
+        "keep": {
+          "title": "How long we keep it",
+          "points1": {
+            "item1": "Audio recordings: 24 hours, then they are automatically deleted.",
+            "item2": "Study data: for as long as your account exists.",
+            "item3": "Invoice records: kept after account deletion for as long as tax regulations require.",
+            "item4": "After you delete your account: we delete the remaining data within 30 days."
+          }
+        },
+        "kids": {
+          "title": "User ages",
+          "paragraph1": "Becan is designed for university students. If you are under 18, you need your guardian’s consent before using the service."
+        },
+        "cookies": {
+          "title": "Cookies",
+          "paragraph1": "You can find the details on the <cookies>Cookies page</cookies>."
+        },
+        "contact": {
+          "title": "Contact us",
+          "paragraph1": "For any question about your privacy or request about your data, contact us through the <contact>Contact page</contact>. We will reply within the time stated there."
+        }
+      },
+      "metadataDescription": "Becan listens to your voice to explain your course — this page tells you exactly what happens to it.",
+      "updated": "2026-08-23",
+      "translationNotice": "This is a translation for convenience. The Arabic version is the governing text. <arabic>Read the Arabic version</arabic>"
+    },
+    "Terms": {
+      "metadataTitle": "Terms and conditions — Becan",
+      "title": "Terms and conditions",
+      "lede": "Written in everyday language so you can actually read them. If anything is unclear, contact us and we will explain it.",
+      "sections": {
+        "who": {
+          "title": "Who we are and what we offer",
+          "paragraph1": "With Becan, you get spoken explanations of your university course on an interactive board, followed by questions to check that you understood. The service uses content we prepare — you do not upload content; you simply choose your course and chapter.",
+          "paragraph2": "Using the service means you agree to these terms. If you do not agree, do not use the service."
+        },
+        "account": {
+          "title": "Your account",
+          "paragraph1": "You register with your email or mobile number. Your account is for you alone — do not share it. You are responsible for everything that happens through your account. If you suspect someone has accessed it, tell us immediately.",
+          "paragraph2": "The information you enter must be accurate: your university and major determine which courses you see. Incorrect information will show you a course that is not yours."
+        },
+        "use": {
+          "title": "Permitted use",
+          "paragraph1": "The service is for your personal study. You must not:",
+          "points1": {
+            "item1": "Record, publish, or sell sessions, or republish the board and explanations.",
+            "item2": "Share your account or sell access to it.",
+            "item3": "Use automated tools to scrape content or overload the service.",
+            "item4": "Use Becan for cheating or plagiarism in an exam or graded assignment."
+          },
+          "paragraph2": "Breaking these rules means your account will be suspended. If your account is suspended for a violation, there is no refund for the remaining period."
+        },
+        "content": {
+          "title": "Content and ownership",
+          "paragraph1": "The explanations, board, questions, and audio belong to Becan. You may use them for your studies while your subscription is active. Course names, codes, and university cover images belong to their owners and appear here only for identification.",
+          "paragraph2": "Becan does not replace your instructor’s lectures or your course’s approved reference material. The content we prepare is based on your course sources and is reviewed, but remains supporting material. Your final grade is your responsibility and your instructor’s."
+        },
+        "money": {
+          "title": "Subscriptions and payment",
+          "paragraph1": "Prices shown on the <plans>Plans page</plans> include VAT. Your subscription renews automatically each month until you cancel it.",
+          "paragraph2": "Full details of cancellation and refunds are in the <refunds>Refunds and cancellation policy</refunds>.",
+          "paragraph3": "We may change prices. If we do, we will give you at least 30 days’ notice. The new price applies from the renewal after that notice — not partway through your current paid period."
+        },
+        "availability": {
+          "title": "Service availability",
+          "paragraph1": "We work to keep Becan running, but the service needs maintenance and sometimes has outages. System status and past outages are published on the <status>Status page</status>.",
+          "paragraph2": "If a prolonged outage is caused by us, we will compensate you with minutes or a refund as explained in the refunds policy."
+        },
+        "end": {
+          "title": "Account suspension",
+          "paragraph1": "You can delete your account at any time in <data>Your data settings</data>. We only suspend your account for breaking these terms or in response to a request under the law, and we tell you why."
+        },
+        "law": {
+          "title": "Applicable law",
+          "paragraph1": "These terms are subject to the laws of the Kingdom of Saudi Arabia. Any dispute will be heard by the competent judicial authority there."
+        },
+        "contact": {
+          "title": "Contact us",
+          "paragraph1": "For any question about these terms, contact us through the <contact>Contact page</contact>."
+        }
+      },
+      "metadataDescription": "Written in everyday language so you can actually read them. If anything is unclear, contact us and we will explain it.",
+      "updated": "2026-08-23",
+      "translationNotice": "This is a translation for convenience. The Arabic version is the governing text. <arabic>Read the Arabic version</arabic>"
+    },
+    "Refunds": {
+      "metadataTitle": "Refunds and cancellation — Becan",
+      "title": "Refunds and cancellation",
+      "lede": "Cancel whenever you want with one click, and know from the start when you can get your money back and when you cannot.",
+      "sections": {
+        "cancel": {
+          "title": "Cancellation",
+          "paragraph1": "You can cancel your subscription at any time on the <subscription>Subscription page</subscription>, with one click and one confirmation step. We do not ask for a reason or refer you to anyone.",
+          "paragraph2": "Cancellation stops your next renewal, not your current plan. It stays active with its full minute allowance until the end of the period you paid for. The date is clearly shown on the same page. You then return automatically to the free plan, and your data and progress stay as they are."
+        },
+        "refund": {
+          "title": "When you can get your money back",
+          "paragraph1": "<strong>A full refund within 7 days</strong> of your first payment to Becan, provided you have used no more than 20% of your plan’s minutes. Give the service a proper try. If it does not help you, we will refund the full amount.",
+          "paragraph2": "We also refund you in these cases:",
+          "points1": {
+            "item1": "A duplicate charge or an incorrect amount — we refund it in full, without conditions.",
+            "item2": "An outage caused by us that prevents you from studying for a prolonged period — we refund the value of the affected period or compensate you with minutes. You choose.",
+            "item3": "A course we promised would be ready by a certain date is delayed, and you subscribed for that course."
+          }
+        },
+        "noRefund": {
+          "title": "When a refund is not available",
+          "points1": {
+            "item1": "After 7 days from payment, or after you have used more than 20% of your plan’s minutes — whichever comes first. You can cancel renewal and keep using the period you paid for.",
+            "item2": "Renewals after the first month — cancellation prevents the next renewal; it does not refund one that has already happened.",
+            "item3": "Account suspension for breaking the terms, such as sharing your account or republishing content."
+          }
+        },
+        "how": {
+          "title": "How to request a refund",
+          "paragraph1": "Contact us through the <contact>Contact page</contact> — WhatsApp is faster — and include your invoice number, which you can find in <invoices>Your invoices</invoices>. We do not ask for any card number.",
+          "paragraph2": "We reply to your request within one business day with an approval or a rejection with reasons — we do not leave you without an answer."
+        },
+        "when": {
+          "title": "When you receive the money",
+          "paragraph1": "The money goes back to the same payment method you used. We do not refund it to another method or as credit in Becan unless you ask us to.",
+          "paragraph2": "We issue the refund within 1 to 3 business days. Your bank then needs 5 to 10 business days for it to appear in your account. That second period depends on your bank, not us. We give you the transaction number so you can ask about it.",
+          "paragraph3": "Tax is refunded with the amount. We issue a refund invoice, which you can find in <invoices>Your invoices</invoices>."
+        }
+      },
+      "metadataDescription": "Cancel whenever you want with one click, and know from the start when you can get your money back and when you cannot.",
+      "updated": "2026-08-23",
+      "translationNotice": "This is a translation for convenience. The Arabic version is the governing text. <arabic>Read the Arabic version</arabic>"
+    },
+    "Cookies": {
+      "metadataTitle": "Cookies — Becan",
+      "title": "Cookies",
+      "lede": "Three types, all to run your account. None for advertising.",
+      "sections": {
+        "what": {
+          "title": "What they are",
+          "paragraph1": "Small files your browser saves to remember that you are signed in and to keep your preferences between visits. Without them, you would need to sign in again every time you open a page."
+        },
+        "kinds": {
+          "title": "Which ones we use",
+          "paragraph1": "Only three types, all necessary to run the service:",
+          "points1": {
+            "item1": "Sign-in session: keeps you signed in until you sign out yourself. It expires 30 days after your last use.",
+            "item2": "Preferences: explanation speed, quiz format, and the last course you opened, so you do not have to set them again each time.",
+            "item3": "Security: prevents other sites from sending requests in your name. These expire when the session ends."
+          },
+          "paragraph2": "<strong>We do not use advertising cookies or track you across sites</strong>, and we do not sell your data to anyone. That is why you do not see a consent pop-up following you on every page."
+        },
+        "control": {
+          "title": "How to control them",
+          "paragraph1": "You can delete or block them in your browser settings at any time. But blocking sign-in cookies means you cannot sign in or continue a session — the service itself needs them.",
+          "paragraph2": "If you want to erase everything we hold about you, do that in <data>Your data</data>, rather than in your browser."
+        },
+        "more": {
+          "title": "More information",
+          "paragraph1": "Details of what we collect about you and how we use it are in the <privacy>Privacy policy</privacy>."
+        }
+      },
+      "metadataDescription": "Three types, all to run your account. None for advertising.",
+      "updated": "2026-08-23",
+      "translationNotice": "This is a translation for convenience. The Arabic version is the governing text. <arabic>Read the Arabic version</arabic>"
+    }
+  }
+}

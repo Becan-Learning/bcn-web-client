@@ -1,0 +1,1093 @@
+{
+  "LanguageSwitcher": {
+    "label": "English",
+    "ariaLabel": "غيّر لغة الواجهة إلى الإنجليزية"
+  },
+  "Metadata": {
+    "title": "بيكان — مدرّسك الخصوصي لمقررك",
+    "description": "بيكان يشرح لك مقررك بصوته، ويسألك عشان يتأكد إنك فهمت، ويعرف وين تنكسر درجتك في الاختبار."
+  },
+  "SiteHeader": {
+    "login": "دخول"
+  },
+  "Brand": {
+    "name": "بيكان"
+  },
+  "SiteFooter": {
+    "how": "كيف يعمل",
+    "pricing": "الأسعار",
+    "faq": "الأسئلة الشائعة",
+    "contact": "تواصل معنا",
+    "status": "حالة النظام",
+    "ambassadors": "السفراء",
+    "login": "دخول",
+    "terms": "الشروط والأحكام",
+    "privacy": "سياسة الخصوصية",
+    "refunds": "الاسترجاع والإلغاء",
+    "cookies": "ملفات تعريف الارتباط",
+    "contactInfo": "معلومات التواصل",
+    "emailLabel": "البريد الإلكتروني: ",
+    "phoneLabel": "هاتف: ",
+    "addressLabel": "العنوان: ",
+    "address": "الخرج، حي النهضة، عبد الرحمن الناصر 16439",
+    "businessLabel": "رقم المنشأة الموحد: ",
+    "email": "support@chapter14.net",
+    "phone": "+966508337658",
+    "businessNumber": "7051848427",
+    "siteLinks": "روابط الموقع",
+    "policies": "السياسات"
+  },
+  "OfflineBar": {
+    "title": "ما في اتصال",
+    "body": "الصفحة اللي قدامك تشتغل، ونرجّع الباقي أول ما يرجع."
+  },
+  "SupportButton": {
+    "ariaLabel": "تواصل مع الدعم على واتساب",
+    "help": "محتاج مساعدة؟",
+    "context": "السلام عليكم، عندي سؤال عن بيكان"
+  },
+  "DocPage": {
+    "updated": "آخر تحديث: {updated}",
+    "contentsLabel": "محتويات الصفحة",
+    "contents": "المحتويات"
+  },
+  "Settings": {
+    "Account": {
+      "interfaceLanguage": "لغة الواجهة",
+      "metadataTitle": "الحساب — بيكان",
+      "title": "الحساب",
+      "lede": "التعديل ينحفظ تلقائيًا أول ما تخرج من الحقل.",
+      "data": "بياناتك",
+      "name": "الاسم",
+      "contactHint": "نستعمله لتذكيرك قبل اختبارك ولإرسال فواتيرك",
+      "contact": "البريد أو رقم الجوال",
+      "universityAndMajor": "جامعتك وتخصصك",
+      "universityEffect": "يحدّدان المقررات اللي تظهر لك في البحث — غيّرهما إذا انتقلت أو حوّلت تخصصك.",
+      "university": "الجامعة",
+      "major": "التخصص",
+      "password": "كلمة المرور",
+      "passwordEffect": "تغييرها يحتاج خطوة تأكيد — ما تنحفظ تلقائيًا مثل بقية الحقول.",
+      "changePassword": "غيّر كلمة المرور",
+      "currentRequired": "اكتب كلمة المرور الحالية",
+      "newInvalid": "كلمة المرور الجديدة 8 حروف على الأقل",
+      "currentPassword": "كلمة المرور الحالية",
+      "passwordHint": "8 حروف على الأقل",
+      "newPassword": "كلمة المرور الجديدة",
+      "savePassword": "احفظ كلمة المرور",
+      "cancel": "تراجع",
+      "exampleName": "عبدالله",
+      "exampleContact": "abdullah@example.com"
+    },
+    "metadataTitle": "الإعدادات — بيكان",
+    "title": "الإعدادات",
+    "sections": "أقسام الإعدادات",
+    "account": "الحساب",
+    "accountHint": "اسمك وبريدك وجامعتك",
+    "study": "تفضيلات المذاكرة",
+    "studyHint": "سرعة الشرح وشكل الاختبار",
+    "notifications": "الإشعارات",
+    "notificationsHint": "واتساب والبريد، كل نوع بمفتاحه",
+    "subscription": "الاشتراك",
+    "subscriptionHint": "خطتك ودقائقك والتجديد",
+    "invoices": "الفواتير",
+    "invoicesHint": "سجل مدفوعاتك بالضريبة مفصولة",
+    "data": "بياناتك",
+    "dataHint": "تنزيل بياناتك أو حذف حسابك",
+    "saved": "انحفظ",
+    "Study": {
+      "metadataTitle": "تفضيلات المذاكرة — بيكان",
+      "title": "تفضيلات المذاكرة",
+      "lede": "قيم البداية لكل جلسة جديدة — وكلها تتغيّر أثناء الشرح نفسه.",
+      "slow": "بطيء",
+      "normal": "طبيعي",
+      "fast": "سريع",
+      "mcq": "اختيار من متعدد",
+      "essay": "مقالي",
+      "problems": "مسائل",
+      "time": "وقتك للمذاكرة",
+      "timeEffect": "«مستعجل» يعطيك المختصر ويركّز على الأهم. «عندي وقت» يشرح بهدوء بأمثلة ويتأكد إنك فهمت. يسري من الجلسة الجاية.",
+      "speed": "سرعة الشرح الافتراضية — قريبًا",
+      "speedEffect": "الشرح اليوم بسرعة واحدة. هذا الخيار يُفعَّل مع دعم السرعة في الجلسة.",
+      "format": "شكل الاختبار الافتراضي",
+      "formatEffect": "يحدّد شكل الأسئلة اللي تجاوب عليها بعد كل موضوع — وتقدر تحدّد شكلًا مختلفًا لكل مقرر من صفحته.",
+      "recordings": "تسجيلاتك الصوتية",
+      "keepAudio": "احتفظ بتسجيلات أسئلتي",
+      "recordingsEffect": "مطفأ افتراضيًا: صوتك يُحذف خلال 24 ساعة من نهاية الجلسة. بتشغيله يبقى 30 يومًا تقدر تسمعه فيها من صفحة الجلسة.",
+      "quick": "مستعجل",
+      "relaxed": "عندي وقت"
+    },
+    "Notifications": {
+      "metadataTitle": "الإشعارات — بيكان",
+      "title": "الإشعارات",
+      "lede": "كل نوع بمفتاحه — ما فيه مفتاح واحد يطفّي كل شيء.",
+      "whatsapp": "واتساب",
+      "email": "بريد",
+      "inapp": "داخل التطبيق",
+      "examTitle": "تذكير قبل الاختبار",
+      "examEffect": "يوصلك قبل اختبارك بأسبوع وبيومين، وفيه الفصول اللي باقية عليك في المقرر.",
+      "readyTitle": "مقررك جاهز",
+      "readyEffect": "يوصلك أول ما يجهز مقرر طلبته ولم يكن موجودًا وقتها.",
+      "quotaTitle": "اقتراب نفاد الدقائق",
+      "quotaEffect": "ينبّهك داخل التطبيق لما يبقى أقل من 20٪ من دقائق شهرك — ما نرسله واتساب ولا بريد.",
+      "billingAlways": "رسائل الفواتير وتأكيد الدفع تُرسل دائمًا — تخصّ فلوسك، فما نطفيها.",
+      "channelLabel": "{kind} على {channel}"
+    },
+    "Data": {
+      "metadataTitle": "بياناتك — بيكان",
+      "title": "بياناتك",
+      "lede": "بياناتك لك: تنزّلها متى ما تبي، وتحذفها متى ما تبي.",
+      "downloadTitle": "نزّل بياناتك",
+      "downloadBody": "ملف واحد فيه جلساتك وتقدّمك في كل مقرر، وأسئلتك وإجاباتك، ومواعيد اختباراتك، وبيانات حسابك. بصيغة تفتحها في أي جدول.",
+      "requested": "نجهّز ملفك الحين، ويوصلك رابط تنزيله على بريدك خلال ساعة. الرابط يشتغل 7 أيام.",
+      "download": "نزّل بياناتي",
+      "deleteTitle": "حذف الحساب",
+      "deleteBody": "الحذف نهائي وما يترجع. قبل ما تقرّر، الصفحة الجاية تشرح لك بالضبط وش ينحذف ووش يبقى وكم ياخذ.",
+      "deleteLink": "اقرأ وش يصير قبل الحذف"
+    },
+    "Delete": {
+      "metadataTitle": "حذف الحساب — بيكان",
+      "title": "حذف الحساب",
+      "lede": "اقرأ الجزئين تحت قبل ما تقرّر — بعد الحذف ما فيه رجعة.",
+      "deletedAccount": "حسابك واسمك وبريدك وجوالك.",
+      "deletedSessions": "جلساتك كلها: وش شرحه لك بيكان، وأسئلتك وإجاباتك، ووين تعثّرت.",
+      "deletedProgress": "تقدّمك في كل مقرر، ومواعيد اختباراتك المحفوظة.",
+      "deletedPreferences": "تفضيلاتك وإعدادات إشعاراتك.",
+      "deletedAudio": "أي تسجيل صوتي باقٍ لك عندنا.",
+      "keptInvoices": "فواتيرك ومبالغ مدفوعاتك — تلزمنا الأنظمة الضريبية بحفظها، وما فيها محتوى مذاكرتك.",
+      "keptStats": "بيانات إحصائية مجمَّعة ما ترجع لك ولا تدلّ عليك، مثل عدد الطلاب اللي درسوا فصلًا معيّنًا.",
+      "deletedTitle": "اللي ينحذف",
+      "keptTitle": "اللي يبقى",
+      "whenTitle": "متى يصير",
+      "whenBody": "حسابك يُقفل فورًا ما إن تأكّد الطلب — ما تقدر تدخل بعدها. وبياناتك تُحذف من أنظمتنا خلال 30 يومًا، وخلال أول 7 أيام منها تقدر تلغي الطلب من الرابط اللي نرسله على بريدك.",
+      "phrase": "احذف حسابي",
+      "receivedTitle": "استلمنا طلب الحذف",
+      "receivedBody": "حسابك أُقفل الحين، وبياناتك تُحذف خلال 30 يومًا. أرسلنا لك تأكيدًا على بريدك، وفيه رابط تلغي فيه الطلب خلال 7 أيام لو غيّرت رأيك.",
+      "home": "ارجع للصفحة الرئيسية",
+      "confirmLabel": "اكتب الجملة عشان نتأكّد",
+      "delete": "احذف حسابي نهائيًا",
+      "cancel": "تراجع",
+      "phraseInvalid": "اكتب «{phrase}» بالضبط عشان يتأكّد إنك قاصد",
+      "phraseHint": "اكتبها بالضبط: {phrase}",
+      "activeSubscription": "عندك اشتراك مدفوع شغّال حتى <strong>{date}</strong>. الحذف يوقفه من الحين، وما نرجّع قيمة المدة المتبقية — <cancel>الإلغاء بدون حذف</cancel> يخلّيك تستفيد منها لآخرها."
+    },
+    "Invoices": {
+      "metadataTitle": "الفواتير — بيكان",
+      "title": "الفواتير",
+      "lede": "كل مبلغ دفعته، والضريبة مفصولة عن الصافي.",
+      "emptyTitle": "ما فيه فواتير بعد",
+      "emptyBody": "أول فاتورة تظهر هنا بعد أول اشتراك مدفوع.",
+      "net": "الصافي",
+      "vat": "الضريبة",
+      "caption": "سجل فواتيرك",
+      "date": "التاريخ",
+      "plan": "الخطة",
+      "total": "الإجمالي",
+      "invoice": "الفاتورة",
+      "open": "افتح الفاتورة",
+      "amount": "{amount} ريال",
+      "planName": "خطة {plan}",
+      "note": "كل المبالغ بالريال السعودي وشاملة ضريبة القيمة المضافة. تحتاج فاتورة باسم جهة؟ <contact>راسلنا</contact>."
+    },
+    "Invoice": {
+      "invoices": "الفواتير",
+      "brand": "بيكان",
+      "subscriptionInvoice": "فاتورة اشتراك",
+      "number": "رقم الفاتورة",
+      "date": "التاريخ",
+      "description": "الوصف",
+      "method": "وسيلة الدفع",
+      "net": "الصافي",
+      "totalPaid": "الإجمالي المدفوع",
+      "paid": "مدفوعة · المبالغ بالريال السعودي.",
+      "print": "احفظ الفاتورة",
+      "planMonth": "خطة {plan} — شهر واحد",
+      "vatRate": "ضريبة القيمة المضافة {rate}٪",
+      "amount": "{amount} ريال",
+      "metadataTitle": "فاتورة {id} — بيكان"
+    },
+    "Subscription": {
+      "metadataTitle": "الاشتراك — بيكان",
+      "title": "الاشتراك",
+      "canceledTitle": "التجديد ملغى",
+      "resume": "استأنف الاشتراك",
+      "plan": "خطتك",
+      "endsOn": "تنتهي في",
+      "renewsOn": "التجديد القادم",
+      "method": "وسيلة الدفع",
+      "minutes": "دقائق هذا الشهر",
+      "change": "غيّر خطتك",
+      "free": "بلا رسوم",
+      "cancelTitle": "إلغاء الاشتراك",
+      "confirmTitle": "بالإلغاء ترجع للخطة المجانية",
+      "confirm": "أكّد الإلغاء",
+      "keep": "خلّني على خطتي",
+      "cancelBody": "تقدر تلغي التجديد في أي وقت، وتبقى خطتك شغّالة حتى نهاية المدة المدفوعة.",
+      "cancel": "ألغِ التجديد",
+      "compare": "قارن الخطط كاملة",
+      "canceledBody": "خطة {plan} تبقى مفعّلة لك حتى <strong>{date}</strong>، وبعدها ترجع للخطة المجانية. ما راح ينخصم منك شيء.",
+      "monthlyPrice": "{price} ريال / شهر",
+      "vatNote": "السعر شامل ضريبة القيمة المضافة، وتفصيلها في <invoices>فواتيرك</invoices>.",
+      "remaining": "{count, plural, zero {دقيقة باقية} one {دقيقة واحدة باقية} two {دقيقتان باقيتان} few {دقائق باقية} many {دقيقة باقية} other {دقيقة باقية}}",
+      "used": "استهلكت {usedLabel} من {total, plural, zero {{totalLabel} دقيقة} one {دقيقة واحدة} two {دقيقتين} few {{totalLabel} دقائق} many {{totalLabel} دقيقة} other {{totalLabel} دقيقة}}",
+      "usedRenewal": "استهلكت {usedLabel} من {total, plural, zero {{totalLabel} دقيقة} one {دقيقة واحدة} two {دقيقتين} few {{totalLabel} دقائق} many {{totalLabel} دقيقة} other {{totalLabel} دقيقة}} · تتجدّد في {date}",
+      "otherPlan": "{price} · {count, plural, zero {{countLabel} دقيقة} one {دقيقة واحدة} two {دقيقتان} few {{countLabel} دقائق} many {{countLabel} دقيقة} other {{countLabel} دقيقة}}",
+      "loseMinutes": "دقائقك ترجع من {fromLabel} إلى {to, plural, zero {{toLabel} دقيقة} one {دقيقة واحدة} two {دقيقتين} few {{toLabel} دقائق} many {{toLabel} دقيقة} other {{toLabel} دقيقة}} في الشهر.",
+      "loseCourses": "مقرراتك ترجع من «{from}» إلى «{to}».",
+      "activeUntil": "خطة {plan} تبقى شغّالة حتى {date}.",
+      "upgrade": "ارقِ لـ{plan}",
+      "downgrade": "نزّل لـ{plan}"
+    }
+  },
+  "Quota": {
+    "title": "خلّصت دقائق هذا الشهر",
+    "progress": "ذاكرت <strong>{studied, plural, zero {{studiedLabel} دقيقة} one {دقيقة واحدة} two {دقيقتان} few {{studiedLabel} دقائق} many {{studiedLabel} دقيقة} other {{studiedLabel} دقيقة}}</strong> — وباقي لك <strong>{chaptersLeft, plural, zero {{chaptersLabel} فصل} one {فصل واحد} two {فصلان} few {{chaptersLabel} فصول} many {{chaptersLabel} فصلًا} other {{chaptersLabel} فصل}}</strong> قبل الاختبار.",
+    "continue": "كمّل بـ {price} ريال/شهر",
+    "plans": "شوف الخطط",
+    "allowance": "{minutes, plural, zero {{minutesLabel} دقيقة} one {دقيقة واحدة} two {دقيقتان} few {{minutesLabel} دقائق} many {{minutesLabel} دقيقة} other {{minutesLabel} دقيقة}} شهريًا · كل مقرراتك"
+  },
+  "Error": {
+    "title": "الصفحة ما فتحت",
+    "body": "وقف شيء عندنا وإحنا نحمّل الصفحة — مو من جهازك ولا من اتصالك، وما ضاع من تقدّمك شيء.",
+    "retry": "حاول مرة ثانية",
+    "courses": "ارجع لمقرراتك",
+    "help": "تكرّر معك؟ <contact>راسلنا</contact> وشوف <status>حالة النظام</status>.",
+    "digest": "لو راسلتنا، أرفق هذا الرمز ويوصلنا سجل العطل مباشرة: <code>{digest}</code>"
+  },
+  "NotFound": {
+    "metadataTitle": "الصفحة مو موجودة — بيكان",
+    "title": "الصفحة مو موجودة",
+    "body": "الرابط اللي فتحته قديم، أو العنوان فيه حرف ناقص.",
+    "waysLabel": "مخارج",
+    "courses": "مقرراتي",
+    "search": "ابحث عن مقرر",
+    "home": "الصفحة الرئيسية"
+  },
+  "Maintenance": {
+    "metadataTitle": "صيانة — بيكان",
+    "title": "بيكان تحت الصيانة",
+    "body": "نحدّث الخوادم اللي تشغّل الشرح الصوتي. الخدمة موقوفة كاملة خلال التحديث، وحسابك ودقائقك واشتراكك ما تأثّر منها شيء.",
+    "backLabel": "نرجع الساعة",
+    "backAt": "2:00 صباحًا",
+    "backIn": "بعد ساعة ونصف من الآن تقريبًا.",
+    "status": "تابع حالة النظام",
+    "contact": "راسلنا لو أمرك مستعجل"
+  },
+  "Status": {
+    "metadataTitle": "حالة النظام — بيكان",
+    "title": "حالة النظام",
+    "checked": "آخر فحص: 23 أغسطس 2026 · 4:20 مساءً · نفحص كل دقيقة.",
+    "partsTitle": "أجزاء الخدمة",
+    "historyTitle": "الأعطال السابقة",
+    "historyBody": "كل عطل صار عندنا، ومدته، ووش سوّينا عشان ما يتكرّر.",
+    "incident": "{title} · {minutes, plural, zero {{minutesLabel} دقيقة} one {دقيقة واحدة} two {دقيقتان} few {{minutesLabel} دقائق} many {{minutesLabel} دقيقة} other {{minutesLabel} دقيقة}}",
+    "report": "تشوف مشكلة مو مذكورة هنا؟ <contact>بلّغنا</contact> — أول بلاغ يوصلنا يفتح لنا العطل.",
+    "faq": "الأسئلة الشائعة",
+    "levels": {
+      "ok": {
+        "label": "كل شيء يشتغل",
+        "note": "ما فيه عطل معروف الحين."
+      },
+      "partial": {
+        "label": "متأثر جزئيًا",
+        "note": "جزء من الخدمة أبطأ من المعتاد أو متعطّل."
+      },
+      "down": {
+        "label": "متوقف",
+        "note": "الخدمة موقوفة، وإحنا نشتغل عليها."
+      }
+    },
+    "parts": {
+      "voice": "الشرح الصوتي",
+      "board": "السبورة والشرائح",
+      "auth": "الدخول والتسجيل",
+      "billing": "الدفع والاشتراك"
+    },
+    "history": {
+      "voice": {
+        "date": "11 أغسطس 2026",
+        "title": "الشرح الصوتي متقطّع",
+        "what": "مزوّد المعالجة الصوتية تعطّل عنده تحديث. الجلسات المتأثرة رجعت من نفس الموضوع، وما انخصمت دقائقها."
+      },
+      "slides": {
+        "date": "2 أغسطس 2026",
+        "title": "بطء في فتح الشرائح",
+        "what": "ضغط على خادم الملفات وقت الاختبارات النهائية. زدنا السعة ووضعنا حدًّا يمنع تكراره."
+      },
+      "maintenance": {
+        "date": "19 يوليو 2026",
+        "title": "صيانة مجدولة",
+        "what": "تحديث الخوادم، وكان معلَنًا قبلها بيومين."
+      }
+    }
+  },
+  "Ambassadors": {
+    "Form": {
+      "universityRequired": "اختر جامعتك من القائمة",
+      "chooseUniversity": "اختر جامعتك",
+      "universityName": "اسم جامعتك",
+      "other": "أخرى",
+      "phonePlaceholder": "05xxxxxxxx",
+      "contactInvalid": "تأكد من البريد، أو من أن الرقم 10 أرقام يبدأ بـ 05",
+      "nameRequired": "اكتب اسمك",
+      "sentTitle": "وصلنا طلبك",
+      "name": "اسمك",
+      "university": "جامعتك",
+      "contactRequired": "اكتب رقم جوالك أو بريدك",
+      "contact": "رقم جوالك أو بريدك",
+      "reachHint": "اختياري — يساعدنا نرتّب الطلبات",
+      "reach": "وين توصل لزملائك؟",
+      "reachPlaceholder": "قروب الدفعة، حساب في تويتر، نادي الكلية…",
+      "submit": "سجّل كسفير",
+      "sentBody": "نراجع الطلبات مرة كل أسبوع، ونرد عليك خلال خمسة أيام. لو انقبلت، يوصلك رابطك ولوحة متابعة تشوف فيها من سجّل منك."
+    },
+    "metadataTitle": "سفراء بيكان",
+    "metadataDescription": "طلاب يوصّلون بيكان لزملائهم، وياخذون مقابلها.",
+    "title": "كن <word>سفير</word> بيكان في جامعتك",
+    "intro": "الطلاب يسمعون من الطلاب. إذا بيكان نفعك، وصّله لزملائك وخذ مقابله.",
+    "commission": "20٪",
+    "commissionBody": "من كل اشتراك يجي من رابطك",
+    "commissionNote": "مع اشتراك برو مجاني لك طول ما أنت سفير.",
+    "doesTitle": "وش يسوي السفير",
+    "getsTitle": "وش تاخذ",
+    "applyTitle": "سجّل",
+    "applyBody": "أربعة أسطر، وندرس طلبك ونرد خلال خمسة أيام.",
+    "doesShare": "توصّل بيكان لزملائك في دفعتك — قروب، أو حساب، أو كلمة في المذاكرة الجماعية.",
+    "doesTry": "تجرّب المقررات الجديدة قبل ما تنزل، وتقول لنا وش ناقصها.",
+    "doesRequest": "توصّل لنا المقررات اللي يحتاجها قسمك عشان نجهّزها قبل الترم الجاي.",
+    "getsProTitle": "اشتراك برو مجاني",
+    "getsProBody": "طول ما أنت سفير — 500 دقيقة شهريًا وكل مقرراتك.",
+    "getsCommissionTitle": "عمولة على كل اشتراك",
+    "getsCommissionBody": "20٪ من قيمة كل اشتراك يجي من رابطك، تتكرّر مع كل تجديد للسنة الأولى.",
+    "getsBadgeTitle": "شارة سفير",
+    "getsBadgeBody": "على حسابك وفي ملفك، مع شهادة تقدر تحطّها في سيرتك الذاتية."
+  },
+  "Investors": {
+    "Form": {
+      "emailInvalid": "تأكد من صيغة البريد",
+      "emailPlaceholder": "name@fund.com",
+      "nameRequired": "اكتب اسمك",
+      "sentTitle": "وصلنا طلبك",
+      "orgRequired": "اكتب اسم الجهة أو الصندوق",
+      "name": "الاسم",
+      "organization": "الجهة",
+      "email": "البريد",
+      "sentBody": "نرسل الـ<latin>Deck</latin> على بريدك خلال يوم عمل واحد، ومعه موعد مقترح لمكالمة قصيرة إن رغبت.",
+      "submit": "اطلب الـ<latin>Deck</latin>"
+    },
+    "metadataTitle": "للمستثمرين — بيكان",
+    "metadataDescription": "منتج ويب عربي يشرح للطالب الجامعي مقرره بالصوت على سبورة تفاعلية، ثم يسأله ليتأكد أنه فهم. سوقنا الأول: طلاب الجامعات السعودية.",
+    "title": "بيكان — للمستثمرين",
+    "intro": "منتج ويب عربي يشرح للطالب الجامعي مقرره بالصوت على سبورة تفاعلية، ثم يسأله ليتأكد أنه فهم. سوقنا الأول: طلاب الجامعات السعودية.",
+    "metricsNote": "أرقام تشغيلية حتى 23 أغسطس 2026، من الاستخدام الفعلي لا من تسجيلات الاهتمام.",
+    "deckBody": "يشمل السوق والمنتج ونموذج الإيراد والفريق والخطة المالية. نرسله خلال يوم عمل واحد.",
+    "deckTitle": "اطلب الـ<latin>Deck</latin>",
+    "Metrics": {
+      "students": {
+        "note": "مسجَّلون ونشطون",
+        "amount": "{count, plural, zero {<value>{countLabel}</value> <unit>طالب</unit>} one {<unit>طالب واحد</unit>} two {<unit>طالبان</unit>} few {<value>{countLabel}</value> <unit>طلاب</unit>} many {<value>{countLabel}</value> <unit>طالبًا</unit>} other {<value>{countLabel}</value> <unit>طالب</unit>}}"
+      },
+      "sessions": {
+        "note": "جلسة شرح مكتملة",
+        "amount": "{count, plural, zero {<value>{countLabel}</value> <unit>جلسة</unit>} one {<unit>جلسة واحدة</unit>} two {<unit>جلستان</unit>} few {<value>{countLabel}</value> <unit>جلسات</unit>} many {<value>{countLabel}</value> <unit>جلسة</unit>} other {<value>{countLabel}</value> <unit>جلسة</unit>}}"
+      },
+      "hours": {
+        "note": "تعلّم فعلي داخل الجلسات",
+        "amount": "{count, plural, zero {<value>{countLabel}</value> <unit>ساعة</unit>} one {<unit>ساعة واحدة</unit>} two {<unit>ساعتان</unit>} few {<value>{countLabel}</value> <unit>ساعات</unit>} many {<value>{countLabel}</value> <unit>ساعة</unit>} other {<value>{countLabel}</value> <unit>ساعة</unit>}}"
+      },
+      "return": {
+        "note": "يرجعون لجلسة ثانية",
+        "amount": "<value>{countLabel}٪</value> <unit>عودة</unit>"
+      },
+      "rating": {
+        "note": "تقييم الطلاب للجلسة",
+        "amount": "<value>{countLabel}</value> <unit>من 5</unit>"
+      }
+    }
+  },
+  "Join": {
+    "Form": {
+      "emailPlaceholder": "name@example.com",
+      "contactInvalid": "تأكد من البريد أو من أن الرقم 10 أرقام يبدأ بـ 05",
+      "contactRequired": "اكتب بريدك أو رقم جوالك",
+      "google": "متابعة بحساب Google",
+      "or": "أو",
+      "contact": "البريد أو رقم الجوال",
+      "continue": "متابعة",
+      "agreement": "بالمتابعة أنت توافق على <terms>الشروط</terms> و<privacy>سياسة الخصوصية</privacy>"
+    },
+    "metadataTitle": "سجّل دخولك — بيكان",
+    "metadataDescription": "ادخل وارجع إلى نفس الفصل الذي كنت فيه.",
+    "unlocksDefault": "تسجيلك يفتح مقررك من حيث وقفت",
+    "title": "سجّل <word>دخولك</word>",
+    "chapter": "الفصل {chapter}",
+    "unlocks": "تسجيلك يفتح: <context>{unlocks}</context>"
+  },
+  "Request": {
+    "Form": {
+      "universityRequired": "اختر جامعتك من القائمة",
+      "chooseUniversity": "اختر جامعتك",
+      "universityName": "اسم جامعتك",
+      "other": "أخرى",
+      "emailInvalid": "تأكد من صيغة البريد",
+      "phonePlaceholder": "05xxxxxxxx",
+      "emailPlaceholder": "name@example.com",
+      "universityNameRequired": "اكتب اسم جامعتك",
+      "courseRequired": "اكتب اسم المقرر أو رمزه",
+      "emailRequired": "اكتب بريدك",
+      "phoneRequired": "اكتب رقم جوالك",
+      "phoneInvalid": "الرقم غير مكتمل — 10 أرقام تبدأ بـ 05",
+      "university": "الجامعة",
+      "universityPlaceholder": "اكتب اسم الجامعة",
+      "course": "اسم المقرر أو رمزه",
+      "coursePlaceholder": "مثال: محاسبة 2 أو ⁦ACCT 201⁩",
+      "contact": "نبلّغك أول ما تجهز:",
+      "preferPhone": "أفضّل رقم الجوال",
+      "preferEmail": "أفضّل البريد",
+      "optional": "اختياري",
+      "files": "عندك ملفات المقرر؟ ارفعها ويجهز أسرع",
+      "chooseFiles": "اسحب الملفات أو اختر",
+      "errors": "أكمل الحقول المعلَّمة أعلاه ثم أرسل",
+      "submit": "أرسل الطلب"
+    },
+    "metadataTitle": "اطلب مقررك — بيكان",
+    "metadataDescription": "نجهّز المقررات حسب الطلب. كل طلب يرفع أولوية المقرر في قائمة الإنتاج.",
+    "eyebrow": "طلب مقرر",
+    "intro": "نجهّز المقررات حسب الطلب. كل طلب يرفع أولوية المقرر في قائمة الإنتاج.",
+    "Sent": {
+      "metadataTitle": "وصلنا طلبك — بيكان",
+      "metadataDescription": "نبلّغك على واتساب أول ما يجهز المقرر.",
+      "tryAnother": "جرّب مقررًا آخر",
+      "title": "وصلنا <word>طلبك</word>",
+      "body": "نبلّغك على واتساب أول ما يجهز المقرر.<br></br>كل طلب جديد يرفع أولويتها في قائمة الإنتاج.",
+      "shareSubject": "طلبت «{subject}» على بيكان. اطلبها معي وترتفع أولويتها.",
+      "shareDefault": "طلبت مقرري على بيكان. اطلب مقررك وترتفع أولويته.",
+      "peers": "{count, plural, zero {ما فيه طلاب طلبوا المقرر} one {طالب واحد طلب} two {طالبان طلبا} few {{countLabel} طلاب طلبوا} many {{countLabel} طالبًا طلبوا} other {{countLabel} طالب طلبوا}}"
+    },
+    "title": "اطلب <word>مقررك</word>",
+    "Share": {
+      "share": "شارك بيكان مع زملائك",
+      "title": "بيكان",
+      "copied": "نُسخ الرابط",
+      "failed": "ما قدرنا ننسخ الرابط. انسخ عنوان الصفحة وشاركه مع زملائك."
+    }
+  },
+  "Contact": {
+    "Form": {
+      "emailPlaceholder": "name@example.com",
+      "contactInvalid": "تأكد من البريد، أو من أن الرقم 10 أرقام يبدأ بـ 05",
+      "sentTitle": "وصلتنا رسالتك",
+      "contactRequired": "اكتب بريدك أو رقم جوالك عشان نردّ عليك",
+      "messageRequired": "اكتب تفاصيل أكثر — 10 حروف على الأقل",
+      "sentBody": "نردّ عليك خلال يوم عمل واحد على نفس العنوان اللي كتبته. وإذا أمرك مستعجل، راسلنا واتساب وتوصلك ردّة أسرع.",
+      "topic": "الموضوع",
+      "contact": "بريدك أو رقم جوالك",
+      "messageHint": "اذكر المقرر والفصل إن كانت المشكلة في جلسة — يختصر علينا نصف المتابعة",
+      "message": "رسالتك",
+      "submit": "أرسل الرسالة",
+      "topicCourse": "مقرر ناقص أو فصل غير جاهز",
+      "topicSession": "مشكلة في الجلسة أو الميكروفون",
+      "topicBilling": "دفع أو اشتراك أو استرجاع",
+      "topicAccount": "حسابي وبياناتي",
+      "topicOther": "شيء ثاني"
+    },
+    "metadataTitle": "تواصل معنا — بيكان",
+    "metadataDescription": "واتساب أسرع طريقة توصلنا فيها. وإذا تفضّل الكتابة، النموذج تحت.",
+    "title": "تواصل معنا",
+    "intro": "واتساب أسرع طريقة توصلنا فيها. وإذا تفضّل الكتابة، النموذج تحت.",
+    "whatsappContext": "السلام عليكم، عندي سؤال عن بيكان",
+    "whatsapp": "راسلنا على واتساب",
+    "formTitle": "أو اكتب لنا",
+    "formBody": "نردّ على نفس العنوان اللي تكتبه خلال يوم عمل.",
+    "faq": "شوف الأسئلة الشائعة",
+    "replyHours": "{when} · نردّ {reply}",
+    "beforeContact": "قبل ما تراسلنا، جواب سؤالك يمكن يكون في <faq>الأسئلة الشائعة</faq>. ولو الخدمة كلها واقفة، شوف <status>حالة النظام</status> قبل — يمكن نكون نعرف ونشتغل عليها."
+  },
+  "Universities": {
+    "kingSaud": "جامعة الملك سعود",
+    "kingAbdulaziz": "جامعة الملك عبدالعزيز",
+    "imam": "جامعة الإمام محمد بن سعود الإسلامية"
+  },
+  "Faq": {
+    "metadataTitle": "الأسئلة الشائعة — بيكان",
+    "metadataDescription": "ابحث عن سؤالك، وإذا ما لقيته راسلنا ونضيفه.",
+    "title": "الأسئلة الشائعة",
+    "intro": "ابحث عن سؤالك، وإذا ما لقيته راسلنا ونضيفه.",
+    "contact": "ما لقيت جوابك؟ راسلنا",
+    "Search": {
+      "label": "ابحث في الأسئلة",
+      "placeholder": "ابحث — مثلًا: ميكروفون، إلغاء، مدى",
+      "emptyTitle": "سؤالك مو هنا؟",
+      "hits": "{count, plural, zero {ما فيه سؤال يطابق بحثك.} one {سؤال واحد يطابق بحثك.} two {سؤالان يطابقان بحثك.} few {{countLabel} أسئلة تطابق بحثك.} many {{countLabel} سؤالًا يطابق بحثك.} other {{countLabel} سؤال يطابق بحثك.}}",
+      "emptyBody": "اسألنا مباشرة على واتساب من <contact>صفحة التواصل</contact>، ونضيف الجواب هنا لو تكرّر."
+    }
+  },
+  "Plans": {
+    "metadataTitle": "الخطط — بيكان",
+    "metadataDescription": "الأسعار شاملة ضريبة القيمة المضافة.",
+    "chapters": "الفصول في الشهر",
+    "minutes": "الدقائق",
+    "hours": "بالساعات",
+    "courses": "المقررات",
+    "minuteCount": "{count, plural, zero {{countLabel} دقيقة} one {دقيقة واحدة} two {دقيقتان} few {{countLabel} دقائق} many {{countLabel} دقيقة} other {{countLabel} دقيقة}}",
+    "title": "الخطط",
+    "comparisonCaption": "مقارنة حجم الخطط",
+    "comparison": "المقارنة",
+    "sharedFeatures": "الشرح والسبورة والأسئلة والملخّص",
+    "included": "كامل",
+    "beforePaying": "قبل ما تدفع",
+    "tryFree": "الخطة المجانية بلا بطاقة — جرّب أولًا.",
+    "cancel": "تلغي التجديد بضغطة، وخطتك تكمل إلى نهاية المدة المدفوعة.",
+    "refunds": "الاسترجاع والإلغاء",
+    "pricingFaq": "أسئلة عن الأسعار",
+    "vatTitle": "الضريبة داخل السعر",
+    "vatBody": "السعر الذي تراه هو الذي يُخصم — لا رسوم تُضاف عند الدفع. والفاتورة تفصل الصافي عن الضريبة.",
+    "intro": "بيكان نفسه في كل الخطط — نفس الشرح، ونفس السبورة، ونفس الأسئلة، ونفس الملخّص. الفرق في <strong>الوقت</strong> و<strong>عدد المقررات</strong> فقط.",
+    "paymentMethods": "مدى و <latin>Apple Pay</latin> والبطاقات الائتمانية.",
+    "taxBreakdown": "{net} + {vat} ضريبة = <strong>{gross} ريال</strong>",
+    "vatRate": "ضريبة القيمة المضافة {rate}٪."
+  },
+  "PlanCard": {
+    "current": "خطتك الحالية",
+    "freeNote": "بلا بطاقة ولا اشتراك",
+    "vatIncluded": "شامل ضريبة القيمة المضافة",
+    "startFree": "ابدأ مجانًا",
+    "choose": "اختر {plan}",
+    "price": "<price>{priceLabel}</price> <unit>ريال / شهر</unit>",
+    "minutes": "{count, plural, zero {<amount>{countLabel}</amount> <unit>دقيقة في الشهر</unit>} one {<unit>دقيقة واحدة في الشهر</unit>} two {<unit>دقيقتان في الشهر</unit>} few {<amount>{countLabel}</amount> <unit>دقائق في الشهر</unit>} many {<amount>{countLabel}</amount> <unit>دقيقة في الشهر</unit>} other {<amount>{countLabel}</amount> <unit>دقيقة في الشهر</unit>}}"
+  },
+  "Landing": {
+    "metadataTitle": "بيكان — مدرّسك الخصوصي لمقررك",
+    "metadataDescription": "بيكان يشرح لك مقررك بصوته، ويسألك عشان يتأكد إنك فهمت، ويعرف وين تنكسر درجتك في الاختبار.",
+    "cta": "اختر مقررك مجانًا",
+    "pricingNav": "الأسعار",
+    "howNav": "كيف يعمل",
+    "heroTitle": "كفاية مذاكرة",
+    "wrong": "غلط",
+    "unclear": "ما تفهّمك",
+    "wasteful": "تضيع وقتك",
+    "distracting": "تشتّتك",
+    "name": "بيكان",
+    "captureTitle": "جاهز تبدأ؟",
+    "captureBody": "اختر مقررك، واسمع أول شرح الحين.",
+    "tutor": "<word>مدرّسك الخصوصي</word> بالذكاء الاصطناعي",
+    "Sections": {
+      "understandClaim": "يفهمك",
+      "understandWhy": "بدون ما يكثر كلام",
+      "groundedClaim": "ما يخرف",
+      "groundedWhy": "لأنه مدرَّب على مقررك",
+      "easyClaim": "سهل جدًا",
+      "easyWhy": "بضغطة زر تبدأ مذاكرة",
+      "freeNote": "بلا بطاقة ولا اشتراك",
+      "chooseCourse": "اختر مقررك",
+      "chooseCourseDetail": "برمزه أو باسمه — تلقاه جاهزًا بفصوله",
+      "chooseChapter": "اختر الفصل",
+      "chooseChapterDetail": "ترى مواضيعه ومدّته قبل ما تبدأ",
+      "start": "ابدأ الشرح",
+      "startDetail": "يشرح على السبورة ويسألك ليتأكّد إنك فهمت",
+      "howTitle": "كيف يعمل",
+      "quoteOne": "ساعدني في الوقت الضيق، وركّز على المهم، وفعلًا جاء في الاختبار النهائي.",
+      "quoteTwo": "بذاكر منه مرة ثانية لاختبار الإعادة.",
+      "quoteThree": "الشرح واضح وسلس وساعدني أفهم كثير.",
+      "surveySource": "من استبيان الاختبار الميداني",
+      "sessions": "{count, plural, zero {جلسة} one {جلسة واحدة} two {جلستان} few {جلسات} many {جلسة} other {جلسة}}",
+      "studyMinutes": "{count, plural, zero {دقيقة مذاكرة} one {دقيقة مذاكرة واحدة} two {دقيقتا مذاكرة} few {دقائق مذاكرة} many {دقيقة مذاكرة} other {دقيقة مذاكرة}}",
+      "studentRating": "تقييمه من 5",
+      "minutes": "{count, plural, zero {دقيقة} one {دقيقة واحدة} two {دقيقتان} few {دقائق} many {دقيقة} other {دقيقة}}",
+      "sessionAverage": "{count, plural, zero {دقيقة متوسط الجلسة} one {دقيقة واحدة متوسط الجلسة} two {دقيقتان متوسط الجلسة} few {دقائق متوسط الجلسة} many {دقيقة متوسط الجلسة} other {دقيقة متوسط الجلسة}}",
+      "proofTitle": "من الطلاب قالوا إن بيكان صار مصدرهم الأساسي للمذاكرة",
+      "proofNote": "الأرقام من الاختبار الميداني — جلسات فعلية لا تسجيلات اهتمام.",
+      "pricingTitle": "اشترك الآن",
+      "faqTitle": "أسئلة قبل ما تبدأ",
+      "faqLink": "شوف كل الأسئلة",
+      "stepNumber": "الخطوة {step}",
+      "ratingLabel": "{rating} من 5",
+      "rating": "<strong>{rating}</strong> من 5 · تقييم الجلسات",
+      "pricingBody": "تاخذ فايدة المدرّس الخصوصي — <strong>بسعر حصة واحدة منه</strong>.",
+      "pricingNote": "الأسعار شهرية وشاملة ضريبة القيمة المضافة · <refunds>تلغي في أي وقت</refunds>",
+      "voice": "<hears>يسمع منك</hears> <speaks>ويتكلم معك</speaks>"
+    },
+    "Demo": {
+      "caption": "لمحة من جلسة شرح في بيكان — مسار المواضيع والسبورة والشرائح.",
+      "explaining": "يشرح الآن",
+      "course": "مبادئ المحاسبة 1 · الفصل 3",
+      "penalty": "ما يفقد الدرجة:",
+      "slideTitle": "شريحة من المقرر"
+    }
+  },
+  "Courses": {
+    "metadataTitle": "وش مقررك؟ — بيكان",
+    "metadataDescription": "ابحث عن مقررك باسمه أو رمزه وابدأ الشرح من أول فصل.",
+    "eyebrow": "اختيار المقرر",
+    "search": "ابحث عن مقررك",
+    "searchPlaceholder": "ابحث باسم المقرر أو رمزه",
+    "university": "الجامعة",
+    "allUniversities": "كل الجامعات",
+    "college": "الكلية / التخصص",
+    "allColleges": "كل الكليات",
+    "noResults": "لا نتائج",
+    "requestBody": "نجهّز المقررات حسب الطلب، وكل طلب يرفع أولوية مقرره في قائمة الإنتاج.",
+    "requestThis": "اطلب هذا المقرر",
+    "notFound": "ما لقيت مقررك؟",
+    "request": "اطلب مقررك",
+    "title": "وش <word>مقررك</word>؟",
+    "count": "{count, plural, zero {لا مقررات} one {مقرر واحد} two {مقرران} few {{countLabel} مقررات} many {{countLabel} مقررًا} other {{countLabel} مقرر}}",
+    "emptyTitle": "ما لقينا <query>{search}</query>"
+  },
+  "Course": {
+    "notFoundTitle": "المقرر غير موجود — بيكان",
+    "chapters": "الفصول",
+    "checks": "اختبارات التحقق",
+    "sources": "مصادر أخرى",
+    "notStarted": "ما بدأت",
+    "nextStatus": "الخطوة الجاية",
+    "almost": "باقي له شوي",
+    "done": "أنجزته",
+    "notStartedMastery": "لم تبدأ",
+    "progress": "تقدّمك في المقرر",
+    "exam": "اختبارك المتوقّع",
+    "resume": "أكمل",
+    "start": "ابدأ الشرح",
+    "soon": "قريبًا",
+    "continue": "كمّل مذاكرة",
+    "content": "محتوى المقرر",
+    "completed": "أنجزت {doneLabel} من {total, plural, zero {{totalLabel} فصل} one {فصل واحد} two {فصلين} few {{totalLabel} فصول} many {{totalLabel} فصلًا} other {{totalLabel} فصل}}",
+    "metadataTitle": "{course} — بيكان",
+    "metadataDescription": "{university} · {count, plural, zero {لا فصول جاهزة} one {فصل واحد جاهز} two {فصلان جاهزان} few {{countLabel} فصول جاهزة} many {{countLabel} فصلًا جاهزًا} other {{countLabel} فصل جاهز}}.",
+    "courseSummary": "{university} · {count, plural, zero {{countLabel} فصل} one {فصل واحد} two {فصلان} few {{countLabel} فصول} many {{countLabel} فصلًا} other {{countLabel} فصل}}",
+    "topics": "{count, plural, zero {لا مواضيع} one {موضوع واحد} two {موضوعان} few {{countLabel} مواضيع} many {{countLabel} موضوعًا} other {{countLabel} موضوع}}",
+    "mastery": "{percent}% إتقان",
+    "nextStep": "الخطوة التالية: {next}",
+    "nextChapter": "الفصل {number} · {title}"
+  },
+  "Home": {
+    "metadataTitle": "مقرراتك — بيكان",
+    "greeting": "مساك يا عبدالرحمن",
+    "settings": "الإعدادات",
+    "title": "مقرراتك",
+    "add": "أضف مقررًا",
+    "soon": "قريبًا"
+  },
+  "Checkout": {
+    "metadataTitle": "الدفع — بيكان",
+    "title": "الدفع",
+    "numberInvalid": "رقم البطاقة 16 رقمًا",
+    "expiryInvalid": "اكتب الشهر والسنة — مثل 09/28",
+    "monthInvalid": "الشهر بين 01 و 12",
+    "cvcInvalid": "رمز التحقق 3 أرقام خلف البطاقة",
+    "nameRequired": "اكتب الاسم كما هو على البطاقة",
+    "method": "وسيلة الدفع",
+    "number": "رقم البطاقة",
+    "expiry": "الانتهاء",
+    "cvc": "رمز التحقق",
+    "name": "الاسم على البطاقة",
+    "phonePayment": "تكمل الدفع من جوالك بلا كتابة أي رقم.",
+    "summary": "ملخص الطلب",
+    "net": "الصافي",
+    "total": "الإجمالي",
+    "security": "الدفع يمرّ عبر بوابة دفع معتمدة، وبيكان لا يحفظ رقم بطاقتك. يتجدّد الاشتراك شهريًا وتقدر تلغيه في أي وقت.",
+    "Result": {
+      "metadataTitle": "نتيجة الدفع — بيكان",
+      "declinedWhy": "بنكك رفض العملية.",
+      "declinedFix": "تواصل مع بنكك أو جرّب بطاقة ثانية — الرفض من عندهم لا من بيكان.",
+      "fundsWhy": "الرصيد لا يكفي المبلغ.",
+      "fundsFix": "اشحن الحساب أو جرّب وسيلة ثانية، والخطة تبقى محجوزة لك.",
+      "expiredWhy": "البطاقة منتهية الصلاحية.",
+      "expiredFix": "استخدم بطاقة سارية، أو ادفع من جوالك بلا كتابة أرقام.",
+      "onlineWhy": "الشراء عبر الإنترنت غير مفعّل على بطاقتك.",
+      "onlineFix": "فعّله من تطبيق بنكك — عادةً تحت «إعدادات البطاقة» — ثم أعد المحاولة.",
+      "successTitle": "تمت الترقية",
+      "resumeLabel": "كنت في",
+      "resume": "كمّل من وين وقفت",
+      "home": "ارجع لمقرراتك",
+      "invoice": "شوف فاتورتك",
+      "subscription": "إدارة الاشتراك",
+      "failedTitle": "ما تمّ الدفع",
+      "unchanged": "ما انخصم منك شيء، وخطتك ما تغيّرت.",
+      "retry": "حاول مرة ثانية",
+      "anotherMethod": "جرّب وسيلة ثانية",
+      "pendingTitle": "الدفع قيد المعالجة",
+      "pendingBody": "بنكك يراجع العملية، وهذا يستغرق دقائق. نبلّغك على واتساب وعلى بريدك أول ما تكتمل، وما تحتاج تعيد المحاولة.",
+      "continueTitle": "تقدر تكمّل الحين",
+      "pendingDefault": "دقائق خطتك الحالية باقية، وتقدر تذاكر بها إلى أن يكتمل الدفع.",
+      "status": "تابع حالة الاشتراك",
+      "successBody": "صرت على خطة {plan} — {minutes, plural, zero {{minutesLabel} دقيقة} one {دقيقة واحدة} two {دقيقتان} few {{minutesLabel} دقائق} many {{minutesLabel} دقيقة} other {{minutesLabel} دقيقة}} شهريًا، وكل مقرراتك مفتوحة. وصلتك الفاتورة على بريدك.",
+      "resumeChapter": "{course} · الفصل {number} — {title}",
+      "help": "تكرّر معك؟ <contact>راسلنا على واتساب</contact> ونتابعها معك.",
+      "pendingResume": "دقائق خطتك الحالية باقية، وتقدر تكمّل {course} — الفصل {number} إلى أن يكتمل الدفع."
+    },
+    "planSummary": "خطة {plan} — {minutes, plural, zero {{minutesLabel} دقيقة} one {دقيقة واحدة} two {دقيقتان} few {{minutesLabel} دقائق} many {{minutesLabel} دقيقة} other {{minutesLabel} دقيقة}} شهريًا، {courses}.",
+    "planMonth": "خطة {plan} — شهر واحد",
+    "vatRate": "ضريبة القيمة المضافة {rate}٪",
+    "amount": "{amount} ريال",
+    "pay": "ادفع {amount} ريال",
+    "numberPlaceholder": "0000 0000 0000 0000",
+    "expiryPlaceholder": "MM/YY",
+    "cvcPlaceholder": "123"
+  },
+  "CourseCard": {
+    "completed": "أنجزت {doneLabel} من {total, plural, zero {{totalLabel} فصل} one {فصل واحد} two {فصلين} few {{totalLabel} فصول} many {{totalLabel} فصلًا} other {{totalLabel} فصل}}"
+  },
+  "Session": {
+    "loadingSlides": "تجهيز الشرائح…",
+    "exit": "خروج من الجلسة",
+    "lessons": "الدروس",
+    "lessonsShort": "دروس",
+    "noLessons": "ما وصلت قائمة الدروس. تقدر تبدأ الشرح من الدرس الأول مباشرة.",
+    "closeLessonsList": "أغلق قائمة الدروس",
+    "openLessonsList": "افتح قائمة الدروس",
+    "closeLessons": "أغلق الدروس",
+    "close": "إغلاق",
+    "rotate": "اقلب الشاشة",
+    "rotateHint": "عشان تاخذ أفضل تجربة",
+    "okay": "تمام",
+    "explanationLanguage": "لغة الشرح",
+    "languageOptions": {
+      "ar": "عربي",
+      "en": "English"
+    },
+    "chatListening": "يسمعك — أو اكتب سؤالك",
+    "chatQuestion": "اكتب سؤالك",
+    "chatPlaceholder": "وش اللي ما وضح؟",
+    "send": "أرسل",
+    "closeChat": "أغلق الشات",
+    "comingSoon": "قريبًا",
+    "soonLabel": "{label} — قريبًا",
+    "startHint": "اضغط هنا لتبدأ الشرح",
+    "start": "ابدأ الشرح",
+    "pauseSoon": "وقّف — قريبًا",
+    "micOff": "أقفل المايك",
+    "micOn": "افتح المايك",
+    "chat": "الشات",
+    "confused": "ما فهمت",
+    "repeat": "أعد السطر",
+    "speedSoon": "سرعة الشرح — قريبًا",
+    "speed": {
+      "slow": "بطيء",
+      "normal": "طبيعي",
+      "fast": "سريع"
+    },
+    "slides": "الشرائح",
+    "end": "إنهاء الجلسة",
+    "questionTitle": "سؤال الفهم",
+    "answerVoice": "أجاوب بصوتي",
+    "question": "سؤال",
+    "answerHint": "جاوب بصوتك، أو اكتب جوابك في الشات.",
+    "endTitle": "تنهي الجلسة؟",
+    "endHint": "تقدر ترجع لنفس الفصل بعدين.",
+    "continue": "كمّل",
+    "confirmEnd": "أنهِ الجلسة",
+    "connectionCut": "انقطع الاتصال",
+    "connectionFailed": "ما قدرنا نوصل للشرح. تأكّد من اتصالك وجرّب مرة ثانية.",
+    "resume": "كمّل من وين وقفت",
+    "retry": "جرّب مرة ثانية",
+    "backCourse": "ارجع للمقرر",
+    "chooseLesson": "أو اختر درسًا من المسار لتبدأ منه.",
+    "preparingExplanation": "يجهّز الشرح…",
+    "boardHint": "السبورة تُكتب مع الشرح.",
+    "chapter": "الفصل {number}",
+    "courseChapter": "{course} · الفصل {number}",
+    "courseChapterDetail": "{course} · الفصل {number} · {detail}",
+    "lessonAccessible": "{number}. {lesson} — {state}",
+    "lessonTitle": "{number}. {lesson}",
+    "lessonProgress": "{done}/{total}",
+    "topicOf": "الموضوع {number} من {total}",
+    "topic": "الموضوع {number}",
+    "lastPosition": "كنت في: <lesson>{lessonName}</lesson>",
+    "lastPositionDetail": "كنت في: <lesson>{lessonName}</lesson> · {detail}",
+    "metadataFallback": "الجلسة — بيكان",
+    "metadata": "{chapter} — {course} — بيكان",
+    "phase": {
+      "idle": "",
+      "connecting": "يجهّز الجلسة",
+      "live": "يشرح الآن",
+      "thinking": "يفكّر",
+      "listening": "يسمعك",
+      "question": "سؤال",
+      "ending": "انتهت الجلسة",
+      "cut": "انقطع الاتصال"
+    },
+    "lessonState": {
+      "none": "لم يبدأ",
+      "now": "يُشرح الآن",
+      "done": "تم"
+    },
+    "duration": "{count, plural, zero {<estimate>~{countLabel}</estimate> دقيقة} one {دقيقة واحدة تقريبًا} two {دقيقتان تقريبًا} few {<estimate>~{countLabel}</estimate> دقائق} many {<estimate>~{countLabel}</estimate> دقيقة} other {<estimate>~{countLabel}</estimate> دقيقة}}",
+    "introStats": "{lessons, plural, zero {لا دروس} one {درس واحد} two {درسان} few {{lessonsLabel} دروس} many {{lessonsLabel} درسًا} other {{lessonsLabel} درس}} · {count, plural, zero {<estimate>~{countLabel}</estimate> دقيقة} one {دقيقة واحدة تقريبًا} two {دقيقتان تقريبًا} few {<estimate>~{countLabel}</estimate> دقائق} many {<estimate>~{countLabel}</estimate> دقيقة} other {<estimate>~{countLabel}</estimate> دقيقة}}",
+    "Slides": {
+      "loadError": "ما قدرنا نفتح الشرائح. جرّب تحدّث الصفحة.",
+      "slide": "الشريحة {number}",
+      "enlargeSlide": "كبّر الشريحة {number}",
+      "enlarge": "تكبير",
+      "startHereSoon": "ابدأ الشرح من هنا — قريبًا",
+      "slideOf": "الشريحة {number} من {total}",
+      "closeZoom": "أغلق التكبير",
+      "previous": "الشريحة السابقة",
+      "next": "الشريحة التالية",
+      "pageOf": "{number} من {total}"
+    }
+  },
+  "SessionSummary": {
+    "metadata": "ملخص الجلسة — بيكان",
+    "setExamDate": "حدّد تاريخ اختبارك",
+    "courseFinished": "خلّصت {course} كاملة",
+    "limit": "خلص وقت الجلسة المسموح. قيّم جلستك تحت، وتقدر تبدأ جلسة جديدة بعدها.",
+    "struggled": "تعثّرت في:",
+    "stumbleAsset": "تعريف الأصل",
+    "stumbleControl": "الفرق بين السيطرة والملكية",
+    "penalty": "<strong>ما يفقد الدرجة: </strong>تكتب «تملكه» بدل «تسيطر عليه»",
+    "continueChapter": "كمّل الفصل",
+    "plan": "شوف خطتك",
+    "reviewStumbles": "راجع اللي تعثّرت فيه",
+    "nextChapter": "الفصل التالي",
+    "daysLeft": "{count, plural, zero {اليوم اختبار {course}} one {باقي يوم واحد على اختبار {course}} two {باقي يومان على اختبار {course}} few {باقي {countLabel} أيام على اختبار {course}} many {باقي {countLabel} يومًا على اختبار {course}} other {باقي {countLabel} يوم على اختبار {course}}}",
+    "covered": "{total, plural, zero {غطّيت {covered} من {totalLabel} مواضيع} one {غطّيت {covered} من موضوع واحد} two {غطّيت {covered} من موضوعين} few {غطّيت {covered} من {totalLabel} مواضيع} many {غطّيت {covered} من {totalLabel} موضوعًا} other {غطّيت {covered} من {totalLabel} موضوع}}",
+    "chapterFinished": "خلّصت الفصل {number}",
+    "sessionEnded": "انتهت جلستك في الفصل {number}",
+    "progress": "{total, plural, zero {أنجزت {doneLabel} من {totalLabel} فصول} one {أنجزت {doneLabel} من فصل واحد} two {أنجزت {doneLabel} من فصلين} few {أنجزت {doneLabel} من {totalLabel} فصول} many {أنجزت {doneLabel} من {totalLabel} فصلًا} other {أنجزت {doneLabel} من {totalLabel} فصل}}"
+  },
+  "SessionFeedback": {
+    "sent": "وصل تقييمك. نقرأ كل ملاحظة.",
+    "title": "كيف كانت الجلسة؟",
+    "notes": "وش نحسّن؟",
+    "error": "ما وصل التقييم. تأكّد من اتصالك وجرّب مرة ثانية.",
+    "sending": "يُرسل…",
+    "submit": "أرسل التقييم",
+    "rating": {
+      "bad": "سيئة",
+      "poor": "ضعيفة",
+      "acceptable": "مقبولة",
+      "good": "جيدة",
+      "excellent": "ممتازة"
+    }
+  },
+  "Legal": {
+    "Privacy": {
+      "metadataTitle": "سياسة الخصوصية — بيكان",
+      "title": "سياسة الخصوصية",
+      "lede": "بيكان يسمع صوتك عشان يشرح لك — وهذي الصفحة تقول بالضبط وش يصير فيه.",
+      "sections": {
+        "summary": {
+          "title": "الخلاصة في ثلاثة أسطر",
+          "points1": {
+            "item1": "نجمع أقل ما نحتاجه: هويتك، جامعتك وتخصصك، وتقدّمك في المذاكرة.",
+            "item2": "صوتك يُعالَج عشان تتكلّم مع بيكان، ويُحذف تلقائيًا بعد الجلسة إلا إذا سمحت بحفظه.",
+            "item3": "ما نبيع بياناتك لأحد، ولا نستعملها في إعلانات."
+          }
+        },
+        "voice": {
+          "title": "صوتك — كيف نعالجه ونحفظه",
+          "paragraph1": "بيكان منتج صوتي، فهذا القسم أهم ما في الصفحة. حين تتكلّم مع بيكان أثناء الجلسة، يصير التالي:",
+          "points1": {
+            "item1": "الميكروفون ما يشتغل إلا لما تضغط زر الكلام — ما فيه استماع مستمر ولا خلفي.",
+            "item2": "صوتك ينتقل مشفّرًا إلى خوادمنا، ويتحوّل إلى نصّ عشان يفهم بيكان سؤالك.",
+            "item3": "التسجيل الصوتي نفسه يُحذف تلقائيًا خلال 24 ساعة من نهاية الجلسة.",
+            "item4": "النصّ المستخرَج منه يبقى مربوطًا بحسابك عشان يعرف بيكان وين تعثّرت — وتقدر تحذفه بحذف حسابك.",
+            "item5": "ما نستعمل صوتك في تدريب نماذج، ولا نشاركه مع أحد خارج مزوّد المعالجة الصوتية اللي نستعمله."
+          },
+          "paragraph2": "إذا تبي بيكان يحتفظ بتسجيلاتك فترة أطول عشان تراجعها بنفسك، هذا خيار تفعّله أنت من <study>تفضيلات المذاكرة</study> — مطفأ افتراضيًا."
+        },
+        "what": {
+          "title": "بقية البيانات اللي نجمعها",
+          "points1": {
+            "item1": "بيانات الحساب: اسمك، بريدك أو جوالك، جامعتك، تخصصك.",
+            "item2": "بيانات المذاكرة: المقررات اللي اخترتها، الفصول اللي أنجزتها، أسئلتك وإجاباتك، وين تعثّرت، وكم دقيقة استهلكت.",
+            "item3": "بيانات الدفع: خطتك وتاريخ التجديد وآخر أربعة أرقام من بطاقتك. رقم البطاقة الكامل ما يمرّ علينا أصلًا — يروح مباشرة لبوابة الدفع.",
+            "item4": "بيانات تقنية: نوع جهازك ومتصفّحك وسجلات الأعطال، عشان نعرف ليش وقفت الجلسة عندك."
+          }
+        },
+        "why": {
+          "title": "ليش نجمعها",
+          "points1": {
+            "item1": "نشغّل الخدمة: نعرض مقررك، ونكمّل من وين وقفت، ونحسب دقائقك.",
+            "item2": "نحسّن الشرح: نعرف أي موضوع يتعثّر فيه أغلب الطلاب فنعيد بناءه.",
+            "item3": "نبلّغك: تذكير قبل اختبارك، وإشعار لما يجهز مقررك — والقنوات تختارها أنت من الإشعارات.",
+            "item4": "نحمي الخدمة: نكشف إساءة الاستعمال ومشاركة الحسابات."
+          }
+        },
+        "share": {
+          "title": "مع مين نشاركها",
+          "paragraph1": "ما نبيع بياناتك. نشاركها فقط مع مزوّدي خدمة نحتاجهم لتشغيل بيكان، وبالقدر اللي يحتاجونه:",
+          "points1": {
+            "item1": "مزوّد المعالجة الصوتية ونماذج الشرح.",
+            "item2": "بوابة الدفع، وتستلم بيانات بطاقتك مباشرة لا عن طريقنا.",
+            "item3": "مزوّد الاستضافة والتحليلات التشغيلية.",
+            "item4": "الجهات النظامية إذا طلبتها بموجب النظام."
+          },
+          "paragraph2": "<strong>جامعتك ما تستلم منّا شيئًا</strong> — لا درجاتك ولا تعثّرك ولا حتى إنك مسجّل عندنا."
+        },
+        "rights": {
+          "title": "حقوقك",
+          "paragraph1": "نظام حماية البيانات الشخصية السعودي يعطيك حقوقًا على بياناتك، ومنها:",
+          "points1": {
+            "item1": "تعرف أي بيانات عندنا عنك.",
+            "item2": "تنزّل نسخة منها — من إعدادات بياناتك، بضغطة.",
+            "item3": "تصحّح أي معلومة غلط.",
+            "item4": "تطلب حذف بياناتك، وتحذف حسابك بنفسك.",
+            "item5": "تسحب موافقتك على أي استعمال اختياري، مثل حفظ التسجيلات."
+          },
+          "paragraph2": "كلها تنفّذها بنفسك من <data>بياناتك</data>، وإن احتجت مساعدة راسلنا."
+        },
+        "keep": {
+          "title": "كم نحتفظ بها",
+          "points1": {
+            "item1": "التسجيل الصوتي: 24 ساعة، ثم يُحذف تلقائيًا.",
+            "item2": "بيانات مذاكرتك: طول ما حسابك موجود.",
+            "item3": "سجلات الفواتير: تبقى بعد حذف الحساب للمدة اللي تلزمنا بها الأنظمة الضريبية.",
+            "item4": "بعد حذف حسابك: نحذف الباقي خلال 30 يومًا."
+          }
+        },
+        "kids": {
+          "title": "أعمار المستخدمين",
+          "paragraph1": "بيكان مصمَّم لطلاب الجامعات. إذا كان عمرك أقل من 18 سنة، تحتاج موافقة وليّك قبل ما تستعمل الخدمة."
+        },
+        "cookies": {
+          "title": "ملفات تعريف الارتباط",
+          "paragraph1": "تفاصيلها في <cookies>صفحة ملفات تعريف الارتباط</cookies>."
+        },
+        "contact": {
+          "title": "تواصل معنا",
+          "paragraph1": "أي سؤال عن خصوصيتك أو طلب يخصّ بياناتك، راسلنا من <contact>صفحة التواصل</contact>، ونردّ خلال المدة المذكورة فيها."
+        }
+      },
+      "metadataDescription": "بيكان يسمع صوتك عشان يشرح لك — وهذي الصفحة تقول بالضبط وش يصير فيه.",
+      "updated": "2026-08-23",
+      "translationNotice": "هذه ترجمة للتيسير. النسخة العربية هي النصّ المعتمد. <arabic>اقرأ النسخة العربية</arabic>"
+    },
+    "Terms": {
+      "metadataTitle": "الشروط والأحكام — بيكان",
+      "title": "الشروط والأحكام",
+      "lede": "مكتوبة بلغة عادية عشان تقرأها فعلًا. أي بند فيه غموض، راسلنا ونوضّحه.",
+      "sections": {
+        "who": {
+          "title": "من نحن وما نقدّمه",
+          "paragraph1": "بيكان خدمة تشرح لك مقررك الجامعي بالصوت على سبورة تفاعلية، وتسألك أسئلة تتأكد فيها إنك فهمت. الخدمة تشتغل على المحتوى اللي نجهّزه إحنا — أنت ما ترفع محتوى، وتختار مقررك وفصلك وبس.",
+          "paragraph2": "استعمالك للخدمة يعني إنك موافق على هالشروط. إذا ما وافقت عليها، لا تستعمل الخدمة."
+        },
+        "account": {
+          "title": "حسابك",
+          "paragraph1": "تسجّل ببريدك أو رقم جوالك، والحساب لك أنت وحدك — ما تشاركه مع غيرك. أنت مسؤول عن كل شيء يصير من حسابك، وإذا شكّيت إن أحد دخل عليه بلّغنا فورًا.",
+          "paragraph2": "البيانات اللي تكتبها لازم تكون صحيحة: جامعتك وتخصصك يحدّدان المقررات اللي تشوفها، والمعلومة الغلط تعطيك مقررًا مو مقررك."
+        },
+        "use": {
+          "title": "الاستعمال المسموح",
+          "paragraph1": "الخدمة لمذاكرتك الشخصية. وممنوع عليك:",
+          "points1": {
+            "item1": "تسجيل الجلسات أو نشرها أو بيعها أو إعادة نشر السبورة والشرح.",
+            "item2": "مشاركة حسابك أو بيع الدخول عليه.",
+            "item3": "استعمال أدوات آلية تسحب المحتوى أو تحمّل الخدمة فوق طاقتها.",
+            "item4": "استعمال بيكان في غش أو انتحال داخل اختبار أو واجب مرصود عليه درجة."
+          },
+          "paragraph2": "مخالفة هذي البنود تعني إيقاف الحساب، ومع الإيقاف بسبب مخالفة ما فيه استرجاع للمدة المتبقية."
+        },
+        "content": {
+          "title": "المحتوى والملكية",
+          "paragraph1": "الشرح والسبورة والأسئلة والصوت ملك بيكان، ولك حق استعمالها لمذاكرتك طول ما اشتراكك شغّال. أسماء المقررات ورموزها وأغلفة الجامعات تعود لأصحابها، وذكرها هنا للتعريف لا أكثر.",
+          "paragraph2": "بيكان مو بديلًا عن محاضرات أستاذك ولا عن مرجع مقررك المعتمد، والمحتوى اللي نجهّزه مبني على مصادر مقرّرك ويُراجَع، لكنه يبقى مادة مساندة. الدرجة النهائية مسؤوليتك أنت وأستاذك."
+        },
+        "money": {
+          "title": "الاشتراك والدفع",
+          "paragraph1": "الأسعار المعروضة في <plans>صفحة الخطط</plans> شاملة ضريبة القيمة المضافة، والاشتراك يتجدّد شهريًا تلقائيًا إلى أن تلغيه.",
+          "paragraph2": "تفاصيل الإلغاء والاسترجاع كاملة في <refunds>سياسة الاسترجاع والإلغاء</refunds>.",
+          "paragraph3": "نقدر نغيّر الأسعار، وإذا صار ذلك نبلّغك قبلها بثلاثين يومًا على الأقل، والسعر الجديد يبدأ من التجديد اللي بعد التبليغ — مو من نصّ مدتك الحالية."
+        },
+        "availability": {
+          "title": "توفّر الخدمة",
+          "paragraph1": "نشتغل على إبقاء بيكان شغّالة، لكن الخدمة تحتاج صيانة وأحيانًا يصير عطل. حالة النظام والأعطال السابقة منشورة في <status>صفحة الحالة</status>.",
+          "paragraph2": "إذا صار انقطاع طويل من عندنا، عوّضناك بدقائق أو باسترجاع حسب ما توضّحه سياسة الاسترجاع."
+        },
+        "end": {
+          "title": "إيقاف الحساب",
+          "paragraph1": "تقدر تحذف حسابك في أي وقت من <data>إعدادات بياناتك</data>. ومن جهتنا ما نوقف حسابك إلا لمخالفة هالشروط أو لطلب نظامي، ونبلّغك بالسبب."
+        },
+        "law": {
+          "title": "النظام المطبَّق",
+          "paragraph1": "تخضع هذه الشروط لأنظمة المملكة العربية السعودية، وأي خلاف ينظر أمام الجهة القضائية المختصة فيها."
+        },
+        "contact": {
+          "title": "تواصل معنا",
+          "paragraph1": "أي سؤال عن هالشروط، راسلنا من <contact>صفحة التواصل</contact>."
+        }
+      },
+      "metadataDescription": "مكتوبة بلغة عادية عشان تقرأها فعلًا. أي بند فيه غموض، راسلنا ونوضّحه.",
+      "updated": "2026-08-23",
+      "translationNotice": "هذه ترجمة للتيسير. النسخة العربية هي النصّ المعتمد. <arabic>اقرأ النسخة العربية</arabic>"
+    },
+    "Refunds": {
+      "metadataTitle": "الاسترجاع والإلغاء — بيكان",
+      "title": "الاسترجاع والإلغاء",
+      "lede": "تلغي متى ما تبي بضغطة، وتعرف من الحين متى ترجع لك فلوسك ومتى ما ترجع.",
+      "sections": {
+        "cancel": {
+          "title": "الإلغاء",
+          "paragraph1": "تقدر تلغي اشتراكك في أي وقت من <subscription>صفحة الاشتراك</subscription>، بضغطة وخطوة تأكيد واحدة. ما نطلب منك سبب ولا نحوّلك على أحد.",
+          "paragraph2": "الإلغاء يوقف التجديد القادم، وما يوقف خطتك الحالية: تبقى شغّالة بدقائقها كاملة حتى نهاية المدة اللي دفعتها، والتاريخ مكتوب لك صراحة في نفس الصفحة. بعد ذلك ترجع تلقائيًا للخطة المجانية، وبياناتك وتقدّمك يبقيان كما هما."
+        },
+        "refund": {
+          "title": "متى ترجع لك فلوسك",
+          "paragraph1": "<strong>استرجاع كامل خلال 7 أيام</strong> من أول عملية دفع لك في بيكان، بشرط ما تكون استهلكت أكثر من 20٪ من دقائق خطتك. جرّب الخدمة بجدّ، وإذا ما نفعتك رجّعنا لك المبلغ كامل.",
+          "paragraph2": "ونرجّع لك المبلغ كذلك في هذي الحالات:",
+          "points1": {
+            "item1": "خصم مكرّر أو خصم بمبلغ غلط — نرجّعه كامل بلا شروط.",
+            "item2": "انقطاع من عندنا يمنعك من المذاكرة مدة طويلة — نرجّع لك قيمة المدة المتأثّرة أو نعوّضك بدقائق، وتختار أنت.",
+            "item3": "مقرر وعدناك بجاهزيته في تاريخ ثم تأخّر، وكان اشتراكك عشانه."
+          }
+        },
+        "noRefund": {
+          "title": "متى ما يصير استرجاع",
+          "points1": {
+            "item1": "بعد مرور 7 أيام على الدفع، أو بعد استهلاك أكثر من 20٪ من دقائق الخطة — أيّهما أسبق. تقدر تلغي التجديد، والمدة المدفوعة تكمل معك.",
+            "item2": "التجديدات بعد الشهر الأول — الإلغاء يمنع التجديد اللي بعده، ما يرجّع اللي صار.",
+            "item3": "إيقاف الحساب بسبب مخالفة الشروط، مثل مشاركة الحساب أو إعادة نشر المحتوى."
+          }
+        },
+        "how": {
+          "title": "كيف تطلب الاسترجاع",
+          "paragraph1": "راسلنا من <contact>صفحة التواصل</contact> — واتساب أسرع — واكتب رقم الفاتورة، وتلقاه في <invoices>فواتيرك</invoices>. ما نطلب منك أي رقم بطاقة.",
+          "paragraph2": "نردّ على طلبك خلال يوم عمل واحد بقبول أو برفض مسبَّب — ما نتركك بلا جواب."
+        },
+        "when": {
+          "title": "متى يوصلك المبلغ",
+          "paragraph1": "المبلغ يرجع على نفس وسيلة الدفع اللي دفعت بها — ما نرجّعه على وسيلة ثانية ولا كرصيد داخل بيكان إلا إذا طلبت أنت ذلك.",
+          "paragraph2": "نُصدر الاسترجاع من عندنا خلال يوم إلى ثلاثة أيام عمل، وبعدها البنك يحتاج من 5 إلى 10 أيام عمل عشان يظهر في حسابك. المدة الثانية على بنكك لا علينا، ونعطيك رقم العملية عشان تسأل بها.",
+          "paragraph3": "الضريبة تُرجَع مع المبلغ، وتُصدر لك فاتورة استرجاع تلقاها في <invoices>فواتيرك</invoices>."
+        }
+      },
+      "metadataDescription": "تلغي متى ما تبي بضغطة، وتعرف من الحين متى ترجع لك فلوسك ومتى ما ترجع.",
+      "updated": "2026-08-23",
+      "translationNotice": "هذه ترجمة للتيسير. النسخة العربية هي النصّ المعتمد. <arabic>اقرأ النسخة العربية</arabic>"
+    },
+    "Cookies": {
+      "metadataTitle": "ملفات تعريف الارتباط — بيكان",
+      "title": "ملفات تعريف الارتباط",
+      "lede": "ثلاثة أنواع، كلها لتشغيل حسابك. ولا واحد منها للإعلانات.",
+      "sections": {
+        "what": {
+          "title": "وش هي",
+          "paragraph1": "ملفات صغيرة يحفظها متصفّحك عشان يتذكّر إنك داخل على حسابك، ويتذكّر تفضيلاتك بين الزيارات. بلاها تحتاج تسجّل دخول من جديد كل مرة تفتح فيها صفحة."
+        },
+        "kinds": {
+          "title": "وش نستعمل منها",
+          "paragraph1": "ثلاثة أنواع فقط، وكلها ضرورية لتشغيل الخدمة:",
+          "points1": {
+            "item1": "جلسة الدخول: تبقيك مسجّلًا حتى تخرج بنفسك. تنتهي بعد 30 يومًا من آخر استعمال.",
+            "item2": "تفضيلاتك: سرعة الشرح وشكل الاختبار وآخر مقرر فتحته، عشان ما تعيد ضبطها كل مرة.",
+            "item3": "الأمان: تمنع إرسال طلبات من مواقع ثانية باسمك، وتنتهي بانتهاء الجلسة."
+          },
+          "paragraph2": "<strong>ما نستعمل ارتباطات إعلانية ولا تتبّعًا عبر المواقع</strong>، وما نبيع بياناتك لأحد. عشان كذا ما تشوف عندنا نافذة موافقة تلاحقك في كل صفحة."
+        },
+        "control": {
+          "title": "كيف تتحكّم فيها",
+          "paragraph1": "تقدر تحذفها أو تمنعها من إعدادات متصفّحك في أي وقت. لكن منع ارتباطات الدخول يعني إنك ما تقدر تسجّل دخول ولا تكمّل جلسة — الخدمة نفسها تحتاجها.",
+          "paragraph2": "وإذا تبي تمسح كل شيء يخصّك عندنا، فذلك من <data>بياناتك</data> لا من المتصفّح."
+        },
+        "more": {
+          "title": "المزيد",
+          "paragraph1": "تفاصيل ما نجمعه عنك وكيف نستعمله في <privacy>سياسة الخصوصية</privacy>."
+        }
+      },
+      "metadataDescription": "ثلاثة أنواع، كلها لتشغيل حسابك. ولا واحد منها للإعلانات.",
+      "updated": "2026-08-23",
+      "translationNotice": "هذه ترجمة للتيسير. النسخة العربية هي النصّ المعتمد. <arabic>اقرأ النسخة العربية</arabic>"
+    }
+  }
+}

@@ -1,4 +1,5 @@
-import type { IconKey } from "@/app/courses/subject-icon";
+import type { Localized } from "@/i18n/localized";
+import type { IconKey } from "@/app/[locale]/courses/subject-icon";
 
 /* كتالوج عرض. ACCT 101 وحدها من docs/design-brief.md — البقية بيانات
    عرض حتى يصل الكتالوج الحقيقي. */
@@ -11,22 +12,22 @@ export type College = "business" | "science" | "engineering";
 export type Tone =
   "lilac" | "base" | "deep" | "amber" | "walnut" | "olive" | "oliveDark";
 
-export const COLLEGES: { id: College; label: string }[] = [
-  { id: "business", label: "إدارة الأعمال" },
-  { id: "science", label: "العلوم" },
-  { id: "engineering", label: "الهندسة" },
+export const COLLEGES: { id: College; label: Localized }[] = [
+  { id: "business", label: { ar: "إدارة الأعمال", en: "Business Administration" } },
+  { id: "science", label: { ar: "العلوم", en: "Science" } },
+  { id: "engineering", label: { ar: "الهندسة", en: "Engineering" } },
 ];
 
-export const UNIVERSITIES = [
-  "جامعة الملك سعود",
-  "جامعة الملك عبدالعزيز",
-  "جامعة الإمام محمد بن سعود الإسلامية",
+export const UNIVERSITIES: Localized[] = [
+  { ar: "جامعة الملك سعود", en: "King Saud University" },
+  { ar: "جامعة الملك عبدالعزيز", en: "King Abdulaziz University" },
+  { ar: "جامعة الإمام محمد بن سعود الإسلامية", en: "Imam Mohammad Ibn Saud Islamic University" },
 ];
 
 export type Course = {
   code: string;
-  name: string;
-  university: string;
+  name: Localized;
+  university: Localized;
   college: College;
   tone: Tone;
   icon: IconKey;
@@ -35,72 +36,72 @@ export type Course = {
 export const COURSES: Course[] = [
   {
     code: "ACCT 101",
-    name: "مبادئ المحاسبة 1",
-    university: "جامعة الملك سعود",
+    name: { ar: "مبادئ المحاسبة 1", en: "Principles of Accounting 1" },
+    university: { ar: "جامعة الملك سعود", en: "King Saud University" },
     college: "business",
     tone: "deep",
     icon: "coins",
   },
   {
     code: "ECON 101",
-    name: "مبادئ الاقتصاد الجزئي",
-    university: "جامعة الملك سعود",
+    name: { ar: "مبادئ الاقتصاد الجزئي", en: "Principles of Microeconomics" },
+    university: { ar: "جامعة الملك سعود", en: "King Saud University" },
     college: "business",
     tone: "lilac",
     icon: "bars",
   },
   {
     code: "MGT 101",
-    name: "مبادئ الإدارة",
-    university: "جامعة الملك سعود",
+    name: { ar: "مبادئ الإدارة", en: "Principles of Management" },
+    university: { ar: "جامعة الملك سعود", en: "King Saud University" },
     college: "business",
     tone: "base",
     icon: "blocks",
   },
   {
     code: "MATH 101",
-    name: "حساب التفاضل والتكامل 1",
-    university: "جامعة الملك سعود",
+    name: { ar: "حساب التفاضل والتكامل 1", en: "Calculus 1" },
+    university: { ar: "جامعة الملك سعود", en: "King Saud University" },
     college: "science",
     tone: "lilac",
     icon: "torus",
   },
   {
     code: "CHEM 101",
-    name: "الكيمياء العامة 1",
-    university: "جامعة الملك سعود",
+    name: { ar: "الكيمياء العامة 1", en: "General Chemistry 1" },
+    university: { ar: "جامعة الملك سعود", en: "King Saud University" },
     college: "science",
     tone: "olive",
     icon: "flask",
   },
   {
     code: "PHYS 101",
-    name: "فيزياء عامة 1",
-    university: "جامعة الملك عبدالعزيز",
+    name: { ar: "فيزياء عامة 1", en: "General Physics 1" },
+    university: { ar: "جامعة الملك عبدالعزيز", en: "King Abdulaziz University" },
     college: "science",
     tone: "deep",
     icon: "atom",
   },
   {
     code: "STAT 101",
-    name: "مبادئ الإحصاء",
-    university: "جامعة الملك عبدالعزيز",
+    name: { ar: "مبادئ الإحصاء", en: "Principles of Statistics" },
+    university: { ar: "جامعة الملك عبدالعزيز", en: "King Abdulaziz University" },
     college: "science",
     tone: "walnut",
     icon: "donut",
   },
   {
     code: "CS 101",
-    name: "مقدمة في البرمجة",
-    university: "جامعة الملك سعود",
+    name: { ar: "مقدمة في البرمجة", en: "Introduction to Programming" },
+    university: { ar: "جامعة الملك سعود", en: "King Saud University" },
     college: "engineering",
     tone: "amber",
     icon: "cube",
   },
   {
     code: "EE 201",
-    name: "الدوائر الكهربائية",
-    university: "جامعة الملك عبدالعزيز",
+    name: { ar: "الدوائر الكهربائية", en: "Electric Circuits" },
+    university: { ar: "جامعة الملك عبدالعزيز", en: "King Abdulaziz University" },
     college: "engineering",
     tone: "oliveDark",
     icon: "bolt",
@@ -205,32 +206,16 @@ export const TONES: Record<
   },
 };
 
-/* عدّ عربي سليم بدل «3 مقرر». */
-export function countLabel(n: number) {
-  if (n === 1) return "مقرر واحد";
-  if (n === 2) return "مقرران";
-  if (n <= 10) return `${n} مقررات`;
-  return `${n} مقررًا`;
-}
-
-/* عدّ الطلاب — «8 طلاب» لا «8 طالب». */
-export function studentsLabel(n: number) {
-  if (n === 1) return "طالب واحد طلب";
-  if (n === 2) return "طالبان طلبا";
-  if (n <= 10) return `${n} طلاب طلبوا`;
-  return `${n} طالبًا طلبوا`;
-}
-
 /* ————— الفصول —————
    ACCT 101 · الفصل 3 «الأصول والخصوم» بمدّته ومواضيعه منقول من
    docs/design-brief.md. بقية الفصول بيانات عرض حتى يصل المحتوى.
    الصيغة: [العنوان, الدقائق, عدد المواضيع, جاهز؟] */
 
-type Row = [string, number, number, boolean?];
+type Row = [Localized, number, number, boolean?];
 
 export type Chapter = {
   n: number;
-  title: string;
+  title: Localized;
   minutes: number;
   topics: number;
   ready: boolean;
@@ -238,98 +223,98 @@ export type Chapter = {
 
 const ROWS: Record<string, Row[]> = {
   "ACCT 101": [
-    ["المعادلة المحاسبية", 20, 9],
-    ["الحسابات والقيود", 25, 11],
-    ["الأصول والخصوم", 25, 12],
-    ["دورة المحاسبة", 30, 10],
-    ["التسويات الجردية", 28, 12],
-    ["القوائم المالية", 30, 13],
-    ["النقدية والبنوك", 22, 8],
-    ["المدينون والمخزون", 26, 10],
-    ["الأصول الثابتة والإهلاك", 24, 9],
-    ["المحاسبة عن الشركات", 28, 11, false],
+    [{ ar: "المعادلة المحاسبية", en: "The Accounting Equation" }, 20, 9],
+    [{ ar: "الحسابات والقيود", en: "Accounts and Journal Entries" }, 25, 11],
+    [{ ar: "الأصول والخصوم", en: "Assets and Liabilities" }, 25, 12],
+    [{ ar: "دورة المحاسبة", en: "The Accounting Cycle" }, 30, 10],
+    [{ ar: "التسويات الجردية", en: "Adjusting Entries" }, 28, 12],
+    [{ ar: "القوائم المالية", en: "Financial Statements" }, 30, 13],
+    [{ ar: "النقدية والبنوك", en: "Cash and Banks" }, 22, 8],
+    [{ ar: "المدينون والمخزون", en: "Receivables and Inventory" }, 26, 10],
+    [{ ar: "الأصول الثابتة والإهلاك", en: "Fixed Assets and Depreciation" }, 24, 9],
+    [{ ar: "المحاسبة عن الشركات", en: "Accounting for Companies" }, 28, 11, false],
   ],
   "ECON 101": [
-    ["مبادئ الاقتصاد", 18, 7],
-    ["العرض والطلب", 26, 12],
-    ["مرونة الطلب", 22, 9],
-    ["سلوك المستهلك", 24, 10],
-    ["نظرية الإنتاج", 26, 11],
-    ["التكاليف", 24, 10],
-    ["المنافسة الكاملة", 28, 12],
-    ["الاحتكار", 25, 9, false],
+    [{ ar: "مبادئ الاقتصاد", en: "Principles of Economics" }, 18, 7],
+    [{ ar: "العرض والطلب", en: "Supply and Demand" }, 26, 12],
+    [{ ar: "مرونة الطلب", en: "Demand Elasticity" }, 22, 9],
+    [{ ar: "سلوك المستهلك", en: "Consumer Behavior" }, 24, 10],
+    [{ ar: "نظرية الإنتاج", en: "Production Theory" }, 26, 11],
+    [{ ar: "التكاليف", en: "Costs" }, 24, 10],
+    [{ ar: "المنافسة الكاملة", en: "Perfect Competition" }, 28, 12],
+    [{ ar: "الاحتكار", en: "Monopoly" }, 25, 9, false],
   ],
   "MGT 101": [
-    ["مدخل إلى الإدارة", 18, 8],
-    ["التخطيط", 22, 9],
-    ["التنظيم", 24, 10],
-    ["التوظيف", 20, 8],
-    ["القيادة", 26, 11],
-    ["الرقابة", 22, 9],
-    ["اتخاذ القرار", 24, 10],
+    [{ ar: "مدخل إلى الإدارة", en: "Introduction to Management" }, 18, 8],
+    [{ ar: "التخطيط", en: "Planning" }, 22, 9],
+    [{ ar: "التنظيم", en: "Organizing" }, 24, 10],
+    [{ ar: "التوظيف", en: "Staffing" }, 20, 8],
+    [{ ar: "القيادة", en: "Leadership" }, 26, 11],
+    [{ ar: "الرقابة", en: "Controlling" }, 22, 9],
+    [{ ar: "اتخاذ القرار", en: "Decision-Making" }, 24, 10],
   ],
   "MATH 101": [
-    ["النهايات والاتصال", 28, 12],
-    ["المشتقة وقواعدها", 30, 14],
-    ["قاعدة السلسلة", 22, 8],
-    ["تطبيقات المشتقة", 32, 15],
-    ["التكامل غير المحدد", 28, 12],
-    ["التكامل المحدد", 30, 13],
-    ["تطبيقات التكامل", 30, 12, false],
+    [{ ar: "النهايات والاتصال", en: "Limits and Continuity" }, 28, 12],
+    [{ ar: "المشتقة وقواعدها", en: "Derivatives and Differentiation Rules" }, 30, 14],
+    [{ ar: "قاعدة السلسلة", en: "The Chain Rule" }, 22, 8],
+    [{ ar: "تطبيقات المشتقة", en: "Applications of Derivatives" }, 32, 15],
+    [{ ar: "التكامل غير المحدد", en: "Indefinite Integrals" }, 28, 12],
+    [{ ar: "التكامل المحدد", en: "Definite Integrals" }, 30, 13],
+    [{ ar: "تطبيقات التكامل", en: "Applications of Integration" }, 30, 12, false],
   ],
   "CHEM 101": [
-    ["بنية الذرة", 24, 10],
-    ["الجدول الدوري", 22, 9],
-    ["الروابط الكيميائية", 28, 12],
-    ["المعادلات والموازنة", 20, 8],
-    ["الحسابات الكيميائية", 30, 13],
-    ["الغازات", 26, 11],
-    ["المحاليل", 24, 10],
-    ["الحموض والقواعد", 28, 12],
+    [{ ar: "بنية الذرة", en: "Atomic Structure" }, 24, 10],
+    [{ ar: "الجدول الدوري", en: "The Periodic Table" }, 22, 9],
+    [{ ar: "الروابط الكيميائية", en: "Chemical Bonds" }, 28, 12],
+    [{ ar: "المعادلات والموازنة", en: "Equations and Balancing" }, 20, 8],
+    [{ ar: "الحسابات الكيميائية", en: "Stoichiometry" }, 30, 13],
+    [{ ar: "الغازات", en: "Gases" }, 26, 11],
+    [{ ar: "المحاليل", en: "Solutions" }, 24, 10],
+    [{ ar: "الحموض والقواعد", en: "Acids and Bases" }, 28, 12],
   ],
   "PHYS 101": [
-    ["القياس والوحدات", 16, 6],
-    ["الحركة في بُعد واحد", 26, 11],
-    ["الحركة في بُعدين", 28, 12],
-    ["قوانين نيوتن", 30, 14],
-    ["الشغل والطاقة", 28, 12],
-    ["كمية الحركة", 24, 10],
-    ["الحركة الدورانية", 30, 13],
-    ["الاتزان", 22, 9],
-    ["الجاذبية", 24, 10],
-    ["الموائع", 26, 11, false],
+    [{ ar: "القياس والوحدات", en: "Measurement and Units" }, 16, 6],
+    [{ ar: "الحركة في بُعد واحد", en: "Motion in One Dimension" }, 26, 11],
+    [{ ar: "الحركة في بُعدين", en: "Motion in Two Dimensions" }, 28, 12],
+    [{ ar: "قوانين نيوتن", en: "Newton’s Laws" }, 30, 14],
+    [{ ar: "الشغل والطاقة", en: "Work and Energy" }, 28, 12],
+    [{ ar: "كمية الحركة", en: "Momentum" }, 24, 10],
+    [{ ar: "الحركة الدورانية", en: "Rotational Motion" }, 30, 13],
+    [{ ar: "الاتزان", en: "Equilibrium" }, 22, 9],
+    [{ ar: "الجاذبية", en: "Gravity" }, 24, 10],
+    [{ ar: "الموائع", en: "Fluids" }, 26, 11, false],
   ],
   "STAT 101": [
-    ["وصف البيانات", 20, 8],
-    ["مقاييس النزعة المركزية", 24, 10],
-    ["مقاييس التشتت", 22, 9],
-    ["الاحتمالات", 28, 12],
-    ["التوزيعات الاحتمالية", 30, 13],
-    ["العيّنات والتقدير", 26, 11],
+    [{ ar: "وصف البيانات", en: "Describing Data" }, 20, 8],
+    [{ ar: "مقاييس النزعة المركزية", en: "Measures of Central Tendency" }, 24, 10],
+    [{ ar: "مقاييس التشتت", en: "Measures of Dispersion" }, 22, 9],
+    [{ ar: "الاحتمالات", en: "Probability" }, 28, 12],
+    [{ ar: "التوزيعات الاحتمالية", en: "Probability Distributions" }, 30, 13],
+    [{ ar: "العيّنات والتقدير", en: "Sampling and Estimation" }, 26, 11],
   ],
   "CS 101": [
-    ["مقدمة في البرمجة", 18, 7],
-    ["المتغيّرات والأنواع", 22, 9],
-    ["العمليات والتعابير", 20, 8],
-    ["الجمل الشرطية", 24, 10],
-    ["الحلقات التكرارية", 26, 11],
-    ["الدوال", 28, 12],
-    ["المصفوفات", 26, 11],
-    ["السلاسل النصية", 22, 9],
-    ["الملفات", 20, 8],
-    ["البرمجة الكائنية", 32, 14],
-    ["معالجة الأخطاء", 20, 8, false],
+    [{ ar: "مقدمة في البرمجة", en: "Introduction to Programming" }, 18, 7],
+    [{ ar: "المتغيّرات والأنواع", en: "Variables and Types" }, 22, 9],
+    [{ ar: "العمليات والتعابير", en: "Operators and Expressions" }, 20, 8],
+    [{ ar: "الجمل الشرطية", en: "Conditional Statements" }, 24, 10],
+    [{ ar: "الحلقات التكرارية", en: "Loops" }, 26, 11],
+    [{ ar: "الدوال", en: "Functions" }, 28, 12],
+    [{ ar: "المصفوفات", en: "Arrays" }, 26, 11],
+    [{ ar: "السلاسل النصية", en: "Strings" }, 22, 9],
+    [{ ar: "الملفات", en: "Files" }, 20, 8],
+    [{ ar: "البرمجة الكائنية", en: "Object-Oriented Programming" }, 32, 14],
+    [{ ar: "معالجة الأخطاء", en: "Error Handling" }, 20, 8, false],
   ],
   "EE 201": [
-    ["عناصر الدائرة", 20, 8],
-    ["قانون أوم", 22, 9],
-    ["قوانين كيرشوف", 28, 12],
-    ["التوصيل التوالي والتوازي", 24, 10],
-    ["تحليل العقد", 30, 13],
-    ["تحليل الحلقات", 28, 12],
-    ["نظريات الدوائر", 30, 13],
-    ["المكثّفات والملفّات", 26, 11],
-    ["دوائر التيار المتردد", 32, 14],
+    [{ ar: "عناصر الدائرة", en: "Circuit Elements" }, 20, 8],
+    [{ ar: "قانون أوم", en: "Ohm’s Law" }, 22, 9],
+    [{ ar: "قوانين كيرشوف", en: "Kirchhoff’s Laws" }, 28, 12],
+    [{ ar: "التوصيل التوالي والتوازي", en: "Series and Parallel Connections" }, 24, 10],
+    [{ ar: "تحليل العقد", en: "Nodal Analysis" }, 30, 13],
+    [{ ar: "تحليل الحلقات", en: "Mesh Analysis" }, 28, 12],
+    [{ ar: "نظريات الدوائر", en: "Circuit Theorems" }, 30, 13],
+    [{ ar: "المكثّفات والملفّات", en: "Capacitors and Inductors" }, 26, 11],
+    [{ ar: "دوائر التيار المتردد", en: "AC Circuits" }, 32, 14],
   ],
 };
 

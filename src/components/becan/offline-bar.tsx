@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useSyncExternalStore } from "react";
 
 /* E3 — انقطاع الاتصال خارج الجلسة.
@@ -29,6 +30,7 @@ const getSnapshot = () => navigator.onLine;
 const getServerSnapshot = () => true;
 
 export function OfflineBar() {
+  const t = useTranslations("OfflineBar");
   const online = useSyncExternalStore(
     subscribe,
     getSnapshot,
@@ -45,9 +47,9 @@ export function OfflineBar() {
       className="sticky top-0 z-40 bg-tint-amber"
     >
       <div className="mx-auto flex w-full max-w-page flex-wrap items-baseline gap-x-2 px-4 py-2.5 text-sm md:px-8 xl:px-10">
-        <span className="font-semibold text-ink">ما في اتصال</span>
+        <span className="font-semibold text-ink">{t("title")}</span>
         <span className="text-ink-2">
-          الصفحة اللي قدامك تشتغل، ونرجّع الباقي أول ما يرجع.
+          {t("body")}
         </span>
       </div>
     </div>

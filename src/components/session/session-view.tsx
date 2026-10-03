@@ -1,8 +1,25 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
+import {
+  getExplanationLanguage,
+  getServerExplanationLanguage,
+  resolveExplanationLanguage,
+  setExplanationLanguage,
+  subscribeExplanationLanguage,
+  type ExplanationLanguage,
+} from "./explanation-language";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { motion, useReducedMotion } from "motion/react";
 import {
   RoomAudioRenderer,
@@ -35,9 +52,7 @@ import {
   TopicsRail,
   TopicsSheet,
   TopicsTrack,
-  lessonsLabel,
   type Phase,
-  type SessionLanguage,
   type TopicState,
 } from "./parts";
 import { useIsMobile } from "./use-is-mobile";
@@ -52,8 +67,13 @@ import { useIsMobile } from "./use-is-mobile";
 
 const SlidesPane = dynamic(() => import("./slides-pdf").then((m) => m.SlidesPane), {
   ssr: false,
-  loading: () => <SlidesMessage text="تجهيز الشرائح…" />,
+  loading: LoadingSlides,
 });
+
+function LoadingSlides() {
+  const t = useTranslations("Session");
+  return <SlidesMessage text={t("loadingSlides")} />;
+}
 
 /* اسم مؤقّت حتى يُركَّب الحساب (Clerk) */
 const USER_NAME = "طالب بيكان";
@@ -71,7 +91,21 @@ type SessionViewProps = {
 
 export function SessionView(props: SessionViewProps) {
   const { courseId, chapterId } = props.content;
-  const [language, setLanguage] = useState<SessionLanguage>("Arabic");
+  const locale = useLocale();
+  const stored = useSyncExternalStore(
+    subscribeExplanationLanguage,
+    getExplanationLanguage,
+    getServerExplanationLanguage,
+  );
+  /* الاختيار يبقى حتى إن حُجب التخزين؛ وبعد البدء لا يغيّره لسان آخر. */
+  const [picked, setPicked] = useState<ExplanationLanguage | null>(null);
+  const [locked, setLocked] = useState<ExplanationLanguage | null>(null);
+  const language = locked ?? picked ?? resolveExplanationLanguage(stored, locale);
+  const chooseLanguage = (value: ExplanationLanguage) => {
+    if (locked) return;
+    setPicked(value);
+    setExplanationLanguage(value);
+  };
 
   const tokenSource = useMemo(
     () =>
@@ -103,7 +137,8 @@ export function SessionView(props: SessionViewProps) {
         {...props}
         session={session}
         language={language}
-        onLanguage={setLanguage}
+        onLanguage={chooseLanguage}
+        onLockLanguage={() => setLocked(language)}
       />
     </SessionProvider>
   );
@@ -113,6 +148,7 @@ function SessionScreen({
   session,
   language,
   onLanguage,
+  onLockLanguage,
   courseName,
   courseSlug,
   chapterNo,
@@ -122,9 +158,13 @@ function SessionScreen({
   lessons,
 }: SessionViewProps & {
   session: ReturnType<typeof useSession>;
-  language: SessionLanguage;
-  onLanguage: (l: SessionLanguage) => void;
+  language: ExplanationLanguage;
+  onLanguage: (l: ExplanationLanguage) => void;
+  onLockLanguage: () => void;
 }) {
+  const t = useTranslations("Session");
+  const format = useFormatter();
+  const number = (value: number) => format.number(value, { numberingSystem: "latn" });
   const router = useRouter();
   const reduce = useReducedMotion() ?? false;
   const isMobile = useIsMobile();
@@ -204,6 +244,7 @@ function SessionScreen({
 
   const start = async (lessonSlug: string | null = null) => {
     if (starting) return;
+    onLockLanguage();
     dispatch({ action: "session_reset" });
     pendingLesson.current = lessonSlug;
     setFailed(false);
@@ -319,8 +360,8 @@ function SessionScreen({
   const detail =
     state.topic && state.topic.index > 0
       ? state.lesson?.totalTopics
-        ? `الموضوع ${state.topic.index} من ${state.lesson.totalTopics}`
-        : `الموضوع ${state.topic.index}`
+        ? t("topicOf", { number: number(state.topic.index), total: number(state.lesson.totalTopics) })
+        : t("topic", { number: number(state.topic.index) })
       : undefined;
 
   /* ————— انقطاع ————— */
@@ -330,18 +371,16 @@ function SessionScreen({
       <Shell reduce={reduce}>
         <TopBar phase="cut" courseName={courseName} chapterNo={chapterNo} onExit={onExit} />
         <div className="mx-auto flex w-full max-w-measure flex-1 flex-col justify-center px-5 py-10">
-          <h1 className="text-3xl font-bold text-ink">انقطع الاتصال</h1>
+          <h1 className="text-3xl font-bold text-ink">{t("connectionCut")}</h1>
           <p className="mt-4 leading-base text-ink-2">
             {lastLesson ? (
-              <>
-                كنت في:{" "}
-                <span dir="auto" className="font-semibold text-ink">
-                  {lastLesson.name}
-                </span>
-                {detail ? ` · ${detail}` : ""}
-              </>
+              t.rich(detail ? "lastPositionDetail" : "lastPosition", {
+                lessonName: lastLesson.name,
+                ...(detail ? { detail } : {}),
+                lesson: (chunks) => <bdi className="font-semibold text-ink">{chunks}</bdi>,
+              })
             ) : (
-              "ما قدرنا نوصل للشرح. تأكّد من اتصالك وجرّب مرة ثانية."
+              t("connectionFailed")
             )}
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -350,14 +389,14 @@ function SessionScreen({
               onClick={() => void start(state.lesson?.slug ?? null)}
               className="inline-flex h-12 items-center justify-center rounded-pill bg-pressable px-6 font-semibold text-on-pressable"
             >
-              {lastLesson ? "كمّل من وين وقفت" : "جرّب مرة ثانية"}
+              {lastLesson ? t("resume") : t("retry")}
             </button>
             <button
               type="button"
               onClick={onExit}
               className="inline-flex h-12 items-center justify-center rounded-pill border border-line px-6 font-semibold text-ink"
             >
-              ارجع للمقرر
+              {t("backCourse")}
             </button>
           </div>
         </div>
@@ -367,23 +406,28 @@ function SessionScreen({
 
   const intro = (
     <>
-      <p className="text-sm text-ink-2">الفصل {chapterNo}</p>
+      <p className="text-sm text-ink-2">{t("chapter", { number: number(chapterNo) })}</p>
       <h1 className="mt-2 text-3xl font-bold text-ink md:text-4xl">{chapterTitle}</h1>
       {phase === "idle" ? (
         <>
           {/* التلدة رمز لاتيني ملاصق لرقم — تُلَفّ بـdir="ltr" */}
           <p className="mt-4 text-ink-2">
-            {lessons.length > 0 ? `${lessonsLabel(lessons.length)} · ` : ""}
-            <span dir="ltr">~{minutes}</span> دقيقة
+            {t.rich(lessons.length > 0 ? "introStats" : "duration", {
+              count: minutes,
+              countLabel: number(minutes),
+              lessons: lessons.length,
+              lessonsLabel: number(lessons.length),
+              estimate: (chunks) => <span dir="ltr">{chunks}</span>,
+            })}
           </p>
           <LanguageChoice value={language} onChange={onLanguage} />
           {lessons.length > 0 ? (
-            <p className="mt-6 text-sm text-ink-2">أو اختر درسًا من المسار لتبدأ منه.</p>
+            <p className="mt-6 text-sm text-ink-2">{t("chooseLesson")}</p>
           ) : null}
         </>
       ) : (
         <p className="mt-4 text-ink-2">
-          {phase === "connecting" ? "يجهّز الشرح…" : "السبورة تُكتب مع الشرح."}
+          {phase === "connecting" ? t("preparingExplanation") : t("boardHint")}
         </p>
       )}
     </>

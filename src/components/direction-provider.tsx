@@ -1,9 +1,15 @@
 "use client";
 
 import { Direction } from "radix-ui";
+import { useLocale } from "next-intl";
 
-/* اتجاه Radix — النوافذ والقوائم تقرأ RTL بلا تمرير dir لكل مكوّن.
+/* اتجاه Radix — النوافذ والقوائم تتبع لغة الواجهة بلا تمرير dir لكل مكوّن.
    مكوّن عميل لأن المزوّد سياق React، والتخطيط الجذري مكوّن خادم. */
 export function DirectionProvider({ children }: { children: React.ReactNode }) {
-  return <Direction.Provider dir="rtl">{children}</Direction.Provider>;
+  const locale = useLocale();
+  return (
+    <Direction.Provider dir={locale === "ar" ? "rtl" : "ltr"}>
+      {children}
+    </Direction.Provider>
+  );
 }

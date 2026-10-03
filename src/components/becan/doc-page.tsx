@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { PageShell, Section, SiteHeader } from "./kit";
 
 /* المجموعة ج — قشرة صفحات السياسات.
@@ -17,29 +18,38 @@ export type DocSection = {
   body: React.ReactNode;
 };
 
-export function DocPage({
+export async function DocPage({
   title,
   updated,
   lede,
+  notice,
   sections,
 }: {
   title: string;
   /** تاريخ آخر تحديث — ظاهر في الأعلى، شرط في البريف */
   updated: string;
   lede?: string;
+  notice?: React.ReactNode;
   sections: DocSection[];
 }) {
+  const t = await getTranslations("DocPage");
   return (
     <PageShell withFooter>
       <SiteHeader />
 
       <Section className="pt-10 pb-16 md:pt-14">
+        {notice ? (
+          <div className="mb-6 max-w-measure rounded-xl border border-line bg-surface-2 p-4">
+            {notice}
+          </div>
+        ) : null}
+
         <h1 className="font-display text-4xl leading-tight font-bold text-ink md:text-5xl">
           {title}
         </h1>
 
         <p className="mt-3 text-sm font-semibold text-ink-2">
-          آخر تحديث: {updated}
+          {t("updated", { updated })}
         </p>
 
         {lede ? (
@@ -48,10 +58,10 @@ export function DocPage({
 
         <div className="mt-10 md:grid md:grid-cols-[14rem_minmax(0,1fr)] md:items-start md:gap-10">
           <nav
-            aria-label="محتويات الصفحة"
+            aria-label={t("contentsLabel")}
             className="rounded-xl border border-line p-4 md:sticky md:top-6 md:rounded-none md:border-0 md:p-0"
           >
-            <p className="text-sm font-semibold text-ink-2">المحتويات</p>
+            <p className="text-sm font-semibold text-ink-2">{t("contents")}</p>
 
             <ol className="mt-2 flex flex-col">
               {sections.map((s) => (

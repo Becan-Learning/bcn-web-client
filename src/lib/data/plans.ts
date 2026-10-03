@@ -1,3 +1,5 @@
+import type { Localized } from "@/i18n/localized";
+
 /* الخطط — مصدر واحد لصفحة الخطط والدفع والاشتراك والفواتير.
 
    الأسعار **شاملة ضريبة القيمة المضافة 15٪** كما ينصّ البريف، فالصافي
@@ -10,16 +12,16 @@ export const VAT = 0.15;
 
 export type Plan = {
   id: "free" | "lite" | "pro";
-  name: string;
+  name: Localized;
   /** السعر شاملًا الضريبة */
   price: number;
   minutes: number;
   /** ترجمة الدقيقة إلى لغة الطالب */
-  hours: string;
-  chapters: string;
-  courses: string;
+  hours: Localized;
+  chapters: Localized;
+  courses: Localized;
   /** تبرير لا زخرفة — يقول متى تنفع لا أنها الأفضل */
-  badge?: string;
+  badge?: Localized;
   /** الخطة المميّزة بصريًّا. واحدة لا أكثر. */
   featured?: boolean;
 };
@@ -27,33 +29,33 @@ export type Plan = {
 export const PLANS: Plan[] = [
   {
     id: "free",
-    name: "مجاني",
+    name: { ar: "مجاني", en: "Free" },
     price: 0,
     minutes: 60,
-    hours: "≈ ساعة مذاكرة موجّهة",
-    chapters: "≈ فصلان",
-    courses: "مقرر واحد",
+    hours: { ar: "≈ ساعة مذاكرة موجّهة", en: "≈ 1 hour of guided study" },
+    chapters: { ar: "≈ فصلان", en: "≈ 2 chapters" },
+    courses: { ar: "مقرر واحد", en: "One course" },
   },
   {
     id: "lite",
-    name: "لايت",
+    name: { ar: "لايت", en: "Lite" },
     price: 90,
     minutes: 250,
-    hours: "≈ 4 ساعات مذاكرة موجّهة",
-    chapters: "≈ 10 فصول",
-    courses: "كل مقرراتك",
-    badge: "الأنسب للبداية",
+    hours: { ar: "≈ 4 ساعات مذاكرة موجّهة", en: "≈ 4 hours of guided study" },
+    chapters: { ar: "≈ 10 فصول", en: "≈ 10 chapters" },
+    courses: { ar: "كل مقرراتك", en: "All your courses" },
+    badge: { ar: "الأنسب للبداية", en: "Best for getting started" },
     featured: true,
   },
   {
     id: "pro",
-    name: "برو",
+    name: { ar: "برو", en: "Pro" },
     price: 149,
     minutes: 500,
-    hours: "≈ 8 ساعات مذاكرة موجّهة",
-    chapters: "≈ 20 فصلًا",
-    courses: "كل مقرراتك",
-    badge: "الأنسب قبل الاختبارات",
+    hours: { ar: "≈ 8 ساعات مذاكرة موجّهة", en: "≈ 8 hours of guided study" },
+    chapters: { ar: "≈ 20 فصلًا", en: "≈ 20 chapters" },
+    courses: { ar: "كل مقرراتك", en: "All your courses" },
+    badge: { ar: "الأنسب قبل الاختبارات", en: "Best before exams" },
   },
 ];
 

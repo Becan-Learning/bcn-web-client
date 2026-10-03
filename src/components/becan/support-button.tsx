@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { whatsappHref } from "@/lib/data/support";
 
 /* زرّ الدعم الطافي — واتساب، في كل صفحة.
@@ -21,12 +22,13 @@ import { whatsappHref } from "@/lib/data/support";
    `print:hidden` كي لا يُطبع مع الفاتورة. */
 
 export function SupportButton() {
+  const t = useTranslations("SupportButton");
   return (
     <a
-      href={whatsappHref("السلام عليكم، عندي سؤال عن بيكان")}
+      href={whatsappHref(t("context"))}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="تواصل مع الدعم على واتساب"
+      aria-label={t("ariaLabel")}
       className="group fixed end-4 bottom-4 z-40 flex h-14 w-14 items-center justify-center rounded-pill bg-aubergine-deep text-on-dominant shadow-lift transition-transform duration-200 hover:-translate-y-1 md:end-6 md:bottom-6 print:hidden"
     >
       <WhatsappIcon className="h-7 w-7" />
@@ -34,7 +36,7 @@ export function SupportButton() {
       {/* التسمية تظهر بالتمرير على الديسكتوب وحده: على الجوال لا
           تمرير، وإظهارها دائمًا يجعل القرص شريطًا يزاحم المحتوى. */}
       <span className="pointer-events-none absolute end-full me-3 hidden whitespace-nowrap rounded-md bg-ink px-3 py-1.5 text-sm font-semibold text-ground opacity-0 transition-opacity duration-200 group-hover:opacity-100 md:block">
-        محتاج مساعدة؟
+        {t("help")}
       </span>
     </a>
   );

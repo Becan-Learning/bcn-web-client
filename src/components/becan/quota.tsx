@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { useFormatter, useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { ArrowForward } from "./icons";
 import { PrimaryButton } from "./kit";
 
@@ -31,18 +32,24 @@ export function QuotaBlock({
   minutes: number;
   quiet?: boolean;
 }) {
+  const t = useTranslations("Quota");
+  const format = useFormatter();
+  const number = (value: number) => format.number(value, { numberingSystem: "latn" });
   return (
     <section className="rounded-xl bg-tint-amber p-5 md:p-6">
       <h2 className="text-xl font-bold text-ink md:text-2xl">
-        خلّصت دقائق هذا الشهر
+        {t("title")}
       </h2>
 
       {/* الإنجاز أولًا ثم الحدّ، والحدّ مربوط بما ينتظره لا بميزة */}
       <p className="mt-3 max-w-measure leading-base text-ink-2">
-        ذاكرت <span className="font-semibold text-ink">{studied} دقيقة</span> —
-        وباقي لك{" "}
-        <span className="font-semibold text-ink">{chaptersLeft} فصول</span> قبل
-        الاختبار.
+        {t.rich("progress", {
+          studied,
+          studiedLabel: number(studied),
+          chaptersLeft,
+          chaptersLabel: number(chaptersLeft),
+          strong: (chunks) => <span className="font-semibold text-ink">{chunks}</span>,
+        })}
       </p>
 
       <div className="mt-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
@@ -51,11 +58,11 @@ export function QuotaBlock({
             href="/plans"
             className="inline-flex h-12 items-center justify-center rounded-pill border border-aubergine-mid px-6 font-semibold text-aubergine-base"
           >
-            كمّل بـ {price} ريال/شهر
+            {t("continue", { price: number(price) })}
           </Link>
         ) : (
           <PrimaryButton href="/plans" className="w-full sm:w-fit">
-            كمّل بـ {price} ريال/شهر
+            {t("continue", { price: number(price) })}
           </PrimaryButton>
         )}
 
@@ -63,13 +70,13 @@ export function QuotaBlock({
           href="/plans"
           className="group inline-flex min-h-11 items-center gap-2 px-2 font-semibold text-ink"
         >
-          شوف الخطط
-          <ArrowForward className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1" />
+          {t("plans")}
+          <ArrowForward className="h-4 w-4 transition-transform duration-200 rtl:group-hover:-translate-x-1 ltr:group-hover:translate-x-1" />
         </Link>
       </div>
 
       <p className="mt-3 text-sm text-ink-2">
-        {minutes} دقيقة شهريًا · كل مقرراتك
+        {t("allowance", { minutes, minutesLabel: number(minutes) })}
       </p>
     </section>
   );

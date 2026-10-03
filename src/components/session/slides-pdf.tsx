@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { Document, Page, pdfjs } from "react-pdf";
 import { Dialog } from "radix-ui";
-import { ArrowForward, ExpandIcon, ShrinkIcon } from "@/components/becan/icons";
+import { ArrowBack, ArrowForward, ExpandIcon, ShrinkIcon } from "@/components/becan/icons";
 import { SlidesMessage } from "./parts";
 
 /* لوح الشرائح — ملف PDF الحقيقي عبر react-pdf.
@@ -59,6 +60,10 @@ export function SlidesPane({
   url: string;
   agentPage: number | null;
 }) {
+  const t = useTranslations("Session");
+  const locale = useLocale();
+  const format = useFormatter();
+  const number = (value: number) => format.number(value, { numberingSystem: "latn" });
   const [numPages, setNumPages] = useState(0);
   const [picked, setPicked] = useState<{ page: number; agentPage: number | null } | null>(null);
   const [zoom, setZoom] = useState<number | null>(null);
@@ -131,13 +136,13 @@ export function SlidesPane({
     <Document
       file={url}
       onLoadSuccess={({ numPages: n }) => setNumPages(n)}
-      loading={<SlidesMessage text="تجهيز الشرائح…" />}
-      error={<SlidesMessage text="ما قدرنا نفتح الشرائح. جرّب تحدّث الصفحة." />}
+      loading={<SlidesMessage text={t("loadingSlides")} />}
+      error={<SlidesMessage text={t("Slides.loadError")} />}
       className="flex min-h-0 flex-1 flex-col"
     >
       <ol
         ref={listRef}
-        aria-label="الشرائح"
+        aria-label={t("slides")}
         className="no-scrollbar flex min-h-0 flex-1 gap-3 overflow-x-auto px-1.5 py-1 md:flex-col md:overflow-x-hidden md:overflow-y-auto"
       >
         {Array.from({ length: numPages }, (_, i) => i + 1).map((p) => {
@@ -155,7 +160,7 @@ export function SlidesPane({
                   type="button"
                   onClick={() => setPicked({ page: p, agentPage })}
                   aria-current={open ? "true" : undefined}
-                  aria-label={`الشريحة ${p}`}
+                  aria-label={t("Slides.slide", { number: number(p) })}
                   /* الحاوية تقصّ ما خارجها، فالحلقة ترتسم داخل الزرّ */
                   className="block w-full focus-visible:outline-offset-[-3px]"
                 >
@@ -185,8 +190,8 @@ export function SlidesPane({
                   <button
                     type="button"
                     onClick={() => setZoom(p)}
-                    aria-label={`كبّر الشريحة ${p}`}
-                    title="تكبير"
+                    aria-label={t("Slides.enlargeSlide", { number: number(p) })}
+                    title={t("Slides.enlarge")}
                     className="group/zoom flex h-11 w-11 items-center justify-center pointer-fine:md:h-8 pointer-fine:md:w-8"
                   >
                     <span className="flex h-7 w-7 items-center justify-center rounded-pill bg-ground/85 text-ink-2 transition-colors group-hover/zoom:text-ink">
@@ -201,10 +206,10 @@ export function SlidesPane({
                     <button
                       type="button"
                       aria-disabled
-                      title="قريبًا"
+                      title={t("comingSoon")}
                       className="inline-flex min-h-11 items-center rounded-pill border border-dashed border-ink-3 bg-ground/85 px-3 text-xs font-bold text-ink-2"
                     >
-                      ابدأ الشرح من هنا — قريبًا
+                      {t("Slides.startHereSoon")}
                     </button>
                   </div>
                 ) : null}
@@ -224,13 +229,13 @@ export function SlidesPane({
           <div data-theme="dark" data-surface="session" className="text-ink">
             <Dialog.Content
               aria-describedby={undefined}
-              /* الأسهم في RTL: اليسار «التالية» واليمين «السابقة» */
+              /* الأسهم تتبع لغة الواجهة، لا لغة الشرح داخل السبورة. */
               onKeyDown={(e) => {
                 if (zoom === null) return;
                 const target =
-                  e.key === "ArrowLeft"
+                  e.key === (locale === "ar" ? "ArrowLeft" : "ArrowRight")
                     ? zoom + 1
-                    : e.key === "ArrowRight"
+                    : e.key === (locale === "ar" ? "ArrowRight" : "ArrowLeft")
                       ? zoom - 1
                       : e.key === "Home"
                         ? 1
@@ -246,10 +251,10 @@ export function SlidesPane({
               {/* العدّاد المرئي واحد — تحت الشريحة قرب الإبهام؛ العنوان للقارئ الصوتي */}
               <div className="mx-auto flex w-full max-w-5xl items-center justify-end gap-3 pb-2">
                 <Dialog.Title className="sr-only">
-                  الشريحة {zoom} من {numPages}
+                  {t("Slides.slideOf", { number: number(zoom ?? 1), total: number(numPages) })}
                 </Dialog.Title>
                 <Dialog.Close
-                  aria-label="أغلق التكبير"
+                  aria-label={t("Slides.closeZoom")}
                   className="flex h-11 w-11 items-center justify-center rounded-pill text-ink-2 transition-colors hover:bg-surface hover:text-ink pointer-fine:md:h-8 pointer-fine:md:w-8"
                 >
                   <ShrinkIcon className="h-4 w-4" />
@@ -280,21 +285,21 @@ export function SlidesPane({
               </div>
 
               {/* التنقّل تحت الشريحة — في متناول الإبهام (نمط 10).
-                  السابقة في بداية السطر (يمين) والتالية في نهايته (يسار). */}
+                  السابقة في بداية السطر والتالية في نهايته. */}
               {zoom !== null ? (
                 <div className="mx-auto flex w-full max-w-5xl items-center justify-center gap-4 pt-3">
                   <ZoomNav
-                    label="الشريحة السابقة"
+                    label={t("Slides.previous")}
                     disabled={zoom <= 1}
                     onClick={() => go(zoom - 1)}
                   >
-                    <ArrowForward className="h-5 w-5 rotate-180" />
+                    <ArrowBack className="h-5 w-5" />
                   </ZoomNav>
                   <p aria-live="polite" className="min-w-20 text-center text-sm font-semibold text-ink">
-                    {zoom} من {numPages}
+                    {t("Slides.pageOf", { number: number(zoom), total: number(numPages) })}
                   </p>
                   <ZoomNav
-                    label="الشريحة التالية"
+                    label={t("Slides.next")}
                     disabled={zoom >= numPages}
                     onClick={() => go(zoom + 1)}
                   >

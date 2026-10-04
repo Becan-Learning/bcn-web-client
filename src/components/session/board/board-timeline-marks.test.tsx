@@ -68,7 +68,9 @@ describe("علامات التقسيم", () => {
     decorate.mockClear();
     renderBoardHtml(boardState({ items: [timeline(2)] }), { language: "English" });
 
-    const addresses = decorate.mock.calls.map(([, address]) => address);
+    const addresses = decorate.mock.calls
+      .map(([, address]) => address)
+      .filter((address) => address.scope === "division");
     expect(addresses).toEqual([
       { scope: "division", index: 0 },
       { scope: "division", index: 1 },

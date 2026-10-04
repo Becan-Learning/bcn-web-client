@@ -38,7 +38,7 @@ export function EquationItem({ item, language }: BoardKindProps<"equation">) {
 
   if (rendered === null) {
     return <code dir="ltr" className={`min-w-0 max-w-full whitespace-pre-wrap text-sm text-ink-2 [overflow-wrap:anywhere] [unicode-bidi:isolate] ${payload.display ? "block" : "inline-block"}`}>
-      <RichText text={payload.latex} markup={false} pen={item.pen} spans={item.marks.filter((mark) => mark.scope === "span")} />
+      {payload.latex}
     </code>;
   }
 

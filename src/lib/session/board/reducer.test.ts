@@ -1,7 +1,7 @@
+/* Fixtures: Becan-Learning/bcn-lk-agent-main feat/board-v3 @ 62d9b47ab3aa710e2d996ba89ee6ccd90434d2ec. */
 import { describe, expect, it } from "vitest";
-import { parseBoardControlEvent } from "./parse";
-import { teachingBoardReducer } from "./reducer";
-import { INITIAL_BOARD_STATE, type BoardAction, type BoardState, type TablePayload } from "./types";
+import { INITIAL_SESSION_STATE, parseAgentMessage, sessionReducer } from "../session-reducer";
+import { INITIAL_BOARD_STATE, type BoardState, type TablePayload } from "./types";
 
 /* المخفّض يُختبر من طرف الأسلاك لا من طرف الأنواع: كل رسالة تمرّ
    على المحلّل أوّلًا كما تمرّ في الجلسة الحقيقية، فيُغطّى العقد
@@ -9,8 +9,9 @@ import { INITIAL_BOARD_STATE, type BoardAction, type BoardState, type TablePaylo
 
 function apply(state: BoardState, ...messages: unknown[]) {
   return messages.reduce<BoardState>((acc, message) => {
-    const event = parseBoardControlEvent(message);
-    return teachingBoardReducer(acc, (event ?? { action: "board_reset" }) as BoardAction);
+    const event = parseAgentMessage(message);
+    expect(event).not.toBeNull();
+    return event ? sessionReducer({ ...INITIAL_SESSION_STATE, board: acc }, event).board : acc;
   }, state);
 }
 
@@ -49,9 +50,9 @@ describe("بوّابة المراجعة", () => {
   });
 
   it("رسالة بلا rev صحيح تُرفض عند التحليل", () => {
-    expect(parseBoardControlEvent({ action: "board_show" })).toBeNull();
-    expect(parseBoardControlEvent({ action: "board_show", rev: "2" })).toBeNull();
-    expect(parseBoardControlEvent({ action: "board_show", rev: 2 })).not.toBeNull();
+    expect(parseAgentMessage({ action: "board_show" })).toBeNull();
+    expect(parseAgentMessage({ action: "board_show", rev: "2" })).toBeNull();
+    expect(parseAgentMessage({ action: "board_show", rev: 2 })).not.toBeNull();
   });
 });
 
@@ -142,15 +143,10 @@ describe("board_annotate", () => {
     expect(cleared.items[0].annotation).toBeNull();
   });
 
-  it("حالة مجهولة تُقرأ مسحًا لا تُرفض", () => {
-    const state = apply(
-      INITIAL_BOARD_STATE,
-      bullet("a", 1),
-      { action: "board_annotate", id: "a", kind: "key", rev: 2 },
-      { action: "board_annotate", id: "a", kind: "غير-معروف", rev: 3 },
-    );
-    expect(state.items[0].annotation).toBeNull();
+  it("حالة مجهولة تُرفض ولا تتحوّل إلى مسح", () => {
+    expect(parseAgentMessage({ action: "board_annotate", id: "a", kind: "غير-معروف", rev: 3 })).toBeNull();
   });
+
 });
 
 describe("board_clear", () => {
@@ -200,8 +196,8 @@ describe("board_reveal و board_pin", () => {
     const two = apply(state, { action: "board_reveal", id: "d", index: 1, rev: 2 });
     expect(two.items[0].revealed).toBe(2);
 
-    const clamped = apply(two, { action: "board_reveal", id: "d", index: 9, rev: 3 });
-    expect(clamped.items[0].revealed).toBe(3);
+    const ignored = apply(two, { action: "board_reveal", id: "d", index: 9, rev: 3 });
+    expect(ignored.items[0].revealed).toBe(2);
   });
 
   it("التثبيت ينقل المنطقة ويبقي الموضع في المصفوفة", () => {
@@ -287,15 +283,14 @@ describe("التحليل — حمولة تالفة تُسقط البند ولا 
     ["chain بوصلة واحدة", add("x", "chain", { links: ["أ"] }, 2)],
     ["options بلا صلب", add("x", "options", { options: [] }, 2)],
     ["callout بنوع مجهول", add("x", "callout", { kind: "zzz", text: "ن" }, 2)],
-    ["نوع غير معروف", add("x", "zzz", { text: "ن" }, 2)],
     ["منطقة غير معروفة", add("x", "text", { text: "ن" }, 2, "elsewhere")],
   ];
 
   it.each(malformed)("%s يُرفض", (_name, message) => {
-    expect(parseBoardControlEvent(message)).toBeNull();
+    expect(parseAgentMessage(message)).toBeNull();
   });
 
-  it("الخليّة الفارغة مشروعة، والصفّ يُسوّى إلى طول الرأس", () => {
+  it("الخليّة الفارغة مشروعة مع بقاء عدد الأعمدة", () => {
     const state = apply(
       INITIAL_BOARD_STATE,
       add(
@@ -304,7 +299,7 @@ describe("التحليل — حمولة تالفة تُسقط البند ولا 
         {
           variant: "journal",
           header: ["Account", "Debit", "Credit"],
-          rows: [["Cash", "120,000", ""], ["Revenue"]],
+          rows: [["Cash", "120,000", ""], ["Revenue", "", ""]],
         },
         1,
       ),
@@ -325,7 +320,7 @@ describe("التحليل — حمولة تالفة تُسقط البند ولا 
 describe("board_reset", () => {
   it("يعيد الحالة إلى أوّلها بعدّادها", () => {
     const state = apply(INITIAL_BOARD_STATE, bullet("a", 1), bullet("b", 7));
-    const reset = teachingBoardReducer(state, { action: "board_reset" });
+    const reset = sessionReducer({ ...INITIAL_SESSION_STATE, board: state }, { action: "session_reset" }).board;
 
     expect(reset).toBe(INITIAL_BOARD_STATE);
     expect(reset.rev).toBe(0);

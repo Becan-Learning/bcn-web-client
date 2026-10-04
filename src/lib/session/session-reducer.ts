@@ -27,6 +27,8 @@ export type SessionState = {
   checkpoint: Checkpoint | null;
   /** الوكيل أعلن بلوغ الحدّ الزمني */
   ending: boolean;
+  /** سببٌ تشخيصيّ من الوكيل، لا يُعرض لأنه لا يتبع لغة الطالب */
+  endingMessage: string | null;
 };
 
 export const INITIAL_SESSION_STATE: SessionState = {
@@ -37,6 +39,7 @@ export const INITIAL_SESSION_STATE: SessionState = {
   completedLessons: [],
   checkpoint: null,
   ending: false,
+  endingMessage: null,
 };
 
 export type AgentMessage = BoardAction | UIControlEvent;
@@ -94,7 +97,7 @@ export function sessionReducer(
       return { ...state, topic: null };
 
     case "session_ending":
-      return state.ending ? state : { ...state, ending: true };
+      return { ...state, ending: true, endingMessage: action.message };
 
     default: {
       const board = teachingBoardReducer(state.board, action);

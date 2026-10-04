@@ -214,8 +214,11 @@ function SessionScreen({
       const message = parseAgentMessage(parsed);
       if (message) dispatch(message);
     };
+    const onDisconnected = () => dispatch({ action: "board_reset" });
+    room.on(RoomEvent.Disconnected, onDisconnected);
     room.on(RoomEvent.DataReceived, onData);
     return () => {
+      room.off(RoomEvent.Disconnected, onDisconnected);
       room.off(RoomEvent.DataReceived, onData);
     };
   }, [session.room]);

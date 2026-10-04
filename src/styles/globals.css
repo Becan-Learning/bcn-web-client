@@ -752,3 +752,5 @@
     transition: none;
   }
 }
+
+@import "./board-l3.css";

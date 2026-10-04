@@ -1,4 +1,4 @@
-import type { AnnotationKind, CalloutKind } from "@/lib/session/teaching-board";
+import type { AnnotationKind, CalloutKind, MarkState, Stage } from "@/lib/session/teaching-board";
 import type { ExplanationLanguage } from "../explanation-language";
 
 /* ألفاظ السبورة كلام المعلّم فتتبع لغة الشرح، لا الواجهة؛
@@ -24,6 +24,7 @@ export const CALLOUT_LABEL: Record<CalloutKind, Record<ExplanationLanguage, stri
   definition: { Arabic: "تعريف", English: "Definition" },
   example: { Arabic: "مثال", English: "Example" },
   exam: { Arabic: "يجي في الاختبار", English: "In the exam" },
+  verbatim: { Arabic: "بنص الكتاب", English: "Textbook text" },
 };
 
 export const BLANK_LABEL = { Arabic: "فراغ", English: "blank" } as const;
@@ -32,3 +33,23 @@ export const OPTION_LABELS = {
   Arabic: ["A", "B", "C", "D", "E", "F"],
   English: ["A", "B", "C", "D", "E", "F"],
 } as const;
+
+export const STAGE_LABEL: Record<Stage, Record<ExplanationLanguage, string>> = {
+  worked: { Arabic: "أنا أشاهد", English: "I'm watching" },
+  faded: { Arabic: "أنا أملأ", English: "I'm filling in" },
+  try: { Arabic: "هذا لي", English: "This one is mine" },
+};
+
+export const EXAMPLE_LABEL = { Arabic: "مثال", English: "Example" } as const;
+
+export const MARK_LABEL: Record<MarkState, Record<ExplanationLanguage, string>> = {
+  highlight: { Arabic: "مُبرَز", English: "Highlighted" },
+  correct: { Arabic: "إجابة صحيحة", English: "Correct" },
+  wrong: { Arabic: "إجابة خاطئة", English: "Wrong" },
+  dim: { Arabic: "أقل بروزًا", English: "Dimmed" },
+  strike: { Arabic: "مشطوب", English: "Struck through" },
+  focus: { Arabic: "انظر هنا", English: "Focus here" },
+};
+
+export const UNKNOWN_ICON_LABEL = { Arabic: "رمز غير معروف", English: "Unknown icon" } as const;
+export const UNSUPPORTED_LABEL = { Arabic: "عنصر غير مدعوم", English: "Unsupported item" } as const;

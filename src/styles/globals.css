@@ -655,3 +655,119 @@
     transform: none !important;
   }
 }
+
+/* أقلام السبورة حدودٌ هادئة لا تعيد تلوين المتن.
+   mark: --bcn-ink بخط متصل، construct: --bcn-ink-2 بخط متصل،
+   flow: --bcn-ink-2 بخط متقطع، trap: --bcn-warmth بخط مزدوج سميك،
+   alt: --bcn-ink بخط منقّط. ثلاثة أحبار مشروعة لا تكفي خمسة أدوار،
+   لذلك يكمّل نمط الخط التمييز. الجوزي يحمل الحدّ فقط، والكهرماني
+   للفعل، والأخضر للصحيح، ولون الخطأ للإجابة الخاطئة وحدها. */
+[data-surface="session"] .chalkboard [data-pen="mark"] {
+  border-inline-start: 2px solid var(--bcn-ink);
+}
+[data-surface="session"] .chalkboard [data-pen="construct"] {
+  border-inline-start: 2px solid var(--bcn-ink-2);
+}
+[data-surface="session"] .chalkboard [data-pen="flow"] {
+  border-inline-start: 2px dashed var(--bcn-ink-2);
+}
+[data-surface="session"] .chalkboard [data-pen="trap"] {
+  border-inline-start: 4px double var(--bcn-warmth);
+}
+[data-surface="session"] .chalkboard [data-pen="alt"] {
+  border-inline-start: 3px dotted var(--bcn-ink);
+}
+
+[data-surface="session"] .chalkboard [data-mark-highlight] {
+  outline: 2px solid var(--bcn-ink);
+  outline-offset: 2px;
+}
+[data-surface="session"] .chalkboard [data-pen="mark"][data-mark-highlight],
+[data-surface="session"] .chalkboard :where([data-pen="mark"]) [data-mark-highlight] {
+  outline: 2px solid var(--bcn-ink);
+}
+[data-surface="session"] .chalkboard [data-pen="construct"][data-mark-highlight],
+[data-surface="session"] .chalkboard :where([data-pen="construct"]) [data-mark-highlight] {
+  outline: 2px solid var(--bcn-ink-2);
+}
+[data-surface="session"] .chalkboard [data-pen="flow"][data-mark-highlight],
+[data-surface="session"] .chalkboard :where([data-pen="flow"]) [data-mark-highlight] {
+  outline: 2px dashed var(--bcn-ink-2);
+}
+[data-surface="session"] .chalkboard [data-pen="trap"][data-mark-highlight],
+[data-surface="session"] .chalkboard :where([data-pen="trap"]) [data-mark-highlight] {
+  outline: 4px double var(--bcn-warmth);
+}
+[data-surface="session"] .chalkboard [data-pen="alt"][data-mark-highlight],
+[data-surface="session"] .chalkboard :where([data-pen="alt"]) [data-mark-highlight] {
+  outline: 3px dotted var(--bcn-ink);
+}
+
+/* مكان الأيقونة محجوز للصحيح والخاطئ؛ يضع المكوّن الرمز ولفظه
+   فيه، ويبقى المتن بحبره كي لا يحمل اللون وحده معنى التصحيح. */
+[data-surface="session"] .chalkboard [data-mark-answer] {
+  position: relative;
+  padding-inline-start: 1.75rem;
+}
+[data-surface="session"] .chalkboard [data-mark-answer="correct"] {
+  border-inline-end: 3px solid var(--bcn-success);
+}
+[data-surface="session"] .chalkboard [data-mark-answer="wrong"] {
+  border-inline-end: 3px solid var(--bcn-error);
+}
+[data-surface="session"] .chalkboard [data-mark-answer] > [data-mark-icon] {
+  position: absolute;
+  inset-inline-start: 0;
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+}
+[data-surface="session"] .chalkboard [data-mark-answer="correct"] > [data-mark-icon] {
+  color: var(--bcn-success);
+}
+[data-surface="session"] .chalkboard [data-mark-answer="wrong"] > [data-mark-icon] {
+  color: var(--bcn-error);
+}
+
+/* شفافية 0.7 تُظهر الخفوت دون تغيير الحبر: فوق --bcn-chalkboard،
+   تباين --bcn-ink هو 6.91:1 و--bcn-ink-2 هو 5.73:1 (كلاهما ≥ 4.5:1).
+   ورمزا --bcn-success و--bcn-error يبقيان 4.54:1 و3.82:1 (كلاهما ≥ 3:1).
+   القياس بمزج قنوات sRGB ثم حساب الإضاءة النسبية، والتعشيش لا يضاعف الخفوت. */
+[data-surface="session"] .chalkboard :is([data-mark-dim], [data-mark-dimmed-by-focus]) {
+  opacity: 0.7;
+}
+[data-surface="session"] .chalkboard :is([data-mark-dim], [data-mark-dimmed-by-focus]) :is([data-mark-dim], [data-mark-dimmed-by-focus]) {
+  opacity: 1;
+}
+[data-surface="session"] .chalkboard [data-mark-strike] {
+  text-decoration-line: line-through;
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--bcn-ink-2);
+}
+[data-surface="session"] .chalkboard [data-mark-focus] {
+  outline: 2px solid var(--bcn-ink);
+  outline-offset: 4px;
+}
+
+/* مراحل المثال تُقرأ من شكل الإطار حتى دون تمييز الألوان. */
+[data-surface="session"] .chalkboard [data-stage="worked"] {
+  border: 2px solid var(--bcn-ink-2);
+}
+[data-surface="session"] .chalkboard [data-stage="faded"] {
+  border: 2px dashed var(--bcn-ink-2);
+}
+[data-surface="session"] .chalkboard [data-stage="try"] {
+  border: 2px dotted var(--bcn-ink-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-surface="session"] .chalkboard :is([data-pen], [data-mark-highlight], [data-mark-answer], [data-mark-dim], [data-mark-strike], [data-mark-focus], [data-mark-dimmed-by-focus], [data-stage]) {
+    animation: none;
+    transition: none;
+  }
+}
+
+@import "./board-l2.css";
+
+@import "./board-l4.css";
+
+@import "./board-l3.css";

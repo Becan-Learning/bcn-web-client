@@ -1,0 +1,97 @@
+/* إلغاء العمل المنظَّم له إطار أيضًا، كي لا يضيع الشطب بين حقوله. */
+[data-surface="session"] .chalkboard [data-cancelled] {
+  border-block: 2px dashed var(--bcn-ink-2);
+  padding: 0.5rem;
+}
+[data-surface="session"] .chalkboard [data-cancelled]:not([data-pen]) {
+  border-inline-start: 2px dashed var(--bcn-ink-2);
+}
+[data-surface="session"] .chalkboard [data-cancelled]:not([data-mark-answer]) {
+  border-inline-end: 2px dashed var(--bcn-ink-2);
+}
+[data-surface="session"] .chalkboard [data-cancelled] :is(p, span, th, td, dt, dd, code) {
+  text-decoration-line: line-through;
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--bcn-ink-2);
+}
+
+[data-surface="session"] .chalkboard [data-board-row][data-mark-strike] :is(th, td, span) {
+  text-decoration-line: line-through;
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--bcn-ink-2);
+}
+
+/* رمز تصحيح الصفّ يعيش داخل أوّل خليّة حفاظًا على بنية الجدول. */
+[data-surface="session"] .chalkboard .board-mark-row[data-mark-answer] > :first-child {
+  padding-inline-start: 2rem;
+}
+[data-surface="session"] .chalkboard .board-mark-row[data-mark-answer] > :first-child[data-mark-answer] {
+  padding-inline-start: 3.5rem;
+}
+[data-surface="session"] .chalkboard .board-mark-row[data-mark-answer] > :first-child > [data-mark-icon] {
+  inset-inline-start: 1.5rem;
+}
+[data-surface="session"] .chalkboard .board-row-feedback > [data-mark-icon] {
+  position: absolute;
+  inset-inline-start: 0;
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+}
+[data-surface="session"] .chalkboard .board-mark-row[data-mark-answer="correct"] .board-row-feedback {
+  color: var(--bcn-success);
+}
+[data-surface="session"] .chalkboard .board-mark-row[data-mark-answer="wrong"] .board-row-feedback {
+  color: var(--bcn-error);
+}
+
+/* الأصناف هنا لا تُنشأ إلا من تغليف المصدر؛ الحبر الباقي يظل مقروءًا. */
+[data-surface="session"] .chalkboard .board-equation[data-equation-focus],
+[data-surface="session"] .chalkboard .board-equation .board-mark-dim {
+  color: var(--bcn-ink-2);
+}
+[data-surface="session"] .chalkboard .board-equation .board-mark-focus {
+  color: var(--bcn-ink);
+  outline: 2px solid var(--bcn-ink);
+  outline-offset: 3px;
+}
+[data-surface="session"] .chalkboard .board-mark-highlight {
+  outline: 2px solid var(--bcn-ink);
+  outline-offset: 2px;
+}
+[data-surface="session"] .chalkboard [data-pen="mark"].board-mark-highlight,
+[data-surface="session"] .chalkboard :where([data-pen="mark"]) .board-mark-highlight {
+  outline: 2px solid var(--bcn-ink);
+}
+[data-surface="session"] .chalkboard [data-pen="construct"].board-mark-highlight,
+[data-surface="session"] .chalkboard :where([data-pen="construct"]) .board-mark-highlight {
+  outline: 2px solid var(--bcn-ink-2);
+}
+[data-surface="session"] .chalkboard [data-pen="flow"].board-mark-highlight,
+[data-surface="session"] .chalkboard :where([data-pen="flow"]) .board-mark-highlight {
+  outline: 2px dashed var(--bcn-ink-2);
+}
+[data-surface="session"] .chalkboard [data-pen="trap"].board-mark-highlight,
+[data-surface="session"] .chalkboard :where([data-pen="trap"]) .board-mark-highlight {
+  outline: 4px double var(--bcn-warmth);
+}
+[data-surface="session"] .chalkboard [data-pen="alt"].board-mark-highlight,
+[data-surface="session"] .chalkboard :where([data-pen="alt"]) .board-mark-highlight {
+  outline: 3px dotted var(--bcn-ink);
+}
+[data-surface="session"] .chalkboard .board-equation .board-mark-correct {
+  border-block-end: 2px solid var(--bcn-success);
+}
+[data-surface="session"] .chalkboard .board-equation .board-mark-wrong {
+  border-block-end: 2px solid var(--bcn-error);
+}
+[data-surface="session"] .chalkboard .board-equation .board-mark-strike,
+[data-surface="session"] .chalkboard .board-equation .board-mark-strike span {
+  text-decoration-line: line-through;
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--bcn-ink-2);
+}
+[data-surface="session"] .chalkboard .board-equation .katex-display {
+  margin: 0;
+  inline-size: max-content;
+  min-inline-size: 100%;
+}

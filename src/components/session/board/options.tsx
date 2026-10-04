@@ -1,75 +1,39 @@
-import { ANNOTATION_LABEL, OPTION_LABELS } from "./labels";
-import { CheckIcon, CloseIcon } from "@/components/becan/icons";
-import type { OptionsPayload, SlotValue } from "@/lib/session/teaching-board";
-import type { ExplanationLanguage } from "../explanation-language";
+import { baseDecoration, decorate, decorationAttrs } from "@/lib/session/board/marks";
+import type { BoardKindProps } from "./kind-props";
+import { ANNOTATION_LABEL, MARK_LABEL, OPTION_LABELS } from "./labels";
+import { RichTextCore } from "./rich-text";
+import { MarkIcon } from "./table";
 
-/* الاختيار من متعدّد (§5.10).
+/* الطالب يجيب بصوته؛ لا تُقرأ صحة الخيار إلا من حالة منشورة.
+   الترقيم الأبجدي يستمر بعد الأسماء المختصرة في جدول الألفاظ. */
+function alphabeticLabel(index: number): string {
+  let label = "";
+  for (let value = index + 1; value > 0; value = Math.floor((value - 1) / 26)) {
+    label = String.fromCharCode(65 + (value - 1) % 26) + label;
+  }
+  return label;
+}
 
-   هذه الخيارات **ليست تفاعلية**: الطالب يجيب بصوته، والسبورة تعكس
-   النتيجة. فلا مستمع ضغطٍ عليها ولا دور لها في التحقّق — سؤال
-   `set_topic` سطحٌ آخر قائم بذاته.
-
-   وصحّة الخيار لا تصل الصفحة أصلًا (تُسقَط عند التحليل)، فلا يمكن
-   أن تتسرّب قبل الإجابة. الحالة تأتي وحدها بـ `board_update`.
-
-   والصحّ والخطأ لا يُبلَّغان باللون وحده: مع كلٍّ أيقونته. */
-
-const STATE_STYLE = {
-  correct: { tone: "text-live", ring: "border-live" },
-  wrong: { tone: "text-error", ring: "border-error" },
-} as const;
-
-/* الأيقونة `aria-hidden` واللون لا يُنطق، فيُنطق الحال نصًّا مخفيًا */
-
-export function OptionsItem({
-  payload,
-  slots,
-  language,
-}: {
-  payload: OptionsPayload;
-  slots: Record<string, SlotValue>;
-  language: ExplanationLanguage;
-}) {
+export function OptionsItem({ item, language }: BoardKindProps<"options">) {
+  const spans = item.marks.filter((mark) => mark.scope === "span");
   return (
-    <div className="flex flex-col gap-2.5">
+    <div className="flex min-w-0 flex-col gap-2.5 [overflow-wrap:anywhere]">
       <p dir="auto" className="leading-base font-semibold text-ink">
-        {payload.stem}
+        <RichTextCore wrap="none" text={item.payload.stem} markup pen={item.pen} spans={spans} />
       </p>
-      <ul className="flex flex-col gap-1.5">
-        {payload.options.map((option, i) => {
-          const state = slots[option.id]?.state;
-          const style =
-            state === "correct" || state === "wrong" ? STATE_STYLE[state] : null;
-
-          return (
-            <li key={option.id} className="flex items-baseline gap-2.5">
-              <span
-                dir="ltr"
-                lang="en"
-                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border text-xs font-bold ${
-                  style ? `${style.ring} ${style.tone}` : "border-ink-3 text-ink-2"
-                }`}
-              >
-                {OPTION_LABELS[language][i] ?? i + 1}
-              </span>
-              <span
-                dir="auto"
-                className={`min-w-0 leading-base ${style ? style.tone : "text-ink"}`}
-              >
-                {option.text}
-              </span>
-              {state === "correct" || state === "wrong" ? (
-                <>
-                  <span className="sr-only">{ANNOTATION_LABEL[state]?.[language]}</span>
-                  {state === "correct" ? (
-                    <CheckIcon className="h-4 w-4 shrink-0 text-live" />
-                  ) : (
-                    <CloseIcon className="h-4 w-4 shrink-0 text-error" />
-                  )}
-                </>
-              ) : null}
-            </li>
-          );
+      <ul className="flex min-w-0 flex-col gap-2">
+        {item.payload.options.map((option, index) => {
+          const state = item.slots[option.id]?.state;
+          const decoration = decorate(item, { scope: "option", option: option.id }, baseDecoration(state));
+          return <li key={option.id} data-board-option={option.id} {...decorationAttrs(decoration)} aria-current={state === "key" ? true : undefined} className="relative flex min-w-0 items-baseline gap-2.5 py-1">
+            <MarkIcon answer={decoration.answer} language={language} />
+            <span dir="ltr" lang="en" className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-sm border border-ink-3 px-1 text-xs font-bold text-ink-2">
+              {OPTION_LABELS[language][index] ?? alphabeticLabel(index)}
+            </span>
+            <span dir="auto" className="min-w-0 leading-base text-ink"><RichTextCore wrap="none" text={option.text} markup pen={item.pen} spans={spans} /></span>
+            {state === "broken" ? <span className="sr-only">{ANNOTATION_LABEL.broken?.[language]}</span> : null}
+            {state === "key" ? <span className="sr-only">{MARK_LABEL.highlight[language]}</span> : null}
+          </li>;
         })}
       </ul>
     </div>

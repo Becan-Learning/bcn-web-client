@@ -1,57 +1,42 @@
+import { useState } from "react";
+import { spanMarks } from "@/lib/session/board/rich-text";
 import type { BoardKindProps } from "./kind-props";
+import { RichTextCore } from "./rich-text";
+import { Accent } from "./text-kinds";
 
-/* التعريف يُكشف مقطعًا مقطعًا مع الصوت (§5.2).
+/* التعريف يُكشف مقطعًا مقطعًا مع الصوت (§5.6).
 
-   المقاطع كلها مرسومة من أول لحظة، وغير المكشوف منها `invisible`:
-   بذلك يُحجز ارتفاع الفقرة كاملًا فلا يقفز ما تحتها عند كل كشف،
-   ولا يبلغ القارئَ الصوتي ما لم يُنطَق بعد.
+   ما لم يُكشف بعدُ **لا يُرسم أصلًا**: لا في شجرة الوصول ولا في
+   مصدر الصفحة ولا في تلميح، فلا يسبق النصُّ نطقَه. والكشف يضيف
+   مقطعًا في آخر الفقرة فلا يتحرّك ما فوقه، فلا يُحجز له ارتفاعٌ.
 
-   ولا مؤقّتات هنا: الوكيل يوقّت كل عملية على الصوت المنطوق، وأي
-   تأخير من الصفحة يضاعف التوقيت ويفكّ التزامن (§1). */
-
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-/** يُبرز كلمات الاختبار داخل المقطع — مطابقة بلا حساسية لحالة الأحرف ولا اشتقاق */
-function emphasise(chunk: string, keyWords: string[]) {
-  const words = keyWords.filter((word) => word.trim().length > 0);
-  if (words.length === 0) return chunk;
-
-  const pattern = new RegExp(`(${words.map(escapeRegExp).join("|")})`, "gi");
-
-  return chunk.split(pattern).map((part, i) =>
-    /* الأجزاء الفردية هي المُلتقَطة — المطابقة لا الفاصل بينها */
-    i % 2 === 1 ? (
-      <strong key={i} className="font-bold text-ink">
-        {part}
-      </strong>
-    ) : (
-      part
-    ),
-  );
-}
-
+   المقاطع حقول مستقلّة: كلمات الاختبار وعلامات المقاطع تُطابَق في
+   كلٍّ منها وحده، ولا وسوم فيها. ولا مؤقّتات هنا: الوكيل يوقّت
+   كل عملية على الصوت المنطوق، وأي تأخير من الصفحة يضاعف التوقيت
+   ويفكّ التزامن (§1). */
 export function DefinitionItem({ item }: BoardKindProps<"definition">) {
   const { payload, revealed } = item;
+  const spans = spanMarks(item.marks);
+  /* ما كان ظاهرًا لحظة وصول البند (إضافة أو استعادة لقطة) لا يُعاد
+     إظهاره بحركة؛ يتحرّك المقطع الذي يُكشف بعدها فقط. */
+  const [settled] = useState(revealed);
+
   return (
-    <p dir="auto" className="leading-base text-ink">
-      {payload.chunks.map((chunk, i) => {
-        const shown = i < revealed;
-        return (
-          <span
-            key={i}
-            aria-hidden={shown ? undefined : "true"}
-            className={
-              shown
-                ? "opacity-100 transition-opacity duration-300"
-                : "invisible opacity-0"
-            }
-          >
-            {emphasise(chunk, payload.keyWords)}{" "}
+    <Accent pen={item.pen}>
+      <p dir="auto" className="leading-base text-ink">
+        {payload.chunks.slice(0, Math.max(revealed, 0)).map((chunk, i) => (
+          <span key={i} className={i < settled ? undefined : "animate-board-in"}>
+            <RichTextCore
+              wrap="none"
+              text={chunk}
+              markup={false}
+              pen={item.pen}
+              spans={spans}
+              emphasis={payload.keyWords}
+            />{" "}
           </span>
-        );
-      })}
-    </p>
+        ))}
+      </p>
+    </Accent>
   );
 }

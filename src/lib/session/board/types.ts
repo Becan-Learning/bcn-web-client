@@ -237,6 +237,17 @@ export type BoardControlEvent =
       rev: number;
     }
   | { action: "board_annotate"; id: string; kind: AnnotationKind | null; rev: number }
+  | {
+      action: "board_mark";
+      id: string;
+      scope: MarkScope;
+      index: number | null;
+      cell: [number, number] | null;
+      option: string | null;
+      match: string | null;
+      state: MarkState | "clear";
+      rev: number;
+    }
   | { action: "board_remove"; id: string; rev: number }
   /** `index` رقم المقطع الذي ظهر للتوّ (من 0) */
   | { action: "board_reveal"; id: string; index: number; rev: number }

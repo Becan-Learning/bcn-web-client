@@ -56,6 +56,7 @@ import {
   type TopicState,
 } from "./parts";
 import { useIsMobile } from "./use-is-mobile";
+import { PacketRecorderButtons, usePacketRecorder } from "./use-packet-recorder";
 
 /* شاشة الجلسة — تخطيط becan-design (عمود الدروس · السبورة · الشرائح)
    يقوده وكيل LiveKit الحقيقي من old-sanad.
@@ -171,6 +172,8 @@ function SessionScreen({
   const agent = useAgent(session);
   const micTrack = useTrackToggle({ source: Track.Source.Microphone });
   const [state, dispatch] = useReducer(sessionReducer, INITIAL_SESSION_STATE);
+  const recorder = usePacketRecorder();
+  const { record } = recorder;
 
   const [started, setStarted] = useState(false);
   const [starting, setStarting] = useState(false);
@@ -211,6 +214,7 @@ function SessionScreen({
       } catch {
         return;
       }
+      record(parsed, room.name);
       const message = parseAgentMessage(parsed);
       if (message) dispatch(message);
     };
@@ -218,7 +222,7 @@ function SessionScreen({
     return () => {
       room.off(RoomEvent.DataReceived, onData);
     };
-  }, [session.room]);
+  }, [session.room, record]);
 
   /* مغادرة الصفحة بلا خروج صريح لا تترك الغرفة مفتوحة */
   useEffect(
@@ -535,6 +539,7 @@ function SessionScreen({
       />
 
       <RoomAudioRenderer />
+      <PacketRecorderButtons recorder={recorder} />
     </Shell>
   );
 }

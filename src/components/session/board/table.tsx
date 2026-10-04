@@ -4,7 +4,7 @@ import type { TableCell } from "@/lib/session/teaching-board";
 import type { ExplanationLanguage } from "../explanation-language";
 import type { BoardKindProps } from "./kind-props";
 import { MARK_LABEL } from "./labels";
-import { RichText } from "./rich-text";
+import { RichTextCore } from "./rich-text";
 
 /** الرمز ولفظه يصاحبان التصحيح، حتى في الخليّة الفارغة. */
 export function MarkIcon({ answer, language }: { answer: Decoration["answer"]; language: ExplanationLanguage }) {
@@ -12,7 +12,7 @@ export function MarkIcon({ answer, language }: { answer: Decoration["answer"]; l
   return (
     <span data-mark-icon="">
       {answer === "correct" ? <CheckIcon className="h-5 w-5" /> : <CloseIcon className="h-5 w-5" />}
-      <span className="sr-only">{MARK_LABEL[answer][language]}</span>
+      <span dir="auto" className="sr-only">{MARK_LABEL[answer][language]}</span>
     </span>
   );
 }
@@ -27,11 +27,11 @@ export function TableItem({ item, language }: BoardKindProps<"table">) {
   const cell = (value: TableCell, row: number | null, col: number) => row === null
     ? { highlight: false, answer: null, dim: false, strike: false, focus: false, dimmedByFocus: false, ...baseDecoration(value.state) } satisfies Decoration
     : decorate(item, { scope: "cell", cell: [row, col] }, baseDecoration(value.state));
-  const text = (value: string) => <RichText text={value} markup pen={item.pen} spans={spans} />;
+  const text = (value: string) => <RichTextCore wrap="none" text={value} markup pen={item.pen} spans={spans} />;
   const header = (value: TableCell, col: number) => {
     const decoration = cell(value, null, col);
     return (
-      <span {...decorationAttrs(decoration)} className="relative block min-w-0 font-bold text-ink-2">
+      <span dir="auto" {...decorationAttrs(decoration)} className="relative block min-w-0 font-bold text-ink-2">
         <MarkIcon answer={decoration.answer} language={language} />
         {payload.numberedColumns ? <span className="block text-xs tabular-nums">{col + 1}</span> : null}
         {text(value.text)}
@@ -44,7 +44,7 @@ export function TableItem({ item, language }: BoardKindProps<"table">) {
     return (
       <span {...decorationAttrs(decoration)} data-board-cell={`${row}:${col}`} className="relative block min-h-[1.75em] min-w-0 text-ink">
         <MarkIcon answer={decoration.answer} language={language} />
-        <span dir={numeric ? "ltr" : undefined} className={numeric ? "block text-end tabular-nums [unicode-bidi:isolate]" : undefined}>
+        <span dir={numeric ? "ltr" : "auto"} className={numeric ? "block text-end tabular-nums [unicode-bidi:isolate]" : "block"}>
           {text(value.text)}
         </span>
       </span>
@@ -73,7 +73,6 @@ export function TableItem({ item, language }: BoardKindProps<"table">) {
                 const columnDecoration = column(col);
                 return <td key={col} data-board-column={col} {...decorationAttrs(columnDecoration)} className="relative px-3 py-2 align-top leading-base">
                   {col === 0 ? <span className="board-row-feedback"><MarkIcon answer={decoration.answer} language={language} /></span> : null}
-                  <MarkIcon answer={columnDecoration.answer} language={language} />
                   {content(value, index, col)}
                 </td>;
               })}

@@ -7,7 +7,7 @@ import { Accent } from "./text-kinds";
    لكنها تبقى في تدفّق اللوح مقروءةً دون نقر — لا تلميح ولا طيّ. */
 export function NoteItem({ item }: BoardKindProps<"note">) {
   return (
-    <Accent pen={item.pen}>
+    <Accent>
       <p dir="auto" className="text-sm leading-base text-ink-2">
         <RichTextCore
           wrap="none"

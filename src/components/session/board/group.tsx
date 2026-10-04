@@ -4,6 +4,7 @@ import type { BoardGroup, Stage } from "@/lib/session/teaching-board";
 import type { ExplanationLanguage } from "../explanation-language";
 import { EXAMPLE_LABEL, STAGE_LABEL } from "./labels";
 import { RichText } from "./rich-text";
+import { BoardPresence } from "./presence";
 
 /* حاوية المجموعة (§2.1) — إطارٌ وعنوانٌ ووسمان، والأعضاء يضعهم مَن يرسمها.
 
@@ -57,11 +58,13 @@ export function GroupShell({
   group,
   language,
   children,
+  reduce,
 }: {
   group: BoardGroup;
   language: ExplanationLanguage;
   /** null لحاويةٍ بلا أعضاء: يُرسم عنوانها وحده */
   children: ReactNode;
+  reduce: boolean;
 }) {
   return (
     <li
@@ -95,7 +98,11 @@ export function GroupShell({
           <RichText text={group.heading} markup={false} pen={null} spans={[]} />
         </p>
       </div>
-      {children ? <ul className={membersClass(group)}>{children}</ul> : null}
+      <BoardPresence reduce={reduce}>
+        {children ? <ul key={group.id} className={membersClass(group)}>
+          <BoardPresence reduce={reduce}>{children}</BoardPresence>
+        </ul> : null}
+      </BoardPresence>
     </li>
   );
 }

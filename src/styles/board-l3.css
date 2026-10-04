@@ -54,20 +54,28 @@
   outline: 2px solid var(--bcn-ink);
   outline-offset: 3px;
 }
-[data-surface="session"] .chalkboard .board-equation .board-mark-highlight {
+[data-surface="session"] .chalkboard .board-mark-highlight {
   outline: 2px solid var(--bcn-ink);
   outline-offset: 2px;
 }
-[data-surface="session"] .chalkboard [data-pen="construct"] .board-mark-highlight {
-  outline-color: var(--bcn-ink-2);
+[data-surface="session"] .chalkboard [data-pen="mark"].board-mark-highlight,
+[data-surface="session"] .chalkboard :where([data-pen="mark"]) .board-mark-highlight {
+  outline: 2px solid var(--bcn-ink);
 }
-[data-surface="session"] .chalkboard [data-pen="flow"] .board-mark-highlight {
+[data-surface="session"] .chalkboard [data-pen="construct"].board-mark-highlight,
+[data-surface="session"] .chalkboard :where([data-pen="construct"]) .board-mark-highlight {
+  outline: 2px solid var(--bcn-ink-2);
+}
+[data-surface="session"] .chalkboard [data-pen="flow"].board-mark-highlight,
+[data-surface="session"] .chalkboard :where([data-pen="flow"]) .board-mark-highlight {
   outline: 2px dashed var(--bcn-ink-2);
 }
-[data-surface="session"] .chalkboard [data-pen="trap"] .board-mark-highlight {
+[data-surface="session"] .chalkboard [data-pen="trap"].board-mark-highlight,
+[data-surface="session"] .chalkboard :where([data-pen="trap"]) .board-mark-highlight {
   outline: 4px double var(--bcn-warmth);
 }
-[data-surface="session"] .chalkboard [data-pen="alt"] .board-mark-highlight {
+[data-surface="session"] .chalkboard [data-pen="alt"].board-mark-highlight,
+[data-surface="session"] .chalkboard :where([data-pen="alt"]) .board-mark-highlight {
   outline: 3px dotted var(--bcn-ink);
 }
 [data-surface="session"] .chalkboard .board-equation .board-mark-correct {

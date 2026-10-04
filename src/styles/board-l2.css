@@ -13,10 +13,3 @@
 [data-surface="session"] .chalkboard [data-rt-continued] {
   padding-inline-start: 0;
 }
-
-/* لفظ الحال للقارئ الصوتي يصل بلغتين ويُسقَط ما يخالف `lang` غلاف
-   السبورة، فلا يُنطق إلا لفظ لغة الشرح. */
-[data-surface="session"] .chalkboard:lang(ar) [data-cue-lang="en"],
-[data-surface="session"] .chalkboard:lang(en) [data-cue-lang="ar"] {
-  display: none;
-}

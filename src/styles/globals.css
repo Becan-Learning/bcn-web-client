@@ -682,16 +682,24 @@
   outline: 2px solid var(--bcn-ink);
   outline-offset: 2px;
 }
-[data-surface="session"] .chalkboard :is([data-pen="construct"][data-mark-highlight], [data-pen="construct"] [data-mark-highlight]) {
-  outline-color: var(--bcn-ink-2);
+[data-surface="session"] .chalkboard [data-pen="mark"][data-mark-highlight],
+[data-surface="session"] .chalkboard :where([data-pen="mark"]) [data-mark-highlight] {
+  outline: 2px solid var(--bcn-ink);
 }
-[data-surface="session"] .chalkboard :is([data-pen="flow"][data-mark-highlight], [data-pen="flow"] [data-mark-highlight]) {
+[data-surface="session"] .chalkboard [data-pen="construct"][data-mark-highlight],
+[data-surface="session"] .chalkboard :where([data-pen="construct"]) [data-mark-highlight] {
+  outline: 2px solid var(--bcn-ink-2);
+}
+[data-surface="session"] .chalkboard [data-pen="flow"][data-mark-highlight],
+[data-surface="session"] .chalkboard :where([data-pen="flow"]) [data-mark-highlight] {
   outline: 2px dashed var(--bcn-ink-2);
 }
-[data-surface="session"] .chalkboard :is([data-pen="trap"][data-mark-highlight], [data-pen="trap"] [data-mark-highlight]) {
+[data-surface="session"] .chalkboard [data-pen="trap"][data-mark-highlight],
+[data-surface="session"] .chalkboard :where([data-pen="trap"]) [data-mark-highlight] {
   outline: 4px double var(--bcn-warmth);
 }
-[data-surface="session"] .chalkboard :is([data-pen="alt"][data-mark-highlight], [data-pen="alt"] [data-mark-highlight]) {
+[data-surface="session"] .chalkboard [data-pen="alt"][data-mark-highlight],
+[data-surface="session"] .chalkboard :where([data-pen="alt"]) [data-mark-highlight] {
   outline: 3px dotted var(--bcn-ink);
 }
 
@@ -720,10 +728,15 @@
   color: var(--bcn-error);
 }
 
-/* توكن الحبر المخفوت مقيس على اللوح، بخلاف شفافية تُضعف التباين. */
+/* شفافية 0.7 تُظهر الخفوت دون تغيير الحبر: فوق --bcn-chalkboard،
+   تباين --bcn-ink هو 6.91:1 و--bcn-ink-2 هو 5.73:1 (كلاهما ≥ 4.5:1).
+   ورمزا --bcn-success و--bcn-error يبقيان 4.54:1 و3.82:1 (كلاهما ≥ 3:1).
+   القياس بمزج قنوات sRGB ثم حساب الإضاءة النسبية، والتعشيش لا يضاعف الخفوت. */
 [data-surface="session"] .chalkboard :is([data-mark-dim], [data-mark-dimmed-by-focus]) {
-  --bcn-ink: var(--bcn-ink-2);
-  color: var(--bcn-ink);
+  opacity: 0.7;
+}
+[data-surface="session"] .chalkboard :is([data-mark-dim], [data-mark-dimmed-by-focus]) :is([data-mark-dim], [data-mark-dimmed-by-focus]) {
+  opacity: 1;
 }
 [data-surface="session"] .chalkboard [data-mark-strike] {
   text-decoration-line: line-through;

@@ -105,7 +105,7 @@ export function CalloutItem({ item, language }: BoardKindProps<"callout">) {
         </span>
       </p>
       {/* قلم البند حدٌّ على النصّ لا على الإطار: للإطار هويّته من نوع النداء */}
-      <Accent pen={item.pen}>
+      <Accent>
         {verbatim ? (
           <blockquote dir="auto" className={bodyClass}>
             {body}

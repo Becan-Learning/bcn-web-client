@@ -14,25 +14,31 @@
   }
 }
 
-/* قلم الأيقونة حلقةٌ حول الرسم بنمط القلم نفسه في الأنماط المشتركة
+/* قلم الأيقونة والواصق حلقةٌ حول الرسم بنمط القلم نفسه في الأنماط المشتركة
    (متصل · متقطع · مزدوج · منقّط)، فيُقرأ القلم من شكل الحلقة قبل لونها.
    وبلا قلم تبقى حلقةٌ هادئة بلون الحدّ. */
-[data-surface="session"] .chalkboard [data-icon-glyph] {
+[data-surface="session"] .chalkboard [data-icon-glyph],
+[data-surface="session"] .chalkboard [data-marker] {
   border: 1px solid var(--bcn-chalkboard-edge);
 }
-[data-surface="session"] .chalkboard [data-icon-glyph][data-icon-pen="mark"] {
+[data-surface="session"] .chalkboard [data-icon-glyph][data-icon-pen="mark"],
+[data-surface="session"] .chalkboard [data-marker][data-pen="mark"] {
   border: 2px solid var(--bcn-ink);
 }
-[data-surface="session"] .chalkboard [data-icon-glyph][data-icon-pen="construct"] {
+[data-surface="session"] .chalkboard [data-icon-glyph][data-icon-pen="construct"],
+[data-surface="session"] .chalkboard [data-marker][data-pen="construct"] {
   border: 2px solid var(--bcn-ink-2);
 }
-[data-surface="session"] .chalkboard [data-icon-glyph][data-icon-pen="flow"] {
+[data-surface="session"] .chalkboard [data-icon-glyph][data-icon-pen="flow"],
+[data-surface="session"] .chalkboard [data-marker][data-pen="flow"] {
   border: 2px dashed var(--bcn-ink-2);
 }
-[data-surface="session"] .chalkboard [data-icon-glyph][data-icon-pen="trap"] {
+[data-surface="session"] .chalkboard [data-icon-glyph][data-icon-pen="trap"],
+[data-surface="session"] .chalkboard [data-marker][data-pen="trap"] {
   border: 4px double var(--bcn-warmth);
 }
-[data-surface="session"] .chalkboard [data-icon-glyph][data-icon-pen="alt"] {
+[data-surface="session"] .chalkboard [data-icon-glyph][data-icon-pen="alt"],
+[data-surface="session"] .chalkboard [data-marker][data-pen="alt"] {
   border: 3px dotted var(--bcn-ink);
 }
 

@@ -22,7 +22,7 @@ export function DefinitionItem({ item }: BoardKindProps<"definition">) {
   const [settled] = useState(revealed);
 
   return (
-    <Accent pen={item.pen}>
+    <Accent>
       <p dir="auto" className="leading-base text-ink">
         {payload.chunks.slice(0, Math.max(revealed, 0)).map((chunk, i) => (
           <span key={i} className={i < settled ? undefined : "animate-board-in"}>

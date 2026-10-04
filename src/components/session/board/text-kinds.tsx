@@ -1,7 +1,5 @@
 import type { ReactNode } from "react";
-import { penAttrs } from "@/lib/session/board/marks";
 import { spanMarks } from "@/lib/session/board/rich-text";
-import type { Pen } from "@/lib/session/teaching-board";
 import type { BoardKindProps } from "./kind-props";
 import { RichTextCore } from "./rich-text";
 
@@ -18,18 +16,16 @@ import { RichTextCore } from "./rich-text";
 
    ولون النصّ يُبنى شرطيًا لا بالتكديس (مزلق 8). */
 
-/** قلم العنصر حدٌّ هادئ على جانب البداية لا لونٌ يعيد صبغ المتن (§4.2) */
+/** حدّ القلم يملكه غلاف البند؛ هنا يبقى تجميع النصّ وحده. */
 export function Accent({
-  pen,
   className = "",
   children,
 }: {
-  pen: Pen | null;
   className?: string;
   children: ReactNode;
 }) {
   return (
-    <div {...penAttrs(pen)} className={`${pen ? "ps-3" : ""} ${className}`.trim()}>
+    <div className={className}>
       {children}
     </div>
   );
@@ -37,7 +33,7 @@ export function Accent({
 
 export function HeadingLine({ item }: BoardKindProps<"heading" | "title">) {
   return (
-    <Accent pen={item.pen}>
+    <Accent>
       <p dir="auto" className="text-lg leading-base font-bold text-ink md:text-xl">
         <RichTextCore
           wrap="none"
@@ -53,7 +49,7 @@ export function HeadingLine({ item }: BoardKindProps<"heading" | "title">) {
 
 export function TextLine({ item }: BoardKindProps<"text">) {
   return (
-    <Accent pen={item.pen}>
+    <Accent>
       <p dir="auto" className="text-base leading-base text-ink">
         <RichTextCore
           wrap="none"
@@ -74,7 +70,7 @@ export function BulletLine({ item }: BoardKindProps<"bullet">) {
   const spans = spanMarks(item.marks);
   const { text, children } = item.payload;
   return (
-    <Accent pen={item.pen}>
+    <Accent>
       <p className="flex items-baseline gap-3">
         <span aria-hidden="true" className="flex h-5 w-5 shrink-0 items-center justify-center">
           <span className="h-1.5 w-1.5 rounded-pill bg-ink-2" />
@@ -107,7 +103,7 @@ export function BulletLine({ item }: BoardKindProps<"bullet">) {
 /** الترقيم مقصور على المنطقة (§5.1) — وأرقامه إنجليزية كبقية الواجهة */
 export function StepLine({ item, n }: BoardKindProps<"step">) {
   return (
-    <Accent pen={item.pen}>
+    <Accent>
       <p className="flex items-baseline gap-3">
         <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm bg-aubergine-mid text-xs font-bold text-on-dominant">
           {n}

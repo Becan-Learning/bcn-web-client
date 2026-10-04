@@ -4,7 +4,7 @@ import { decorate, decorationAttrs, penAttrs, type Decoration } from "@/lib/sess
 import type { ExplanationLanguage } from "../explanation-language";
 import { MARK_LABEL } from "./labels";
 import type { BoardKindProps } from "./kind-props";
-import { RichText } from "./rich-text";
+import { RichTextCore } from "./rich-text";
 
 /* خطّ زمنيّ واحد مرتَّب (§5.16).
 
@@ -46,8 +46,8 @@ export function TimelineItem({ item, language }: BoardKindProps<"timeline">) {
 
   return (
     <div data-timeline="" className="min-w-0 leading-base text-ink">
-      <p id={labelId} className="mb-2 text-sm font-semibold text-ink-2">
-        <RichText text={axisLabel} markup pen={item.pen} spans={spans} />
+      <p dir="auto" id={labelId} className="mb-2 text-sm font-semibold text-ink-2">
+        <RichTextCore wrap="none" text={axisLabel} markup pen={item.pen} spans={spans} />
       </p>
       <div
         dir="ltr"
@@ -99,7 +99,7 @@ export function TimelineItem({ item, language }: BoardKindProps<"timeline">) {
                     dir="auto"
                     className="text-sm leading-base font-semibold [overflow-wrap:anywhere]"
                   >
-                    <RichText text={division} markup pen={item.pen} spans={spans} />
+                    <RichTextCore wrap="none" text={division} markup pen={item.pen} spans={spans} />
                   </p>
                   {decoration.answer ? (
                     <span data-mark-icon="">
@@ -122,17 +122,19 @@ export function TimelineItem({ item, language }: BoardKindProps<"timeline">) {
                             data-marker={marker.id}
                             aria-hidden="true"
                             {...penAttrs(pen)}
-                            className="h-2 w-8 rounded-pill border border-chalkboard-edge"
+                            data-marker-dot=""
+                            className="size-3 rounded-pill border border-chalkboard-edge"
                           />
                         ) : (
                           <li
                             key={marker.id}
                             data-marker={marker.id}
+                            dir="auto"
                             {...penAttrs(pen)}
                             className="max-w-full rounded-sm border border-chalkboard-edge px-2 py-0.5 text-xs leading-base text-ink [overflow-wrap:anywhere]"
                           >
-                            <span dir="auto">
-                              <RichText text={marker.label} markup pen={pen} spans={spans} />
+                            <span>
+                              <RichTextCore wrap="none" text={marker.label} markup pen={pen} spans={spans} />
                             </span>
                           </li>
                         );

@@ -50,7 +50,7 @@ describe("المخطّط الزمني", () => {
     expect(scroller).toContain("overflow-x-auto");
     expect(scroller).toContain('tabindex="0"');
     expect(scroller).toContain("aria-labelledby");
-    expect(html.match(/<p dir="auto"[^>]*font-semibold/g)).toHaveLength(3);
+    expect(html.match(/<p dir="auto" class="[^>]*font-semibold/g)).toHaveLength(3);
   });
 
   it("الحاوية الممرِّرة محدودة العرض ولا تتجاوز عرض أبيها", () => {
@@ -112,6 +112,9 @@ describe("المخطّط الزمني", () => {
   it("الواصق بلا وسم لا يحمل نصًّا ويخفى عن قارئ الشاشة", () => {
     const html = render(null, false);
     expect(marker(html, "marker-factor")).toContain('aria-hidden="true"');
+    expect(marker(html, "marker-factor")).toContain('data-marker-dot=""');
+    expect(marker(html, "marker-factor")).toContain("size-3 rounded-pill");
+    expect(html).toMatch(/<li data-marker="marker-factor"[^>]*><\/li>/);
   });
 
   it("وسم المحور يُرسم قبل المحور", () => {

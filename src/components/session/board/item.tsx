@@ -31,9 +31,7 @@ import { BulletLine, HeadingLine, StepLine, TextLine } from "./text-kinds";
    `correct` و`wrong` لا يعتمدان على اللون: مع كلٍّ أيقونته، فالبندان
    مقروءان لمن لا يميّز الألوان.
 
-   و`dim` لا يُنفَّذ بالشفافية بل بإعادة توجيه توكن الحبر إلى
-   `--bcn-ink-2`: القيمة المقيسة تحفظ أرضية 5.33:1، والتخمين
-   بالشفافية لا يحفظها. */
+   الخفوت بشفافية مقيسة في الأنماط المشتركة، ولا يغيّر توكن الحبر. */
 
 const FRAMES: Record<AnnotationKind, string> = {
   key: "rounded-md bg-ink/10 px-3 py-2 ring-2 ring-ink",
@@ -104,16 +102,6 @@ export function BoardItemView({
   /** بندٌ آخر في المنطقة نفسها عليه «انظر هنا»، فيُخفَت هذا ولا يُخفى */
   dimmedByFocus?: boolean;
 }) {
-  /* لا مباعدة بمؤقّتات جافاسكربت: الوكيل يوقّت كل عملية على الصوت
-     المنطوق، وأي تأخير من الصفحة يضاعف التوقيت (§1). */
-  const anim = reduce
-    ? {}
-    : {
-        initial: { opacity: 0, y: 7 },
-        animate: { opacity: 1, y: 0 },
-        transition: { duration: 0.25, ease: [0, 0, 0.2, 1] as const },
-      };
-
   const annotation = item.annotation;
   const decoration = decorate(item, { scope: "item" }, baseDecoration(annotation));
   decoration.dimmedByFocus = item.kind !== "title" && dimmedByFocus && !decoration.focus;
@@ -122,17 +110,28 @@ export function BoardItemView({
   const frame = frameKind ? FRAMES[frameKind] : "";
   const label = annotation && annotation !== "correct" && annotation !== "wrong" ? ANNOTATION_LABEL[annotation]?.[language] : undefined;
 
+  /* لا مباعدة بمؤقّتات جافاسكربت: الوكيل يوقّت كل عملية على الصوت
+     المنطوق، وأي تأخير من الصفحة يضاعف التوقيت (§1). */
+  const anim = reduce
+    ? {}
+    : {
+        initial: { opacity: 0, y: 7 },
+        animate: { opacity: decoration.dim || decoration.dimmedByFocus ? 0.7 : 1, y: 0 },
+        exit: { opacity: 0, transition: { duration: 0.15, ease: [0, 0, 0.2, 1] as const } },
+        transition: { duration: 0.25, ease: [0, 0, 0.2, 1] as const },
+      };
+
   return (
     <motion.li
       {...anim}
       {...decorationAttrs(decoration)}
-      {...penAttrs(item.pen)}
+      {...penAttrs(item.kind === "icon" ? null : item.pen)}
       data-board-item={item.id}
       data-cancelled={structured && decoration.strike ? "" : undefined}
       /* النقل بين المناطق يُحرَّك دون تأخير وصول المحتوى. */
       layout={reduce ? false : "position"}
       aria-current={annotation === "key" ? true : undefined}
-      className={`relative min-w-0 ${item.pen ? "ps-3" : ""} ${frame}`}
+      className={`relative min-w-0 ${item.pen && item.kind !== "icon" ? "ps-3" : ""} ${frame}`}
     >
       <MarkIcon answer={decoration.answer} language={language} />
       {label ? <span className="sr-only">{label}</span> : null}

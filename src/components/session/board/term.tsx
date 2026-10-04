@@ -17,7 +17,7 @@ export function TermItem({ item }: BoardKindProps<"term">) {
   const { payload } = item;
   const spans = spanMarks(item.marks);
   return (
-    <Accent pen={item.pen}>
+    <Accent>
       <p className="leading-base">
         <span
           style={{ unicodeBidi: "isolate" }}

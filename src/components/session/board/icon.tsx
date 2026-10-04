@@ -3,7 +3,7 @@ import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import { BOARD_ICON_MAP } from "./icon-map.generated";
 import { UNKNOWN_ICON_LABEL } from "./labels";
 import type { BoardKindProps } from "./kind-props";
-import { RichText } from "./rich-text";
+import { RichTextCore } from "./rich-text";
 
 /* الأيقونة والوسم وحدةُ تخطيطٍ واحدة (§5.17): عنصرٌ واحد يلتفّ كاملًا
    على الجوال، فلا يفترق نصٌّ عن رسمه.
@@ -77,8 +77,8 @@ export function IconItem({ item, language }: BoardKindProps<"icon">) {
           <Placeholder label={UNKNOWN_ICON_LABEL[language]} />
         )}
       </span>
-      <span className="min-w-0 leading-base text-ink [overflow-wrap:anywhere]">
-        <RichText text={label} markup pen={item.pen} spans={spans} />
+      <span dir="auto" className="min-w-0 leading-base text-ink [overflow-wrap:anywhere]">
+        <RichTextCore wrap="none" text={label} markup pen={item.pen} spans={spans} />
       </span>
     </span>
   );

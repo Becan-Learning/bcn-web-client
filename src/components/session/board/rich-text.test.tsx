@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import fixtures from "@/lib/session/board/__fixtures__/board-fixtures.json";
 import type { BoardItem, Mark } from "@/lib/session/teaching-board";
+import { MARK_LABEL } from "./labels";
 import { boardItem, boardState, renderBoardHtml } from "./test-utils";
 
 /* العرض الحقيقي للوح من حالةٍ مبنيّة بالبُناة. نصوص الحمولات منسوخة
@@ -268,13 +269,16 @@ describe("علامات المقاطع (§6)", () => {
     expect(count(html, "data-rt-continued")).toBe(1);
   });
 
-  it("يرسل اللفظ المخفي بلغة الشرح وبالأخرى للغلاف", () => {
+  it.each([AR, EN])("يرسل لفظ حالة واحدًا بلغة الشرح $language", (options) => {
     const html = render([
-      text(base, { marks: [spanMark("300 cm", "correct")] }),
-    ]);
+      text("300 cm", { marks: [spanMark("300 cm", "correct")] }),
+    ], options);
 
-    expect(html).toContain("إجابة صحيحة");
-    expect(html).toContain("data-cue-lang=\"en\"");
+    const label = MARK_LABEL.correct[options.language];
+    const other = MARK_LABEL.correct[options.language === "Arabic" ? "English" : "Arabic"];
+    expect(count(html, label)).toBe(1);
+    expect(html).not.toContain(other);
+    expect(html).not.toContain("data-cue-lang");
   });
 
   it("لا يبحث عبر الحقول: بين الأب والابن وبين نصفي المصطلح", () => {
@@ -364,7 +368,8 @@ describe("الأنواع النصّية", () => {
   it("يرسم قلم البند حدًّا على الحاوية لا لونًا على المتن", () => {
     const html = render([text("سطر", { pen: "trap" })]);
 
-    expect(html).toContain("<div data-pen=\"trap\" class=\"ps-3\">");
+    expect(html).toMatch(/<li[^>]*data-pen="trap"[^>]*data-board-item=/);
+    expect(count(html, 'data-pen="trap"')).toBe(1);
   });
 });
 

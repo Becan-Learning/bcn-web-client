@@ -8,6 +8,7 @@ import {
 } from "@/lib/session/board/rich-text";
 import type { Mark, Pen } from "@/lib/session/teaching-board";
 import { MARK_LABEL } from "./labels";
+import { useBoardLanguage } from "./language";
 
 export type RichTextProps = {
   text: string;
@@ -59,23 +60,13 @@ function Styled({ piece, pen }: { piece: Piece; pen: Pen | null }) {
 
 const LANG_CODE = { Arabic: "ar", English: "en" } as const;
 
-/* القارئ الصوتي يحتاج لفظ الحال لا لونه. وهذا المكوّن لا يعرف لغة
-   الشرح، لكن غلاف السبورة يحمل `lang` بها، فيُرسَل اللفظان ويُخفي
-   `board-l2.css` ما لا يوافق لغة الغلاف — فلا يُنطق إلا لفظ واحد. */
+/* القارئ الصوتي يحتاج لفظ الحال مرة واحدة بلغة الشرح التي يوفّرها اللوح. */
 function Cue({ state }: { state: "correct" | "wrong" | "strike" }) {
+  const language = useBoardLanguage();
   return (
-    <>
-      {(Object.keys(LANG_CODE) as (keyof typeof LANG_CODE)[]).map((language) => (
-        <span
-          key={language}
-          lang={LANG_CODE[language]}
-          data-cue-lang={LANG_CODE[language]}
-          className="sr-only"
-        >
-          {MARK_LABEL[state][language]}
-        </span>
-      ))}
-    </>
+    <span lang={LANG_CODE[language]} dir="auto" className="sr-only">
+      {MARK_LABEL[state][language]}
+    </span>
   );
 }
 

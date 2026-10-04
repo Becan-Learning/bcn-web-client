@@ -5,10 +5,13 @@ import type { BoardItem, Mark } from "@/lib/session/teaching-board";
 
 const { fields } = vi.hoisted(() => ({ fields: [] as RichTextProps[] }));
 /* نختبر ما يُسلَّم إلى عارض النصّ، لا طريقة ترميزه أو عزله. */
-vi.mock("./rich-text", () => ({ RichText: (props: RichTextProps) => {
-  fields.push(props);
-  return <span>{props.text}{props.renderBlank?.(0)}</span>;
-} }));
+vi.mock("./rich-text", () => {
+  const capture = (props: RichTextProps) => {
+    fields.push(props);
+    return <span>{props.text}{props.renderBlank?.(0)}</span>;
+  };
+  return { RichText: capture, RichTextCore: capture };
+});
 beforeEach(() => { fields.length = 0; });
 const span: Mark = { scope: "span", index: null, cell: null, option: null, match: "field", state: "highlight" };
 const itemMark: Mark = { ...span, scope: "item", match: null };

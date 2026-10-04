@@ -1,7 +1,7 @@
 import { decorationAttrs, type Decoration } from "@/lib/session/board/marks";
 import type { BoardKindProps } from "./kind-props";
 import { ANNOTATION_LABEL, MARK_LABEL } from "./labels";
-import { RichText } from "./rich-text";
+import { RichTextCore } from "./rich-text";
 import { MarkIcon } from "./table";
 
 /* السلسلة — آليّة السبب والنتيجة (§5.11).
@@ -46,12 +46,12 @@ export function ChainItem({ item, language }: BoardKindProps<"chain">) {
         return (
           <li key={i} className="flex min-w-0 flex-col items-center">
             {i > 0 ? <Connector broken={broken} index={i} /> : null}
-            {broken ? <span className="sr-only">{ANNOTATION_LABEL.broken?.[language]}</span> : null}
-            <span data-board-link={i} {...decorationAttrs(linkDecoration)} aria-current={state === "key" ? true : undefined} className="relative w-full min-w-0 rounded-md border border-chalkboard-edge bg-ink/5 px-3 py-2 text-center text-sm leading-base text-ink [overflow-wrap:anywhere]">
+            {broken ? <span dir="auto" className="sr-only">{ANNOTATION_LABEL.broken?.[language]}</span> : null}
+            <span dir="auto" data-board-link={i} {...decorationAttrs(linkDecoration)} aria-current={state === "key" ? true : undefined} className="relative w-full min-w-0 rounded-md border border-chalkboard-edge bg-ink/5 px-3 py-2 text-center text-sm leading-base text-ink [overflow-wrap:anywhere]">
               <MarkIcon answer={linkDecoration.answer} language={language} />
-              {i === 0 && state === "broken" ? <span className="sr-only">{ANNOTATION_LABEL.broken?.[language]}</span> : null}
-              {state === "key" ? <span className="sr-only">{MARK_LABEL.highlight[language]}</span> : null}
-              <RichText text={link} markup={false} pen={item.pen} spans={spans} />
+              {i === 0 && state === "broken" ? <span dir="auto" className="sr-only">{ANNOTATION_LABEL.broken?.[language]}</span> : null}
+              {state === "key" ? <span dir="auto" className="sr-only">{MARK_LABEL.highlight[language]}</span> : null}
+              <RichTextCore wrap="none" text={link} markup={false} pen={item.pen} spans={spans} />
             </span>
           </li>
         );

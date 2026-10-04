@@ -1,0 +1,5911 @@
+{
+  "version": 3,
+  "fixtures": [
+    {
+      "name": "add-heading",
+      "status": "v2",
+      "covers": [
+        "BRD-110"
+      ],
+      "description": "Render heading from an empty board. Uses units-plan content where available; table preserves the v2 journal example. New bullet children are one level.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-heading",
+          "region": "live",
+          "kind": "heading",
+          "payload": {
+            "text": "4 · Converting units"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "add-text",
+      "status": "v2",
+      "covers": [
+        "BRD-002",
+        "BRD-110"
+      ],
+      "description": "Render text from an empty board. Uses units-plan content where available; table preserves the v2 journal example. New bullet children are one level.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-text",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "المطلوب: حوّل 300 cm إلى m"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "add-bullet",
+      "status": "v3",
+      "covers": [
+        "BRD-121"
+      ],
+      "description": "Render bullet from an empty board. Uses units-plan content where available; table preserves the v2 journal example. New bullet children are one level.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-bullet",
+          "region": "live",
+          "kind": "bullet",
+          "payload": {
+            "text": "الطول — متر (m)",
+            "children": [
+              "الكتلة — كيلوجرام (kg)",
+              "الزمن — ثانية (s)"
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "add-step",
+      "status": "v2",
+      "covers": [
+        "BRD-109"
+      ],
+      "description": "Render step from an empty board. Uses units-plan content where available; table preserves the v2 journal example. New bullet children are one level.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-step",
+          "region": "live",
+          "kind": "step",
+          "payload": {
+            "text": "المعطى: 300 cm"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        },
+        {
+          "action": "board_add",
+          "id": "board-step-rule",
+          "region": "live",
+          "kind": "step",
+          "payload": {
+            "text": "القانون: اضرب في كسر يساوي 1"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 4
+        }
+      ]
+    },
+    {
+      "name": "add-note",
+      "status": "v3",
+      "covers": [
+        "BRD-105"
+      ],
+      "description": "Render note from an empty board. Uses units-plan content where available; table preserves the v2 journal example. New bullet children are one level.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-note",
+          "region": "live",
+          "kind": "note",
+          "payload": {
+            "text": "الأساسية تُقاس مباشرة بلا معادلة"
+          },
+          "group_id": null,
+          "pen": "construct",
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "add-definition",
+      "status": "v2",
+      "covers": [
+        "BRD-104",
+        "BRD-122"
+      ],
+      "description": "Render definition from an empty board. Uses units-plan content where available; table preserves the v2 journal example. New bullet children are one level.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-definition",
+          "region": "live",
+          "kind": "definition",
+          "payload": {
+            "chunks": [
+              "الأساسية تُقاس مباشرة",
+              "بلا معادلة"
+            ],
+            "key_words": [
+              "مباشرة",
+              "بلا معادلة"
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        },
+        {
+          "action": "board_reveal",
+          "id": "board-definition",
+          "index": 1,
+          "rev": 4
+        }
+      ]
+    },
+    {
+      "name": "add-term",
+      "status": "v2",
+      "covers": [
+        "BRD-110"
+      ],
+      "description": "Render term from an empty board. Uses units-plan content where available; table preserves the v2 journal example. New bullet children are one level.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-term",
+          "region": "live",
+          "kind": "term",
+          "payload": {
+            "en": "conversion factor",
+            "ar": "معامل التحويل"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "add-equation",
+      "status": "v2",
+      "covers": [
+        "BRD-201",
+        "BRD-202"
+      ],
+      "description": "Render equation from an empty board. Uses units-plan content where available; table preserves the v2 journal example. New bullet children are one level.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-equation",
+          "region": "live",
+          "kind": "equation",
+          "payload": {
+            "latex": "\\begin{aligned}300\\ \\text{cm}\\times\\dfrac{1\\ \\text{m}}{100\\ \\text{cm}}&=\\dfrac{300}{100}\\ \\text{m}\\\\&=3\\ \\text{m}\\end{aligned}",
+            "display": true
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "add-compare",
+      "status": "v2",
+      "covers": [
+        "BRD-110"
+      ],
+      "description": "Render compare from an empty board. Uses units-plan content where available; table preserves the v2 journal example. New bullet children are one level.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-compare",
+          "region": "live",
+          "kind": "compare",
+          "payload": {
+            "aspect_label": "الوجه",
+            "columns": [
+              "أساسية (Fundamental)",
+              "مشتقة (Derived)"
+            ],
+            "rows": [
+              {
+                "aspect": "المعادلة",
+                "x": "ما لها",
+                "y": "لها"
+              },
+              {
+                "aspect": "أمثلة",
+                "x": "طول · كتلة · زمن",
+                "y": "مساحة · سرعة · كثافة"
+              }
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "add-table",
+      "status": "v2",
+      "covers": [
+        "BRD-109"
+      ],
+      "description": "Render table from an empty board. Uses units-plan content where available; table preserves the v2 journal example. New bullet children are one level.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-table",
+          "region": "live",
+          "kind": "table",
+          "payload": {
+            "variant": "journal",
+            "header": [
+              "Account",
+              "Debit",
+              "Credit"
+            ],
+            "rows": [
+              [
+                "Cash",
+                "120,000",
+                ""
+              ],
+              [
+                "Revenue - hardware",
+                "",
+                "80,000"
+              ]
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "add-chain",
+      "status": "v2",
+      "covers": [
+        "BRD-122"
+      ],
+      "description": "Render chain from an empty board. Uses units-plan content where available; table preserves the v2 journal example. New bullet children are one level.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-chain",
+          "region": "live",
+          "kind": "chain",
+          "payload": {
+            "links": [
+              "Convert the edge first",
+              "Then square it"
+            ],
+            "break_at": null
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "add-blanks",
+      "status": "v2",
+      "covers": [
+        "BRD-005"
+      ],
+      "description": "Render blanks from an empty board. Uses units-plan content where available; table preserves the v2 journal example. New bullet children are one level.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-blanks",
+          "region": "live",
+          "kind": "blanks",
+          "payload": {
+            "template": "وحدة الكتلة ___",
+            "blanks": [
+              {
+                "id": "u",
+                "fill": "كيلوجرام (kg)"
+              }
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "add-options",
+      "status": "v2",
+      "covers": [
+        "BRD-004"
+      ],
+      "description": "Render options from an empty board. Uses units-plan content where available; table preserves the v2 journal example. New bullet children are one level.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-options",
+          "region": "live",
+          "kind": "options",
+          "payload": {
+            "stem": "وحدة الكتلة في النظام الدولي؟",
+            "options": [
+              {
+                "id": "opt-pound",
+                "text": "باوند (Pound)",
+                "correct": false
+              },
+              {
+                "id": "opt-gram",
+                "text": "جرام (Gram)",
+                "correct": false
+              },
+              {
+                "id": "opt-kg",
+                "text": "كيلوجرام (Kilogram)",
+                "correct": true
+              },
+              {
+                "id": "opt-ounce",
+                "text": "أونصة (Ounce)",
+                "correct": false
+              }
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "add-callout",
+      "status": "v2",
+      "covers": [
+        "BRD-701"
+      ],
+      "description": "Render callout from an empty board. Uses units-plan content where available; table preserves the v2 journal example. New bullet children are one level.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-callout",
+          "region": "live",
+          "kind": "callout",
+          "payload": {
+            "kind": "loses_marks",
+            "text": "الإجابة بالجرام أو الباوند لوحدة الكتلة. المصحح يريد الكيلوجرام."
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "add-divider",
+      "status": "v3",
+      "covers": [
+        "BRD-406"
+      ],
+      "description": "Render divider from an empty board. Uses units-plan content where available; table preserves the v2 journal example. New bullet children are one level.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-divider",
+          "region": "live",
+          "kind": "divider",
+          "payload": {},
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "add-timeline",
+      "status": "v3",
+      "covers": [
+        "BRD-504"
+      ],
+      "description": "Render timeline from an empty board. Uses units-plan content where available; table preserves the v2 journal example. New bullet children are one level.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-timeline",
+          "region": "live",
+          "kind": "timeline",
+          "payload": {
+            "axis_label": "تحويل الوحدات",
+            "divisions": [
+              "المعطى",
+              "معامل التحويل",
+              "النتيجة"
+            ],
+            "markers": [
+              {
+                "id": "marker-given",
+                "at": 0,
+                "label": "300 cm",
+                "pen": null
+              },
+              {
+                "id": "marker-factor",
+                "at": 1,
+                "label": null,
+                "pen": "construct"
+              },
+              {
+                "id": "marker-answer",
+                "at": 2,
+                "label": "3 m",
+                "pen": "flow"
+              }
+            ]
+          },
+          "group_id": null,
+          "pen": "construct",
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "add-icon",
+      "status": "v3",
+      "covers": [
+        "BRD-602",
+        "BRD-603"
+      ],
+      "description": "Render icon from an empty board. Uses units-plan content where available; table preserves the v2 journal example. New bullet children are one level.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-icon",
+          "region": "live",
+          "kind": "icon",
+          "payload": {
+            "icon": "ruler",
+            "label": "الطول — متر (m)",
+            "attach_to": null
+          },
+          "group_id": null,
+          "pen": "construct",
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "frame-lifecycle",
+      "status": "v2",
+      "covers": [
+        "BRD-404"
+      ],
+      "description": "All frame wire actions and each legal clear scope; title/pinned survive regional clears, hide preserves items, final all clear empties state.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_set_title",
+          "id": "board-title-units",
+          "text": "4 · تحويل الوحدات",
+          "rev": 3
+        },
+        {
+          "action": "board_group",
+          "id": "board-group-pin",
+          "region": "pinned",
+          "kind": "box",
+          "heading": "مرجع",
+          "stage": null,
+          "rev": 4
+        },
+        {
+          "action": "board_add",
+          "id": "board-term-ref",
+          "region": "pinned",
+          "kind": "term",
+          "payload": {
+            "en": "conversion factor",
+            "ar": "معامل التحويل"
+          },
+          "group_id": "board-group-pin",
+          "pen": null,
+          "rev": 5
+        },
+        {
+          "action": "board_group",
+          "id": "board-group-live",
+          "region": "live",
+          "kind": "box",
+          "heading": "تحويل الوحدات",
+          "stage": null,
+          "rev": 6
+        },
+        {
+          "action": "board_add",
+          "id": "board-step-live",
+          "region": "live",
+          "kind": "step",
+          "payload": {
+            "text": "المعطى: 300 cm"
+          },
+          "group_id": "board-group-live",
+          "pen": null,
+          "rev": 7
+        },
+        {
+          "action": "board_group",
+          "id": "board-group-temp",
+          "region": "temporary",
+          "kind": "box",
+          "heading": "توضيح",
+          "stage": null,
+          "rev": 8
+        },
+        {
+          "action": "board_add",
+          "id": "board-text-temp",
+          "region": "temporary",
+          "kind": "text",
+          "payload": {
+            "text": "الأساسية تُقاس مباشرة بلا معادلة"
+          },
+          "group_id": "board-group-temp",
+          "pen": null,
+          "rev": 9
+        },
+        {
+          "action": "board_clear",
+          "scope": "live",
+          "rev": 10
+        },
+        {
+          "action": "board_clear",
+          "scope": "temporary",
+          "rev": 11
+        },
+        {
+          "action": "board_hide",
+          "rev": 12
+        },
+        {
+          "action": "board_show",
+          "rev": 13
+        },
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 14
+        }
+      ]
+    },
+    {
+      "name": "progress-events",
+      "status": "v3",
+      "covers": [
+        "BRD-804"
+      ],
+      "description": "Existing revision-free progression packets; topic index 3 of total 6, despite heading 2. PDF scroll and session ending stay on existing surfaces.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "set_lesson",
+          "lesson": "units_prefixes_and_conversion",
+          "number_of_topics": 6
+        },
+        {
+          "action": "set_topic",
+          "topic": "2 · السبع وحدات الأساسية (SI)",
+          "current_topic_index": 3,
+          "question": "وحدة الكتلة في النظام الدولي؟",
+          "choices": [
+            "باوند (Pound)",
+            "جرام (Gram)",
+            "كيلوجرام (Kilogram)",
+            "أونصة (Ounce)"
+          ]
+        },
+        {
+          "action": "board_set_title",
+          "id": "board-title-si",
+          "text": "2 · السبع وحدات الأساسية (SI)",
+          "rev": 3
+        },
+        {
+          "action": "topic_done",
+          "topic": "2 · السبع وحدات الأساسية (SI)"
+        },
+        {
+          "action": "scroll",
+          "page": 4
+        },
+        {
+          "action": "set_topic",
+          "topic": "3 · السوابق (Prefixes)",
+          "current_topic_index": 4,
+          "question": "",
+          "choices": []
+        },
+        {
+          "action": "session_ending",
+          "message": "Session ending due to time limit."
+        }
+      ]
+    },
+    {
+      "name": "legacy-update-text",
+      "status": "v2",
+      "covers": [
+        "BRD-002"
+      ],
+      "description": "Whole-text update preserves identity, annotation and payload kind; no table/latex replacement API.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-text-rule",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "هناك نوعان"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        },
+        {
+          "action": "board_annotate",
+          "id": "board-text-rule",
+          "kind": "warning",
+          "rev": 4
+        },
+        {
+          "action": "board_update",
+          "id": "board-text-rule",
+          "text": "الأساسية تُقاس مباشرة بلا معادلة",
+          "rev": 5
+        }
+      ]
+    },
+    {
+      "name": "legacy-update-fill",
+      "status": "v2",
+      "covers": [
+        "BRD-005"
+      ],
+      "description": "Private authored fill is hidden until an exact named-slot update; second blank remains empty until its packet.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-blanks-rule",
+          "region": "live",
+          "kind": "blanks",
+          "payload": {
+            "template": "Has an equation ⇒ ___   ·   No equation ⇒ ___",
+            "blanks": [
+              {
+                "id": "f1",
+                "fill": "Derived"
+              },
+              {
+                "id": "f2",
+                "fill": "Fundamental"
+              }
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        },
+        {
+          "action": "board_update",
+          "id": "board-blanks-rule",
+          "slot": "f1",
+          "text": "Derived",
+          "rev": 4
+        },
+        {
+          "action": "board_update",
+          "id": "board-blanks-rule",
+          "slot": "f2",
+          "text": "Fundamental",
+          "rev": 5
+        }
+      ]
+    },
+    {
+      "name": "legacy-slot-states",
+      "status": "v2",
+      "covers": [
+        "BRD-004"
+      ],
+      "description": "Options and chain links accept every existing slot state; correct booleans do not paint initial options.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-options-mass",
+          "region": "live",
+          "kind": "options",
+          "payload": {
+            "stem": "وحدة الكتلة في النظام الدولي؟",
+            "options": [
+              {
+                "id": "opt-pound",
+                "text": "باوند (Pound)",
+                "correct": false
+              },
+              {
+                "id": "opt-gram",
+                "text": "جرام (Gram)",
+                "correct": false
+              },
+              {
+                "id": "opt-kg",
+                "text": "كيلوجرام (Kilogram)",
+                "correct": true
+              },
+              {
+                "id": "opt-ounce",
+                "text": "أونصة (Ounce)",
+                "correct": false
+              }
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        },
+        {
+          "action": "board_add",
+          "id": "board-chain-convert",
+          "region": "live",
+          "kind": "chain",
+          "payload": {
+            "links": [
+              "Convert the edge first",
+              "Then square it"
+            ],
+            "break_at": null
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 4
+        },
+        {
+          "action": "board_update",
+          "id": "board-options-mass",
+          "slot": "opt-gram",
+          "state": "correct",
+          "rev": 5
+        },
+        {
+          "action": "board_update",
+          "id": "board-chain-convert",
+          "slot": "1",
+          "state": "correct",
+          "rev": 6
+        },
+        {
+          "action": "board_update",
+          "id": "board-options-mass",
+          "slot": "opt-gram",
+          "state": "wrong",
+          "rev": 7
+        },
+        {
+          "action": "board_update",
+          "id": "board-chain-convert",
+          "slot": "1",
+          "state": "wrong",
+          "rev": 8
+        },
+        {
+          "action": "board_update",
+          "id": "board-options-mass",
+          "slot": "opt-gram",
+          "state": "broken",
+          "rev": 9
+        },
+        {
+          "action": "board_update",
+          "id": "board-chain-convert",
+          "slot": "1",
+          "state": "broken",
+          "rev": 10
+        },
+        {
+          "action": "board_update",
+          "id": "board-options-mass",
+          "slot": "opt-gram",
+          "state": "key",
+          "rev": 11
+        },
+        {
+          "action": "board_update",
+          "id": "board-chain-convert",
+          "slot": "1",
+          "state": "key",
+          "rev": 12
+        }
+      ]
+    },
+    {
+      "name": "legacy-annotations",
+      "status": "v2",
+      "covers": [
+        "BRD-407"
+      ],
+      "description": "All six annotation kinds, null clear, explicit key movement and title annotation. No automatic frontend annotation cleanup.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_set_title",
+          "id": "board-title-rule",
+          "text": "الكمية الأساسية",
+          "rev": 3
+        },
+        {
+          "action": "board_add",
+          "id": "board-text-one",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "الأساسية تُقاس مباشرة بلا معادلة"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 4
+        },
+        {
+          "action": "board_add",
+          "id": "board-text-two",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "المطلوب: حوّل 300 cm إلى m"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 5
+        },
+        {
+          "action": "board_annotate",
+          "id": "board-text-one",
+          "kind": "key",
+          "rev": 6
+        },
+        {
+          "action": "board_annotate",
+          "id": "board-text-one",
+          "kind": "warning",
+          "rev": 7
+        },
+        {
+          "action": "board_annotate",
+          "id": "board-text-one",
+          "kind": "correct",
+          "rev": 8
+        },
+        {
+          "action": "board_annotate",
+          "id": "board-text-one",
+          "kind": "wrong",
+          "rev": 9
+        },
+        {
+          "action": "board_annotate",
+          "id": "board-text-one",
+          "kind": "broken",
+          "rev": 10
+        },
+        {
+          "action": "board_annotate",
+          "id": "board-text-one",
+          "kind": "dim",
+          "rev": 11
+        },
+        {
+          "action": "board_annotate",
+          "id": "board-text-one",
+          "kind": null,
+          "rev": 12
+        },
+        {
+          "action": "board_annotate",
+          "id": "board-text-one",
+          "kind": "key",
+          "rev": 13
+        },
+        {
+          "action": "board_annotate",
+          "id": "board-text-one",
+          "kind": null,
+          "rev": 14
+        },
+        {
+          "action": "board_annotate",
+          "id": "board-text-two",
+          "kind": "key",
+          "rev": 15
+        },
+        {
+          "action": "board_annotate",
+          "id": "board-text-two",
+          "kind": null,
+          "rev": 16
+        },
+        {
+          "action": "board_annotate",
+          "id": "board-title-rule",
+          "kind": "warning",
+          "rev": 17
+        },
+        {
+          "action": "board_annotate",
+          "id": "board-title-rule",
+          "kind": null,
+          "rev": 18
+        }
+      ]
+    },
+    {
+      "name": "groups-box-columns",
+      "status": "v2",
+      "covers": [
+        "BRD-122"
+      ],
+      "description": "Group metadata precedes ordered members. Desktop columns become a vertical stack on portrait; removed member leaves group metadata.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_group",
+          "id": "board-group-box",
+          "region": "live",
+          "kind": "box",
+          "heading": "معامل التحويل",
+          "stage": null,
+          "rev": 3
+        },
+        {
+          "action": "board_add",
+          "id": "board-term-factor",
+          "region": "live",
+          "kind": "term",
+          "payload": {
+            "en": "conversion factor",
+            "ar": "معامل التحويل"
+          },
+          "group_id": "board-group-box",
+          "pen": null,
+          "rev": 4
+        },
+        {
+          "action": "board_group",
+          "id": "board-group-columns",
+          "region": "live",
+          "kind": "columns",
+          "heading": "أساسية ومشتقة",
+          "stage": null,
+          "rev": 5
+        },
+        {
+          "action": "board_add",
+          "id": "board-text-fundamental",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "الأساسية تُقاس مباشرة بلا معادلة"
+          },
+          "group_id": "board-group-columns",
+          "pen": null,
+          "rev": 6
+        },
+        {
+          "action": "board_add",
+          "id": "board-text-derived",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "المشتقة تحتاج كميات أخرى"
+          },
+          "group_id": "board-group-columns",
+          "pen": null,
+          "rev": 7
+        }
+      ]
+    },
+    {
+      "name": "pin-and-clear",
+      "status": "v2",
+      "covers": [
+        "BRD-404"
+      ],
+      "description": "Grouped member moves alone, retains group_id, survives live clear with fallback when its group disappears, and unpins to live.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_group",
+          "id": "board-group-given",
+          "region": "live",
+          "kind": "box",
+          "heading": "تحويل الوحدات",
+          "stage": null,
+          "rev": 3
+        },
+        {
+          "action": "board_add",
+          "id": "board-step-given",
+          "region": "live",
+          "kind": "step",
+          "payload": {
+            "text": "المعطى: 300 cm"
+          },
+          "group_id": "board-group-given",
+          "pen": null,
+          "rev": 4
+        },
+        {
+          "action": "board_annotate",
+          "id": "board-step-given",
+          "kind": "key",
+          "rev": 5
+        },
+        {
+          "action": "board_pin",
+          "id": "board-step-given",
+          "pinned": true,
+          "region": "pinned",
+          "rev": 6
+        },
+        {
+          "action": "board_clear",
+          "scope": "live",
+          "rev": 7
+        },
+        {
+          "action": "board_pin",
+          "id": "board-step-given",
+          "pinned": false,
+          "region": "live",
+          "rev": 8
+        }
+      ]
+    },
+    {
+      "name": "remove-item",
+      "status": "v2",
+      "covers": [
+        "BRD-003"
+      ],
+      "description": "Remove one member without clearing other members or its group.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_group",
+          "id": "board-group-quantities",
+          "region": "live",
+          "kind": "box",
+          "heading": "تحويل الوحدات",
+          "stage": null,
+          "rev": 3
+        },
+        {
+          "action": "board_add",
+          "id": "board-text-length",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "الطول"
+          },
+          "group_id": "board-group-quantities",
+          "pen": null,
+          "rev": 4
+        },
+        {
+          "action": "board_add",
+          "id": "board-text-mass",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "الكتلة"
+          },
+          "group_id": "board-group-quantities",
+          "pen": null,
+          "rev": 5
+        },
+        {
+          "action": "board_remove",
+          "id": "board-text-length",
+          "rev": 6
+        }
+      ]
+    },
+    {
+      "name": "chain-static-break",
+      "status": "v2",
+      "covers": [],
+      "description": "break_at=1 cancels the connector into the second link, not the connector leaving it.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-chain-static",
+          "region": "live",
+          "kind": "chain",
+          "payload": {
+            "links": [
+              "Convert the edge first",
+              "Then square it",
+              "Write the unit"
+            ],
+            "break_at": 1
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "callout-mistake",
+      "status": "v2",
+      "covers": [],
+      "description": "Distinct mistake callout using actual units-plan wording.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-callout-mistake",
+          "region": "live",
+          "kind": "callout",
+          "payload": {
+            "kind": "mistake",
+            "text": "الأس تضاعف: −2 صار −4"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "callout-mnemonic",
+      "status": "v2",
+      "covers": [],
+      "description": "Distinct mnemonic callout using actual units-plan wording.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-callout-mnemonic",
+          "region": "live",
+          "kind": "callout",
+          "payload": {
+            "kind": "mnemonic",
+            "text": "الوحدة اللي نشيلها تنزل تحت عشان تختصر"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "callout-example",
+      "status": "v2",
+      "covers": [],
+      "description": "Distinct example callout using actual units-plan wording.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-callout-example",
+          "region": "live",
+          "kind": "callout",
+          "payload": {
+            "kind": "example",
+            "text": "الإجابة: 200 km³"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "callout-exam",
+      "status": "v2",
+      "covers": [],
+      "description": "Distinct exam callout using actual units-plan wording.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-callout-exam",
+          "region": "live",
+          "kind": "callout",
+          "payload": {
+            "kind": "exam",
+            "text": "الوحدة مرفوعة لقوة ⇒ السابقة ترتفع لنفس القوة"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "callout-definition",
+      "status": "v2",
+      "covers": [],
+      "description": "The legacy definition callout is a complete text box, unlike progressive definition chunks.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-callout-definition",
+          "region": "live",
+          "kind": "callout",
+          "payload": {
+            "kind": "definition",
+            "text": "الأساسية تُقاس مباشرة بلا معادلة"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "callout-verbatim",
+      "status": "v3",
+      "covers": [
+        "BRD-101"
+      ],
+      "description": "Textbook text treatment differs from all six legacy kinds; real must_say from worked conversion segment in each language.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-verbatim-ar",
+          "region": "live",
+          "kind": "callout",
+          "payload": {
+            "kind": "verbatim",
+            "text": "لاحظ أن الوحدات تختصر بشكل صحيح؛ فهذا أساس استخدام conversion factor بطريقة صحيحة!"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        },
+        {
+          "action": "board_add",
+          "id": "board-verbatim-en",
+          "region": "live",
+          "kind": "callout",
+          "payload": {
+            "kind": "verbatim",
+            "text": "Note that the units cancel properly — this is the key to using the conversion factor correctly!"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 4
+        }
+      ]
+    },
+    {
+      "name": "add-table-progressive",
+      "status": "v3",
+      "covers": [
+        "BRD-123",
+        "BRD-303"
+      ],
+      "description": "Seven SI units, header plus one data row on add; Western column numbers remain coordinate labels on portrait cards.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-table-si",
+          "region": "live",
+          "kind": "table",
+          "payload": {
+            "variant": "plain",
+            "header": [
+              "الكمية",
+              "الوحدة",
+              "الرمز"
+            ],
+            "rows": [
+              [
+                "الطول",
+                "metre",
+                "m"
+              ],
+              [
+                "الكتلة",
+                "kilogram",
+                "kg"
+              ],
+              [
+                "الزمن",
+                "second",
+                "s"
+              ],
+              [
+                "التيار الكهربائي",
+                "ampere",
+                "A"
+              ],
+              [
+                "درجة الحرارة",
+                "kelvin",
+                "K"
+              ],
+              [
+                "كمية المادة",
+                "mole",
+                "mol"
+              ],
+              [
+                "شدة الإضاءة",
+                "candela",
+                "cd"
+              ]
+            ],
+            "numbered_columns": true,
+            "reveal": "progressive"
+          },
+          "group_id": null,
+          "pen": "construct",
+          "rev": 3
+        },
+        {
+          "action": "board_reveal",
+          "id": "board-table-si",
+          "index": 1,
+          "rev": 4
+        },
+        {
+          "action": "board_reveal",
+          "id": "board-table-si",
+          "index": 2,
+          "rev": 5
+        },
+        {
+          "action": "board_reveal",
+          "id": "board-table-si",
+          "index": 3,
+          "rev": 6
+        },
+        {
+          "action": "board_reveal",
+          "id": "board-table-si",
+          "index": 4,
+          "rev": 7
+        },
+        {
+          "action": "board_reveal",
+          "id": "board-table-si",
+          "index": 5,
+          "rev": 8
+        },
+        {
+          "action": "board_reveal",
+          "id": "board-table-si",
+          "index": 6,
+          "rev": 9
+        }
+      ]
+    },
+    {
+      "name": "table-static-states",
+      "status": "v3",
+      "covers": [
+        "BRD-301",
+        "BRD-303"
+      ],
+      "description": "All four static cell states, including a marked header and empty cell; mark clear retains authored highlight.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-table-prefixes",
+          "region": "live",
+          "kind": "table",
+          "payload": {
+            "variant": "plain",
+            "header": [
+              {
+                "text": "السابقة",
+                "state": "highlight"
+              },
+              "الرمز",
+              "القيمة"
+            ],
+            "rows": [
+              [
+                "kilo",
+                {
+                  "text": "k",
+                  "state": "correct"
+                },
+                "10³"
+              ],
+              [
+                "centi",
+                {
+                  "text": "c",
+                  "state": "highlight"
+                },
+                {
+                  "text": "10⁻²",
+                  "state": "highlight"
+                }
+              ],
+              [
+                "milli",
+                {
+                  "text": "m",
+                  "state": "wrong"
+                },
+                "10⁻³"
+              ],
+              [
+                "micro",
+                {
+                  "text": "",
+                  "state": "dim"
+                },
+                "10⁻⁶"
+              ]
+            ],
+            "numbered_columns": true
+          },
+          "group_id": null,
+          "pen": "alt",
+          "rev": 3
+        },
+        {
+          "action": "board_mark",
+          "id": "board-table-prefixes",
+          "scope": "cell",
+          "index": null,
+          "cell": [
+            1,
+            2
+          ],
+          "option": null,
+          "match": null,
+          "state": "wrong",
+          "rev": 4
+        },
+        {
+          "action": "board_mark",
+          "id": "board-table-prefixes",
+          "scope": "cell",
+          "index": null,
+          "cell": [
+            1,
+            2
+          ],
+          "option": null,
+          "match": null,
+          "state": "clear",
+          "rev": 5
+        }
+      ]
+    },
+    {
+      "name": "add-timeline-progressive",
+      "status": "v3",
+      "covers": [
+        "BRD-504"
+      ],
+      "description": "Only first division and its marker visible on add; labels/markers at later divisions wait for reveal.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-timeline-conversion",
+          "region": "live",
+          "kind": "timeline",
+          "payload": {
+            "axis_label": "تحويل الوحدات",
+            "divisions": [
+              "المعطى",
+              "معامل التحويل",
+              "النتيجة"
+            ],
+            "markers": [
+              {
+                "id": "marker-given",
+                "at": 0,
+                "label": "300 cm",
+                "pen": null
+              },
+              {
+                "id": "marker-factor",
+                "at": 1,
+                "label": null,
+                "pen": "construct"
+              },
+              {
+                "id": "marker-answer",
+                "at": 2,
+                "label": "3 m",
+                "pen": "flow"
+              }
+            ],
+            "reveal": "progressive"
+          },
+          "group_id": null,
+          "pen": "flow",
+          "rev": 3
+        },
+        {
+          "action": "board_reveal",
+          "id": "board-timeline-conversion",
+          "index": 1,
+          "rev": 4
+        },
+        {
+          "action": "board_reveal",
+          "id": "board-timeline-conversion",
+          "index": 2,
+          "rev": 5
+        }
+      ]
+    },
+    {
+      "name": "scenario-attached-icons",
+      "status": "v3",
+      "covers": [
+        "BRD-601",
+        "BRD-602",
+        "BRD-603",
+        "BRD-604"
+      ],
+      "description": "Scene builds one resolved icon per packet. Attachment refers to real board item id; labels wrap with icons. Removing target falls back to ordinary flow.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_group",
+          "id": "board-group-scenario",
+          "region": "live",
+          "kind": "scenario",
+          "heading": "الطول والكتلة والزمن",
+          "stage": null,
+          "rev": 3
+        },
+        {
+          "action": "board_add",
+          "id": "board-icon-length",
+          "region": "live",
+          "kind": "icon",
+          "payload": {
+            "icon": "ruler",
+            "label": "الطول — متر (m)",
+            "attach_to": null
+          },
+          "group_id": "board-group-scenario",
+          "pen": "construct",
+          "rev": 4
+        },
+        {
+          "action": "board_add",
+          "id": "board-icon-mass",
+          "region": "live",
+          "kind": "icon",
+          "payload": {
+            "icon": "scale_justice",
+            "label": "الكتلة — كيلوجرام (kg)",
+            "attach_to": "board-icon-length"
+          },
+          "group_id": "board-group-scenario",
+          "pen": "alt",
+          "rev": 5
+        },
+        {
+          "action": "board_add",
+          "id": "board-icon-time",
+          "region": "live",
+          "kind": "icon",
+          "payload": {
+            "icon": "clock",
+            "label": "الزمن — ثانية (s)",
+            "attach_to": "board-icon-mass"
+          },
+          "group_id": "board-group-scenario",
+          "pen": "flow",
+          "rev": 6
+        },
+        {
+          "action": "board_remove",
+          "id": "board-icon-length",
+          "rev": 7
+        }
+      ]
+    },
+    {
+      "name": "icon-unknown-placeholder",
+      "status": "v3",
+      "covers": [
+        "BRD-602"
+      ],
+      "description": "Valid catalogue baseline for the unknown-icon defensive rendering check. A frontend fault-injection harness replaces ruler with an unknown name; source packets remain backend-conformant.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-icon-unknown",
+          "region": "live",
+          "kind": "icon",
+          "payload": {
+            "icon": "ruler",
+            "label": "الطول — متر (m)",
+            "attach_to": null
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "example-worked",
+      "status": "v3",
+      "covers": [
+        "BRD-621",
+        "BRD-622"
+      ],
+      "description": "Example container with worked stage has a distinct label/frame; stage does not invent answers or blanks.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_group",
+          "id": "board-group-example-worked",
+          "region": "live",
+          "kind": "example",
+          "heading": "أنا أشاهد",
+          "stage": "worked",
+          "rev": 3
+        },
+        {
+          "action": "board_add",
+          "id": "board-step-worked",
+          "region": "live",
+          "kind": "step",
+          "payload": {
+            "text": "المعطى: 300 cm"
+          },
+          "group_id": "board-group-example-worked",
+          "pen": "construct",
+          "rev": 4
+        },
+        {
+          "action": "board_add",
+          "id": "board-equation-worked",
+          "region": "live",
+          "kind": "equation",
+          "payload": {
+            "latex": "\\begin{aligned}300\\ \\text{cm}\\times\\dfrac{1\\ \\text{m}}{100\\ \\text{cm}}&=\\dfrac{300}{100}\\ \\text{m}\\\\&=3\\ \\text{m}\\end{aligned}",
+            "display": true
+          },
+          "group_id": "board-group-example-worked",
+          "pen": null,
+          "rev": 5
+        }
+      ]
+    },
+    {
+      "name": "example-faded",
+      "status": "v3",
+      "covers": [
+        "BRD-621",
+        "BRD-622"
+      ],
+      "description": "Example container with faded stage has a distinct label/frame; stage does not invent answers or blanks.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_group",
+          "id": "board-group-example-faded",
+          "region": "live",
+          "kind": "example",
+          "heading": "أنا أملأ",
+          "stage": "faded",
+          "rev": 3
+        },
+        {
+          "action": "board_add",
+          "id": "board-blanks-faded",
+          "region": "live",
+          "kind": "blanks",
+          "payload": {
+            "template": "A = (10⁻²)² = ___ m²",
+            "blanks": [
+              {
+                "id": "a",
+                "fill": "10⁻⁴"
+              }
+            ]
+          },
+          "group_id": "board-group-example-faded",
+          "pen": null,
+          "rev": 4
+        }
+      ]
+    },
+    {
+      "name": "example-try",
+      "status": "v3",
+      "covers": [
+        "BRD-621",
+        "BRD-622"
+      ],
+      "description": "Example container with try stage has a distinct label/frame; stage does not invent answers or blanks.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_group",
+          "id": "board-group-example-try",
+          "region": "live",
+          "kind": "example",
+          "heading": "هذا لي",
+          "stage": "try",
+          "rev": 3
+        },
+        {
+          "action": "board_add",
+          "id": "board-text-try",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "المسألة: مكعب ضلعه 2 m — حجمه بالـ cm³"
+          },
+          "group_id": "board-group-example-try",
+          "pen": null,
+          "rev": 4
+        }
+      ]
+    },
+    {
+      "name": "pens-all-roles",
+      "status": "v3",
+      "covers": [
+        "BRD-701",
+        "BRD-108"
+      ],
+      "description": "Every item pen plus null. Roles remain independent of answer states in both themes.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-pen-mark",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "الأساسية تُقاس مباشرة بلا معادلة"
+          },
+          "group_id": null,
+          "pen": "mark",
+          "rev": 3
+        },
+        {
+          "action": "board_add",
+          "id": "board-pen-construct",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "المطلوب: حوّل 300 cm إلى m"
+          },
+          "group_id": null,
+          "pen": "construct",
+          "rev": 4
+        },
+        {
+          "action": "board_add",
+          "id": "board-pen-flow",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "الطول — متر (m)"
+          },
+          "group_id": null,
+          "pen": "flow",
+          "rev": 5
+        },
+        {
+          "action": "board_add",
+          "id": "board-pen-trap",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "الإجابة بالجرام أو الباوند لوحدة الكتلة. المصحح يريد الكيلوجرام."
+          },
+          "group_id": null,
+          "pen": "trap",
+          "rev": 6
+        },
+        {
+          "action": "board_add",
+          "id": "board-pen-alt",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "الوحدة مرفوعة لقوة ⇒ السابقة ترتفع لنفس القوة"
+          },
+          "group_id": null,
+          "pen": "alt",
+          "rev": 7
+        },
+        {
+          "action": "board_add",
+          "id": "board-pen-null",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "الطول · الكتلة · الزمن"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 8
+        }
+      ]
+    },
+    {
+      "name": "markup-showcase",
+      "status": "v3",
+      "covers": [
+        "BRD-102",
+        "BRD-103",
+        "BRD-104",
+        "BRD-106",
+        "BRD-107",
+        "BRD-108",
+        "BRD-110"
+      ],
+      "description": "Every markup marker and every pen highlight, with Arabic, English and LTR math in the same line. Payload length counts visible text.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-text-markup",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "نحوّل **conversion factor** __الوحدة__ ==ناتج== ~~خطأ~~ x_{n+1} e^{-kt} 1 cm^{2} = 10^{-4} m^{2} =={mark}1== =={construct}2== =={flow}3== =={trap}4== =={alt}5=="
+          },
+          "group_id": null,
+          "pen": "construct",
+          "rev": 3
+        },
+        {
+          "action": "board_add",
+          "id": "board-bullet-markup",
+          "region": "live",
+          "kind": "bullet",
+          "payload": {
+            "text": "**الطول** — metre",
+            "children": [
+              "__الكتلة__ — kilogram",
+              "=={alt}الزمن== — second"
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 4
+        },
+        {
+          "action": "board_add",
+          "id": "board-blanks-markup",
+          "region": "live",
+          "kind": "blanks",
+          "payload": {
+            "template": "**وحدة الكتلة** ___",
+            "blanks": [
+              {
+                "id": "u",
+                "fill": "كيلوجرام (kg)"
+              }
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 5
+        },
+        {
+          "action": "board_update",
+          "id": "board-blanks-markup",
+          "slot": "u",
+          "text": "كيلوجرام (kg)",
+          "rev": 6
+        }
+      ]
+    },
+    {
+      "name": "bidi-numbers",
+      "status": "v3",
+      "covers": [
+        "BRD-109",
+        "BRD-110"
+      ],
+      "description": "Exact specimen bidi line and spaced signed number. Visual order is asserted with LTR isolates, unchanged arrows and authored numeric formatting.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-bidi-reference",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "نحوّل الـ conversion factor فنحصل على 1 cm² = 10⁻⁴ m²"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        },
+        {
+          "action": "board_add",
+          "id": "board-bidi-signed",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "الأس تضاعف: − 2 ⇒ −4"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 4
+        },
+        {
+          "action": "board_add",
+          "id": "board-bidi-arrow",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "الطول ← m"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 5
+        },
+        {
+          "action": "board_add",
+          "id": "board-bidi-numbers",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "القيم: 120,000 SAR · 0.04 m · 1000"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 6
+        }
+      ]
+    },
+    {
+      "name": "equation-fallback",
+      "status": "v2",
+      "covers": [],
+      "description": "Defensive malformed LaTeX renders raw text without a reducer exception; valid inline operator/root expression follows.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-equation-invalid",
+          "region": "live",
+          "kind": "equation",
+          "payload": {
+            "latex": "\\frac{300}{",
+            "display": true
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        },
+        {
+          "action": "board_add",
+          "id": "board-equation-inline",
+          "region": "live",
+          "kind": "equation",
+          "payload": {
+            "latex": "\\sqrt{4}=2\\quad 1\\pm2\\times3\\div4\\approx5\\le6\\ge4\\ne0\\to7",
+            "display": false
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 4
+        }
+      ]
+    },
+    {
+      "name": "equation-long-aligned",
+      "status": "v3",
+      "covers": [
+        "BRD-201"
+      ],
+      "description": "Aligned conversion solution longer than v2 180-character limit and no more than 600; local math overflow on phone.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-equation-long",
+          "region": "live",
+          "kind": "equation",
+          "payload": {
+            "latex": "\\begin{aligned}300\\ \\text{cm}\\times\\dfrac{1\\ \\text{m}}{100\\ \\text{cm}}&=\\dfrac{300}{100}\\ \\text{m}\\\\&=3\\ \\text{m}\\\\1\\ \\text{cm}^{2}\\times\\left(\\dfrac{1\\ \\text{m}}{100\\ \\text{cm}}\\right)^2&=\\dfrac{1}{100^{2}}\\ \\text{m}^{2}\\\\&=10^{-4}\\ \\text{m}^{2}\\end{aligned}",
+            "display": true
+          },
+          "group_id": null,
+          "pen": "construct",
+          "rev": 3
+        }
+      ]
+    },
+    {
+      "name": "mark-item-states",
+      "status": "v3",
+      "covers": [
+        "BRD-407"
+      ],
+      "description": "All seven states for item; marks accumulate through focus, then clear removes every mark at this address. Sibling content remains legible.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-mark-item",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "المطلوب: حوّل 300 cm إلى m"
+          },
+          "group_id": null,
+          "pen": "mark",
+          "rev": 3
+        },
+        {
+          "action": "board_add",
+          "id": "board-mark-item-sibling",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "الأساسية تُقاس مباشرة بلا معادلة"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 4
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-item",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 5
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-item",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "correct",
+          "rev": 6
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-item",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "wrong",
+          "rev": 7
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-item",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "dim",
+          "rev": 8
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-item",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "strike",
+          "rev": 9
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-item",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "focus",
+          "rev": 10
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-item",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "clear",
+          "rev": 11
+        }
+      ]
+    },
+    {
+      "name": "mark-row-states",
+      "status": "v3",
+      "covers": [
+        "BRD-004",
+        "BRD-407"
+      ],
+      "description": "All seven states for row; marks accumulate through focus, then clear removes every mark at this address. Sibling content remains legible.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-mark-row",
+          "region": "live",
+          "kind": "table",
+          "payload": {
+            "variant": "plain",
+            "header": [
+              "الكمية",
+              "الوحدة",
+              "الرمز"
+            ],
+            "rows": [
+              [
+                "الطول",
+                "metre",
+                "m"
+              ],
+              [
+                "الكتلة",
+                "kilogram",
+                "kg"
+              ],
+              [
+                "الزمن",
+                "second",
+                "s"
+              ],
+              [
+                "التيار الكهربائي",
+                "ampere",
+                "A"
+              ],
+              [
+                "درجة الحرارة",
+                "kelvin",
+                "K"
+              ],
+              [
+                "كمية المادة",
+                "mole",
+                "mol"
+              ],
+              [
+                "شدة الإضاءة",
+                "candela",
+                "cd"
+              ]
+            ]
+          },
+          "group_id": null,
+          "pen": "mark",
+          "rev": 3
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-row",
+          "scope": "row",
+          "index": 1,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 4
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-row",
+          "scope": "row",
+          "index": 1,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "correct",
+          "rev": 5
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-row",
+          "scope": "row",
+          "index": 1,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "wrong",
+          "rev": 6
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-row",
+          "scope": "row",
+          "index": 1,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "dim",
+          "rev": 7
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-row",
+          "scope": "row",
+          "index": 1,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "strike",
+          "rev": 8
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-row",
+          "scope": "row",
+          "index": 1,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "focus",
+          "rev": 9
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-row",
+          "scope": "row",
+          "index": 1,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "clear",
+          "rev": 10
+        }
+      ]
+    },
+    {
+      "name": "mark-cell-states",
+      "status": "v3",
+      "covers": [
+        "BRD-407"
+      ],
+      "description": "All seven states for cell; marks accumulate through focus, then clear removes every mark at this address. Sibling content remains legible.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-mark-cell",
+          "region": "live",
+          "kind": "table",
+          "payload": {
+            "variant": "plain",
+            "header": [
+              "الكمية",
+              "الوحدة",
+              "الرمز"
+            ],
+            "rows": [
+              [
+                "الطول",
+                "metre",
+                "m"
+              ],
+              [
+                "الكتلة",
+                "kilogram",
+                "kg"
+              ],
+              [
+                "الزمن",
+                "second",
+                "s"
+              ],
+              [
+                "التيار الكهربائي",
+                "ampere",
+                "A"
+              ],
+              [
+                "درجة الحرارة",
+                "kelvin",
+                "K"
+              ],
+              [
+                "كمية المادة",
+                "mole",
+                "mol"
+              ],
+              [
+                "شدة الإضاءة",
+                "candela",
+                "cd"
+              ]
+            ]
+          },
+          "group_id": null,
+          "pen": "mark",
+          "rev": 3
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-cell",
+          "scope": "cell",
+          "index": null,
+          "cell": [
+            1,
+            1
+          ],
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 4
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-cell",
+          "scope": "cell",
+          "index": null,
+          "cell": [
+            1,
+            1
+          ],
+          "option": null,
+          "match": null,
+          "state": "correct",
+          "rev": 5
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-cell",
+          "scope": "cell",
+          "index": null,
+          "cell": [
+            1,
+            1
+          ],
+          "option": null,
+          "match": null,
+          "state": "wrong",
+          "rev": 6
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-cell",
+          "scope": "cell",
+          "index": null,
+          "cell": [
+            1,
+            1
+          ],
+          "option": null,
+          "match": null,
+          "state": "dim",
+          "rev": 7
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-cell",
+          "scope": "cell",
+          "index": null,
+          "cell": [
+            1,
+            1
+          ],
+          "option": null,
+          "match": null,
+          "state": "strike",
+          "rev": 8
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-cell",
+          "scope": "cell",
+          "index": null,
+          "cell": [
+            1,
+            1
+          ],
+          "option": null,
+          "match": null,
+          "state": "focus",
+          "rev": 9
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-cell",
+          "scope": "cell",
+          "index": null,
+          "cell": [
+            1,
+            1
+          ],
+          "option": null,
+          "match": null,
+          "state": "clear",
+          "rev": 10
+        }
+      ]
+    },
+    {
+      "name": "mark-column-states",
+      "status": "v3",
+      "covers": [
+        "BRD-407"
+      ],
+      "description": "All seven states for column; marks accumulate through focus, then clear removes every mark at this address. Sibling content remains legible.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-mark-column",
+          "region": "live",
+          "kind": "table",
+          "payload": {
+            "variant": "plain",
+            "header": [
+              "الكمية",
+              "الوحدة",
+              "الرمز"
+            ],
+            "rows": [
+              [
+                "الطول",
+                "metre",
+                "m"
+              ],
+              [
+                "الكتلة",
+                "kilogram",
+                "kg"
+              ],
+              [
+                "الزمن",
+                "second",
+                "s"
+              ],
+              [
+                "التيار الكهربائي",
+                "ampere",
+                "A"
+              ],
+              [
+                "درجة الحرارة",
+                "kelvin",
+                "K"
+              ],
+              [
+                "كمية المادة",
+                "mole",
+                "mol"
+              ],
+              [
+                "شدة الإضاءة",
+                "candela",
+                "cd"
+              ]
+            ]
+          },
+          "group_id": null,
+          "pen": "mark",
+          "rev": 3
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-column",
+          "scope": "column",
+          "index": 2,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 4
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-column",
+          "scope": "column",
+          "index": 2,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "correct",
+          "rev": 5
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-column",
+          "scope": "column",
+          "index": 2,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "wrong",
+          "rev": 6
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-column",
+          "scope": "column",
+          "index": 2,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "dim",
+          "rev": 7
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-column",
+          "scope": "column",
+          "index": 2,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "strike",
+          "rev": 8
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-column",
+          "scope": "column",
+          "index": 2,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "focus",
+          "rev": 9
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-column",
+          "scope": "column",
+          "index": 2,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "clear",
+          "rev": 10
+        }
+      ]
+    },
+    {
+      "name": "mark-option-states",
+      "status": "v3",
+      "covers": [
+        "BRD-004",
+        "BRD-407"
+      ],
+      "description": "All seven states for option; marks accumulate through focus, then clear removes every mark at this address. Sibling content remains legible.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-mark-option",
+          "region": "live",
+          "kind": "options",
+          "payload": {
+            "stem": "وحدة الكتلة في النظام الدولي؟",
+            "options": [
+              {
+                "id": "opt-pound",
+                "text": "باوند (Pound)",
+                "correct": false
+              },
+              {
+                "id": "opt-gram",
+                "text": "جرام (Gram)",
+                "correct": false
+              },
+              {
+                "id": "opt-kg",
+                "text": "كيلوجرام (Kilogram)",
+                "correct": true
+              },
+              {
+                "id": "opt-ounce",
+                "text": "أونصة (Ounce)",
+                "correct": false
+              }
+            ]
+          },
+          "group_id": null,
+          "pen": "mark",
+          "rev": 3
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-option",
+          "scope": "option",
+          "index": null,
+          "cell": null,
+          "option": "opt-kg",
+          "match": null,
+          "state": "highlight",
+          "rev": 4
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-option",
+          "scope": "option",
+          "index": null,
+          "cell": null,
+          "option": "opt-kg",
+          "match": null,
+          "state": "correct",
+          "rev": 5
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-option",
+          "scope": "option",
+          "index": null,
+          "cell": null,
+          "option": "opt-kg",
+          "match": null,
+          "state": "wrong",
+          "rev": 6
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-option",
+          "scope": "option",
+          "index": null,
+          "cell": null,
+          "option": "opt-kg",
+          "match": null,
+          "state": "dim",
+          "rev": 7
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-option",
+          "scope": "option",
+          "index": null,
+          "cell": null,
+          "option": "opt-kg",
+          "match": null,
+          "state": "strike",
+          "rev": 8
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-option",
+          "scope": "option",
+          "index": null,
+          "cell": null,
+          "option": "opt-kg",
+          "match": null,
+          "state": "focus",
+          "rev": 9
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-option",
+          "scope": "option",
+          "index": null,
+          "cell": null,
+          "option": "opt-kg",
+          "match": null,
+          "state": "clear",
+          "rev": 10
+        }
+      ]
+    },
+    {
+      "name": "mark-span-states",
+      "status": "v3",
+      "covers": [
+        "BRD-407"
+      ],
+      "description": "All seven states for span; marks accumulate through focus, then clear removes every mark at this address. Sibling content remains legible.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-mark-span",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "المطلوب: حوّل 300 cm إلى m"
+          },
+          "group_id": null,
+          "pen": "mark",
+          "rev": 3
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-span",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "300 cm",
+          "state": "highlight",
+          "rev": 4
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-span",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "300 cm",
+          "state": "correct",
+          "rev": 5
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-span",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "300 cm",
+          "state": "wrong",
+          "rev": 6
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-span",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "300 cm",
+          "state": "dim",
+          "rev": 7
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-span",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "300 cm",
+          "state": "strike",
+          "rev": 8
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-span",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "300 cm",
+          "state": "focus",
+          "rev": 9
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-span",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "300 cm",
+          "state": "clear",
+          "rev": 10
+        }
+      ]
+    },
+    {
+      "name": "mark-division-states",
+      "status": "v3",
+      "covers": [
+        "BRD-407"
+      ],
+      "description": "All seven states for division; marks accumulate through focus, then clear removes every mark at this address. Sibling content remains legible.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-mark-division",
+          "region": "live",
+          "kind": "timeline",
+          "payload": {
+            "axis_label": "تحويل الوحدات",
+            "divisions": [
+              "المعطى",
+              "معامل التحويل",
+              "النتيجة"
+            ],
+            "markers": [
+              {
+                "id": "marker-given",
+                "at": 0,
+                "label": "300 cm",
+                "pen": null
+              },
+              {
+                "id": "marker-factor",
+                "at": 1,
+                "label": null,
+                "pen": "construct"
+              },
+              {
+                "id": "marker-answer",
+                "at": 2,
+                "label": "3 m",
+                "pen": "flow"
+              }
+            ]
+          },
+          "group_id": null,
+          "pen": "mark",
+          "rev": 3
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-division",
+          "scope": "division",
+          "index": 1,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 4
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-division",
+          "scope": "division",
+          "index": 1,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "correct",
+          "rev": 5
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-division",
+          "scope": "division",
+          "index": 1,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "wrong",
+          "rev": 6
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-division",
+          "scope": "division",
+          "index": 1,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "dim",
+          "rev": 7
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-division",
+          "scope": "division",
+          "index": 1,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "strike",
+          "rev": 8
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-division",
+          "scope": "division",
+          "index": 1,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "focus",
+          "rev": 9
+        },
+        {
+          "action": "board_mark",
+          "id": "board-mark-division",
+          "scope": "division",
+          "index": 1,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "clear",
+          "rev": 10
+        }
+      ]
+    },
+    {
+      "name": "mark-compare-addresses",
+      "status": "v3",
+      "covers": [
+        "BRD-301",
+        "BRD-302",
+        "BRD-304"
+      ],
+      "description": "Compare row/cell/column addressing includes aspect=0,x=1,y=2 and persists when transformed into portrait labelled cards.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-compare-marks",
+          "region": "live",
+          "kind": "compare",
+          "payload": {
+            "aspect_label": "الوجه",
+            "columns": [
+              "أساسية (Fundamental)",
+              "مشتقة (Derived)"
+            ],
+            "rows": [
+              {
+                "aspect": "المعادلة",
+                "x": "ما لها",
+                "y": "لها"
+              },
+              {
+                "aspect": "أمثلة",
+                "x": "طول · كتلة · زمن",
+                "y": "مساحة · سرعة · كثافة"
+              }
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        },
+        {
+          "action": "board_mark",
+          "id": "board-compare-marks",
+          "scope": "row",
+          "index": 1,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "correct",
+          "rev": 4
+        },
+        {
+          "action": "board_mark",
+          "id": "board-compare-marks",
+          "scope": "cell",
+          "index": null,
+          "cell": [
+            0,
+            1
+          ],
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 5
+        },
+        {
+          "action": "board_mark",
+          "id": "board-compare-marks",
+          "scope": "column",
+          "index": 2,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "focus",
+          "rev": 6
+        },
+        {
+          "action": "board_mark",
+          "id": "board-compare-marks",
+          "scope": "column",
+          "index": 2,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "clear",
+          "rev": 7
+        },
+        {
+          "action": "board_mark",
+          "id": "board-compare-marks",
+          "scope": "column",
+          "index": 0,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 8
+        }
+      ]
+    },
+    {
+      "name": "mark-equation-span",
+      "status": "v3",
+      "covers": [
+        "BRD-202"
+      ],
+      "description": "Exact original LaTeX denominator and result matching, clear restores original, missing substring ignored without crashing. Controlled htmlClass wrapping.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-equation-marks",
+          "region": "live",
+          "kind": "equation",
+          "payload": {
+            "latex": "\\begin{aligned}300\\ \\text{cm}\\times\\dfrac{1\\ \\text{m}}{100\\ \\text{cm}}&=\\dfrac{300}{100}\\ \\text{m}\\\\&=3\\ \\text{m}\\end{aligned}",
+            "display": true
+          },
+          "group_id": null,
+          "pen": "mark",
+          "rev": 3
+        },
+        {
+          "action": "board_mark",
+          "id": "board-equation-marks",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "100\\ \\text{cm}",
+          "state": "highlight",
+          "rev": 4
+        },
+        {
+          "action": "board_mark",
+          "id": "board-equation-marks",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "3\\ \\text{m}",
+          "state": "correct",
+          "rev": 5
+        },
+        {
+          "action": "board_mark",
+          "id": "board-equation-marks",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "3\\ \\text{m}",
+          "state": "focus",
+          "rev": 6
+        },
+        {
+          "action": "board_mark",
+          "id": "board-equation-marks",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "100\\ \\text{cm}",
+          "state": "clear",
+          "rev": 7
+        },
+        {
+          "action": "board_mark",
+          "id": "board-equation-marks",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "999",
+          "state": "highlight",
+          "rev": 8
+        },
+        {
+          "action": "board_mark",
+          "id": "board-equation-marks",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "clear",
+          "rev": 9
+        }
+      ]
+    },
+    {
+      "name": "mark-item-all-kinds",
+      "status": "v3",
+      "covers": [
+        "BRD-407"
+      ],
+      "description": "Every kind supports whole-item marks, including divider. Distribution obeys pinned=6/live=7/temporary=4 caps.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-item-heading",
+          "region": "pinned",
+          "kind": "heading",
+          "payload": {
+            "text": "4 · Converting units"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        },
+        {
+          "action": "board_mark",
+          "id": "board-item-heading",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 4
+        },
+        {
+          "action": "board_add",
+          "id": "board-item-text",
+          "region": "temporary",
+          "kind": "text",
+          "payload": {
+            "text": "المطلوب: حوّل 300 cm إلى m"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 5
+        },
+        {
+          "action": "board_mark",
+          "id": "board-item-text",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 6
+        },
+        {
+          "action": "board_add",
+          "id": "board-item-bullet",
+          "region": "pinned",
+          "kind": "bullet",
+          "payload": {
+            "text": "الطول — متر (m)",
+            "children": [
+              "الكتلة — كيلوجرام (kg)",
+              "الزمن — ثانية (s)"
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 7
+        },
+        {
+          "action": "board_mark",
+          "id": "board-item-bullet",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 8
+        },
+        {
+          "action": "board_add",
+          "id": "board-item-step",
+          "region": "temporary",
+          "kind": "step",
+          "payload": {
+            "text": "المعطى: 300 cm"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 9
+        },
+        {
+          "action": "board_mark",
+          "id": "board-item-step",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 10
+        },
+        {
+          "action": "board_add",
+          "id": "board-item-note",
+          "region": "temporary",
+          "kind": "note",
+          "payload": {
+            "text": "الأساسية تُقاس مباشرة بلا معادلة"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 11
+        },
+        {
+          "action": "board_mark",
+          "id": "board-item-note",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 12
+        },
+        {
+          "action": "board_add",
+          "id": "board-item-definition",
+          "region": "live",
+          "kind": "definition",
+          "payload": {
+            "chunks": [
+              "الأساسية تُقاس مباشرة",
+              "بلا معادلة"
+            ],
+            "key_words": [
+              "مباشرة",
+              "بلا معادلة"
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 13
+        },
+        {
+          "action": "board_mark",
+          "id": "board-item-definition",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 14
+        },
+        {
+          "action": "board_add",
+          "id": "board-item-term",
+          "region": "pinned",
+          "kind": "term",
+          "payload": {
+            "en": "conversion factor",
+            "ar": "معامل التحويل"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 15
+        },
+        {
+          "action": "board_mark",
+          "id": "board-item-term",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 16
+        },
+        {
+          "action": "board_add",
+          "id": "board-item-equation",
+          "region": "pinned",
+          "kind": "equation",
+          "payload": {
+            "latex": "\\begin{aligned}300\\ \\text{cm}\\times\\dfrac{1\\ \\text{m}}{100\\ \\text{cm}}&=\\dfrac{300}{100}\\ \\text{m}\\\\&=3\\ \\text{m}\\end{aligned}",
+            "display": true
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 17
+        },
+        {
+          "action": "board_mark",
+          "id": "board-item-equation",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 18
+        },
+        {
+          "action": "board_add",
+          "id": "board-item-compare",
+          "region": "live",
+          "kind": "compare",
+          "payload": {
+            "aspect_label": "الوجه",
+            "columns": [
+              "أساسية (Fundamental)",
+              "مشتقة (Derived)"
+            ],
+            "rows": [
+              {
+                "aspect": "المعادلة",
+                "x": "ما لها",
+                "y": "لها"
+              },
+              {
+                "aspect": "أمثلة",
+                "x": "طول · كتلة · زمن",
+                "y": "مساحة · سرعة · كثافة"
+              }
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 19
+        },
+        {
+          "action": "board_mark",
+          "id": "board-item-compare",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 20
+        },
+        {
+          "action": "board_add",
+          "id": "board-item-table",
+          "region": "pinned",
+          "kind": "table",
+          "payload": {
+            "variant": "journal",
+            "header": [
+              "Account",
+              "Debit",
+              "Credit"
+            ],
+            "rows": [
+              [
+                "Cash",
+                "120,000",
+                ""
+              ],
+              [
+                "Revenue - hardware",
+                "",
+                "80,000"
+              ]
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 21
+        },
+        {
+          "action": "board_mark",
+          "id": "board-item-table",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 22
+        },
+        {
+          "action": "board_add",
+          "id": "board-item-chain",
+          "region": "pinned",
+          "kind": "chain",
+          "payload": {
+            "links": [
+              "Convert the edge first",
+              "Then square it"
+            ],
+            "break_at": null
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 23
+        },
+        {
+          "action": "board_mark",
+          "id": "board-item-chain",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 24
+        },
+        {
+          "action": "board_add",
+          "id": "board-item-blanks",
+          "region": "live",
+          "kind": "blanks",
+          "payload": {
+            "template": "وحدة الكتلة ___",
+            "blanks": [
+              {
+                "id": "u",
+                "fill": "كيلوجرام (kg)"
+              }
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 25
+        },
+        {
+          "action": "board_mark",
+          "id": "board-item-blanks",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 26
+        },
+        {
+          "action": "board_add",
+          "id": "board-item-options",
+          "region": "live",
+          "kind": "options",
+          "payload": {
+            "stem": "وحدة الكتلة في النظام الدولي؟",
+            "options": [
+              {
+                "id": "opt-pound",
+                "text": "باوند (Pound)",
+                "correct": false
+              },
+              {
+                "id": "opt-gram",
+                "text": "جرام (Gram)",
+                "correct": false
+              },
+              {
+                "id": "opt-kg",
+                "text": "كيلوجرام (Kilogram)",
+                "correct": true
+              },
+              {
+                "id": "opt-ounce",
+                "text": "أونصة (Ounce)",
+                "correct": false
+              }
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 27
+        },
+        {
+          "action": "board_mark",
+          "id": "board-item-options",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 28
+        },
+        {
+          "action": "board_add",
+          "id": "board-item-callout",
+          "region": "live",
+          "kind": "callout",
+          "payload": {
+            "kind": "loses_marks",
+            "text": "الإجابة بالجرام أو الباوند لوحدة الكتلة. المصحح يريد الكيلوجرام."
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 29
+        },
+        {
+          "action": "board_mark",
+          "id": "board-item-callout",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 30
+        },
+        {
+          "action": "board_add",
+          "id": "board-item-divider",
+          "region": "temporary",
+          "kind": "divider",
+          "payload": {},
+          "group_id": null,
+          "pen": null,
+          "rev": 31
+        },
+        {
+          "action": "board_mark",
+          "id": "board-item-divider",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 32
+        },
+        {
+          "action": "board_add",
+          "id": "board-item-timeline",
+          "region": "live",
+          "kind": "timeline",
+          "payload": {
+            "axis_label": "تحويل الوحدات",
+            "divisions": [
+              "المعطى",
+              "معامل التحويل",
+              "النتيجة"
+            ],
+            "markers": [
+              {
+                "id": "marker-given",
+                "at": 0,
+                "label": "300 cm",
+                "pen": null
+              },
+              {
+                "id": "marker-factor",
+                "at": 1,
+                "label": null,
+                "pen": "construct"
+              },
+              {
+                "id": "marker-answer",
+                "at": 2,
+                "label": "3 m",
+                "pen": "flow"
+              }
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 33
+        },
+        {
+          "action": "board_mark",
+          "id": "board-item-timeline",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 34
+        },
+        {
+          "action": "board_add",
+          "id": "board-item-icon",
+          "region": "live",
+          "kind": "icon",
+          "payload": {
+            "icon": "ruler",
+            "label": "الطول — متر (m)",
+            "attach_to": null
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 35
+        },
+        {
+          "action": "board_mark",
+          "id": "board-item-icon",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "highlight",
+          "rev": 36
+        }
+      ]
+    },
+    {
+      "name": "mark-span-text-kinds",
+      "status": "v3",
+      "covers": [
+        "BRD-102",
+        "BRD-202"
+      ],
+      "description": "Every text-bearing kind plus equation supports exact spans, including markup-free children/chunks/term/labels, with no span on divider.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-span-heading",
+          "region": "pinned",
+          "kind": "heading",
+          "payload": {
+            "text": "4 · Converting units"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        },
+        {
+          "action": "board_mark",
+          "id": "board-span-heading",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "Converting",
+          "state": "highlight",
+          "rev": 4
+        },
+        {
+          "action": "board_add",
+          "id": "board-span-text",
+          "region": "temporary",
+          "kind": "text",
+          "payload": {
+            "text": "المطلوب: حوّل 300 cm إلى m"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 5
+        },
+        {
+          "action": "board_mark",
+          "id": "board-span-text",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "300 cm",
+          "state": "highlight",
+          "rev": 6
+        },
+        {
+          "action": "board_add",
+          "id": "board-span-bullet",
+          "region": "pinned",
+          "kind": "bullet",
+          "payload": {
+            "text": "الطول — متر (m)",
+            "children": [
+              "الكتلة — كيلوجرام (kg)",
+              "الزمن — ثانية (s)"
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 7
+        },
+        {
+          "action": "board_mark",
+          "id": "board-span-bullet",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "كيلوجرام",
+          "state": "highlight",
+          "rev": 8
+        },
+        {
+          "action": "board_add",
+          "id": "board-span-step",
+          "region": "temporary",
+          "kind": "step",
+          "payload": {
+            "text": "المعطى: 300 cm"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 9
+        },
+        {
+          "action": "board_mark",
+          "id": "board-span-step",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "300 cm",
+          "state": "highlight",
+          "rev": 10
+        },
+        {
+          "action": "board_add",
+          "id": "board-span-note",
+          "region": "temporary",
+          "kind": "note",
+          "payload": {
+            "text": "الأساسية تُقاس مباشرة بلا معادلة"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 11
+        },
+        {
+          "action": "board_mark",
+          "id": "board-span-note",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "بلا معادلة",
+          "state": "highlight",
+          "rev": 12
+        },
+        {
+          "action": "board_add",
+          "id": "board-span-definition",
+          "region": "live",
+          "kind": "definition",
+          "payload": {
+            "chunks": [
+              "الأساسية تُقاس مباشرة",
+              "بلا معادلة"
+            ],
+            "key_words": [
+              "مباشرة",
+              "بلا معادلة"
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 13
+        },
+        {
+          "action": "board_mark",
+          "id": "board-span-definition",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "مباشرة",
+          "state": "highlight",
+          "rev": 14
+        },
+        {
+          "action": "board_add",
+          "id": "board-span-term",
+          "region": "pinned",
+          "kind": "term",
+          "payload": {
+            "en": "conversion factor",
+            "ar": "معامل التحويل"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 15
+        },
+        {
+          "action": "board_mark",
+          "id": "board-span-term",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "conversion factor",
+          "state": "highlight",
+          "rev": 16
+        },
+        {
+          "action": "board_add",
+          "id": "board-span-equation",
+          "region": "pinned",
+          "kind": "equation",
+          "payload": {
+            "latex": "\\begin{aligned}300\\ \\text{cm}\\times\\dfrac{1\\ \\text{m}}{100\\ \\text{cm}}&=\\dfrac{300}{100}\\ \\text{m}\\\\&=3\\ \\text{m}\\end{aligned}",
+            "display": true
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 17
+        },
+        {
+          "action": "board_mark",
+          "id": "board-span-equation",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "100\\ \\text{cm}",
+          "state": "highlight",
+          "rev": 18
+        },
+        {
+          "action": "board_add",
+          "id": "board-span-compare",
+          "region": "live",
+          "kind": "compare",
+          "payload": {
+            "aspect_label": "الوجه",
+            "columns": [
+              "أساسية (Fundamental)",
+              "مشتقة (Derived)"
+            ],
+            "rows": [
+              {
+                "aspect": "المعادلة",
+                "x": "ما لها",
+                "y": "لها"
+              },
+              {
+                "aspect": "أمثلة",
+                "x": "طول · كتلة · زمن",
+                "y": "مساحة · سرعة · كثافة"
+              }
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 19
+        },
+        {
+          "action": "board_mark",
+          "id": "board-span-compare",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "أساسية",
+          "state": "highlight",
+          "rev": 20
+        },
+        {
+          "action": "board_add",
+          "id": "board-span-table",
+          "region": "pinned",
+          "kind": "table",
+          "payload": {
+            "variant": "journal",
+            "header": [
+              "Account",
+              "Debit",
+              "Credit"
+            ],
+            "rows": [
+              [
+                "Cash",
+                "120,000",
+                ""
+              ],
+              [
+                "Revenue - hardware",
+                "",
+                "80,000"
+              ]
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 21
+        },
+        {
+          "action": "board_mark",
+          "id": "board-span-table",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "Cash",
+          "state": "highlight",
+          "rev": 22
+        },
+        {
+          "action": "board_add",
+          "id": "board-span-chain",
+          "region": "pinned",
+          "kind": "chain",
+          "payload": {
+            "links": [
+              "Convert the edge first",
+              "Then square it"
+            ],
+            "break_at": null
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 23
+        },
+        {
+          "action": "board_mark",
+          "id": "board-span-chain",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "square",
+          "state": "highlight",
+          "rev": 24
+        },
+        {
+          "action": "board_add",
+          "id": "board-span-blanks",
+          "region": "live",
+          "kind": "blanks",
+          "payload": {
+            "template": "وحدة الكتلة ___",
+            "blanks": [
+              {
+                "id": "u",
+                "fill": "كيلوجرام (kg)"
+              }
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 25
+        },
+        {
+          "action": "board_mark",
+          "id": "board-span-blanks",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "الكتلة",
+          "state": "highlight",
+          "rev": 26
+        },
+        {
+          "action": "board_add",
+          "id": "board-span-options",
+          "region": "live",
+          "kind": "options",
+          "payload": {
+            "stem": "وحدة الكتلة في النظام الدولي؟",
+            "options": [
+              {
+                "id": "opt-pound",
+                "text": "باوند (Pound)",
+                "correct": false
+              },
+              {
+                "id": "opt-gram",
+                "text": "جرام (Gram)",
+                "correct": false
+              },
+              {
+                "id": "opt-kg",
+                "text": "كيلوجرام (Kilogram)",
+                "correct": true
+              },
+              {
+                "id": "opt-ounce",
+                "text": "أونصة (Ounce)",
+                "correct": false
+              }
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 27
+        },
+        {
+          "action": "board_mark",
+          "id": "board-span-options",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "كيلوجرام",
+          "state": "highlight",
+          "rev": 28
+        },
+        {
+          "action": "board_add",
+          "id": "board-span-callout",
+          "region": "live",
+          "kind": "callout",
+          "payload": {
+            "kind": "loses_marks",
+            "text": "الإجابة بالجرام أو الباوند لوحدة الكتلة. المصحح يريد الكيلوجرام."
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 29
+        },
+        {
+          "action": "board_mark",
+          "id": "board-span-callout",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "الكيلوجرام",
+          "state": "highlight",
+          "rev": 30
+        },
+        {
+          "action": "board_add",
+          "id": "board-span-timeline",
+          "region": "live",
+          "kind": "timeline",
+          "payload": {
+            "axis_label": "تحويل الوحدات",
+            "divisions": [
+              "المعطى",
+              "معامل التحويل",
+              "النتيجة"
+            ],
+            "markers": [
+              {
+                "id": "marker-given",
+                "at": 0,
+                "label": "300 cm",
+                "pen": null
+              },
+              {
+                "id": "marker-factor",
+                "at": 1,
+                "label": null,
+                "pen": "construct"
+              },
+              {
+                "id": "marker-answer",
+                "at": 2,
+                "label": "3 m",
+                "pen": "flow"
+              }
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 31
+        },
+        {
+          "action": "board_mark",
+          "id": "board-span-timeline",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "النتيجة",
+          "state": "highlight",
+          "rev": 32
+        },
+        {
+          "action": "board_add",
+          "id": "board-span-icon",
+          "region": "live",
+          "kind": "icon",
+          "payload": {
+            "icon": "ruler",
+            "label": "الطول — متر (m)",
+            "attach_to": null
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 33
+        },
+        {
+          "action": "board_mark",
+          "id": "board-span-icon",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "الطول",
+          "state": "highlight",
+          "rev": 34
+        }
+      ]
+    },
+    {
+      "name": "mark-accumulate-clear",
+      "status": "v3",
+      "covers": [
+        "BRD-301",
+        "BRD-302",
+        "BRD-304",
+        "BRD-407"
+      ],
+      "description": "Marks on hidden rows wait for reveal; independent properties accumulate, focus union, item clear removes all scopes but keeps static state/legacy annotation. Focus recomputes after pin/remove.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-table-accumulate",
+          "region": "live",
+          "kind": "table",
+          "payload": {
+            "variant": "plain",
+            "header": [
+              "الكمية",
+              "الوحدة",
+              "الرمز"
+            ],
+            "rows": [
+              [
+                "الطول",
+                "metre",
+                "m"
+              ],
+              [
+                "الكتلة",
+                {
+                  "text": "kilogram",
+                  "state": "highlight"
+                },
+                "kg"
+              ],
+              [
+                "الزمن",
+                "second",
+                "s"
+              ],
+              [
+                "التيار الكهربائي",
+                "ampere",
+                "A"
+              ],
+              [
+                "درجة الحرارة",
+                "kelvin",
+                "K"
+              ],
+              [
+                "كمية المادة",
+                "mole",
+                "mol"
+              ],
+              [
+                "شدة الإضاءة",
+                "candela",
+                "cd"
+              ]
+            ],
+            "reveal": "progressive"
+          },
+          "group_id": null,
+          "pen": "construct",
+          "rev": 3
+        },
+        {
+          "action": "board_add",
+          "id": "board-text-sibling",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "الأساسية تُقاس مباشرة بلا معادلة"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 4
+        },
+        {
+          "action": "board_annotate",
+          "id": "board-table-accumulate",
+          "kind": "warning",
+          "rev": 5
+        },
+        {
+          "action": "board_mark",
+          "id": "board-table-accumulate",
+          "scope": "row",
+          "index": 1,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "correct",
+          "rev": 6
+        },
+        {
+          "action": "board_mark",
+          "id": "board-table-accumulate",
+          "scope": "cell",
+          "index": null,
+          "cell": [
+            1,
+            1
+          ],
+          "option": null,
+          "match": null,
+          "state": "strike",
+          "rev": 7
+        },
+        {
+          "action": "board_mark",
+          "id": "board-table-accumulate",
+          "scope": "column",
+          "index": 1,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "focus",
+          "rev": 8
+        },
+        {
+          "action": "board_mark",
+          "id": "board-table-accumulate",
+          "scope": "column",
+          "index": 2,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "focus",
+          "rev": 9
+        },
+        {
+          "action": "board_reveal",
+          "id": "board-table-accumulate",
+          "index": 1,
+          "rev": 10
+        },
+        {
+          "action": "board_mark",
+          "id": "board-table-accumulate",
+          "scope": "cell",
+          "index": null,
+          "cell": [
+            1,
+            1
+          ],
+          "option": null,
+          "match": null,
+          "state": "wrong",
+          "rev": 11
+        },
+        {
+          "action": "board_mark",
+          "id": "board-table-accumulate",
+          "scope": "cell",
+          "index": null,
+          "cell": [
+            1,
+            1
+          ],
+          "option": null,
+          "match": null,
+          "state": "correct",
+          "rev": 12
+        },
+        {
+          "action": "board_mark",
+          "id": "board-table-accumulate",
+          "scope": "cell",
+          "index": null,
+          "cell": [
+            1,
+            1
+          ],
+          "option": null,
+          "match": null,
+          "state": "clear",
+          "rev": 13
+        },
+        {
+          "action": "board_mark",
+          "id": "board-table-accumulate",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "clear",
+          "rev": 14
+        },
+        {
+          "action": "board_mark",
+          "id": "board-table-accumulate",
+          "scope": "item",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": null,
+          "state": "focus",
+          "rev": 15
+        },
+        {
+          "action": "board_add",
+          "id": "board-text-new-sibling",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "المطلوب: حوّل 300 cm إلى m"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 16
+        },
+        {
+          "action": "board_pin",
+          "id": "board-table-accumulate",
+          "pinned": true,
+          "region": "pinned",
+          "rev": 17
+        },
+        {
+          "action": "board_pin",
+          "id": "board-table-accumulate",
+          "pinned": false,
+          "region": "live",
+          "rev": 18
+        },
+        {
+          "action": "board_remove",
+          "id": "board-table-accumulate",
+          "rev": 19
+        }
+      ]
+    },
+    {
+      "name": "eviction-live-13",
+      "status": "v2",
+      "covers": [
+        "BRD-405"
+      ],
+      "description": "After 12 distinct live items, remove oldest before adding 13th. Backend is the sole eviction owner; pinned reference survives.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-term-pinned",
+          "region": "pinned",
+          "kind": "term",
+          "payload": {
+            "en": "conversion factor",
+            "ar": "معامل التحويل"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        },
+        {
+          "action": "board_add",
+          "id": "board-live-1",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "المطلوب: حوّل 300 cm إلى m · 1"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 4
+        },
+        {
+          "action": "board_add",
+          "id": "board-live-2",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "المطلوب: حوّل 300 cm إلى m · 2"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 5
+        },
+        {
+          "action": "board_add",
+          "id": "board-live-3",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "المطلوب: حوّل 300 cm إلى m · 3"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 6
+        },
+        {
+          "action": "board_add",
+          "id": "board-live-4",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "المطلوب: حوّل 300 cm إلى m · 4"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 7
+        },
+        {
+          "action": "board_add",
+          "id": "board-live-5",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "المطلوب: حوّل 300 cm إلى m · 5"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 8
+        },
+        {
+          "action": "board_add",
+          "id": "board-live-6",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "المطلوب: حوّل 300 cm إلى m · 6"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 9
+        },
+        {
+          "action": "board_add",
+          "id": "board-live-7",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "المطلوب: حوّل 300 cm إلى m · 7"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 10
+        },
+        {
+          "action": "board_add",
+          "id": "board-live-8",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "المطلوب: حوّل 300 cm إلى m · 8"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 11
+        },
+        {
+          "action": "board_add",
+          "id": "board-live-9",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "المطلوب: حوّل 300 cm إلى m · 9"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 12
+        },
+        {
+          "action": "board_add",
+          "id": "board-live-10",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "المطلوب: حوّل 300 cm إلى m · 10"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 13
+        },
+        {
+          "action": "board_add",
+          "id": "board-live-11",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "المطلوب: حوّل 300 cm إلى m · 11"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 14
+        },
+        {
+          "action": "board_add",
+          "id": "board-live-12",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "المطلوب: حوّل 300 cm إلى m · 12"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 15
+        },
+        {
+          "action": "board_remove",
+          "id": "board-live-1",
+          "rev": 16
+        },
+        {
+          "action": "board_add",
+          "id": "board-live-13",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "المطلوب: حوّل 300 cm إلى m · 13"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 17
+        }
+      ]
+    },
+    {
+      "name": "snapshot-full",
+      "status": "v3",
+      "covers": [
+        "BRD-001",
+        "BRD-701",
+        "BRD-123",
+        "BRD-504",
+        "BRD-621",
+        "BRD-622"
+      ],
+      "description": "Authoritative rev 60 follows clear/show rev 1/2 after missed backend mutations. All 17 kinds, six groups/all kinds/stages, pens, marks in application order, visible counts, annotations, slots and attached icons restore atomically within capacities.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_snapshot",
+          "visible": true,
+          "title": {
+            "id": "board-snapshot-title",
+            "kind": "title",
+            "region": "live",
+            "payload": {
+              "text": "4 · تحويل الوحدات"
+            },
+            "group_id": null,
+            "annotation": null,
+            "revealed": 1,
+            "slots": {},
+            "pen": null,
+            "marks": []
+          },
+          "groups": [
+            {
+              "id": "board-snapshot-box",
+              "kind": "box",
+              "region": "pinned",
+              "heading": "مرجع",
+              "stage": null
+            },
+            {
+              "id": "board-snapshot-columns",
+              "kind": "columns",
+              "region": "temporary",
+              "heading": "توضيح",
+              "stage": null
+            },
+            {
+              "id": "board-snapshot-worked",
+              "kind": "example",
+              "region": "live",
+              "heading": "أنا أشاهد",
+              "stage": "worked"
+            },
+            {
+              "id": "board-snapshot-faded",
+              "kind": "example",
+              "region": "live",
+              "heading": "أنا أملأ",
+              "stage": "faded"
+            },
+            {
+              "id": "board-snapshot-try",
+              "kind": "example",
+              "region": "live",
+              "heading": "هذا لي",
+              "stage": "try"
+            },
+            {
+              "id": "board-snapshot-scene",
+              "kind": "scenario",
+              "region": "live",
+              "heading": "الطول والزمن",
+              "stage": null
+            }
+          ],
+          "items": [
+            {
+              "id": "board-snapshot-heading",
+              "kind": "heading",
+              "region": "pinned",
+              "payload": {
+                "text": "4 · Converting units"
+              },
+              "group_id": "board-snapshot-box",
+              "annotation": null,
+              "revealed": 1,
+              "slots": {},
+              "pen": "mark",
+              "marks": []
+            },
+            {
+              "id": "board-snapshot-text",
+              "kind": "text",
+              "region": "temporary",
+              "payload": {
+                "text": "المطلوب: حوّل 300 cm إلى m"
+              },
+              "group_id": "board-snapshot-columns",
+              "annotation": "warning",
+              "revealed": 1,
+              "slots": {},
+              "pen": "construct",
+              "marks": [
+                {
+                  "scope": "item",
+                  "index": null,
+                  "cell": null,
+                  "option": null,
+                  "match": null,
+                  "state": "highlight"
+                },
+                {
+                  "scope": "span",
+                  "index": null,
+                  "cell": null,
+                  "option": null,
+                  "match": "300 cm",
+                  "state": "strike"
+                }
+              ]
+            },
+            {
+              "id": "board-snapshot-bullet",
+              "kind": "bullet",
+              "region": "pinned",
+              "payload": {
+                "text": "الطول — متر (m)",
+                "children": [
+                  "الكتلة — كيلوجرام (kg)",
+                  "الزمن — ثانية (s)"
+                ]
+              },
+              "group_id": "board-snapshot-box",
+              "annotation": null,
+              "revealed": 1,
+              "slots": {},
+              "pen": "flow",
+              "marks": []
+            },
+            {
+              "id": "board-snapshot-step",
+              "kind": "step",
+              "region": "temporary",
+              "payload": {
+                "text": "المعطى: 300 cm"
+              },
+              "group_id": "board-snapshot-columns",
+              "annotation": null,
+              "revealed": 1,
+              "slots": {},
+              "pen": "trap",
+              "marks": []
+            },
+            {
+              "id": "board-snapshot-note",
+              "kind": "note",
+              "region": "temporary",
+              "payload": {
+                "text": "الأساسية تُقاس مباشرة بلا معادلة"
+              },
+              "group_id": "board-snapshot-columns",
+              "annotation": null,
+              "revealed": 1,
+              "slots": {},
+              "pen": "alt",
+              "marks": []
+            },
+            {
+              "id": "board-snapshot-definition",
+              "kind": "definition",
+              "region": "live",
+              "payload": {
+                "chunks": [
+                  "الأساسية تُقاس مباشرة",
+                  "بلا معادلة"
+                ],
+                "key_words": [
+                  "مباشرة",
+                  "بلا معادلة"
+                ]
+              },
+              "group_id": "board-snapshot-worked",
+              "annotation": null,
+              "revealed": 2,
+              "slots": {},
+              "pen": "mark",
+              "marks": []
+            },
+            {
+              "id": "board-snapshot-term",
+              "kind": "term",
+              "region": "pinned",
+              "payload": {
+                "en": "conversion factor",
+                "ar": "معامل التحويل"
+              },
+              "group_id": "board-snapshot-box",
+              "annotation": null,
+              "revealed": 1,
+              "slots": {},
+              "pen": "construct",
+              "marks": []
+            },
+            {
+              "id": "board-snapshot-equation",
+              "kind": "equation",
+              "region": "pinned",
+              "payload": {
+                "latex": "\\begin{aligned}300\\ \\text{cm}\\times\\dfrac{1\\ \\text{m}}{100\\ \\text{cm}}&=\\dfrac{300}{100}\\ \\text{m}\\\\&=3\\ \\text{m}\\end{aligned}",
+                "display": true
+              },
+              "group_id": "board-snapshot-box",
+              "annotation": null,
+              "revealed": 1,
+              "slots": {},
+              "pen": "flow",
+              "marks": [
+                {
+                  "scope": "span",
+                  "index": null,
+                  "cell": null,
+                  "option": null,
+                  "match": "100\\ \\text{cm}",
+                  "state": "highlight"
+                },
+                {
+                  "scope": "span",
+                  "index": null,
+                  "cell": null,
+                  "option": null,
+                  "match": "3\\ \\text{m}",
+                  "state": "correct"
+                }
+              ]
+            },
+            {
+              "id": "board-snapshot-compare",
+              "kind": "compare",
+              "region": "live",
+              "payload": {
+                "aspect_label": "الوجه",
+                "columns": [
+                  "أساسية (Fundamental)",
+                  "مشتقة (Derived)"
+                ],
+                "rows": [
+                  {
+                    "aspect": "المعادلة",
+                    "x": "ما لها",
+                    "y": "لها"
+                  },
+                  {
+                    "aspect": "أمثلة",
+                    "x": "طول · كتلة · زمن",
+                    "y": "مساحة · سرعة · كثافة"
+                  }
+                ]
+              },
+              "group_id": "board-snapshot-worked",
+              "annotation": null,
+              "revealed": 1,
+              "slots": {},
+              "pen": "trap",
+              "marks": []
+            },
+            {
+              "id": "board-snapshot-table",
+              "kind": "table",
+              "region": "pinned",
+              "payload": {
+                "variant": "plain",
+                "header": [
+                  "الكمية",
+                  "الوحدة",
+                  "الرمز"
+                ],
+                "rows": [
+                  [
+                    "الطول",
+                    "metre",
+                    "m"
+                  ],
+                  [
+                    "الكتلة",
+                    {
+                      "text": "kilogram",
+                      "state": "highlight"
+                    },
+                    "kg"
+                  ],
+                  [
+                    "الزمن",
+                    "second",
+                    "s"
+                  ],
+                  [
+                    "التيار الكهربائي",
+                    "ampere",
+                    "A"
+                  ],
+                  [
+                    "درجة الحرارة",
+                    "kelvin",
+                    "K"
+                  ],
+                  [
+                    "كمية المادة",
+                    "mole",
+                    "mol"
+                  ],
+                  [
+                    "شدة الإضاءة",
+                    "candela",
+                    "cd"
+                  ]
+                ],
+                "numbered_columns": true,
+                "reveal": "progressive"
+              },
+              "group_id": "board-snapshot-box",
+              "annotation": null,
+              "revealed": 3,
+              "slots": {},
+              "pen": "alt",
+              "marks": [
+                {
+                  "scope": "row",
+                  "index": 1,
+                  "cell": null,
+                  "option": null,
+                  "match": null,
+                  "state": "correct"
+                },
+                {
+                  "scope": "cell",
+                  "index": null,
+                  "cell": [
+                    1,
+                    1
+                  ],
+                  "option": null,
+                  "match": null,
+                  "state": "highlight"
+                },
+                {
+                  "scope": "column",
+                  "index": 2,
+                  "cell": null,
+                  "option": null,
+                  "match": null,
+                  "state": "focus"
+                }
+              ]
+            },
+            {
+              "id": "board-snapshot-chain",
+              "kind": "chain",
+              "region": "pinned",
+              "payload": {
+                "links": [
+                  "Convert the edge first",
+                  "Then square it"
+                ],
+                "break_at": null
+              },
+              "group_id": "board-snapshot-box",
+              "annotation": null,
+              "revealed": 1,
+              "slots": {
+                "1": "key"
+              },
+              "pen": "mark",
+              "marks": []
+            },
+            {
+              "id": "board-snapshot-blanks",
+              "kind": "blanks",
+              "region": "live",
+              "payload": {
+                "template": "وحدة الكتلة ___",
+                "blanks": [
+                  {
+                    "id": "u",
+                    "fill": "كيلوجرام (kg)"
+                  }
+                ]
+              },
+              "group_id": "board-snapshot-faded",
+              "annotation": null,
+              "revealed": 1,
+              "slots": {
+                "u": "كيلوجرام (kg)"
+              },
+              "pen": "construct",
+              "marks": []
+            },
+            {
+              "id": "board-snapshot-options",
+              "kind": "options",
+              "region": "live",
+              "payload": {
+                "stem": "وحدة الكتلة في النظام الدولي؟",
+                "options": [
+                  {
+                    "id": "opt-pound",
+                    "text": "باوند (Pound)",
+                    "correct": false
+                  },
+                  {
+                    "id": "opt-gram",
+                    "text": "جرام (Gram)",
+                    "correct": false
+                  },
+                  {
+                    "id": "opt-kg",
+                    "text": "كيلوجرام (Kilogram)",
+                    "correct": true
+                  },
+                  {
+                    "id": "opt-ounce",
+                    "text": "أونصة (Ounce)",
+                    "correct": false
+                  }
+                ]
+              },
+              "group_id": "board-snapshot-try",
+              "annotation": null,
+              "revealed": 1,
+              "slots": {
+                "opt-gram": "wrong"
+              },
+              "pen": "flow",
+              "marks": [
+                {
+                  "scope": "option",
+                  "index": null,
+                  "cell": null,
+                  "option": "opt-kg",
+                  "match": null,
+                  "state": "correct"
+                }
+              ]
+            },
+            {
+              "id": "board-snapshot-callout",
+              "kind": "callout",
+              "region": "live",
+              "payload": {
+                "kind": "loses_marks",
+                "text": "الإجابة بالجرام أو الباوند لوحدة الكتلة. المصحح يريد الكيلوجرام."
+              },
+              "group_id": "board-snapshot-worked",
+              "annotation": null,
+              "revealed": 1,
+              "slots": {},
+              "pen": "trap",
+              "marks": []
+            },
+            {
+              "id": "board-snapshot-divider",
+              "kind": "divider",
+              "region": "temporary",
+              "payload": {},
+              "group_id": "board-snapshot-columns",
+              "annotation": null,
+              "revealed": 1,
+              "slots": {},
+              "pen": "alt",
+              "marks": []
+            },
+            {
+              "id": "board-snapshot-timeline",
+              "kind": "timeline",
+              "region": "live",
+              "payload": {
+                "axis_label": "تحويل الوحدات",
+                "divisions": [
+                  "المعطى",
+                  "معامل التحويل",
+                  "النتيجة"
+                ],
+                "markers": [
+                  {
+                    "id": "marker-given",
+                    "at": 0,
+                    "label": "300 cm",
+                    "pen": null
+                  },
+                  {
+                    "id": "marker-factor",
+                    "at": 1,
+                    "label": null,
+                    "pen": "construct"
+                  },
+                  {
+                    "id": "marker-answer",
+                    "at": 2,
+                    "label": "3 m",
+                    "pen": "flow"
+                  }
+                ],
+                "reveal": "progressive"
+              },
+              "group_id": "board-snapshot-worked",
+              "annotation": null,
+              "revealed": 2,
+              "slots": {},
+              "pen": "mark",
+              "marks": [
+                {
+                  "scope": "division",
+                  "index": 1,
+                  "cell": null,
+                  "option": null,
+                  "match": null,
+                  "state": "focus"
+                }
+              ]
+            },
+            {
+              "id": "board-snapshot-icon",
+              "kind": "icon",
+              "region": "live",
+              "payload": {
+                "icon": "ruler",
+                "label": "الطول — متر (m)",
+                "attach_to": null
+              },
+              "group_id": "board-snapshot-scene",
+              "annotation": null,
+              "revealed": 1,
+              "slots": {},
+              "pen": "construct",
+              "marks": []
+            },
+            {
+              "id": "board-snapshot-icon-time",
+              "kind": "icon",
+              "region": "live",
+              "payload": {
+                "icon": "clock",
+                "label": "الزمن — ثانية (s)",
+                "attach_to": "board-snapshot-icon"
+              },
+              "group_id": "board-snapshot-scene",
+              "annotation": null,
+              "revealed": 1,
+              "slots": {},
+              "pen": null,
+              "marks": []
+            }
+          ],
+          "rev": 60
+        }
+      ]
+    },
+    {
+      "name": "sequence-worked-conversion",
+      "status": "v3",
+      "covers": [
+        "BRD-201",
+        "BRD-202",
+        "BRD-621",
+        "BRD-622"
+      ],
+      "description": "Short speech-paced worked example: frame, worked container, given, aligned solution, denominator/result marks. Harness can interrupt after given; published content stays.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_set_title",
+          "id": "board-title-conversion",
+          "text": "4 · تحويل الوحدات",
+          "rev": 3
+        },
+        {
+          "action": "board_group",
+          "id": "board-group-conversion",
+          "region": "live",
+          "kind": "example",
+          "heading": "حوّل 300 cm إلى m",
+          "stage": "worked",
+          "rev": 4
+        },
+        {
+          "action": "board_add",
+          "id": "board-step-conversion",
+          "region": "live",
+          "kind": "step",
+          "payload": {
+            "text": "المعطى: 300 cm"
+          },
+          "group_id": "board-group-conversion",
+          "pen": "construct",
+          "rev": 5
+        },
+        {
+          "action": "board_add",
+          "id": "board-equation-conversion",
+          "region": "live",
+          "kind": "equation",
+          "payload": {
+            "latex": "\\begin{aligned}300\\ \\text{cm}\\times\\dfrac{1\\ \\text{m}}{100\\ \\text{cm}}&=\\dfrac{300}{100}\\ \\text{m}\\\\&=3\\ \\text{m}\\end{aligned}",
+            "display": true
+          },
+          "group_id": "board-group-conversion",
+          "pen": "construct",
+          "rev": 6
+        },
+        {
+          "action": "board_mark",
+          "id": "board-equation-conversion",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "100\\ \\text{cm}",
+          "state": "highlight",
+          "rev": 7
+        },
+        {
+          "action": "board_mark",
+          "id": "board-equation-conversion",
+          "scope": "span",
+          "index": null,
+          "cell": null,
+          "option": null,
+          "match": "3\\ \\text{m}",
+          "state": "correct",
+          "rev": 8
+        }
+      ]
+    },
+    {
+      "name": "sequence-answer-remediation",
+      "status": "v3",
+      "covers": [
+        "BRD-004",
+        "BRD-404"
+      ],
+      "description": "Short wrong answer → temporary explanation → return sequence. Marks chosen option only; no automatic reveal of correct option.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "board_add",
+          "id": "board-options-answer",
+          "region": "live",
+          "kind": "options",
+          "payload": {
+            "stem": "وحدة الكتلة في النظام الدولي؟",
+            "options": [
+              {
+                "id": "opt-pound",
+                "text": "باوند (Pound)",
+                "correct": false
+              },
+              {
+                "id": "opt-gram",
+                "text": "جرام (Gram)",
+                "correct": false
+              },
+              {
+                "id": "opt-kg",
+                "text": "كيلوجرام (Kilogram)",
+                "correct": true
+              },
+              {
+                "id": "opt-ounce",
+                "text": "أونصة (Ounce)",
+                "correct": false
+              }
+            ]
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 3
+        },
+        {
+          "action": "board_mark",
+          "id": "board-options-answer",
+          "scope": "option",
+          "index": null,
+          "cell": null,
+          "option": "opt-gram",
+          "match": null,
+          "state": "wrong",
+          "rev": 4
+        },
+        {
+          "action": "board_add",
+          "id": "board-note-remediation",
+          "region": "temporary",
+          "kind": "note",
+          "payload": {
+            "text": "الجرام ليس وحدة أساسية"
+          },
+          "group_id": null,
+          "pen": "trap",
+          "rev": 5
+        },
+        {
+          "action": "board_clear",
+          "scope": "temporary",
+          "rev": 6
+        },
+        {
+          "action": "board_mark",
+          "id": "board-options-answer",
+          "scope": "option",
+          "index": null,
+          "cell": null,
+          "option": "opt-kg",
+          "match": null,
+          "state": "correct",
+          "rev": 7
+        }
+      ]
+    },
+    {
+      "name": "sequence-topic-turnover",
+      "status": "v2",
+      "covers": [
+        "BRD-404",
+        "BRD-804"
+      ],
+      "description": "Short live turnover preserves pinned reference, then full topic boundary clears pin/title and supplies new title without redundant show.",
+      "messages": [
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 1
+        },
+        {
+          "action": "board_show",
+          "rev": 2
+        },
+        {
+          "action": "set_lesson",
+          "lesson": "units_prefixes_and_conversion_en",
+          "number_of_topics": 6
+        },
+        {
+          "action": "board_set_title",
+          "id": "board-title-old",
+          "text": "3 · Prefixes",
+          "rev": 3
+        },
+        {
+          "action": "board_add",
+          "id": "board-term-reference",
+          "region": "pinned",
+          "kind": "term",
+          "payload": {
+            "en": "prefix",
+            "ar": "سابقة"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 4
+        },
+        {
+          "action": "board_add",
+          "id": "board-text-old",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "These five are enough for the exam"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 5
+        },
+        {
+          "action": "board_clear",
+          "scope": "live",
+          "rev": 6
+        },
+        {
+          "action": "board_add",
+          "id": "board-text-stage",
+          "region": "live",
+          "kind": "text",
+          "payload": {
+            "text": "Convert 300 cm to m"
+          },
+          "group_id": null,
+          "pen": null,
+          "rev": 7
+        },
+        {
+          "action": "topic_done",
+          "topic": "3 · Prefixes"
+        },
+        {
+          "action": "set_topic",
+          "topic": "4 · Converting units",
+          "current_topic_index": 5,
+          "question": "",
+          "choices": []
+        },
+        {
+          "action": "board_clear",
+          "scope": "all",
+          "rev": 8
+        },
+        {
+          "action": "board_set_title",
+          "id": "board-title-new",
+          "text": "4 · Converting units",
+          "rev": 9
+        }
+      ]
+    }
+  ]
+}

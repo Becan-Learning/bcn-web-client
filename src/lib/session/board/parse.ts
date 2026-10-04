@@ -1,5 +1,5 @@
 import {
-  CALLOUT_KINDS,
+  type CalloutKind,
   type AnnotationKind,
   type BoardControlEvent,
   type BoardGroup,
@@ -10,6 +10,11 @@ import {
   type BoardScope,
   type SlotState,
   type SlotValue,
+  type Mark,
+  type MarkScope,
+  type MarkState,
+  type Pen,
+  type TableCell,
 } from "./types";
 
 /* تحليل رسائل السبورة — حارسٌ بين قناة البيانات والمخفّض.
@@ -60,12 +65,20 @@ const ANNOTATIONS: readonly AnnotationKind[] = [
   "broken",
   "dim",
 ];
-const SLOT_STATES: readonly SlotState[] = ["correct", "wrong", "broken"];
+/* قبول الرسائل مستقلّ عن مفردات العرض حتى تبقى الحمولات المألوفة كما هي. */
+const WIRE_CALLOUT_KINDS: readonly CalloutKind[] = [
+  "loses_marks", "mistake", "mnemonic", "definition", "example", "exam", "verbatim",
+];
+const SLOT_STATES: readonly SlotState[] = ["correct", "wrong", "broken", "key"];
 const ITEM_KINDS: readonly BoardItemKind[] = [
   "heading",
   "text",
   "bullet",
   "step",
+  "note",
+  "divider",
+  "timeline",
+  "icon",
   "definition",
   "term",
   "equation",
@@ -91,10 +104,16 @@ function parsePayload(kind: BoardItem["kind"], raw: unknown): BoardPayload | nul
     case "title":
     case "heading":
     case "text":
-    case "bullet":
-    case "step": {
+    case "step":
+    case "note": {
       const t = text(raw.text);
       return t === null ? null : { text: t };
+    }
+
+    case "bullet": {
+      const t = text(raw.text);
+      const children = raw.children === undefined ? [] : texts(raw.children);
+      return t === null || children === null ? null : { text: t, children };
     }
 
     case "definition": {
@@ -113,50 +132,94 @@ function parsePayload(kind: BoardItem["kind"], raw: unknown): BoardPayload | nul
     case "equation": {
       const latex = text(raw.latex);
       if (latex === null) return null;
+      if (raw.display !== undefined && typeof raw.display !== "boolean") return null;
       return { latex, display: raw.display !== false };
     }
 
     case "compare": {
       const columns = texts(raw.columns);
       if (!columns || columns.length !== 2) return null;
-      if (!Array.isArray(raw.rows)) return null;
+      if (!Array.isArray(raw.rows) || raw.rows.length === 0) return null;
 
       const rows = [];
       for (const entry of raw.rows) {
         if (!isRecord(entry)) return null;
-        const aspect = cell(entry.aspect);
-        const x = cell(entry.x);
-        const y = cell(entry.y);
+        const aspect = text(entry.aspect);
+        const x = text(entry.x);
+        const y = text(entry.y);
         if (aspect === null || x === null || y === null) return null;
         rows.push({ aspect, x, y });
       }
 
+      const aspectLabel = text(raw.aspect_label);
+      if (aspectLabel === null) return null;
       return {
-        aspectLabel: cell(raw.aspect_label) ?? "",
+        aspectLabel,
         columns: [columns[0], columns[1]],
         rows,
       };
     }
 
     case "table": {
-      const header = texts(raw.header);
-      if (!header || header.length === 0 || !Array.isArray(raw.rows)) return null;
-
-      /* الصفّ يُسوّى إلى طول الرأس بدل رفضه: عمودٌ منزاح يقرؤه
-         المحاسب إجابةً خاطئة، وصفٌّ ناقص خيرٌ من بندٍ غائب. */
-      const rows: string[][] = [];
+      if (!Array.isArray(raw.header) || raw.header.length === 0 ||
+          !Array.isArray(raw.rows) || raw.rows.length === 0) return null;
+      const header = raw.header.map(parseCell);
+      if (header.some((entry) => entry === null || text(entry.text) === null)) return null;
+      const rows: TableCell[][] = [];
       for (const entry of raw.rows) {
-        if (!Array.isArray(entry)) return null;
-        const row: string[] = [];
-        for (let i = 0; i < header.length; i += 1) {
-          const value = cell(entry[i]);
-          if (entry[i] !== undefined && value === null) return null;
-          row.push(value ?? "");
-        }
-        rows.push(row);
+        if (!Array.isArray(entry) || entry.length !== header.length) return null;
+        const row = entry.map(parseCell);
+        if (row.some((value) => value === null)) return null;
+        rows.push(row as TableCell[]);
       }
+      const variant = oneOf(["plain", "journal"] as const, raw.variant);
+      if (variant === null || (raw.numbered_columns !== undefined &&
+          typeof raw.numbered_columns !== "boolean") ||
+          (raw.reveal !== undefined && raw.reveal !== "progressive")) return null;
+      if (variant === "journal" && (header.length !== 3 ||
+          header.some((entry, index) => entry?.text !== ["Account", "Debit", "Credit"][index]))) return null;
+      return {
+        variant,
+        header: header as TableCell[],
+        rows,
+        numberedColumns: raw.numbered_columns === true,
+        progressive: raw.reveal === "progressive",
+      };
+    }
 
-      return { variant: cell(raw.variant), header, rows };
+    case "divider":
+      return {};
+
+    case "timeline": {
+      const axisLabel = text(raw.axis_label);
+      const divisions = texts(raw.divisions);
+      if (axisLabel === null || divisions === null || divisions.length < 2 ||
+          !Array.isArray(raw.markers) ||
+          (raw.reveal !== undefined && raw.reveal !== "progressive")) return null;
+      const markers = [];
+      const ids = new Set<string>();
+      for (const entry of raw.markers) {
+        if (!isRecord(entry)) return null;
+        const id = text(entry.id);
+        const at = int(entry.at);
+        const label = entry.label === null ? null : text(entry.label);
+        const pen = oneOf(PENS, entry.pen);
+        if (id === null || ids.has(id) || at === null || at < 0 || at >= divisions.length ||
+            (entry.label !== null && label === null) ||
+            (entry.pen !== null && pen === null)) return null;
+        ids.add(id);
+        markers.push({ id, at, label, pen });
+      }
+      return { axisLabel, divisions, markers, progressive: raw.reveal === "progressive" };
+    }
+
+    case "icon": {
+      const icon = text(raw.icon);
+      const label = text(raw.label);
+      const attachTo = text(raw.attach_to);
+      if (icon === null || label === null ||
+          (raw.attach_to !== null && attachTo === null)) return null;
+      return { icon, label, attachTo };
     }
 
     case "chain": {
@@ -168,7 +231,7 @@ function parsePayload(kind: BoardItem["kind"], raw: unknown): BoardPayload | nul
 
       return {
         links,
-        breakAt: breakAt !== null && breakAt >= 1 && breakAt <= links.length ? breakAt : null,
+        breakAt: breakAt !== null && breakAt >= 1 && breakAt < links.length ? breakAt : null,
       };
     }
 
@@ -208,31 +271,66 @@ function parsePayload(kind: BoardItem["kind"], raw: unknown): BoardPayload | nul
     }
 
     case "callout": {
-      const calloutKind = oneOf(CALLOUT_KINDS, raw.kind);
+      const calloutKind = oneOf(WIRE_CALLOUT_KINDS, raw.kind);
       const t = text(raw.text);
       return calloutKind === null || t === null ? null : { kind: calloutKind, text: t };
     }
   }
+  return null;
 }
 
-function parseSlots(raw: unknown): Record<string, SlotValue> {
-  if (!isRecord(raw)) return {};
+const PENS: readonly Pen[] = ["mark", "construct", "flow", "trap", "alt"];
+const MARK_SCOPES: readonly MarkScope[] = ["item", "row", "cell", "column", "option", "span", "division"];
+const MARK_STATES: readonly (MarkState | "clear")[] = [
+  "highlight", "correct", "wrong", "dim", "strike", "focus", "clear",
+];
 
+function parseCell(raw: unknown): TableCell | null {
+  if (typeof raw === "string") return { text: raw, state: null };
+  if (!isRecord(raw) || typeof raw.text !== "string") return null;
+  const state = oneOf(["highlight", "correct", "wrong", "dim"] as const, raw.state);
+  return state === null ? null : { text: raw.text, state };
+}
+
+function parseMark(raw: unknown): Omit<Mark, "state"> & { state: MarkState | "clear" } | null {
+  if (!isRecord(raw)) return null;
+  const scope = oneOf(MARK_SCOPES, raw.scope);
+  const state = oneOf(MARK_STATES, raw.state);
+  const index = int(raw.index);
+  const pair = Array.isArray(raw.cell) && raw.cell.length === 2 &&
+    int(raw.cell[0]) !== null && int(raw.cell[1]) !== null
+    ? [raw.cell[0], raw.cell[1]] as [number, number] : null;
+  const option = text(raw.option);
+  const match = text(raw.match);
+  if (scope === null || state === null ||
+      (raw.index !== null && index === null) ||
+      (raw.cell !== null && pair === null) ||
+      (raw.option !== null && option === null) ||
+      (raw.match !== null && match === null)) return null;
+  if ((["row", "column", "division"].includes(scope) ? index === null : raw.index !== null) ||
+      (scope === "cell" ? pair === null : raw.cell !== null) ||
+      (scope === "option" ? option === null : raw.option !== null) ||
+      (scope === "span" ? match === null : raw.match !== null)) return null;
+  return { scope, index, cell: pair, option, match, state };
+}
+
+function parseSlots(raw: unknown, kind: BoardItem["kind"]): Record<string, SlotValue> {
+  if (!isRecord(raw)) return {};
   const slots: Record<string, SlotValue> = {};
   for (const [key, value] of Object.entries(raw)) {
-    if (!isRecord(value)) continue;
-    const slot: SlotValue = {};
-    const t = cell(value.text);
-    const state = oneOf(SLOT_STATES, value.state);
-    if (t !== null) slot.text = t;
-    if (state !== null) slot.state = state;
-    if (t !== null || state !== null) slots[key] = slot;
+    if (typeof value !== "string") continue;
+    if (kind === "blanks") {
+      Object.defineProperty(slots, key, { value: { text: value }, enumerable: true });
+    } else if (kind === "options" || kind === "chain") {
+      const state = oneOf(SLOT_STATES, value);
+      if (state !== null) Object.defineProperty(slots, key, { value: { state }, enumerable: true });
+    }
   }
   return slots;
 }
 
 /** يخدم `board_add` ولقطة `board_snapshot` معًا — الحقول نفسها */
-function parseItem(raw: unknown, titleAllowed = false): BoardItem | null {
+function parseItem(raw: unknown, snapshot = false, titleAllowed = false): BoardItem | null {
   if (!isRecord(raw)) return null;
 
   const id = text(raw.id);
@@ -240,13 +338,28 @@ function parseItem(raw: unknown, titleAllowed = false): BoardItem | null {
   const kind =
     titleAllowed && raw.kind === "title"
       ? ("title" as const)
-      : oneOf(ITEM_KINDS, raw.kind);
-  if (id === null || region === null || kind === null) return null;
+      : oneOf(ITEM_KINDS, raw.kind) ?? (text(raw.kind) !== null && raw.kind !== "title" ? "unsupported" : null);
+  if (id === null || region === null || kind === null || (titleAllowed && kind !== "title") ||
+      (raw.group_id !== undefined && raw.group_id !== null && text(raw.group_id) === null) ||
+      (snapshot && raw.annotation !== undefined && raw.annotation !== null &&
+        oneOf(ANNOTATIONS, raw.annotation) === null)) return null;
 
-  const payload = parsePayload(kind, raw.payload);
+  const payload = kind === "unsupported" ? { wireKind: raw.kind as string } : parsePayload(kind, raw.payload);
   if (payload === null) return null;
 
-  const revealed = int(raw.revealed);
+  const revealed = snapshot ? int(raw.revealed) : null;
+  if (snapshot && ((raw.revealed !== undefined && (revealed === null || revealed < 1)) ||
+      (raw.slots !== undefined && !isRecord(raw.slots)))) return null;
+  const pen = oneOf(PENS, raw.pen);
+  if (raw.pen !== undefined && raw.pen !== null && pen === null) return null;
+  const marks: Mark[] = [];
+  if (snapshot && raw.marks !== undefined) {
+    if (!Array.isArray(raw.marks)) return null;
+    for (const entry of raw.marks) {
+      const mark = parseMark(entry);
+      if (mark !== null && mark.state !== "clear") marks.push({ ...mark, state: mark.state });
+    }
+  }
 
   return {
     id,
@@ -254,9 +367,11 @@ function parseItem(raw: unknown, titleAllowed = false): BoardItem | null {
     region,
     payload,
     groupId: text(raw.group_id),
-    annotation: oneOf(ANNOTATIONS, raw.annotation),
+    annotation: snapshot ? oneOf(ANNOTATIONS, raw.annotation) : null,
     revealed: revealed !== null && revealed > 0 ? revealed : 1,
-    slots: parseSlots(raw.slots),
+    slots: snapshot ? parseSlots(raw.slots, kind) : {},
+    pen,
+    marks,
   } as BoardItem;
 }
 
@@ -264,11 +379,14 @@ function parseGroup(raw: unknown): BoardGroup | null {
   if (!isRecord(raw)) return null;
 
   const id = text(raw.id);
-  const kind = oneOf(["box", "columns"] as const, raw.kind);
+  const kind = oneOf(["box", "columns", "example", "scenario"] as const, raw.kind);
   const region = oneOf(REGIONS, raw.region);
   if (id === null || kind === null || region === null) return null;
 
-  return { id, kind, region, heading: cell(raw.heading) ?? "" };
+  const heading = text(raw.heading);
+  const stage = oneOf(["worked", "faded", "try"] as const, raw.stage);
+  if (heading === null || (raw.stage !== undefined && raw.stage !== null && stage === null)) return null;
+  return { id, kind, region, heading, stage };
 }
 
 /* ————— الرسالة ————— */
@@ -288,9 +406,11 @@ export function parseBoardControlEvent(value: unknown): BoardControlEvent | null
     case "board_hide":
       return { action: value.action, rev };
 
-    case "board_clear":
+    case "board_clear": {
       /* غياب المدى يُقرأ «الكل» احتياطًا (§4.1) */
-      return { action: "board_clear", scope: oneOf(SCOPES, value.scope) ?? "all", rev };
+      const scope = value.scope === undefined ? "all" : oneOf(SCOPES, value.scope);
+      return scope === null ? null : { action: "board_clear", scope, rev };
+    }
 
     case "board_set_title": {
       const id = text(value.id);
@@ -329,10 +449,16 @@ export function parseBoardControlEvent(value: unknown): BoardControlEvent | null
 
     case "board_annotate": {
       const id = text(value.id);
-      if (id === null) return null;
+      if (id === null || (value.kind !== null && oneOf(ANNOTATIONS, value.kind) === null)) return null;
       /* kind: null يمسح الحالة — والمسح يصل رسالةً مستقلّة قبل
          التعيين الجديد حين تنتقل `key` (§4.3). */
       return { action: "board_annotate", id, kind: oneOf(ANNOTATIONS, value.kind), rev };
+    }
+
+    case "board_mark": {
+      const id = text(value.id);
+      const mark = parseMark(value);
+      return id === null || mark === null ? null : { action: "board_mark", id, ...mark, rev };
     }
 
     case "board_remove": {
@@ -351,6 +477,8 @@ export function parseBoardControlEvent(value: unknown): BoardControlEvent | null
     case "board_pin": {
       const id = text(value.id);
       if (id === null) return null;
+      if ((value.pinned !== undefined && typeof value.pinned !== "boolean") ||
+          (value.region !== undefined && oneOf(REGIONS, value.region) === null)) return null;
       const pinned = value.pinned !== false;
       return {
         action: "board_pin",
@@ -362,19 +490,18 @@ export function parseBoardControlEvent(value: unknown): BoardControlEvent | null
     }
 
     case "board_snapshot": {
+      if (typeof value.visible !== "boolean" || !Array.isArray(value.items) ||
+          !Array.isArray(value.groups) || (value.title !== null && !isRecord(value.title))) return null;
       /* عنصرٌ تالف يُسقَط وحده ولا يُبطل اللقطة كلها */
-      const items = Array.isArray(value.items)
-        ? value.items.map((raw) => parseItem(raw)).filter((it): it is BoardItem => it !== null)
-        : [];
-      const groups = Array.isArray(value.groups)
-        ? value.groups.map(parseGroup).filter((g): g is BoardGroup => g !== null)
-        : [];
+      const items = value.items.map((raw) => parseItem(raw, true))
+        .filter((it): it is BoardItem => it !== null);
+      const groups = value.groups.map(parseGroup).filter((g): g is BoardGroup => g !== null);
 
       return {
         action: "board_snapshot",
         rev,
-        visible: value.visible !== false,
-        title: parseItem(value.title, true),
+        visible: value.visible,
+        title: parseItem(value.title, true, true),
         groups,
         items,
       };

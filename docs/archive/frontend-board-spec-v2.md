@@ -1,11 +1,13 @@
 # Teaching Board v2 — Frontend Specification
 
+> **Superseded by [frontend-board-spec-v3.md](../frontend-board-spec-v3.md)** (2026-10-04). Kept for history; implement against v3.
+
 **For the frontend engineer working on `test-web-client`.** This is a delta against the working V1
 board, not a rebuild guide. Read §1 first: about half the existing implementation is untouched.
 
 The agent change behind it: the board's content is now **authored in the lesson plan** rather than
-invented live. A Board Director LLM only decides *when* the tutor has reached an authored note;
-backend code assigns ids, owns regions and capacity, and publishes every mutation. The consequence
+invented live. A Beat matcher only judges *when* the tutor has reached an authored note; backend code assigns ids, owns
+regions and capacity, and publishes every mutation. The consequence
 for you is that the board can now **change things already on screen** — fill a blank, mark an answer,
 reveal the next line of a definition, remove one item — instead of only appending downward.
 
@@ -63,6 +65,11 @@ teleport.
 Capacity is enforced by the backend. You will never be asked to render a thirteenth live item, and
 you should not implement your own overflow policy — but the column must scroll vertically, because
 twelve items plus a pinned band will not fit a portrait phone.
+
+When a region is full, the backend evicts its oldest unpinned item to make room, so the new item still
+arrives ([ADR-0003](../adr/0003-jev-beat-matcher-and-board-assistant.md), phase 1; until then a full
+region rejects the add and the beat is lost). Nothing new is required of the frontend beyond the
+existing removal handling; animate the departing item as you would any `board_remove`.
 
 ---
 

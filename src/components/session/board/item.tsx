@@ -1,8 +1,15 @@
 import { ANNOTATION_LABEL } from "./labels";
+import { baseDecoration, decorate, decorationAttrs, penAttrs } from "@/lib/session/board/marks";
 import { motion } from "motion/react";
-import { CheckIcon, CloseIcon, WarningIcon } from "@/components/becan/icons";
+import { WarningIcon } from "@/components/becan/icons";
 import type { AnnotationKind, BoardItem } from "@/lib/session/teaching-board";
 import type { ExplanationLanguage } from "../explanation-language";
+import { DividerItem } from "./divider";
+import { IconItem } from "./icon";
+import { NoteItem } from "./note";
+import { TimelineItem } from "./timeline";
+import { UnsupportedItem } from "./unsupported";
+import type { BoardKindProps } from "./kind-props";
 import { BlanksItem } from "./blanks";
 import { CalloutItem } from "./callout";
 import { ChainItem } from "./chain";
@@ -10,7 +17,7 @@ import { CompareItem } from "./compare";
 import { DefinitionItem } from "./definition";
 import { EquationItem } from "./equation";
 import { OptionsItem } from "./options";
-import { TableItem } from "./table";
+import { MarkIcon, TableItem } from "./table";
 import { TermItem } from "./term";
 import { BulletLine, HeadingLine, StepLine, TextLine } from "./text-kinds";
 
@@ -24,9 +31,7 @@ import { BulletLine, HeadingLine, StepLine, TextLine } from "./text-kinds";
    `correct` و`wrong` لا يعتمدان على اللون: مع كلٍّ أيقونته، فالبندان
    مقروءان لمن لا يميّز الألوان.
 
-   و`dim` لا يُنفَّذ بالشفافية بل بإعادة توجيه توكن الحبر إلى
-   `--bcn-ink-2`: القيمة المقيسة تحفظ أرضية 5.33:1، والتخمين
-   بالشفافية لا يحفظها. */
+   الخفوت بشفافية مقيسة في الأنماط المشتركة، ولا يغيّر توكن الحبر. */
 
 const FRAMES: Record<AnnotationKind, string> = {
   key: "rounded-md bg-ink/10 px-3 py-2 ring-2 ring-ink",
@@ -37,57 +42,49 @@ const FRAMES: Record<AnnotationKind, string> = {
   dim: "",
 };
 
-const BADGES: Partial<Record<AnnotationKind, () => React.ReactElement>> = {
-  warning: () => <WarningIcon className="h-5 w-5 shrink-0 text-warmth" />,
-  correct: () => <CheckIcon className="h-5 w-5 shrink-0 text-live" />,
-  wrong: () => <CloseIcon className="h-5 w-5 shrink-0 text-error" />,
-};
-
-/* الأيقونات كلها `aria-hidden`، فاللون والأيقونة يسقطان معًا عند
-   قارئ الشاشة ولا يبقى فرقٌ بين «صحيح» و«خطأ». فيُنطق الحال نصًّا
-   مخفيًا بصريًا — وهو ما يجعل §5.4 مستوفاةً فعلًا لا شكلًا. */
-
-/* الحبر المخفوت: توكنٌ يُعاد توجيهه للشجرة كلها، فيتبعه كل ما
-   تحته بلا أن تعرف المكوّنات شيئًا عن الحالة. */
-const DIM_STYLE = { "--bcn-ink": "var(--bcn-ink-2)" } as React.CSSProperties;
-
 function Body({
   item,
   n,
   language,
-}: {
-  item: BoardItem;
-  n: number;
-  language: ExplanationLanguage;
-}) {
+}: BoardKindProps) {
   switch (item.kind) {
     case "title":
     case "heading":
-      return <HeadingLine text={item.payload.text} />;
+      return <HeadingLine item={item} language={language} n={n} />;
     case "text":
-      return <TextLine text={item.payload.text} />;
+      return <TextLine item={item} language={language} n={n} />;
     case "bullet":
-      return <BulletLine text={item.payload.text} />;
+      return <BulletLine item={item} language={language} n={n} />;
     case "step":
-      return <StepLine text={item.payload.text} n={n} />;
+      return <StepLine item={item} language={language} n={n} />;
+    case "note":
+      return <NoteItem item={item} language={language} n={n} />;
+    case "divider":
+      return <DividerItem item={item} language={language} n={n} />;
+    case "timeline":
+      return <TimelineItem item={item} language={language} n={n} />;
+    case "icon":
+      return <IconItem item={item} language={language} n={n} />;
+    case "unsupported":
+      return <UnsupportedItem item={item} language={language} n={n} />;
     case "definition":
-      return <DefinitionItem payload={item.payload} revealed={item.revealed} />;
+      return <DefinitionItem item={item} language={language} n={n} />;
     case "term":
-      return <TermItem payload={item.payload} />;
+      return <TermItem item={item} language={language} n={n} />;
     case "equation":
-      return <EquationItem payload={item.payload} />;
+      return <EquationItem item={item} language={language} n={n} />;
     case "compare":
-      return <CompareItem payload={item.payload} />;
+      return <CompareItem item={item} language={language} n={n} />;
     case "table":
-      return <TableItem payload={item.payload} />;
+      return <TableItem item={item} language={language} n={n} />;
     case "chain":
-      return <ChainItem payload={item.payload} slots={item.slots} />;
+      return <ChainItem item={item} language={language} n={n} />;
     case "blanks":
-      return <BlanksItem payload={item.payload} slots={item.slots} language={language} />;
+      return <BlanksItem item={item} language={language} n={n} />;
     case "options":
-      return <OptionsItem payload={item.payload} slots={item.slots} language={language} />;
+      return <OptionsItem item={item} language={language} n={n} />;
     case "callout":
-      return <CalloutItem payload={item.payload} language={language} />;
+      return <CalloutItem item={item} language={language} n={n} />;
   }
 }
 
@@ -96,40 +93,50 @@ export function BoardItemView({
   n,
   language,
   reduce,
+  dimmedByFocus = false,
 }: {
   item: BoardItem;
   n: number;
   language: ExplanationLanguage;
   reduce: boolean;
+  /** بندٌ آخر في المنطقة نفسها عليه «انظر هنا»، فيُخفَت هذا ولا يُخفى */
+  dimmedByFocus?: boolean;
 }) {
+  const annotation = item.annotation;
+  const decoration = decorate(item, { scope: "item" }, baseDecoration(annotation));
+  decoration.dimmedByFocus = item.kind !== "title" && dimmedByFocus && !decoration.focus;
+  const structured = ["table", "compare", "options", "chain", "blanks", "equation", "timeline", "icon"].includes(item.kind);
+  const frameKind = annotation === "correct" || annotation === "wrong" ? decoration.answer : annotation;
+  const frame = frameKind ? FRAMES[frameKind] : "";
+  const label = annotation && annotation !== "correct" && annotation !== "wrong" ? ANNOTATION_LABEL[annotation]?.[language] : undefined;
+
   /* لا مباعدة بمؤقّتات جافاسكربت: الوكيل يوقّت كل عملية على الصوت
      المنطوق، وأي تأخير من الصفحة يضاعف التوقيت (§1). */
   const anim = reduce
     ? {}
     : {
         initial: { opacity: 0, y: 7 },
-        animate: { opacity: 1, y: 0 },
+        animate: { opacity: decoration.dim || decoration.dimmedByFocus ? 0.7 : 1, y: 0 },
+        exit: { opacity: 0, transition: { duration: 0.15, ease: [0, 0, 0.2, 1] as const } },
         transition: { duration: 0.25, ease: [0, 0, 0.2, 1] as const },
       };
-
-  const annotation = item.annotation;
-  const frame = annotation ? FRAMES[annotation] : "";
-  const badge = annotation ? BADGES[annotation] : undefined;
-  const label = annotation ? ANNOTATION_LABEL[annotation]?.[language] : undefined;
 
   return (
     <motion.li
       {...anim}
-      /* النقل بين «الحيّ» و«المثبَّت» يُحرَّك ولا يقفز (§3) */
+      {...decorationAttrs(decoration)}
+      {...penAttrs(item.kind === "icon" ? null : item.pen)}
+      data-board-item={item.id}
+      data-cancelled={structured && decoration.strike ? "" : undefined}
+      /* النقل بين المناطق يُحرَّك دون تأخير وصول المحتوى. */
       layout={reduce ? false : "position"}
-      /* «البند الذي عليه المعلّم الآن» — حالٌ دلاليّ لا حلقة وحسب */
       aria-current={annotation === "key" ? true : undefined}
-      style={annotation === "dim" ? DIM_STYLE : undefined}
-      className={badge ? `flex gap-2.5 ${frame}` : frame}
+      className={`relative min-w-0 ${item.pen && item.kind !== "icon" ? "ps-3" : ""} ${frame}`}
     >
+      <MarkIcon answer={decoration.answer} language={language} />
       {label ? <span className="sr-only">{label}</span> : null}
-      {badge ? badge() : null}
-      <div className="min-w-0 flex-1">
+      {annotation === "warning" ? <WarningIcon className="mb-1 h-5 w-5 text-ink-2" /> : null}
+      <div className="min-w-0">
         <Body item={item} n={n} language={language} />
       </div>
     </motion.li>

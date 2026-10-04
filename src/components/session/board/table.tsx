@@ -1,102 +1,103 @@
-import type { TablePayload } from "@/lib/session/teaching-board";
+import { CheckIcon, CloseIcon } from "@/components/becan/icons";
+import { baseDecoration, decorate, decorationAttrs, type Decoration } from "@/lib/session/board/marks";
+import type { TableCell } from "@/lib/session/teaching-board";
+import type { ExplanationLanguage } from "../explanation-language";
 import type { BoardKindProps } from "./kind-props";
+import { MARK_LABEL } from "./labels";
+import { RichText } from "./rich-text";
 
-/* الجدول (§5.7).
-
-   `variant: "journal"` يضمن أن الرأس هو Account · Debit · Credit،
-   ويوجب محاذاة رقمية: إلى نهاية الخليّة، بأرقام ثابتة العرض، ومن
-   اليسار إلى اليمين مهما كان اتجاه اللوح. المحاسب يقرأ العمود
-   المنزاح إجابةً خاطئة.
-
-   والخليّة الفارغة مشروعة — سطر القيد يملأ المدين أو الدائن لا
-   كليهما — فيجب أن تحفظ عرضها لا أن تنطوي. */
-
-const isNumericColumn = (payload: TablePayload, index: number) =>
-  payload.variant === "journal" && index > 0;
-
-function Cell({
-  value,
-  numeric,
-  head = false,
-}: {
-  value: string;
-  numeric: boolean;
-  head?: boolean;
-}) {
-  const tone = head ? "leading-base font-bold text-ink-2" : "leading-base text-ink";
-  /* مسافة غير قاصمة تحفظ ارتفاع السطر في الخليّة الفارغة */
-  const content = value.trim().length > 0 ? value : " ";
-
-  if (numeric) {
-    return (
-      <span
-        dir="ltr"
-        style={{ unicodeBidi: "isolate" }}
-        className={`block min-w-16 text-end tabular-nums ${tone}`}
-      >
-        {content}
-      </span>
-    );
-  }
-
+/** الرمز ولفظه يصاحبان التصحيح، حتى في الخليّة الفارغة. */
+export function MarkIcon({ answer, language }: { answer: Decoration["answer"]; language: ExplanationLanguage }) {
+  if (!answer) return null;
   return (
-    <span dir="auto" className={`block ${tone}`}>
-      {content}
+    <span data-mark-icon="">
+      {answer === "correct" ? <CheckIcon className="h-5 w-5" /> : <CloseIcon className="h-5 w-5" />}
+      <span className="sr-only">{MARK_LABEL[answer][language]}</span>
     </span>
   );
 }
 
-export function TableItem({ item }: BoardKindProps<"table">) {
+/* الطبقات منفصلة: العمود يشمل رأسه، والخليّة تحفظ حالتها المؤلَّفة
+   والصفّ يجمع حقوله دون أن يمحو علامة أحدها. */
+export function TableItem({ item, language }: BoardKindProps<"table">) {
   const { payload } = item;
-  const cellClass = "px-3 py-2 align-top leading-base";
+  const spans = item.marks.filter((mark) => mark.scope === "span");
+  const rows = payload.rows.slice(0, item.revealed);
+  const column = (index: number) => decorate(item, { scope: "column", index });
+  const cell = (value: TableCell, row: number | null, col: number) => row === null
+    ? { highlight: false, answer: null, dim: false, strike: false, focus: false, dimmedByFocus: false, ...baseDecoration(value.state) } satisfies Decoration
+    : decorate(item, { scope: "cell", cell: [row, col] }, baseDecoration(value.state));
+  const text = (value: string) => <RichText text={value} markup pen={item.pen} spans={spans} />;
+  const header = (value: TableCell, col: number) => {
+    const decoration = cell(value, null, col);
+    return (
+      <span {...decorationAttrs(decoration)} className="relative block min-w-0 font-bold text-ink-2">
+        <MarkIcon answer={decoration.answer} language={language} />
+        {payload.numberedColumns ? <span className="block text-xs tabular-nums">{col + 1}</span> : null}
+        {text(value.text)}
+      </span>
+    );
+  };
+  const content = (value: TableCell, row: number, col: number) => {
+    const decoration = cell(value, row, col);
+    const numeric = payload.variant === "journal" && col > 0;
+    return (
+      <span {...decorationAttrs(decoration)} data-board-cell={`${row}:${col}`} className="relative block min-h-[1.75em] min-w-0 text-ink">
+        <MarkIcon answer={decoration.answer} language={language} />
+        <span dir={numeric ? "ltr" : undefined} className={numeric ? "block text-end tabular-nums [unicode-bidi:isolate]" : undefined}>
+          {text(value.text)}
+        </span>
+      </span>
+    );
+  };
 
   return (
-    <div>
-      {/* جدول حقيقيّ فوق نقطة التوقّف */}
-      <table className="hidden w-full border-collapse text-sm md:table">
+    <div className="min-w-0 [overflow-wrap:anywhere]">
+      <table className="hidden w-full table-fixed border-collapse text-sm md:table">
         <thead>
           <tr className="border-b border-chalkboard-edge bg-ink/5">
-            {payload.header.map((label, i) => (
-              <th key={i} scope="col" className={cellClass}>
-                <Cell value={label.text} numeric={isNumericColumn(payload, i)} head />
-              </th>
-            ))}
+            {payload.header.map((value, col) => {
+              const decoration = column(col);
+              return <th key={col} scope="col" data-board-column={col} {...decorationAttrs(decoration)} className="relative px-3 py-2 text-start align-top leading-base">
+                <MarkIcon answer={decoration.answer} language={language} />
+                {header(value, col)}
+              </th>;
+            })}
           </tr>
         </thead>
         <tbody>
-          {payload.rows.map((row, i) => (
-            <tr key={i} className="border-b border-chalkboard-edge/60 last:border-0">
-              {row.map((value, j) => (
-                <td key={j} className={cellClass}>
-                  <Cell value={value.text} numeric={isNumericColumn(payload, j)} />
-                </td>
-              ))}
-            </tr>
-          ))}
+          {rows.map((row, index) => {
+            const decoration = decorate(item, { scope: "row", index });
+            return <tr key={index} data-board-row={index} {...decorationAttrs(decoration)} className="board-mark-row border-b border-chalkboard-edge/60 last:border-0">
+              {row.map((value, col) => {
+                const columnDecoration = column(col);
+                return <td key={col} data-board-column={col} {...decorationAttrs(columnDecoration)} className="relative px-3 py-2 align-top leading-base">
+                  {col === 0 ? <span className="board-row-feedback"><MarkIcon answer={decoration.answer} language={language} /></span> : null}
+                  <MarkIcon answer={columnDecoration.answer} language={language} />
+                  {content(value, index, col)}
+                </td>;
+              })}
+            </tr>;
+          })}
         </tbody>
       </table>
-
-      {/* بطاقة لكل صفّ على الجوال — الرأس يصير تسمية كل حقل (§8) */}
-      <ul className="flex flex-col gap-2 md:hidden">
-        {payload.rows.map((row, i) => (
-          <li
-            key={i}
-            className="rounded-md border border-chalkboard-edge px-3 py-2.5 text-sm"
-          >
-            <dl className="flex flex-col gap-1">
-              {payload.header.map((label, j) => (
-                <div key={j} className="flex items-baseline justify-between gap-3">
-                  <dt dir="auto" className="shrink-0 text-xs leading-base font-semibold text-ink-2">
-                    {label.text}
-                  </dt>
-                  <dd className="min-w-0">
-                    <Cell value={row[j]?.text ?? ""} numeric={isNumericColumn(payload, j)} />
-                  </dd>
-                </div>
-              ))}
+      <ul className="flex min-w-0 flex-col gap-2 md:hidden">
+        {rows.map((row, index) => {
+          const decoration = decorate(item, { scope: "row", index });
+          return <li key={index} data-board-row={index} {...decorationAttrs(decoration)} className="relative min-w-0 rounded-md border border-chalkboard-edge px-3 py-2.5 text-sm">
+            <MarkIcon answer={decoration.answer} language={language} />
+            <dl className="flex min-w-0 flex-col gap-2">
+              {payload.header.map((value, col) => {
+                const columnDecoration = column(col);
+                return <div key={col} data-board-column={col} {...decorationAttrs(columnDecoration)} className="relative grid min-w-0 grid-cols-2 items-baseline gap-3">
+                  <MarkIcon answer={columnDecoration.answer} language={language} />
+                  <dt className="min-w-0 text-xs leading-base">{header(value, col)}</dt>
+                  <dd className="min-w-0">{content(row[col], index, col)}</dd>
+                </div>;
+              })}
             </dl>
-          </li>
-        ))}
+          </li>;
+        })}
       </ul>
     </div>
   );

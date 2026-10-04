@@ -121,3 +121,14 @@
 - **Question:** Are real plans expected to send a content heading (as in `sequence-worked-conversion`),
   with the stage conveyed only by `stage`? If the backend ever sends the stage meaning as the heading,
   should the frontend suppress a heading that equals its own stage label?
+
+## Q-L3-1 — Focus on an unrevealed row or division
+
+- **Section:** Contract §5.10, §5.16, §6.1–§6.3.
+- **Fixtures:** `add-table-progressive`, `mark-row-states`, `mark-division-states`; none combines
+  an unrevealed target with focus.
+- **Interim behaviour:** A stored row/division focus starts dimming its visible siblings only
+  when its target is revealed. Its content remains absent before reveal, and the mark is retained.
+- **Question:** Should an unrevealed focused row/division dim visible siblings immediately,
+  or should all its visual effects wait for reveal? Waiting avoids suggesting hidden content
+  before the tutor reaches it.

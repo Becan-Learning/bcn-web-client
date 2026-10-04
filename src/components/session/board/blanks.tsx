@@ -1,60 +1,27 @@
 import { BLANK_LABEL } from "./labels";
 import type { BoardKindProps } from "./kind-props";
+import { RichText } from "./rich-text";
 
-/* املأ الفراغ (§5.9).
-
-   القالب يُقسَّم على `___` بالترتيب: أول فراغ هو blanks[0]. والفراغ
-   غير المملوء يُرسم خطًّا تحتيًا ظاهرًا — الفجوة الخالية تُقرأ خطأً
-   مطبعيًا لا سؤالًا.
-
-   والجواب لا يُرسم عند الإضافة أبدًا: `fill` مُسقَط عند التحليل،
-   ويصل لاحقًا بـ `board_update` على خانة الفراغ. فيُملأ في مكانه
-   بومضة قصيرة، والسطر لا يُعاد رسمه. */
-
-const PLACEHOLDER = "___";
-
-/* الخطّ التحتي وحده لا يُنطق، فالجملة تُقرأ منقوصة بلا إشارة إلى
-   موضع الفراغ. يُنطق بكلمة مخفية بصريًا. */
-
+/* القالب وحده يحمل مواضع الفراغات؛ لا يُعرض جواب قبل وصوله
+   في الخانة، ويظل الملء جزءًا من الجملة عند التفافها. */
 export function BlanksItem({ item, language }: BoardKindProps<"blanks">) {
-  const { payload, slots } = item;
-  const parts = payload.template.split(PLACEHOLDER);
-
+  const spans = item.marks.filter((mark) => mark.scope === "span");
   return (
-    <p dir="auto" className="leading-loose text-ink">
-      {parts.map((part, i) => {
-        if (i === parts.length - 1) return <span key={i}>{part}</span>;
-
-        const blank = payload.blanks[i];
-        const fill = blank ? slots[blank.id]?.text : undefined;
-
-        return (
-          <span key={i}>
-            {part}
-            {fill ? (
-              /* المفتاح على القيمة، فيُعاد تركيب المحضن عند الملء
-                 وتعمل ومضته مرّة واحدة بلا مؤقّت. */
-              <span
-                key={fill}
-                dir="auto"
-                className="mx-1 inline-block border-b-2 border-ink px-1.5 font-bold text-ink animate-board-in"
-              >
-                {fill}
-              </span>
-            ) : (
-              <>
-                <span className="sr-only">{BLANK_LABEL[language]}</span>
-                <span
-                  aria-hidden="true"
-                  className="mx-1 inline-block min-w-[5ch] border-b-2 border-ink-3 align-baseline"
-                >
-                  {" "}
-                </span>
-              </>
-            )}
+    <p className="min-w-0 leading-loose text-ink [overflow-wrap:anywhere]">
+      <RichText text={item.payload.template} markup pen={item.pen} spans={spans} renderBlank={(index) => {
+        const blank = item.payload.blanks[index];
+        const fill = blank ? item.slots[blank.id]?.text : undefined;
+        return fill !== undefined ? (
+          <span className="mx-1 inline border-b-2 border-ink px-1.5 font-bold">
+            <RichText text={fill} markup={false} pen={item.pen} spans={spans} />
           </span>
+        ) : (
+          <>
+            <span className="sr-only">{BLANK_LABEL[language]}</span>
+            <span aria-hidden="true" className="mx-1 inline-block min-w-[5ch] border-b-2 border-ink-3 align-baseline">{" "}</span>
+          </>
         );
-      })}
+      }} />
     </p>
   );
 }

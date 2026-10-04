@@ -109,3 +109,15 @@
   division. It carries no text and is hidden from screen readers, since the wire gives it no name.
 - **Question:** Should a marker without a label be visible at all, and does it have an intended
   meaning ("a step happens here") that needs an accessible name?
+
+## Q-INT-1 — Example group heading repeats the stage label
+
+- **Section:** Contract §2.1 (groups, stages) and §3.8 (`heading`).
+- **Fixtures:** `example-worked`, `example-faded`, `example-try` use the headings “أنا أشاهد”,
+  “أنا أملأ” and “هذا لي”, which are exactly the stage meanings in §2.1. `sequence-worked-conversion`
+  uses a content heading instead (“حوّل 300 cm إلى m”).
+- **Interim behaviour:** The heading is rendered as sent next to the stage badge, so in these three
+  fixtures the same words appear twice (badge and heading).
+- **Question:** Are real plans expected to send a content heading (as in `sequence-worked-conversion`),
+  with the stage conveyed only by `stage`? If the backend ever sends the stage meaning as the heading,
+  should the frontend suppress a heading that equals its own stage label?

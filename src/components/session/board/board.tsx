@@ -1,16 +1,21 @@
 import { BAND_LABEL, BOARD_LABEL } from "./labels";
-import { useCallback, useEffect, useRef } from "react";
-import type {
-  BoardGroup,
-  BoardItem,
-  BoardRegion,
-  BoardState,
-} from "@/lib/session/teaching-board";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import type { BoardItem, BoardState } from "@/lib/session/teaching-board";
+import { itemFocusDimmed } from "@/lib/session/board/marks";
 import { Caret } from "../parts";
 import type { ExplanationLanguage } from "../explanation-language";
 import { boardFrame } from "./frame";
 import { useLocale } from "next-intl";
+import { GroupShell } from "./group";
+import { IconAttachmentsProvider } from "./icon";
 import { BoardItemView } from "./item";
+import {
+  projectRegion,
+  stepNumbers,
+  validAttachments,
+  type RegionBlock,
+  type RegionEntry,
+} from "./region-blocks";
 
 /* ————— السبورة —————
 
@@ -28,117 +33,49 @@ import { BoardItemView } from "./item";
    السعة يفرضها الخادم (§3) فلا سياسة فيضٍ هنا — لكن العمود يمرّر،
    لأن اثني عشر بندًا مع شريطٍ مثبَّت لا تسع شاشة جوّال رأسية. */
 
-type Block =
-  | { type: "item"; item: BoardItem }
-  | { type: "group"; group: BoardGroup; members: BoardItem[] };
-
-function blocksFor(
-  items: BoardItem[],
-  groups: BoardGroup[],
-  region: BoardRegion,
-): Block[] {
-  const regionItems = items.filter((item) => item.region === region);
-  const blocks: Block[] = [];
-  const placed = new Set<string>();
-
-  /* الحاوية تصل قبل أوّل عضو فيها، فموضع أوّل عضو هو موضعها.
-     وحاوية في منطقة أخرى تُتجاهل: البند يُرسم وحده بدل أن يتكرّر
-     عنوانها في المنطقتين. */
-  for (const item of regionItems) {
-    const group = item.groupId
-      ? groups.find(
-          (candidate) => candidate.id === item.groupId && candidate.region === region,
-        )
-      : undefined;
-
-    if (!group) {
-      blocks.push({ type: "item", item });
-      continue;
-    }
-    if (placed.has(group.id)) continue;
-
-    placed.add(group.id);
-    blocks.push({
-      type: "group",
-      group,
-      members: regionItems.filter((member) => member.groupId === group.id),
-    });
-  }
-
-  /* حاوية بلا أعضاء ممكنة إن رُفضت إضافةٌ لاحقة: يُرسم عنوانها
-     وحده ولا ينكسر شيء (§4.4). */
-  for (const group of groups) {
-    if (group.region === region && !placed.has(group.id)) {
-      blocks.push({ type: "group", group, members: [] });
-    }
-  }
-
-  return blocks;
-}
-
 function Region({
-  items,
-  groups,
-  region,
+  board,
+  blocks,
   language,
   reduce,
-  className,
 }: {
-  items: BoardItem[];
-  groups: BoardGroup[];
-  region: BoardRegion;
+  board: BoardState;
+  blocks: RegionBlock[];
   language: ExplanationLanguage;
   reduce: boolean;
-  className?: string;
 }) {
-  const blocks = blocksFor(items, groups, region);
-
-  /* ترقيم الخطوات مقصور على المنطقة (§5.1) */
-  const stepNumbers = new Map<string, number>();
-  items
-    .filter((item) => item.region === region && item.kind === "step")
-    .forEach((item, i) => stepNumbers.set(item.id, i + 1));
+  const numbers = stepNumbers(blocks);
 
   const view = (item: BoardItem) => (
     <BoardItemView
       key={item.id}
       item={item}
-      n={stepNumbers.get(item.id) ?? 0}
+      n={numbers.get(item.id) ?? 0}
       language={language}
       reduce={reduce}
+      dimmedByFocus={itemFocusDimmed(board, item)}
     />
   );
 
+  /* أيقونات ألصق بعضها ببعض تقف متجاورة في صفٍّ يلتفّ وحداتٍ كاملة */
+  const entry = (placed: RegionEntry) =>
+    placed.type === "item" ? (
+      view(placed.item)
+    ) : (
+      <li key={placed.items[0].id} data-icon-cluster="">
+        <ul className="flex flex-wrap items-start gap-x-4 gap-y-3">{placed.items.map(view)}</ul>
+      </li>
+    );
+
   return (
-    <ul className={`flex flex-col gap-4 ${className ?? ""}`}>
+    <ul className="flex flex-col gap-4">
       {blocks.map((block) =>
-        block.type === "item" ? (
-          view(block.item)
+        block.type === "group" ? (
+          <GroupShell key={block.group.id} group={block.group} language={language}>
+            {block.entries.length > 0 ? block.entries.map(entry) : null}
+          </GroupShell>
         ) : (
-          <li
-            key={block.group.id}
-            className={
-              block.group.kind === "box"
-                ? "rounded-md border border-chalkboard-edge px-3.5 py-3"
-                : undefined
-            }
-          >
-            {block.group.heading ? (
-              <p dir="auto" className="mb-2.5 text-sm leading-base font-bold text-ink-2">
-                {block.group.heading}
-              </p>
-            ) : null}
-            {/* الأعمدة تتكدّس رأسيًا تحت العنوان على الجوال (§8) */}
-            <ul
-              className={
-                block.group.kind === "columns"
-                  ? "grid grid-cols-1 gap-4 md:grid-cols-2"
-                  : "flex flex-col gap-3"
-              }
-            >
-              {block.members.map(view)}
-            </ul>
-          </li>
+          entry(block)
         ),
       )}
     </ul>
@@ -170,8 +107,9 @@ export function Board({
   }, []);
 
   const live = board.items.filter((item) => item.region === "live");
-  const pinned = board.items.filter((item) => item.region === "pinned");
-  const temporary = board.items.filter((item) => item.region === "temporary");
+  /* الإلصاق يُحسب مرّة على اللوح كله: صلاحيته تتعلّق بمنطقة الهدف
+     وحاويته، لا بالمنطقة التي تُرسم الآن. */
+  const attachments = useMemo(() => validAttachments(board.items), [board.items]);
 
   /* الكشف يزيد الارتفاع كما تزيده الإضافة، فيُتابَع الاثنان */
   const revealed = live.reduce((sum, item) => sum + item.revealed, 0);
@@ -198,6 +136,19 @@ export function Board({
     );
   }
 
+  const pinned = projectRegion(board, "pinned");
+  const liveBlocks = projectRegion(board, "live");
+  const temporary = projectRegion(board, "temporary");
+  const region = (blocks: RegionBlock[]) => (
+    <Region board={board} blocks={blocks} language={language} reduce={reduce} />
+  );
+
+  /* كل منطقة تُعلَن بإعلانٍ مهذَّب خاصّ بها (§4.4)، والحاويتان
+     المثبَّتة والمؤقّتة تبقيان في الصفحة وإن فرغتا: منطقةٌ حيّة تُنشأ
+     وفيها محتواها لا تُعلِن شيئًا، فلو وُلدت الحاوية مع أوّل بند لضاع
+     إعلانه. والبنود الخفيّة غائبة من الشجرة أصلًا فلا يقرؤها القارئ،
+     ولا جواب خاصّ يصل الصفحة. وحين تفرغ تفقد إطارها وحشوها فلا تأخذ
+     مكانًا ولا فاصلًا. */
   return (
     <section
       aria-label={BOARD_LABEL[language]}
@@ -205,63 +156,60 @@ export function Board({
       data-diverged={board.diverged ? "" : undefined}
       className="chalkboard font-sans leading-base flex min-h-0 flex-1 flex-col rounded-xl border border-chalkboard-edge px-5 pt-6 pb-20 md:px-8 md:pt-8"
     >
-      <div className="mx-auto flex min-h-0 w-full max-w-measure flex-1 flex-col gap-4">
-        {board.title && board.title.kind === "title" ? (
-          <p className="shrink-0 text-xl leading-base font-bold text-ink md:text-2xl">
-            <span dir="auto">{board.title.payload.text}</span>
-          </p>
-        ) : null}
+      <IconAttachmentsProvider value={attachments}>
+        <div className="mx-auto flex min-h-0 w-full max-w-measure flex-1 flex-col">
+          {/* العنوان بند كبقية البنود: يأخذ الإطار والشارة ولفظ الحالة
+              وقلمه وعلاماته من غلاف البند نفسه، لا نسخةً ثانية منها */}
+          {board.title ? (
+            <ul data-board-title="" className="mb-4 shrink-0">
+              <BoardItemView
+                item={board.title}
+                n={0}
+                language={language}
+                reduce={reduce}
+              />
+            </ul>
+          ) : null}
 
-        {pinned.length > 0 ? (
           <div
             role="group"
             aria-label={BAND_LABEL.pinned[language]}
-            className="shrink-0 overflow-y-auto rounded-lg border border-chalkboard-edge bg-ink/5 px-4 py-3 max-md:max-h-[30%]"
+            aria-live="polite"
+            className={
+              pinned.length > 0
+                ? "mb-4 shrink-0 overflow-y-auto rounded-lg border border-chalkboard-edge bg-ink/5 px-4 py-3 max-md:max-h-[30%]"
+                : undefined
+            }
           >
-            <Region
-              items={board.items}
-              groups={board.groups}
-              region="pinned"
-              language={language}
-              reduce={reduce}
-            />
+            {pinned.length > 0 ? region(pinned) : null}
           </div>
-        ) : null}
 
-        <div
-          ref={ref}
-          onScroll={onScroll}
-          tabIndex={0}
-          className="min-h-0 flex-1 overflow-y-auto"
-        >
-          <div aria-live="polite">
-            <Region
-              items={board.items}
-              groups={board.groups}
-              region="live"
-              language={language}
-              reduce={reduce}
-            />
-            {speaking ? <Caret /> : null}
+          <div
+            ref={ref}
+            onScroll={onScroll}
+            tabIndex={0}
+            className="min-h-0 flex-1 overflow-y-auto"
+          >
+            <div aria-live="polite">
+              {region(liveBlocks)}
+              {speaking ? <Caret /> : null}
+            </div>
           </div>
-        </div>
 
-        {temporary.length > 0 ? (
           <div
             role="group"
             aria-label={BAND_LABEL.temporary[language]}
-            className="shrink-0 overflow-y-auto rounded-lg border border-dashed border-ink-3 px-4 py-3 max-md:max-h-[25%]"
+            aria-live="polite"
+            className={
+              temporary.length > 0
+                ? "mt-4 shrink-0 overflow-y-auto rounded-lg border border-dashed border-ink-3 px-4 py-3 max-md:max-h-[25%]"
+                : undefined
+            }
           >
-            <Region
-              items={board.items}
-              groups={board.groups}
-              region="temporary"
-              language={language}
-              reduce={reduce}
-            />
+            {temporary.length > 0 ? region(temporary) : null}
           </div>
-        ) : null}
-      </div>
+        </div>
+      </IconAttachmentsProvider>
     </section>
   );
 }

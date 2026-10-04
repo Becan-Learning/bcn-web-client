@@ -10,7 +10,7 @@ import {
   UNKNOWN_ICON_LABEL,
   UNSUPPORTED_LABEL,
 } from "./labels";
-import { boardGroup, boardItem, boardState, renderBoardHtml } from "./test-utils";
+import { boardGroup, boardItem, boardState, renderBoardHtml, visibleText } from "./test-utils";
 
 const LANGUAGES: ExplanationLanguage[] = ["Arabic", "English"];
 
@@ -58,7 +58,7 @@ describe("مجموعات المثال والمراحل", () => {
       expect(between(html, `data-group-badge="${stage}"`, "</span>")).toContain(`border-${pattern}`);
       /* لا فراغات تُخترع من المرحلة */
       expect(html).not.toContain(BLANK_LABEL[language]);
-      expect(html).toContain("حوّل 300 cm إلى m");
+      expect(visibleText(html)).toContain("حوّل 300 cm إلى m");
     },
   );
 
@@ -240,7 +240,7 @@ describe("عنوان السبورة", () => {
     );
     const title = between(html, "data-board-title", 'aria-live="polite"');
 
-    expect(title).toContain("4 · تحويل الوحدات");
+    expect(visibleText(title)).toContain("4 · تحويل الوحدات");
     expect(title).toContain(ANNOTATION_LABEL.warning![language]);
     expect(title).toContain("border-warmth");
   });
@@ -356,7 +356,7 @@ describe("الأيقونات والمشهد", () => {
     );
     expect(html).toContain("data-icon-placeholder");
     expect(html).toContain(`aria-label="${UNKNOWN_ICON_LABEL.Arabic}"`);
-    expect(html).toContain("الطول — متر (m)");
+    expect(visibleText(html)).toContain("الطول — متر (m)");
   });
 
   it("اسم يطابق خاصية موروثة يعامَل مجهولًا", () => {

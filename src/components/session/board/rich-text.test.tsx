@@ -25,8 +25,10 @@ function fixturePayload(fixture: string, id: string): Record<string, unknown> {
 const AR = { language: "Arabic" } as const;
 const EN = { language: "English" } as const;
 
+/* المعرّف هويّة البند على السلك، فلا يتكرّر في حالةٍ واحدة */
 function render(items: BoardItem[], options: typeof AR | typeof EN = AR) {
-  return renderBoardHtml(boardState({ items }), options);
+  const unique = items.map((item, i) => ({ ...item, id: `${item.id}-${i}` }));
+  return renderBoardHtml(boardState({ items: unique }), options);
 }
 
 function spanMark(match: string, state: Mark["state"]): Mark {

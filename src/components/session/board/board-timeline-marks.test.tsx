@@ -24,7 +24,7 @@ vi.mock("@/lib/session/board/marks", async (importOriginal) => ({
   decorate: (item: BoardItem, address: Address) => decorate(item, address),
 }));
 
-const { boardItem, boardState, renderBoardHtml } = await import("./test-utils");
+const { boardItem, boardState, renderBoardHtml, visibleText } = await import("./test-utils");
 
 const timeline = (revealed: number) =>
   boardItem(
@@ -47,7 +47,7 @@ describe("علامات التقسيم", () => {
     expect(division).toContain('data-mark-answer="correct"');
     expect(division).toContain("data-mark-focus");
     expect(division).not.toContain("data-mark-dimmed-by-focus");
-    expect(division).toContain("× 100");
+    expect(visibleText(division)).toContain("× 100");
     expect(division).toContain("معامل التحويل");
   });
 

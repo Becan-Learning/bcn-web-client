@@ -71,3 +71,15 @@ export function renderBoardHtml(
     </NextIntlClientProvider>,
   );
 }
+
+/** النصّ كما يُقرأ: عزل الاتجاه والتنسيق يقطعان النصّ إلى عناصر،
+    فالمقارنة بالحروف تجري بعد نزع الوسوم لا على HTML الخام. */
+export function visibleText(html: string): string {
+  return html
+    .replace(/<[^>]+>/g, "")
+    .replaceAll("&#x27;", "'")
+    .replaceAll("&quot;", '"')
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">")
+    .replaceAll("&amp;", "&");
+}

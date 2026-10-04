@@ -1,3 +1,5 @@
+import type { BoardKindProps } from "./kind-props";
+
 /* الأنواع النصّية الأربعة — منقولة عن `BoardLine` في الإصدار الأول.
 
    `dir="auto"` على محضن النصّ لا على الصفّ، فتبقى العلامة والرقم في
@@ -6,7 +8,8 @@
 
    ولون النصّ يُبنى شرطيًا لا بالتكديس (مزلق 8). */
 
-export function HeadingLine({ text }: { text: string }) {
+export function HeadingLine({ item }: BoardKindProps<"heading" | "title">) {
+  const { text } = item.payload;
   return (
     <p className="text-base leading-base font-bold text-ink md:text-lg">
       <span dir="auto">{text}</span>
@@ -14,7 +17,8 @@ export function HeadingLine({ text }: { text: string }) {
   );
 }
 
-export function TextLine({ text }: { text: string }) {
+export function TextLine({ item }: BoardKindProps<"text">) {
+  const { text } = item.payload;
   return (
     <p dir="auto" className="leading-base text-ink-2">
       {text}
@@ -22,7 +26,8 @@ export function TextLine({ text }: { text: string }) {
   );
 }
 
-export function BulletLine({ text }: { text: string }) {
+export function BulletLine({ item }: BoardKindProps<"bullet">) {
+  const { text } = item.payload;
   return (
     <p className="flex items-baseline gap-3">
       <span aria-hidden="true" className="flex h-5 w-5 shrink-0 items-center justify-center">
@@ -36,7 +41,8 @@ export function BulletLine({ text }: { text: string }) {
 }
 
 /** الترقيم مقصور على المنطقة (§5.1) — وأرقامه إنجليزية كبقية الواجهة */
-export function StepLine({ text, n }: { text: string; n: number }) {
+export function StepLine({ item, n }: BoardKindProps<"step">) {
+  const { text } = item.payload;
   return (
     <p className="flex items-baseline gap-3">
       <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm bg-aubergine-mid text-xs font-bold text-on-dominant">

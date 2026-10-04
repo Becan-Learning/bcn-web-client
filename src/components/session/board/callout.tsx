@@ -7,8 +7,8 @@ import {
   MistakeIcon,
   MnemonicIcon,
 } from "@/components/becan/icons";
-import type { CalloutKind, CalloutPayload } from "@/lib/session/teaching-board";
-import type { ExplanationLanguage } from "../explanation-language";
+import type { CalloutKind } from "@/lib/session/teaching-board";
+import type { BoardKindProps } from "./kind-props";
 
 /* النداءات الستّة (§5.11).
 
@@ -28,6 +28,7 @@ const ICONS: Record<CalloutKind, (p: { className?: string }) => React.ReactEleme
   definition: BookIcon,
   example: ExampleIcon,
   exam: ExamIcon,
+  verbatim: BookIcon,
 };
 
 /* لكلٍّ حدُّه وتعبئته وأيقونته — فالتمييز لا يقع على اللون وحده.
@@ -46,15 +47,11 @@ const STYLES: Record<CalloutKind, { frame: string; icon: string }> = {
   mnemonic: { frame: "border border-dashed border-ink-3 bg-ink/5", icon: "text-ink-2" },
   example: { frame: "border border-dashed border-warmth", icon: "text-warmth" },
   definition: { frame: "bg-ink/10", icon: "text-ink-2" },
+  verbatim: { frame: "border border-ink-2", icon: "text-ink-2" },
 };
 
-export function CalloutItem({
-  payload,
-  language,
-}: {
-  payload: CalloutPayload;
-  language: ExplanationLanguage;
-}) {
+export function CalloutItem({ item, language }: BoardKindProps<"callout">) {
+  const { payload } = item;
   const Icon = ICONS[payload.kind];
   const style = STYLES[payload.kind];
   const label = CALLOUT_LABEL[payload.kind][language];

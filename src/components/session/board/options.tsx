@@ -1,7 +1,6 @@
 import { ANNOTATION_LABEL, OPTION_LABELS } from "./labels";
 import { CheckIcon, CloseIcon } from "@/components/becan/icons";
-import type { OptionsPayload, SlotValue } from "@/lib/session/teaching-board";
-import type { ExplanationLanguage } from "../explanation-language";
+import type { BoardKindProps } from "./kind-props";
 
 /* الاختيار من متعدّد (§5.10).
 
@@ -21,15 +20,8 @@ const STATE_STYLE = {
 
 /* الأيقونة `aria-hidden` واللون لا يُنطق، فيُنطق الحال نصًّا مخفيًا */
 
-export function OptionsItem({
-  payload,
-  slots,
-  language,
-}: {
-  payload: OptionsPayload;
-  slots: Record<string, SlotValue>;
-  language: ExplanationLanguage;
-}) {
+export function OptionsItem({ item, language }: BoardKindProps<"options">) {
+  const { payload, slots } = item;
   return (
     <div className="flex flex-col gap-2.5">
       <p dir="auto" className="leading-base font-semibold text-ink">

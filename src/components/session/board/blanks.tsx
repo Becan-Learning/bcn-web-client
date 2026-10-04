@@ -1,6 +1,5 @@
 import { BLANK_LABEL } from "./labels";
-import type { BlanksPayload, SlotValue } from "@/lib/session/teaching-board";
-import type { ExplanationLanguage } from "../explanation-language";
+import type { BoardKindProps } from "./kind-props";
 
 /* املأ الفراغ (§5.9).
 
@@ -17,15 +16,8 @@ const PLACEHOLDER = "___";
 /* الخطّ التحتي وحده لا يُنطق، فالجملة تُقرأ منقوصة بلا إشارة إلى
    موضع الفراغ. يُنطق بكلمة مخفية بصريًا. */
 
-export function BlanksItem({
-  payload,
-  slots,
-  language,
-}: {
-  payload: BlanksPayload;
-  slots: Record<string, SlotValue>;
-  language: ExplanationLanguage;
-}) {
+export function BlanksItem({ item, language }: BoardKindProps<"blanks">) {
+  const { payload, slots } = item;
   const parts = payload.template.split(PLACEHOLDER);
 
   return (

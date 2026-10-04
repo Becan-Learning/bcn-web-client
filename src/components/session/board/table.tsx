@@ -1,4 +1,5 @@
 import type { TablePayload } from "@/lib/session/teaching-board";
+import type { BoardKindProps } from "./kind-props";
 
 /* الجدول (§5.7).
 
@@ -45,7 +46,8 @@ function Cell({
   );
 }
 
-export function TableItem({ payload }: { payload: TablePayload }) {
+export function TableItem({ item }: BoardKindProps<"table">) {
+  const { payload } = item;
   const cellClass = "px-3 py-2 align-top leading-base";
 
   return (
@@ -56,7 +58,7 @@ export function TableItem({ payload }: { payload: TablePayload }) {
           <tr className="border-b border-chalkboard-edge bg-ink/5">
             {payload.header.map((label, i) => (
               <th key={i} scope="col" className={cellClass}>
-                <Cell value={label} numeric={isNumericColumn(payload, i)} head />
+                <Cell value={label.text} numeric={isNumericColumn(payload, i)} head />
               </th>
             ))}
           </tr>
@@ -66,7 +68,7 @@ export function TableItem({ payload }: { payload: TablePayload }) {
             <tr key={i} className="border-b border-chalkboard-edge/60 last:border-0">
               {row.map((value, j) => (
                 <td key={j} className={cellClass}>
-                  <Cell value={value} numeric={isNumericColumn(payload, j)} />
+                  <Cell value={value.text} numeric={isNumericColumn(payload, j)} />
                 </td>
               ))}
             </tr>
@@ -85,10 +87,10 @@ export function TableItem({ payload }: { payload: TablePayload }) {
               {payload.header.map((label, j) => (
                 <div key={j} className="flex items-baseline justify-between gap-3">
                   <dt dir="auto" className="shrink-0 text-xs leading-base font-semibold text-ink-2">
-                    {label}
+                    {label.text}
                   </dt>
                   <dd className="min-w-0">
-                    <Cell value={row[j] ?? ""} numeric={isNumericColumn(payload, j)} />
+                    <Cell value={row[j]?.text ?? ""} numeric={isNumericColumn(payload, j)} />
                   </dd>
                 </div>
               ))}

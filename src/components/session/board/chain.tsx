@@ -1,4 +1,4 @@
-import type { ChainPayload, SlotValue } from "@/lib/session/teaching-board";
+import type { BoardKindProps } from "./kind-props";
 
 /* السلسلة — آليّة السبب والنتيجة (§5.8).
 
@@ -29,13 +29,8 @@ function Connector({ broken }: { broken: boolean }) {
   );
 }
 
-export function ChainItem({
-  payload,
-  slots,
-}: {
-  payload: ChainPayload;
-  slots: Record<string, SlotValue>;
-}) {
+export function ChainItem({ item }: BoardKindProps<"chain">) {
+  const { payload, slots } = item;
   return (
     <ol className="flex flex-col items-stretch gap-0">
       {payload.links.map((link, i) => {

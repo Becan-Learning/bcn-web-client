@@ -1,5 +1,5 @@
 import {
-  CALLOUT_KINDS,
+  type CalloutKind,
   type AnnotationKind,
   type BoardControlEvent,
   type BoardGroup,
@@ -60,6 +60,10 @@ const ANNOTATIONS: readonly AnnotationKind[] = [
   "broken",
   "dim",
 ];
+/* قبول الرسائل مستقلّ عن مفردات العرض حتى تبقى الحمولات المألوفة كما هي. */
+const WIRE_CALLOUT_KINDS: readonly CalloutKind[] = [
+  "loses_marks", "mistake", "mnemonic", "definition", "example", "exam",
+];
 const SLOT_STATES: readonly SlotState[] = ["correct", "wrong", "broken"];
 const ITEM_KINDS: readonly BoardItemKind[] = [
   "heading",
@@ -91,10 +95,14 @@ function parsePayload(kind: BoardItem["kind"], raw: unknown): BoardPayload | nul
     case "title":
     case "heading":
     case "text":
-    case "bullet":
     case "step": {
       const t = text(raw.text);
       return t === null ? null : { text: t };
+    }
+
+    case "bullet": {
+      const t = text(raw.text);
+      return t === null ? null : { text: t, children: [] };
     }
 
     case "definition": {
@@ -156,7 +164,13 @@ function parsePayload(kind: BoardItem["kind"], raw: unknown): BoardPayload | nul
         rows.push(row);
       }
 
-      return { variant: cell(raw.variant), header, rows };
+      return {
+        variant: raw.variant === "journal" ? "journal" : "plain",
+        header: header.map((text) => ({ text, state: null })),
+        rows: rows.map((row) => row.map((text) => ({ text, state: null }))),
+        numberedColumns: false,
+        progressive: false,
+      };
     }
 
     case "chain": {
@@ -208,11 +222,12 @@ function parsePayload(kind: BoardItem["kind"], raw: unknown): BoardPayload | nul
     }
 
     case "callout": {
-      const calloutKind = oneOf(CALLOUT_KINDS, raw.kind);
+      const calloutKind = oneOf(WIRE_CALLOUT_KINDS, raw.kind);
       const t = text(raw.text);
       return calloutKind === null || t === null ? null : { kind: calloutKind, text: t };
     }
   }
+  return null;
 }
 
 function parseSlots(raw: unknown): Record<string, SlotValue> {
@@ -257,6 +272,8 @@ function parseItem(raw: unknown, titleAllowed = false): BoardItem | null {
     annotation: oneOf(ANNOTATIONS, raw.annotation),
     revealed: revealed !== null && revealed > 0 ? revealed : 1,
     slots: parseSlots(raw.slots),
+    pen: null,
+    marks: [],
   } as BoardItem;
 }
 
@@ -268,7 +285,7 @@ function parseGroup(raw: unknown): BoardGroup | null {
   const region = oneOf(REGIONS, raw.region);
   if (id === null || kind === null || region === null) return null;
 
-  return { id, kind, region, heading: cell(raw.heading) ?? "" };
+  return { id, kind, region, heading: cell(raw.heading) ?? "", stage: null };
 }
 
 /* ————— الرسالة ————— */

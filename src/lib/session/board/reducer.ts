@@ -84,6 +84,8 @@ export function teachingBoardReducer(
           annotation: null,
           revealed: 1,
           slots: {},
+          pen: null,
+          marks: [],
         },
       };
 

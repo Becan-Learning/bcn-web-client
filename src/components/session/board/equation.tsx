@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import katex from "katex";
 import "katex/dist/katex.min.css";
-import type { EquationPayload } from "@/lib/session/teaching-board";
+import type { BoardKindProps } from "./kind-props";
 
 /* المعادلات بـ KaTeX (§5.5).
 
@@ -17,7 +17,8 @@ import type { EquationPayload } from "@/lib/session/teaching-board";
    التي تضمّ هذا المكوّن — أي شاشة الجلسة وحدها. وخطوط KaTeX
    لاتينية ولا تظهر إلا داخل معادلة، فلا تمسّ خطّ الواجهة. */
 
-export function EquationItem({ payload }: { payload: EquationPayload }) {
+export function EquationItem({ item }: BoardKindProps<"equation">) {
+  const { payload } = item;
   const html = useMemo(() => {
     try {
       return katex.renderToString(payload.latex, {

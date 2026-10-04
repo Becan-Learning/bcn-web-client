@@ -1,4 +1,4 @@
-import type { TermPayload } from "@/lib/session/teaching-board";
+import type { BoardKindProps } from "./kind-props";
 
 /* المصطلح ثنائي اللغة (§5.3).
 
@@ -7,7 +7,8 @@ import type { TermPayload } from "@/lib/session/teaching-board";
    خاصّ به: `isolate` على الحاوية و`dir` صريح لكل نصف. وهذا هو
    الحال الشائع على لوحٍ عربيّ لا الحالة الشاذّة. */
 
-export function TermItem({ payload }: { payload: TermPayload }) {
+export function TermItem({ item }: BoardKindProps<"term">) {
+  const { payload } = item;
   return (
     <p className="leading-base">
       <span

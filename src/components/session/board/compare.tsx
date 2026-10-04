@@ -1,4 +1,4 @@
-import type { ComparePayload } from "@/lib/session/teaching-board";
+import type { BoardKindProps } from "./kind-props";
 
 /* الزوج الأدنى (§5.6) — عمودان لا أكثر، و`x` للأول و`y` للثاني.
 
@@ -12,7 +12,8 @@ import type { ComparePayload } from "@/lib/session/teaching-board";
 
 const SIDE_ACCENT = ["border-warmth", "border-ink-3"] as const;
 
-export function CompareItem({ payload }: { payload: ComparePayload }) {
+export function CompareItem({ item }: BoardKindProps<"compare">) {
+  const { payload } = item;
   const cellClass = "px-3 py-2 align-top leading-base";
 
   return (

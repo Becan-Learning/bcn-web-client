@@ -3,6 +3,12 @@ import { motion } from "motion/react";
 import { CheckIcon, CloseIcon, WarningIcon } from "@/components/becan/icons";
 import type { AnnotationKind, BoardItem } from "@/lib/session/teaching-board";
 import type { ExplanationLanguage } from "../explanation-language";
+import { DividerItem } from "./divider";
+import { IconItem } from "./icon";
+import { NoteItem } from "./note";
+import { TimelineItem } from "./timeline";
+import { UnsupportedItem } from "./unsupported";
+import type { BoardKindProps } from "./kind-props";
 import { BlanksItem } from "./blanks";
 import { CalloutItem } from "./callout";
 import { ChainItem } from "./chain";
@@ -55,39 +61,45 @@ function Body({
   item,
   n,
   language,
-}: {
-  item: BoardItem;
-  n: number;
-  language: ExplanationLanguage;
-}) {
+}: BoardKindProps) {
   switch (item.kind) {
     case "title":
     case "heading":
-      return <HeadingLine text={item.payload.text} />;
+      return <HeadingLine item={item} language={language} n={n} />;
     case "text":
-      return <TextLine text={item.payload.text} />;
+      return <TextLine item={item} language={language} n={n} />;
     case "bullet":
-      return <BulletLine text={item.payload.text} />;
+      return <BulletLine item={item} language={language} n={n} />;
     case "step":
-      return <StepLine text={item.payload.text} n={n} />;
+      return <StepLine item={item} language={language} n={n} />;
+    case "note":
+      return <NoteItem item={item} language={language} n={n} />;
+    case "divider":
+      return <DividerItem item={item} language={language} n={n} />;
+    case "timeline":
+      return <TimelineItem item={item} language={language} n={n} />;
+    case "icon":
+      return <IconItem item={item} language={language} n={n} />;
+    case "unsupported":
+      return <UnsupportedItem item={item} language={language} n={n} />;
     case "definition":
-      return <DefinitionItem payload={item.payload} revealed={item.revealed} />;
+      return <DefinitionItem item={item} language={language} n={n} />;
     case "term":
-      return <TermItem payload={item.payload} />;
+      return <TermItem item={item} language={language} n={n} />;
     case "equation":
-      return <EquationItem payload={item.payload} />;
+      return <EquationItem item={item} language={language} n={n} />;
     case "compare":
-      return <CompareItem payload={item.payload} />;
+      return <CompareItem item={item} language={language} n={n} />;
     case "table":
-      return <TableItem payload={item.payload} />;
+      return <TableItem item={item} language={language} n={n} />;
     case "chain":
-      return <ChainItem payload={item.payload} slots={item.slots} />;
+      return <ChainItem item={item} language={language} n={n} />;
     case "blanks":
-      return <BlanksItem payload={item.payload} slots={item.slots} language={language} />;
+      return <BlanksItem item={item} language={language} n={n} />;
     case "options":
-      return <OptionsItem payload={item.payload} slots={item.slots} language={language} />;
+      return <OptionsItem item={item} language={language} n={n} />;
     case "callout":
-      return <CalloutItem payload={item.payload} language={language} />;
+      return <CalloutItem item={item} language={language} n={n} />;
   }
 }
 
@@ -96,12 +108,16 @@ export function BoardItemView({
   n,
   language,
   reduce,
+  dimmedByFocus = false,
 }: {
   item: BoardItem;
   n: number;
   language: ExplanationLanguage;
   reduce: boolean;
+  /** بندٌ آخر في المنطقة نفسها عليه «انظر هنا»، فيُخفَت هذا ولا يُخفى */
+  dimmedByFocus?: boolean;
 }) {
+  void dimmedByFocus;
   /* لا مباعدة بمؤقّتات جافاسكربت: الوكيل يوقّت كل عملية على الصوت
      المنطوق، وأي تأخير من الصفحة يضاعف التوقيت (§1). */
   const anim = reduce

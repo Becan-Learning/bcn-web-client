@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { parseBoardControlEvent } from "./parse";
 import { teachingBoardReducer } from "./reducer";
-import { INITIAL_BOARD_STATE, type BoardAction, type BoardState } from "./types";
+import { INITIAL_BOARD_STATE, type BoardAction, type BoardState, type TablePayload } from "./types";
 
 /* المخفّض يُختبر من طرف الأسلاك لا من طرف الأنواع: كل رسالة تمرّ
    على المحلّل أوّلًا كما تمرّ في الجلسة الحقيقية، فيُغطّى العقد
@@ -83,7 +83,7 @@ describe("board_update", () => {
       bullet("a", 1),
       { action: "board_update", id: "a", text: "نصّ جديد", rev: 2 },
     );
-    expect(state.items[0].payload).toEqual({ text: "نصّ جديد" });
+    expect(state.items[0].payload).toEqual({ text: "نصّ جديد", children: [] });
   });
 
   it("بلا خانة لا يمسّ حمولةً بلا نصّ", () => {
@@ -310,9 +310,9 @@ describe("التحليل — حمولة تالفة تُسقط البند ولا 
       ),
     );
 
-    const payload = state.items[0].payload as { rows: string[][] };
-    expect(payload.rows[0]).toEqual(["Cash", "120,000", ""]);
-    expect(payload.rows[1]).toEqual(["Revenue", "", ""]);
+    const payload = state.items[0].payload as TablePayload;
+    expect(payload.rows[0].map((cell) => cell.text)).toEqual(["Cash", "120,000", ""]);
+    expect(payload.rows[1].map((cell) => cell.text)).toEqual(["Revenue", "", ""]);
   });
 
   it("النصّ يصل كما هو بلا تشذيب ولا قصّ", () => {

@@ -1,4 +1,4 @@
-import type { DefinitionPayload } from "@/lib/session/teaching-board";
+import type { BoardKindProps } from "./kind-props";
 
 /* التعريف يُكشف مقطعًا مقطعًا مع الصوت (§5.2).
 
@@ -32,13 +32,8 @@ function emphasise(chunk: string, keyWords: string[]) {
   );
 }
 
-export function DefinitionItem({
-  payload,
-  revealed,
-}: {
-  payload: DefinitionPayload;
-  revealed: number;
-}) {
+export function DefinitionItem({ item }: BoardKindProps<"definition">) {
+  const { payload, revealed } = item;
   return (
     <p dir="auto" className="leading-base text-ink">
       {payload.chunks.map((chunk, i) => {

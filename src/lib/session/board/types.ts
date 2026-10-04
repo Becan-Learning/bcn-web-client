@@ -1,4 +1,4 @@
-/* عقد السبورة — الإصدار الثاني.
+/* عقد السبورة — المحتوى والحالات المشتركة.
 
    محتوى السبورة صار مؤلَّفًا في خطة الدرس لا مخترَعًا أثناء الشرح:
    الوكيل يقرّر متى بلغ المعلّمُ ملاحظةً مكتوبة، والخادم يوزّع
@@ -8,7 +8,7 @@
    تكشف سطرًا، تحذف عنصرًا — لا تُلحِق سطورًا نازلةً وحسب.
 
    أسماء الأفعال والحقول عقدٌ مع الوكيل الخارجي فلا تُعاد تسميتها من
-   طرف واحد. المواصفة: docs/frontend-board-spec-v2.md */
+   طرف واحد. المواصفة: docs/frontend-board-spec-v3.md */
 
 /** المناطق الثلاث — السعة يفرضها الخادم لا الصفحة */
 export type BoardRegion = "pinned" | "live" | "temporary";
@@ -21,6 +21,11 @@ export type BoardItemKind =
   | "text"
   | "bullet"
   | "step"
+  | "note"
+  | "divider"
+  | "timeline"
+  | "icon"
+  | "unsupported"
   | "definition"
   | "term"
   | "equation"
@@ -46,7 +51,8 @@ export type CalloutKind =
   | "mnemonic"
   | "definition"
   | "example"
-  | "exam";
+  | "exam"
+  | "verbatim";
 
 export const CALLOUT_KINDS: readonly CalloutKind[] = [
   "loses_marks",
@@ -55,11 +61,34 @@ export const CALLOUT_KINDS: readonly CalloutKind[] = [
   "definition",
   "example",
   "exam",
+  "verbatim",
 ];
+
+/** القلم إبرازٌ للمحتوى، مستقلّ عن صحة الإجابة */
+export type Pen = "mark" | "construct" | "flow" | "trap" | "alt";
+export type MarkScope = "item" | "row" | "cell" | "column" | "option" | "span" | "division";
+export type MarkState = "highlight" | "correct" | "wrong" | "dim" | "strike" | "focus";
+export type Mark = {
+  scope: MarkScope;
+  index: number | null;
+  cell: [number, number] | null;
+  option: string | null;
+  match: string | null;
+  state: MarkState;
+};
+export type Stage = "worked" | "faded" | "try";
+export type CellState = "highlight" | "correct" | "wrong" | "dim";
+export type TableCell = { text: string; state: CellState | null };
 
 /* ————— الحمولات ————— */
 
 export type TextPayload = { text: string };
+export type HeadingPayload = TextPayload;
+export type StepPayload = TextPayload;
+export type NotePayload = TextPayload;
+export type TitlePayload = TextPayload;
+export type BulletPayload = { text: string; children: string[] };
+export type DividerPayload = Record<string, never>;
 export type DefinitionPayload = { chunks: string[]; keyWords: string[] };
 export type TermPayload = { en: string; ar: string };
 export type EquationPayload = { latex: string; display: boolean };
@@ -73,15 +102,17 @@ export type ComparePayload = {
 };
 
 export type TablePayload = {
-  variant: string | null;
-  header: string[];
+  variant: "plain" | "journal";
+  header: TableCell[];
   /** خليّة فارغة مشروعة — سطر القيد يملأ المدين أو الدائن لا كليهما */
-  rows: string[][];
+  rows: TableCell[][];
+  numberedColumns: boolean;
+  progressive: boolean;
 };
 
 export type ChainPayload = {
   links: string[];
-  /** رقم الوصلة (من 1) التي يُكسر واصلُها الداخل، أو null */
+  /** فهرس الوصلة التي يُكسر واصلُها الداخل، أو null */
   breakAt: number | null;
 };
 
@@ -99,55 +130,69 @@ export type OptionsPayload = {
 
 export type CalloutPayload = { kind: CalloutKind; text: string };
 
-export type BoardPayload =
-  | TextPayload
-  | DefinitionPayload
-  | TermPayload
-  | EquationPayload
-  | ComparePayload
-  | TablePayload
-  | ChainPayload
-  | BlanksPayload
-  | OptionsPayload
-  | CalloutPayload;
+export type TimelinePayload = {
+  axisLabel: string;
+  divisions: string[];
+  markers: { id: string; at: number; label: string | null; pen: Pen | null }[];
+  progressive: boolean;
+};
+export type IconPayload = { icon: string; label: string; attachTo: string | null };
+export type UnsupportedPayload = { wireKind: string };
+
+/** ربط النوع بحمولته يحفظ تضييق الأنواع عند اختيار المكوّن */
+export type BoardPayloadByKind = {
+  title: TitlePayload;
+  heading: HeadingPayload;
+  text: TextPayload;
+  bullet: BulletPayload;
+  step: StepPayload;
+  note: NotePayload;
+  divider: DividerPayload;
+  definition: DefinitionPayload;
+  term: TermPayload;
+  equation: EquationPayload;
+  compare: ComparePayload;
+  table: TablePayload;
+  chain: ChainPayload;
+  blanks: BlanksPayload;
+  options: OptionsPayload;
+  callout: CalloutPayload;
+  timeline: TimelinePayload;
+  icon: IconPayload;
+  unsupported: UnsupportedPayload;
+};
+export type BoardPayload = BoardPayloadByKind[keyof BoardPayloadByKind];
 
 /* ————— العنصر ————— */
 
 /** ما يكتبه `board_update` في خانة ابن: فراغٌ يُملأ أو خيارٌ يُصحَّح */
-export type SlotState = "correct" | "wrong" | "broken";
+export type SlotState = "correct" | "wrong" | "broken" | "key";
 export type SlotValue = { text?: string; state?: SlotState };
 
-type ItemBase = {
+export type ItemBase = {
   id: string;
   region: BoardRegion;
   /** حاوية أنشأها `board_group` قبله، أو null */
   groupId: string | null;
   annotation: AnnotationKind | null;
-  /** مقاطع التعريف الظاهرة؛ 1 لما سواه */
+  /** عدد المقاطع أو الصفوف أو التقسيمات الظاهرة */
   revealed: number;
   /** معرّف الفراغ · معرّف الخيار · رقم الوصلة (من 0) */
   slots: Record<string, SlotValue>;
+  pen: Pen | null;
+  marks: Mark[];
 };
 
-export type BoardItem = ItemBase &
-  (
-    | { kind: "title" | "heading" | "text" | "bullet" | "step"; payload: TextPayload }
-    | { kind: "definition"; payload: DefinitionPayload }
-    | { kind: "term"; payload: TermPayload }
-    | { kind: "equation"; payload: EquationPayload }
-    | { kind: "compare"; payload: ComparePayload }
-    | { kind: "table"; payload: TablePayload }
-    | { kind: "chain"; payload: ChainPayload }
-    | { kind: "blanks"; payload: BlanksPayload }
-    | { kind: "options"; payload: OptionsPayload }
-    | { kind: "callout"; payload: CalloutPayload }
-  );
+export type BoardItem = {
+  [K in keyof BoardPayloadByKind]: ItemBase & { kind: K; payload: BoardPayloadByKind[K] };
+}[keyof BoardPayloadByKind];
 
 export type BoardGroup = {
   id: string;
-  kind: "box" | "columns";
+  kind: "box" | "columns" | "example" | "scenario";
   region: BoardRegion;
   heading: string;
+  stage: Stage | null;
 };
 
 /* ————— الحالة ————— */

@@ -1,0 +1,22 @@
+/* نصّ السبورة الغنيّ: ما تحتاجه قطع `RichText` فوق أولويات الأقلام
+   والعلامات المشتركة في globals.css. */
+
+/* الإبراز المضمّن تحيط به حدّان من الأولويات: `data-pen` يضع حدًّا
+   جانبيًا للبند كله، و`data-mark-highlight` يضع إطارًا. على قطعةٍ
+   داخل السطر يكفي الإطار، فيُلغى الحدّ كي لا يتضاعف. */
+[data-surface="session"] .chalkboard .rt-hl {
+  border: 0;
+}
+
+/* مدى العلامة المقطوع عند حدّ تتابعٍ اتجاهيّ: الأيقونة في جزئه الأول
+   وحده، فلا مكان محجوزًا لها في بقية الأجزاء. */
+[data-surface="session"] .chalkboard [data-rt-continued] {
+  padding-inline-start: 0;
+}
+
+/* لفظ الحال للقارئ الصوتي يصل بلغتين ويُسقَط ما يخالف `lang` غلاف
+   السبورة، فلا يُنطق إلا لفظ لغة الشرح. */
+[data-surface="session"] .chalkboard:lang(ar) [data-cue-lang="en"],
+[data-surface="session"] .chalkboard:lang(en) [data-cue-lang="ar"] {
+  display: none;
+}

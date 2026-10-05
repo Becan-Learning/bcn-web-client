@@ -20,7 +20,7 @@ import {
 } from "./explanation-language";
 import dynamic from "next/dynamic";
 import { useRouter } from "@/i18n/navigation";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import {
   RoomAudioRenderer,
   SessionProvider,
@@ -62,6 +62,7 @@ import {
   type TopicState,
 } from "./parts";
 import { useIsMobile } from "./use-is-mobile";
+import { useReducedMotion } from "./use-reduced-motion";
 import { PacketRecorderButtons, usePacketRecorder } from "./use-packet-recorder";
 
 /* شاشة الجلسة — تخطيط becan-design (عمود الدروس · السبورة · الشرائح)
@@ -173,7 +174,7 @@ function SessionScreen({
   const format = useFormatter();
   const number = (value: number) => format.number(value, { numberingSystem: "latn" });
   const router = useRouter();
-  const reduce = useReducedMotion() ?? false;
+  const reduce = useReducedMotion();
   const isMobile = useIsMobile();
   const agent = useAgent(session);
   const [state, dispatch] = useReducer(sessionReducer, INITIAL_SESSION_STATE);
@@ -185,6 +186,9 @@ function SessionScreen({
   const [failed, setFailed] = useState(false);
   const [userEnding, setUserEnding] = useState(false);
   const [micUnavailable, setMicUnavailable] = useState(false);
+  /* useSession().local.microphoneTrack يكون null ما دام المايك مكتومًا، فلا يصلح
+     دليلًا على النشر. نتتبّع نجاح publishTrack بأنفسنا. */
+  const [micPublished, setMicPublished] = useState(false);
   const [studentQuestionStatus, setStudentQuestionStatus] = useState<StudentQuestionStatus>({
     busy: false,
     startedAt: null,
@@ -296,6 +300,7 @@ function SessionScreen({
     setStarting(true);
     try {
       setMicUnavailable(false);
+      setMicPublished(false);
       setNoSpeech(false);
       // enabled:false skips capture in useSession. Acquire and mute BEFORE publishing.
       const microphone = await createLocalAudioTrack().catch((error) => {
@@ -312,7 +317,7 @@ function SessionScreen({
             ? session.room.localParticipant.publishTrack(microphone, {
                 source: Track.Source.Microphone,
                 stopMicTrackOnMute: false,
-              }).catch((error) => {
+              }).then(() => setMicPublished(true), (error) => {
                 microphone.stop();
                 setMicUnavailable(true);
                 console.error("Failed to publish muted microphone:", error);
@@ -406,7 +411,7 @@ function SessionScreen({
 
   const inRoom = session.isConnected;
   const canAsk = inRoom && agent.isConnected && !ending && !micUnavailable &&
-    !!session.local.microphoneTrack && !studentQuestionStatus.busy &&
+    micPublished && !studentQuestionStatus.busy &&
     studentQuestionStatus.startedAt === null;
   const startStudentQuestion = useCallback(() => {
     if (!canAsk || finishing.current) return;

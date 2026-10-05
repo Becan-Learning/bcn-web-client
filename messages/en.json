@@ -745,33 +745,20 @@
       "ar": "عربي",
       "en": "English"
     },
-    "chatListening": "Listening to you — or type your question",
     "chatQuestion": "Type your question",
     "chatPlaceholder": "What’s unclear?",
     "send": "Send",
     "closeChat": "Close chat",
     "comingSoon": "Coming soon",
-    "soonLabel": "{label} — Coming soon",
     "startHint": "Press here to start the explanation",
     "start": "Start explanation",
-    "pauseSoon": "Pause — Coming soon",
-    "micOff": "Turn microphone off",
-    "micOn": "Turn microphone on",
     "chat": "Chat",
-    "confused": "I didn’t get it",
-    "repeat": "Repeat the line",
-    "speedSoon": "Explanation speed — Coming soon",
-    "speed": {
-      "slow": "Slow",
-      "normal": "Normal",
-      "fast": "Fast"
-    },
     "slides": "Slides",
     "end": "End session",
     "questionTitle": "Understanding check",
     "answerVoice": "Answer by voice",
     "question": "Question",
-    "answerHint": "Answer by voice, or type your answer in chat.",
+    "answerHint": "Press “Answer by voice”, or type your answer in chat.",
     "endTitle": "End the session?",
     "endHint": "You can return to the same chapter later.",
     "continue": "Continue",
@@ -824,7 +811,12 @@
       "previous": "Previous slide",
       "next": "Next slide",
       "pageOf": "{number} of {total}"
-    }
+    },
+    "studentQuestionAsk": "Ask",
+    "studentQuestionCancel": "Cancel",
+    "studentQuestionNoSpeech": "We didn't hear anything",
+    "studentQuestionMicUnavailable": "The microphone is unavailable or permission was denied — you can type in chat.",
+    "studentQuestionShortcut": "Ask: Space · Send: Space again · Cancel: Escape"
   },
   "SessionSummary": {
     "metadata": "Session summary — Becan",

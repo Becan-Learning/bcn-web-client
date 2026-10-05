@@ -4,28 +4,26 @@ import { useEffect, useId, useRef, useState } from "react";
 import { useFormatter, useTranslations } from "next-intl";
 import type { ExplanationLanguage } from "./explanation-language";
 import { Dialog } from "radix-ui";
+import { AnimatePresence, motion } from "motion/react";
+import { useAudioWaveform, useTrackVolume, type useSession } from "@livekit/components-react";
 import {
   ChatIcon,
   CheckIcon,
   Chevron,
   CloseIcon,
-  ConfusedIcon,
   ListIcon,
   MicIcon,
-  MicOffIcon,
   PlayIcon,
-  ReplayIcon,
   RotateIcon,
   SlidesIcon,
-  StopIcon,
+  LeaveIcon,
   Waveform,
 } from "@/components/becan/icons";
 import { BecanGlyph } from "@/components/becan/becan-face";
 import type { Checkpoint } from "@/lib/session/session-reducer";
 
 /* أجزاء شاشة الجلسة — تصميم becan-design (الشاشة 7) على محرّك حقيقي.
-   الفرق عن التصميم: الحالة تأتي من الوكيل لا من نصّ مؤقَّت، والأدوات
-   التي لا يدعمها الوكيل بعد ظاهرة بحدّ متقطّع ووسم «قريبًا». */
+   الحالة تأتي من الوكيل، وصوت الطالب محصور في سؤال الطالب. */
 
 export type Phase =
   | "idle"
@@ -514,11 +512,9 @@ export function LanguageChoice({
    يُرسل نصّ الطالب إلى الوكيل على lk.chat. */
 
 export function ChatPanel({
-  listening,
   onSend,
   onClose,
 }: {
-  listening: boolean;
   onSend: (text: string) => Promise<boolean>;
   onClose: () => void;
 }) {
@@ -548,7 +544,7 @@ export function ChatPanel({
       className="absolute inset-x-2 bottom-[4.25rem] z-20 rounded-xl border border-line bg-surface-2 p-4 animate-board-in"
     >
       <label htmlFor="ask" className="text-sm text-ink-2">
-        {listening ? t("chatListening") : t("chatQuestion")}
+        {t("chatQuestion")}
       </label>
       <div className="mt-2 flex gap-2">
         {/* التركيز بمرجع نداء لحظة التركيب — لا مؤقّت ولا rAF (مزلق 14ب) */}
@@ -585,56 +581,28 @@ export function ChatPanel({
 /* ————— شريط الأدوات ————— */
 
 function IconBtn({
-  label,
-  onClick,
-  active,
-  danger,
-  soon,
-  disabled,
-  hideOnMobile,
-  children,
+  label, onClick, active, disabled, children,
 }: {
   label: string;
   onClick?: () => void;
   active?: boolean;
-  danger?: boolean;
-  /** أداة لا يدعمها الوكيل بعد — ظاهرة ومعطّلة */
-  soon?: boolean;
-  /** معطّلة في هذه المرحلة فقط (لا «قريبًا») */
   disabled?: boolean;
-  /** تُخفى دون sm لتتّسع الأدوات الأساسية في شريط 390px */
-  hideOnMobile?: boolean;
   children: React.ReactNode;
 }) {
-  const t = useTranslations("Session");
-  const inert = soon || disabled;
-  const name = soon ? t("soonLabel", { label }) : label;
-  const skin = soon
-    ? "border border-dashed border-ink-3 text-ink-2"
-    : disabled
-      ? "bg-surface text-ink-2 opacity-45"
-      : danger
-        ? "bg-surface text-ink-2"
-        : active
-          ? "bg-ink text-ground"
-          : "bg-surface text-ink-2 hover:text-ink";
-
+  const skin = disabled
+    ? "bg-surface text-ink-2 opacity-45"
+    : active ? "bg-ink text-ground" : "bg-surface text-ink-2 hover:text-ink";
   return (
     <button
       type="button"
-      onClick={inert ? undefined : onClick}
-      aria-label={name}
-      title={name}
-      aria-pressed={inert ? undefined : active}
-      aria-disabled={inert ? true : undefined}
-      /* هدف اللمس 44px على الجوال والقرص المرئي 34 داخله؛
-         وعلى الديسكتوب 32px هدفًا وقرصًا معًا — الإدخال فأرة.
-         العرض يُبنى شرطيًا: flex و hidden لا يُكدَّسان (مزلق 8). */
-      className={`${hideOnMobile ? "hidden sm:flex" : "flex"} h-11 w-11 shrink-0 items-center justify-center pointer-fine:md:h-8 pointer-fine:md:w-8`}
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      aria-pressed={active}
+      disabled={disabled}
+      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill"
     >
-      <span
-        className={`flex h-[34px] w-[34px] items-center justify-center rounded-pill transition-colors md:h-8 md:w-8 [&_svg]:h-[18px] [&_svg]:w-[18px] md:[&_svg]:h-4 md:[&_svg]:w-4 ${skin}`}
-      >
+      <span className={`flex h-[34px] w-[34px] items-center justify-center rounded-pill transition-colors [&_svg]:h-[18px] [&_svg]:w-[18px] ${skin}`}>
         {children}
       </span>
     </button>
@@ -657,30 +625,30 @@ function StartHint() {
   );
 }
 
-const SPEEDS = ["slow", "normal", "fast"] as const;
+type MicrophoneTrack = ReturnType<typeof useSession>["local"]["microphoneTrack"];
 
 export function Toolbar({
-  phase,
-  mic,
-  chat,
-  slides,
-  topics,
-  hint,
-  onPrimary,
-  onMic,
-  onChat,
-  onSlides,
-  onTopics,
-  onEnd,
+  phase, canAsk, micUnavailable, studentQuestionStartedAt, microphoneTrack,
+  noSpeech, reduce, chat, slides, topics, hint,
+  onPrimary, onAsk, onSendStudentQuestion, onCancelStudentQuestion, onSpeech,
+  onChat, onSlides, onTopics, onEnd,
 }: {
   phase: Phase;
-  mic: boolean;
+  canAsk: boolean;
+  micUnavailable: boolean;
+  studentQuestionStartedAt: number | null;
+  microphoneTrack: MicrophoneTrack;
+  noSpeech: boolean;
+  reduce: boolean;
   chat: boolean;
   slides: boolean;
   topics: boolean;
   hint?: boolean;
   onPrimary: () => void;
-  onMic: () => void;
+  onAsk: () => void;
+  onSendStudentQuestion: () => void;
+  onCancelStudentQuestion: () => void;
+  onSpeech: () => void;
   onChat: () => void;
   onSlides: () => void;
   onTopics: () => void;
@@ -688,133 +656,197 @@ export function Toolbar({
 }) {
   const t = useTranslations("Session");
   const canStart = phase === "idle" || phase === "cut";
-  const primaryLabel = canStart ? t("start") : t("pauseSoon");
-  /* الإنهاء لا معنى له قبل البدء ولا بعد الانقطاع — يبقى ظاهرًا معطّلًا
-     كي لا يتزحزح الشريط لحظة البدء */
   const inSession = !canStart && phase !== "ending";
+  const recording = studentQuestionStartedAt !== null;
+  const askRef = useRef<HTMLButtonElement>(null);
+  const wasRecording = useRef(false);
+  useEffect(() => {
+    if (wasRecording.current && !recording && !document.querySelector('[role="dialog"]')) {
+      askRef.current?.focus();
+    }
+    wasRecording.current = recording;
+  }, [recording]);
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-3 z-20 flex justify-center px-3">
-      <div className="pointer-events-auto flex max-w-full items-center gap-0.5 rounded-pill border border-line bg-panel px-1 py-0.5 shadow-lift md:gap-1 md:px-1.5 md:py-1">
-        {/* إدخال الطالب */}
-        <div className="flex items-center gap-1">
-          <IconBtn
-            label={mic ? t("micOff") : t("micOn")}
-            onClick={onMic}
-            danger={!mic}
-            active={mic}
-          >
-            {mic ? <MicIcon /> : <MicOffIcon />}
-          </IconBtn>
-          <IconBtn label={t("chat")} onClick={onChat} active={chat}>
-            <ChatIcon />
-          </IconBtn>
-          <IconBtn label={t("confused")} soon>
-            <ConfusedIcon />
-          </IconBtn>
-        </div>
-
-        <Divider />
-
-        {/* الزر الأساسي — الكهرماني الوحيد في الشاشة. وجه بيكان يسكنه
-            ويتكلّم حين يشرح؛ وأيقونة التشغيل تظهر عند التمرير قبل البدء. */}
-        <span className="group/primary relative flex shrink-0">
-          {hint ? <StartHint /> : null}
-          <button
-            type="button"
-            onClick={canStart ? onPrimary : undefined}
-            aria-label={primaryLabel}
-            title={primaryLabel}
-            aria-disabled={canStart ? undefined : true}
-            aria-busy={phase === "connecting" ? true : undefined}
-            /* الكهرماني للقابل للضغط وحده: أثناء الجلسة الإيقاف «قريبًا»،
-               فيأخذ مظهر الأدوات المعطّلة ويبقى الوجه يتكلّم داخله */
-            className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-pill transition-transform duration-200 ${
-              canStart
-                ? "bg-pressable text-on-pressable hover:scale-110 active:scale-95"
-                : "border border-dashed border-ink-3 text-ink-2"
-            }`}
-          >
-            <BecanGlyph
-              speaking={phase === "live"}
-              className={`h-6 w-8 transition-opacity ${
-                canStart
-                  ? "group-hover/primary:opacity-0 group-focus-within/primary:opacity-0"
-                  : ""
-              }`}
-            />
-            {canStart ? (
-              <span className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover/primary:opacity-100 group-focus-within/primary:opacity-100">
-                <PlayIcon className="h-5 w-5 md:h-4 md:w-4" />
-              </span>
-            ) : null}
-          </button>
-        </span>
-
-        <Divider />
-
-        {/* أدوات العرض */}
-        <div className="flex items-center gap-1">
-          {/* يُخفى على الجوال ليتّسع الشريط لزرّ الإنهاء */}
-          <IconBtn label={t("repeat")} soon hideOnMobile>
-            <ReplayIcon />
-          </IconBtn>
-
-          <div
-            role="group"
-            aria-label={t("speedSoon")}
-            title={t("comingSoon")}
-            className="hidden items-center gap-0.5 rounded-pill border border-dashed border-ink-3 p-0.5 sm:flex"
-          >
-            {SPEEDS.map((s) => (
-              <button
-                key={s}
-                type="button"
-                aria-disabled
-                aria-pressed={s === "normal"}
-                className={`inline-flex h-11 items-center rounded-pill px-2.5 text-[11px] font-semibold md:h-8 ${
-                  s === "normal" ? "bg-surface text-ink" : "text-ink-2"
-                }`}
-              >
-                {t(`speed.${s}`)}
-              </button>
-            ))}
-          </div>
-
-          <IconBtn label={t("slides")} onClick={onSlides} active={slides}>
-            <SlidesIcon />
-          </IconBtn>
-          <IconBtn label={t("lessons")} onClick={onTopics} active={topics}>
-            <ListIcon />
-          </IconBtn>
-          {/* لا أحمر: الإنهاء قرار الطالب لا خطأ، والتأكيد نافذة لا لون */}
-          <IconBtn label={t("end")} onClick={onEnd} disabled={!inSession}>
-            <StopIcon />
-          </IconBtn>
-        </div>
+    <div className="pointer-events-none absolute inset-x-0 bottom-3 z-20 flex flex-col items-center gap-2 px-3">
+      <div role="status" className="text-sm text-ink-2">
+        {noSpeech ? t("studentQuestionNoSpeech") : null}
       </div>
+      <motion.div
+        layout={reduce ? false : true}
+        transition={{ layout: { duration: 0.22, ease: [0.22, 1, 0.36, 1] } }}
+        className={`pointer-events-auto relative max-w-full rounded-pill border border-line bg-panel px-1.5 py-1 shadow-lift ${recording ? "w-[22rem]" : "w-fit"}`}
+      >
+        <AnimatePresence initial={false} mode="popLayout">
+          {recording ? (
+            <motion.div
+              key="recorder"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+            >
+              <StudentQuestionRecorder
+                startedAt={studentQuestionStartedAt}
+                microphoneTrack={microphoneTrack}
+                reduce={reduce}
+                onSend={onSendStudentQuestion}
+                onCancel={onCancelStudentQuestion}
+                onSpeech={onSpeech}
+              />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="toolbar"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="grid grid-cols-[1fr_auto_1fr] items-center gap-1"
+            >
+              <div className="flex w-[8.75rem] items-center gap-1">
+                <button
+                  ref={askRef}
+                  type="button"
+                  disabled={!canAsk}
+                  onClick={onAsk}
+                  title={micUnavailable ? t("studentQuestionMicUnavailable") : t("studentQuestionShortcut")}
+                  className={`inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-pill px-3 text-sm font-semibold transition-transform motion-safe:active:scale-95 disabled:opacity-45 ${canStart ? "border border-line text-ink-2" : "bg-pressable text-on-pressable enabled:hover:bg-pressable/90"}`}
+                >
+                  <MicIcon className="h-[18px] w-[18px]" />
+                  {t("studentQuestionAsk")}
+                </button>
+                <IconBtn label={t("chat")} onClick={onChat} active={chat}>
+                  <ChatIcon />
+                </IconBtn>
+              </div>
+
+              <span className="group/primary relative flex shrink-0">
+                {hint ? <StartHint /> : null}
+                {canStart ? (
+                  <button
+                    type="button"
+                    onClick={onPrimary}
+                    aria-label={t("start")}
+                    title={t("start")}
+                    className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-pill bg-pressable text-on-pressable transition-transform duration-200 motion-safe:hover:scale-110 motion-safe:active:scale-95"
+                  >
+                    <BecanGlyph className="h-6 w-8 transition-opacity group-hover/primary:opacity-0 group-focus-within/primary:opacity-0" />
+                    <span className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover/primary:opacity-100 group-focus-within/primary:opacity-100">
+                      <PlayIcon className="h-5 w-5 md:h-4 md:w-4" />
+                    </span>
+                  </button>
+                ) : (
+                  <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center text-ink-2">
+                    <BecanGlyph speaking={phase === "live"} className="h-6 w-8" />
+                  </span>
+                )}
+              </span>
+
+              <div className="flex w-[8.75rem] items-center gap-1">
+                <IconBtn label={t("slides")} onClick={onSlides} active={slides}>
+                  <SlidesIcon />
+                </IconBtn>
+                <IconBtn label={t("lessons")} onClick={onTopics} active={topics}>
+                  <ListIcon />
+                </IconBtn>
+                <IconBtn label={t("end")} onClick={onEnd} disabled={!inSession}>
+                  <LeaveIcon />
+                </IconBtn>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }
 
-function Divider() {
-  return <span aria-hidden="true" className="hidden h-6 w-px shrink-0 bg-line sm:block" />;
+/** Audio subscriptions and clock stay here so they never re-render the teaching board. */
+function StudentQuestionRecorder({
+  startedAt, microphoneTrack, reduce, onSend, onCancel, onSpeech,
+}: {
+  startedAt: number;
+  microphoneTrack: MicrophoneTrack;
+  reduce: boolean;
+  onSend: () => void;
+  onCancel: () => void;
+  onSpeech: () => void;
+}) {
+  const t = useTranslations("Session");
+  const { bars } = useAudioWaveform(reduce ? undefined : microphoneTrack ?? undefined, {
+    barCount: 24, updateInterval: 50,
+  });
+  const volume = useTrackVolume(microphoneTrack ?? undefined);
+  const [elapsed, setElapsed] = useState(() => Math.floor((Date.now() - startedAt) / 1000));
+  const sendRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    sendRef.current?.focus();
+    const timer = setInterval(() => setElapsed(Math.floor((Date.now() - startedAt) / 1000)), 250);
+    return () => clearInterval(timer);
+  }, [startedAt]);
+  useEffect(() => {
+    if (volume > 0.02) onSpeech();
+  }, [volume, onSpeech]);
+
+  return (
+    <div className="flex h-11 items-center gap-3">
+      <button
+        type="button"
+        onClick={onCancel}
+        aria-label={t("studentQuestionCancel")}
+        title={t("studentQuestionCancel")}
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill border border-line text-ink-2 transition-colors hover:border-ink-2 hover:text-ink"
+      >
+        <CloseIcon className="h-4 w-4" />
+      </button>
+      <span aria-hidden="true" className="flex h-8 min-w-0 flex-1 items-center justify-center gap-0.5 text-ink">
+        {reduce ? (
+          <span className="h-[3px] w-full rounded-pill bg-ink-2" />
+        ) : bars.map((bar, index) => (
+          <span
+            key={index}
+            className="w-[3px] shrink-0 rounded-pill bg-current"
+            style={{ height: `${4 + Math.min(1, Math.max(0, bar)) * 28}px` }}
+          />
+        ))}
+      </span>
+      <span dir="ltr" className="shrink-0 text-sm tabular-nums text-ink-2">
+        {`${Math.floor(elapsed / 60)}:${String(elapsed % 60).padStart(2, "0")}`}
+      </span>
+      <button
+        ref={sendRef}
+        type="button"
+        onClick={onSend}
+        title={t("studentQuestionShortcut")}
+        className="inline-flex h-11 shrink-0 items-center justify-center rounded-pill bg-pressable px-4 text-sm font-semibold text-on-pressable transition-colors hover:bg-pressable/90"
+      >
+        {t("send")}
+      </button>
+    </div>
+  );
 }
 
 /* ————— نافذة سؤال الفهم —————
    الاختيار يُرسل نصّه إلى الوكيل، والوكيل يصحّحه بصوته — فلا تلوين
    صح/خطأ هنا. والسبورة لا تُمسح تحت النافذة. */
 
-export function QuestionDialog({
+export function CheckpointDialog({
   checkpoint,
   open,
   onChoose,
   onDismiss,
+  canAnswerByVoice,
+  micUnavailable,
+  onAnswerByVoice,
 }: {
   checkpoint: Checkpoint | null;
   open: boolean;
   onChoose: (choice: string) => void;
   onDismiss: () => void;
+  canAnswerByVoice: boolean;
+  micUnavailable: boolean;
+  onAnswerByVoice: () => void;
 }) {
   const t = useTranslations("Session");
   return (
@@ -827,13 +859,6 @@ export function QuestionDialog({
       overlayClassName="fixed inset-0 z-40 bg-ground/80 backdrop-blur-sm"
       contentClassName="fixed inset-x-4 bottom-4 z-50 mx-auto max-h-[80dvh] max-w-measure overflow-y-auto rounded-xl border-2 border-ink-3 bg-surface-3 p-5 shadow-lift animate-board-in md:inset-x-0 md:top-1/2 md:bottom-auto md:-translate-y-1/2 md:p-6"
     >
-      <Dialog.Close
-        aria-label={t("answerVoice")}
-        title={t("answerVoice")}
-        className="float-end -mt-1 -me-1 flex h-11 w-11 items-center justify-center rounded-pill text-ink-2 transition-colors hover:bg-ground hover:text-ink"
-      >
-        <CloseIcon className="h-4 w-4" />
-      </Dialog.Close>
       <p className="text-xs font-semibold text-ink-2">{t("question")}</p>
       <p dir="auto" className="mt-2 text-xl font-bold text-ink">
         {checkpoint?.question}
@@ -855,6 +880,16 @@ export function QuestionDialog({
       ) : (
         <p className="mt-4 leading-base text-ink-2">{t("answerHint")}</p>
       )}
+      <button
+        type="button"
+        disabled={!canAnswerByVoice}
+        onClick={onAnswerByVoice}
+        title={micUnavailable ? t("studentQuestionMicUnavailable") : t("answerVoice")}
+        className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-pill border border-ink-2 px-4 font-semibold text-ink transition-colors enabled:hover:bg-ground disabled:opacity-45"
+      >
+        <MicIcon className="h-4 w-4" />
+        {t("answerVoice")}
+      </button>
     </SessionDialog>
   );
 }

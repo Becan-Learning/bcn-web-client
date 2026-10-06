@@ -20,15 +20,21 @@ import {
 } from "./explanation-language";
 import dynamic from "next/dynamic";
 import { useRouter } from "@/i18n/navigation";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import {
   RoomAudioRenderer,
   SessionProvider,
   useAgent,
   useSession,
-  useTrackToggle,
 } from "@livekit/components-react";
-import { ConnectionState, RoomEvent, Track, TokenSource } from "livekit-client";
+import {
+  ConnectionState,
+  createLocalAudioTrack,
+  RoomEvent,
+  Track,
+  TokenSource,
+} from "livekit-client";
+import { createStudentQuestion, type StudentQuestionStatus } from "./student-question";
 import { getExperience } from "@/lib/experience";
 import { getAnonId } from "@/lib/session/anon-id";
 import type { ChapterContent } from "@/lib/session/content";
@@ -44,7 +50,7 @@ import {
   ChatPanel,
   EndSessionDialog,
   LanguageChoice,
-  QuestionDialog,
+  CheckpointDialog,
   RotateNotice,
   SlidesMessage,
   Toolbar,
@@ -56,13 +62,14 @@ import {
   type TopicState,
 } from "./parts";
 import { useIsMobile } from "./use-is-mobile";
+import { useReducedMotion } from "./use-reduced-motion";
 import { PacketRecorderButtons, usePacketRecorder } from "./use-packet-recorder";
 
 /* شاشة الجلسة — تخطيط becan-design (عمود الدروس · السبورة · الشرائح)
    يقوده وكيل LiveKit الحقيقي من old-sanad.
 
    الوكيل يتحكّم بالصفحة برسائل `ui-control` (السبورة، الشريحة، الدرس
-   والموضوع، سؤال الفهم، نهاية الحدّ)، والطالب يكلّمه بالمايك أو بنصّ
+   والموضوع، سؤال الفهم، نهاية الحدّ)، والطالب يكلّمه بسؤال طالب أو بنصّ
    على `lk.chat`. الحالة كلها في `sessionReducer`، والمرحلة المعروضة
    اشتقاق نقيّ من اتصال الغرفة وحالة الوكيل. */
 
@@ -167,10 +174,9 @@ function SessionScreen({
   const format = useFormatter();
   const number = (value: number) => format.number(value, { numberingSystem: "latn" });
   const router = useRouter();
-  const reduce = useReducedMotion() ?? false;
+  const reduce = useReducedMotion();
   const isMobile = useIsMobile();
   const agent = useAgent(session);
-  const micTrack = useTrackToggle({ source: Track.Source.Microphone });
   const [state, dispatch] = useReducer(sessionReducer, INITIAL_SESSION_STATE);
   const recorder = usePacketRecorder();
   const { record } = recorder;
@@ -179,7 +185,40 @@ function SessionScreen({
   const [starting, setStarting] = useState(false);
   const [failed, setFailed] = useState(false);
   const [userEnding, setUserEnding] = useState(false);
-  const [micPref, setMicPref] = useState(true);
+  const [micUnavailable, setMicUnavailable] = useState(false);
+  /* useSession().local.microphoneTrack يكون null ما دام المايك مكتومًا، فلا يصلح
+     دليلًا على النشر. نتتبّع نجاح publishTrack بأنفسنا. */
+  const [micPublished, setMicPublished] = useState(false);
+  const [studentQuestionStatus, setStudentQuestionStatus] = useState<StudentQuestionStatus>({
+    busy: false,
+    startedAt: null,
+  });
+  const [noSpeech, setNoSpeech] = useState(false);
+  const studentQuestion = useMemo(
+    () => createStudentQuestion(
+      session.room.localParticipant,
+      setStudentQuestionStatus,
+      () => setNoSpeech(true),
+    ),
+    [session.room],
+  );
+
+  useEffect(() => {
+    if (!noSpeech) return;
+    const timer = setTimeout(() => setNoSpeech(false), 3_000);
+    return () => clearTimeout(timer);
+  }, [noSpeech]);
+
+  useEffect(() => {
+    if (!session.isConnected || state.ending || userEnding || agent.state === "failed") {
+      void studentQuestion.close("cancel_turn");
+    } else {
+      studentQuestion.observeAgentState(agent.state);
+    }
+  }, [
+    agent.state, session.isConnected, state.ending, userEnding,
+    studentQuestion, studentQuestionStatus.startedAt,
+  ]);
   const [chat, setChat] = useState(false);
   const [showTopics, setShowTopics] = useState(true);
   const [showSlides, setShowSlides] = useState(true);
@@ -230,9 +269,11 @@ function SessionScreen({
   /* مغادرة الصفحة بلا خروج صريح لا تترك الغرفة مفتوحة */
   useEffect(
     () => () => {
-      sessionRef.current.end().catch(() => undefined);
+      void studentQuestion.close("cancel_turn")
+        .then(() => sessionRef.current.end())
+        .catch(() => undefined);
     },
-    [],
+    [studentQuestion],
   );
 
   const sendText = useCallback(
@@ -258,7 +299,35 @@ function SessionScreen({
     setStarted(true);
     setStarting(true);
     try {
-      await session.start({ tracks: { microphone: { enabled: micPref } } });
+      setMicUnavailable(false);
+      setMicPublished(false);
+      setNoSpeech(false);
+      // enabled:false skips capture in useSession. Acquire and mute BEFORE publishing.
+      const microphone = await createLocalAudioTrack().catch((error) => {
+        console.error("Microphone unavailable:", error);
+        setMicUnavailable(true);
+        return null;
+      });
+      try {
+        if (microphone) await microphone.mute();
+        // publishTrack waits for the signal connection; publish before start waits for the agent.
+        await Promise.all([
+          session.start({ tracks: { microphone: { enabled: false } } }),
+          microphone
+            ? session.room.localParticipant.publishTrack(microphone, {
+                source: Track.Source.Microphone,
+                stopMicTrackOnMute: false,
+              }).then(() => setMicPublished(true), (error) => {
+                microphone.stop();
+                setMicUnavailable(true);
+                console.error("Failed to publish muted microphone:", error);
+              })
+            : Promise.resolve(),
+        ]);
+      } catch (error) {
+        microphone?.stop();
+        throw error;
+      }
     } catch (error) {
       console.error("Failed to start session:", error);
       setFailed(true);
@@ -273,6 +342,7 @@ function SessionScreen({
       if (finishing.current) return;
       finishing.current = true;
       const room = sessionRef.current.room.name;
+      await studentQuestion.close("cancel_turn");
       await sessionRef.current.end().catch(() => undefined);
       const q = new URLSearchParams();
       if (room) q.set("room", room);
@@ -280,7 +350,7 @@ function SessionScreen({
       const qs = q.toString();
       router.push(`/session/${courseSlug}/${chapterNo}/done${qs ? `?${qs}` : ""}`);
     },
-    [router, courseSlug, chapterNo],
+    [router, courseSlug, chapterNo, studentQuestion],
   );
 
   useEffect(() => {
@@ -340,11 +410,44 @@ function SessionScreen({
     isMobile ? setTopicsPref(!topicsOpen) : setShowTopics((v) => !v);
 
   const inRoom = session.isConnected;
-  const micOn = inRoom ? micTrack.enabled : micPref;
-  const onMic = () => {
-    if (inRoom) void micTrack.toggle();
-    else setMicPref((v) => !v);
-  };
+  const canAsk = inRoom && agent.isConnected && !ending && !micUnavailable &&
+    micPublished && !studentQuestionStatus.busy &&
+    studentQuestionStatus.startedAt === null;
+  const startStudentQuestion = useCallback(() => {
+    if (!canAsk || finishing.current) return;
+    setChat(false);
+    setTopicsPref(false);
+    setNoSpeech(false);
+    void studentQuestion.start(agent.internal.agentParticipant!.identity, agent.state);
+  }, [canAsk, studentQuestion, agent.internal.agentParticipant, agent.state]);
+
+  useEffect(() => {
+    if (isMobile) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target;
+      if (event.repeat || event.ctrlKey || event.altKey || event.metaKey || event.shiftKey ||
+        (target instanceof HTMLElement && (target.closest("input, textarea, select") || target.isContentEditable)) ||
+        document.querySelector('[role="dialog"], [role="alertdialog"]')) return;
+      if (event.code === "Space") {
+        if (studentQuestionStatus.startedAt !== null) {
+          event.preventDefault();
+          void studentQuestion.close("end_turn");
+        } else if (canAsk) {
+          event.preventDefault();
+          startStudentQuestion();
+        }
+      } else if (event.key === "Escape" &&
+        (studentQuestionStatus.startedAt !== null || studentQuestionStatus.busy)) {
+        event.preventDefault();
+        void studentQuestion.close("cancel_turn");
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [
+    isMobile, canAsk, startStudentQuestion, studentQuestion,
+    studentQuestionStatus.startedAt, studentQuestionStatus.busy,
+  ]);
 
   const endNow = () => {
     setConfirmEnd(false);
@@ -486,7 +589,6 @@ function SessionScreen({
 
           {chat && inRoom ? (
             <ChatPanel
-              listening={phase === "listening"}
               onSend={sendText}
               onClose={() => setChat(false)}
             />
@@ -495,12 +597,20 @@ function SessionScreen({
           <Toolbar
             phase={phase}
             hint={phase === "idle"}
-            mic={micOn}
+            canAsk={canAsk}
+            micUnavailable={micUnavailable}
+            studentQuestionStartedAt={studentQuestionStatus.startedAt}
+            microphoneTrack={session.local.microphoneTrack}
+            noSpeech={noSpeech}
+            reduce={reduce}
+            onAsk={startStudentQuestion}
+            onSendStudentQuestion={() => void studentQuestion.close("end_turn")}
+            onCancelStudentQuestion={() => void studentQuestion.close("cancel_turn")}
+            onSpeech={studentQuestion.speechDetected}
             chat={chat && inRoom}
             slides={showSlides}
             topics={isMobile ? topicsOpen : showTopics}
             onPrimary={() => void start(null)}
-            onMic={onMic}
             onChat={() => setChat((c) => !c)}
             onSlides={() => setShowSlides((v) => !v)}
             onTopics={onTopics}
@@ -525,12 +635,18 @@ function SessionScreen({
         onPick={pickLesson}
       />
 
-      <QuestionDialog
+      <CheckpointDialog
         checkpoint={state.checkpoint}
         open={phase === "question"}
         onChoose={(choice) => {
           dispatch({ action: "checkpoint_clear" });
           void sendText(choice);
+        }}
+        canAnswerByVoice={canAsk}
+        micUnavailable={micUnavailable}
+        onAnswerByVoice={() => {
+          dispatch({ action: "checkpoint_clear" });
+          startStudentQuestion();
         }}
         onDismiss={() => dispatch({ action: "checkpoint_clear" })}
       />

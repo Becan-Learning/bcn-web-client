@@ -35,11 +35,13 @@ Next.js 16 · TypeScript · Tailwind 4 · Motion (الحزمة `motion`، الا
   التنقّل بـ`Link` و`useRouter` من `@/i18n/navigation`؛ **ممنوع `next/link`**.
 - **عقد الوكيل لا يُغيَّر من طرف واحد:** الوكيل ينشر على موضوع `ui-control`
   (`scroll` · `set_lesson` · `set_topic` · `topic_done` · `session_ending` · `board_*`)،
-  والطالب يكتب على `lk.chat`. سمات المشارك في `api/get-lk-token`.
+  والطالب يكتب على `lk.chat` ويستدعي `start_turn` · `end_turn` · `cancel_turn` بـRPC. سمات المشارك في `api/get-lk-token`.
 - **Radix للآليات فقط** (حبس التركيز · Escape · البوابات) ويُلوَّن بالتوكنات. لا مظهر shadcn.
   نوافذ الجلسة داخل البوابة تعيد `data-theme="dark" data-surface="session"`.
-- **أدوات الجلسة التي لا يدعمها الوكيل بعد** (السرعة · الإيقاف · أعد · ما فهمت · ابدأ من هنا)
-  ظاهرة بحدّ متقطّع ووسم «قريبًا» — لا تُخفى ولا تُزيَّف.
+- **أدوات الجلسة التي لا يدعمها الوكيل لا تظهر في شريط الجلسة** — لا أزرار «قريبًا» ولا تزييف.
+- **صوت الطالب لا يبلغ الوكيل إلا عبر «سؤال الطالب»** (زر «اسأل»): المايك مكتوم طوال الجلسة،
+  ولا وضع مايك مفتوح — [ADR 0003](docs/adr/0003-student-voice-only-through-student-questions.md)
+  و[العقد](docs/agent-contract-student-question.md).
 - Clerk وSupabase **غير مركّبين بعد**؛ المعرّف مجهول (`becan:uid`) والكتالوج عرض.
 - التحقق: `pnpm lint` ثم `pnpm type-check` ثم `pnpm build`.
 

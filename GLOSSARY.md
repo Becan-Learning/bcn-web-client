@@ -21,3 +21,14 @@ _Avoid_: session language, tutor language, agent language
 The language a course's own material happens to be in — lesson names, slides, course names as
 the university writes them. Neither the product nor the tutor translates it.
 _Avoid_: course language, material language
+
+## Session
+
+**Checkpoint** (سؤال الفهم):
+A question the tutor puts to the student during a session to confirm they understood a topic.
+_Avoid_: question (alone), quiz
+
+**Student question** (سؤال الطالب):
+A spoken question the student deliberately starts by pressing Ask, cutting the tutor off
+mid-explanation. Outside a student question the tutor does not hear the student's voice.
+_Avoid_: question (alone), interruption, voice message

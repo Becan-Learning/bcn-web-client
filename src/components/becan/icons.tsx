@@ -195,40 +195,11 @@ export function PauseIcon({ className = "h-6 w-6" }: P) {
   );
 }
 
-export function ReplayIcon({ className = "h-5 w-5" }: P) {
-  return (
-    <svg {...base} viewBox="0 0 24 24" className={className}>
-      <path d="M4 10a8 8 0 1 1 .9 5" />
-      <path d="M4 4v6h6" />
-    </svg>
-  );
-}
-
-export function ConfusedIcon({ className = "h-5 w-5" }: P) {
-  return (
-    <svg {...base} viewBox="0 0 24 24" className={className}>
-      <path d="M9.2 9a3 3 0 1 1 4 2.8c-.8.3-1.2 1-1.2 1.8v.4" />
-      <path d="M12 17.5v.5" />
-      <circle cx="12" cy="12" r="9" />
-    </svg>
-  );
-}
-
 export function MicIcon({ className = "h-5 w-5" }: P) {
   return (
     <svg {...base} viewBox="0 0 24 24" className={className}>
       <rect x="9" y="3" width="6" height="11" rx="3" />
       <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
-    </svg>
-  );
-}
-
-export function MicOffIcon({ className = "h-5 w-5" }: P) {
-  return (
-    <svg {...base} viewBox="0 0 24 24" className={className}>
-      <path d="M9 9V6a3 3 0 0 1 5.6-1.5M15 11.5V12a3 3 0 0 1-4.3 2.7" />
-      <path d="M5 11a7 7 0 0 0 10.9 5.8M19 11a7 7 0 0 1-.4 2.3M12 18v3" />
-      <path d="m4 3 16 18" />
     </svg>
   );
 }
@@ -355,11 +326,11 @@ export function ShrinkIcon({ className = "h-4 w-4" }: P) {
   );
 }
 
-/** إنهاء الجلسة — مربّع إيقاف، كي لا يُخلط بـ× الخروج في الشريط العلوي. */
-export function StopIcon({ className = "h-6 w-6" }: P) {
+/** باب وسهم إلى الخارج — يتبع اتجاه القراءة. */
+export function LeaveIcon({ className = "h-6 w-6" }: P) {
   return (
-    <svg {...base} viewBox="0 0 24 24" className={className}>
-      <rect x="6" y="6" width="12" height="12" rx="2.5" />
+    <svg {...base} viewBox="0 0 24 24" className={`rtl:-scale-x-100 ${className}`}>
+      <path d="M10 4H4v16h6M9 12h12m-4-4 4 4-4 4" />
     </svg>
   );
 }

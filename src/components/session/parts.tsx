@@ -600,9 +600,9 @@ function IconBtn({
       title={label}
       aria-pressed={active}
       disabled={disabled}
-      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill"
+      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill pointer-fine:md:h-8 pointer-fine:md:w-8"
     >
-      <span className={`flex h-[34px] w-[34px] items-center justify-center rounded-pill transition-colors [&_svg]:h-[18px] [&_svg]:w-[18px] ${skin}`}>
+      <span className={`flex h-[34px] w-[34px] items-center justify-center rounded-pill transition-colors md:h-8 md:w-8 [&_svg]:h-[18px] [&_svg]:w-[18px] md:[&_svg]:h-4 md:[&_svg]:w-4 ${skin}`}>
         {children}
       </span>
     </button>
@@ -675,7 +675,7 @@ export function Toolbar({
       <motion.div
         layout={reduce ? false : true}
         transition={{ layout: { duration: 0.22, ease: [0.22, 1, 0.36, 1] } }}
-        className={`pointer-events-auto relative max-w-full rounded-pill border border-line bg-panel px-1.5 py-1 shadow-lift ${recording ? "w-[22rem]" : "w-fit"}`}
+        className={`pointer-events-auto relative max-w-full rounded-pill border border-line bg-panel px-1 py-0.5 shadow-lift md:px-1.5 md:py-1 ${recording ? "w-[22rem]" : "w-fit"}`}
       >
         <AnimatePresence initial={false} mode="popLayout">
           {recording ? (
@@ -704,7 +704,7 @@ export function Toolbar({
               transition={{ duration: 0.15 }}
               className="grid grid-cols-[1fr_auto_1fr] items-center gap-1"
             >
-              <div className="flex w-[8.75rem] items-center gap-1">
+              <div className="flex w-[8.75rem] items-center gap-1 pointer-fine:md:w-[7.5rem]">
                 <button
                   ref={askRef}
                   type="button"
@@ -743,7 +743,7 @@ export function Toolbar({
                 )}
               </span>
 
-              <div className="flex w-[8.75rem] items-center gap-1">
+              <div className="flex w-[8.75rem] items-center gap-1 pointer-fine:md:w-[7.5rem]">
                 <IconBtn label={t("slides")} onClick={onSlides} active={slides}>
                   <SlidesIcon />
                 </IconBtn>

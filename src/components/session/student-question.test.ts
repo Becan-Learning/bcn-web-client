@@ -6,14 +6,102 @@ function setup() {
   const setMicrophoneEnabled = vi.fn<(enabled: boolean) => Promise<undefined>>(async () => undefined);
   const onChange = vi.fn();
   const onNoSpeech = vi.fn();
-  const studentQuestion = createStudentQuestion({ performRpc, setMicrophoneEnabled }, onChange, onNoSpeech);
-  return { studentQuestion, performRpc, setMicrophoneEnabled, onChange, onNoSpeech };
+  const onClosed = vi.fn();
+  const studentQuestion = createStudentQuestion({ performRpc, setMicrophoneEnabled }, onChange, onNoSpeech, onClosed);
+  return { studentQuestion, performRpc, setMicrophoneEnabled, onChange, onNoSpeech, onClosed };
 }
 
 beforeEach(() => vi.useFakeTimers());
 afterEach(() => {
   vi.useRealTimers();
   vi.restoreAllMocks();
+});
+
+describe("student question closure outcome", () => {
+  it.each(["end_turn", "cancel_turn"] as const)("reports %s once after closing finishes", async (method) => {
+    const { studentQuestion, performRpc, onClosed, onChange } = setup();
+    await studentQuestion.start("tutor", "listening");
+    let acknowledge!: (value: string) => void;
+    let reachedRpc!: () => void;
+    const rpcStarted = new Promise<void>((resolve) => { reachedRpc = resolve; });
+    performRpc.mockImplementationOnce(() => new Promise((resolve) => {
+      acknowledge = resolve;
+      reachedRpc();
+    }));
+    const closing = studentQuestion.close(method);
+    const duplicate = studentQuestion.close(method);
+    await rpcStarted;
+    expect(onClosed).not.toHaveBeenCalled();
+    acknowledge("");
+    await Promise.all([closing, duplicate]);
+    expect(onChange).toHaveBeenLastCalledWith({ busy: false, startedAt: null });
+    expect(onClosed).toHaveBeenCalledExactlyOnceWith(method === "end_turn" ? "sent" : "cancelled");
+    expect(onChange.mock.invocationCallOrder.at(-1)).toBeLessThan(onClosed.mock.invocationCallOrder[0]);
+    await studentQuestion.close(method);
+    expect(onClosed).toHaveBeenCalledOnce();
+  });
+
+  it.each(["thinking", "speaking"] as const)("reports sent when the agent moves to %s after the mic opened", async (agentState) => {
+    const { studentQuestion, performRpc, onClosed } = setup();
+    await studentQuestion.start("tutor", "listening");
+    studentQuestion.observeAgentState(agentState);
+    await studentQuestion.close(null);
+    expect(performRpc).toHaveBeenCalledTimes(1);
+    expect(onClosed).toHaveBeenCalledExactlyOnceWith("sent");
+  });
+
+  it.each(["end_turn", "cancel_turn", null] as const)("reports cancelled if closed with %s before the mic opened", async (method) => {
+    const { studentQuestion, performRpc, onClosed, setMicrophoneEnabled } = setup();
+    let acknowledge!: (value: string) => void;
+    performRpc.mockImplementationOnce(() => new Promise((resolve) => { acknowledge = resolve; }));
+    const opening = studentQuestion.start("tutor", "listening");
+    if (method === null) studentQuestion.observeAgentState("thinking");
+    const closing = studentQuestion.close(method);
+    expect(onClosed).not.toHaveBeenCalled();
+    acknowledge("");
+    await Promise.all([opening, closing]);
+    expect(setMicrophoneEnabled).toHaveBeenCalledExactlyOnceWith(false);
+    expect(onClosed).toHaveBeenCalledExactlyOnceWith("cancelled");
+  });
+
+  it("reports cancelled when session ending overrides a queued Send", async () => {
+    const { studentQuestion, onClosed } = setup();
+    await studentQuestion.start("tutor", "listening");
+    await Promise.all([studentQuestion.close("end_turn"), studentQuestion.close("cancel_turn")]);
+    expect(onClosed).toHaveBeenCalledExactlyOnceWith("cancelled");
+  });
+
+  it("reports cancelled when cancellation arrives during unmute", async () => {
+    const { studentQuestion, onClosed, setMicrophoneEnabled } = setup();
+    let unmute!: () => void;
+    setMicrophoneEnabled.mockImplementationOnce(() => new Promise((resolve) => { unmute = () => resolve(undefined); }));
+    const opening = studentQuestion.start("tutor", "listening");
+    await Promise.resolve();
+    const closing = studentQuestion.close("cancel_turn");
+    unmute();
+    await Promise.all([opening, closing]);
+    expect(onClosed).toHaveBeenCalledExactlyOnceWith("cancelled");
+  });
+
+  it("reports cancelled for the no-speech guard and sent for the cap", async () => {
+    const { studentQuestion, onClosed } = setup();
+    await studentQuestion.start("tutor", "listening");
+    await vi.advanceTimersByTimeAsync(8_000);
+    expect(onClosed).toHaveBeenCalledExactlyOnceWith("cancelled");
+    await studentQuestion.start("tutor", "listening");
+    studentQuestion.speechDetected();
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(onClosed.mock.calls).toEqual([["cancelled"], ["sent"]]);
+  });
+
+  it.each(["rpc", "mic"])("reports cancelled when startup fails at %s", async (failure) => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const { studentQuestion, performRpc, setMicrophoneEnabled, onClosed } = setup();
+    if (failure === "rpc") performRpc.mockRejectedValueOnce(new Error("RPC failed"));
+    else setMicrophoneEnabled.mockRejectedValueOnce(new Error("Mic lost"));
+    await studentQuestion.start("tutor", "listening");
+    expect(onClosed).toHaveBeenCalledExactlyOnceWith("cancelled");
+  });
 });
 
 describe("student question mic gate", () => {

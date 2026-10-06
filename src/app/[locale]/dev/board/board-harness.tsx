@@ -423,9 +423,10 @@ export function BoardHarness() {
             <Fact name="Slide">{session.page ?? "—"}</Fact>
             <Fact name="Checkpoint">
               {session.checkpoint
-                ? `${session.checkpoint.question} [${session.checkpoint.choices.join(" | ")}]`
+                ? `${session.checkpoint.id}: ${session.checkpoint.question} [${session.checkpoint.choices.join(" | ")}]`
                 : "—"}
             </Fact>
+            <Fact name="Handled checkpoint">{session.handledCheckpointId ?? "—"}</Fact>
             <Fact name="Ending">{session.ending ? "yes" : "no"}</Fact>
           </dl>
 

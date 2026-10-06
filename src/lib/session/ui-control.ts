@@ -12,13 +12,16 @@ export type UIControlEvent =
   | { action: "scroll"; page: number }
   /** بدأ درسًا من قائمة الفصل، ومعه عدد مواضيعه */
   | { action: "set_lesson"; lesson: string; totalTopics: number }
-  /** بدأ موضوعًا، ومعه سؤال التحقّق إن وُجد */
+  /** بدأ موضوعًا */
   | {
       action: "set_topic";
       topic: string | null;
       index: number;
-      question: string;
-      choices: string[];
+    }
+  /** سؤال الفهم المفتوح، أو null لإغلاقه */
+  | {
+      action: "set_checkpoint";
+      checkpoint: { id: string; question: string; choices: string[] } | null;
     }
   | { action: "topic_done" }
   /** بلغت الجلسة حدّها الزمني */
@@ -43,16 +46,23 @@ export function parseUIControlEvent(value: unknown): UIControlEvent | null {
         ? { action: "set_lesson", lesson: value.lesson, totalTopics: value.number_of_topics }
         : null;
     case "set_topic":
-      if (typeof value.topic !== "string" || !positiveInteger(value.current_topic_index) ||
-          typeof value.question !== "string" || !Array.isArray(value.choices) ||
-          !value.choices.every((choice): choice is string => typeof choice === "string")) return null;
+      if (typeof value.topic !== "string" || !positiveInteger(value.current_topic_index)) return null;
       return {
         action: "set_topic",
         topic: value.topic || null,
         index: value.current_topic_index,
-        question: value.question,
-        choices: value.choices,
       };
+    case "set_checkpoint": {
+      const checkpoint = value.checkpoint;
+      if (checkpoint === null) return { action: "set_checkpoint", checkpoint: null };
+      if (!isRecord(checkpoint) || typeof checkpoint.id !== "string" || !checkpoint.id ||
+          typeof checkpoint.text !== "string" || !Array.isArray(checkpoint.choices) ||
+          !checkpoint.choices.every((choice): choice is string => typeof choice === "string")) return null;
+      return {
+        action: "set_checkpoint",
+        checkpoint: { id: checkpoint.id, question: checkpoint.text, choices: checkpoint.choices },
+      };
+    }
     case "topic_done":
       return { action: "topic_done" };
     case "session_ending":

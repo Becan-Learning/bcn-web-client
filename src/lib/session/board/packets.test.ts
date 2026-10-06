@@ -325,7 +325,20 @@ describe("malformed packets and session reset", () => {
     overlay("x", "cell", "correct", 1, { cell: [1, 1.5] }), overlay("x", "item", "correct", 1, { index: 0 }),
     { action: "scroll", page: {} }, { action: "set_lesson", lesson: {} },
     { action: "set_lesson", lesson: "lesson", number_of_topics: 1.5 }, { action: "set_topic" },
-    { action: "set_topic", topic: "topic", current_topic_index: 1, question: "", choices: [{}] },
+    { action: "set_topic", topic: {}, current_topic_index: 1 },
+    { action: "set_topic", topic: "topic" },
+    { action: "set_topic", topic: "topic", current_topic_index: 0 },
+    { action: "set_topic", topic: "topic", current_topic_index: 1.5 },
+    { action: "set_topic", topic: "topic", current_topic_index: "1" },
+    { action: "set_checkpoint" },
+    { action: "set_checkpoint", checkpoint: {} },
+    { action: "set_checkpoint", checkpoint: { id: "", text: "question", choices: [] } },
+    { action: "set_checkpoint", checkpoint: { id: 1, text: "question", choices: [] } },
+    { action: "set_checkpoint", checkpoint: { id: "q:1", text: 1, choices: [] } },
+    { action: "set_checkpoint", checkpoint: { id: "q:1", text: "question", choices: {} } },
+    { action: "set_checkpoint", checkpoint: { id: "q:1", text: "question", choices: [{}] } },
+    { action: "set_checkpoint", checkpoint: "question" },
+    { action: "set_checkpoint", checkpoint: [] },
     { action: "session_ending" }, { action: "session_ending", message: 2 },
   ])("rejects malformed input %# without throwing", (packet) => {
     expect(() => parseAgentMessage(packet)).not.toThrow();
@@ -344,7 +357,7 @@ describe("malformed packets and session reset", () => {
     const state = apply([
       { action: "set_lesson", lesson: "first", number_of_topics: 2 },
       { action: "set_lesson", lesson: "second", number_of_topics: 3 },
-      { action: "set_topic", topic: "topic", current_topic_index: 2, question: "question", choices: ["answer"] },
+      { action: "set_topic", topic: "topic", current_topic_index: 2 },
       add("x", "text", { text: "old session" }, 3),
       { action: "scroll", page: 5 }, { action: "session_ending", message: "reason" },
     ]);

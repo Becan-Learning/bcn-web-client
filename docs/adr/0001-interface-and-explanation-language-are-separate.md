@@ -19,7 +19,7 @@ LTR board inside an RTL page, deliberately.
 
 ## Consequences
 
-- Content language (lesson names, slides, `set_topic` questions) is neither; it renders as
+- Content language (lesson names, slides, checkpoint questions) is neither; it renders as
   delivered with bidi isolation and is never translated by the product.
 - The interface language cannot be switched inside a session — switching navigates and would
   drop the LiveKit room.

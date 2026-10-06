@@ -14,7 +14,7 @@ import { parseUIControlEvent, type UIControlEvent } from "./ui-control";
 /** درس من `lessons_list.json` في تخزين الفصل */
 export type Lesson = { name: string; brief: string; slug: string };
 
-export type Checkpoint = { question: string; choices: string[] };
+export type Checkpoint = { id: string; question: string; choices: string[] };
 
 export type SessionState = {
   board: BoardState;
@@ -25,6 +25,7 @@ export type SessionState = {
   /** دروس انتقل الوكيل منها إلى غيرها */
   completedLessons: string[];
   checkpoint: Checkpoint | null;
+  handledCheckpointId: string | null;
   /** الوكيل أعلن بلوغ الحدّ الزمني */
   ending: boolean;
   /** سببٌ تشخيصيّ من الوكيل، لا يُعرض لأنه لا يتبع لغة الطالب */
@@ -38,6 +39,7 @@ export const INITIAL_SESSION_STATE: SessionState = {
   topic: null,
   completedLessons: [],
   checkpoint: null,
+  handledCheckpointId: null,
   ending: false,
   endingMessage: null,
 };
@@ -46,11 +48,25 @@ export type AgentMessage = BoardAction | UIControlEvent;
 
 export type SessionAction =
   | AgentMessage
-  | { action: "checkpoint_clear" }
+  | { action: "checkpoint_handled"; id: string }
+  | { action: "checkpoint_unhandled"; id: string }
   | { action: "session_reset" };
 
 export function parseAgentMessage(value: unknown): AgentMessage | null {
   return parseBoardControlEvent(value) ?? parseUIControlEvent(value);
+}
+
+/** سؤال مفتوح لم يتعامل معه الطالب، والوكيل جاهز للسمع */
+export function checkpointShown(
+  state: SessionState,
+  agentState: string,
+  studentQuestionStatus: { busy: boolean; startedAt: number | null },
+): boolean {
+  return state.checkpoint !== null &&
+    agentState === "listening" &&
+    studentQuestionStatus.busy === false &&
+    studentQuestionStatus.startedAt === null &&
+    state.checkpoint.id !== state.handledCheckpointId;
 }
 
 export function sessionReducer(
@@ -62,8 +78,16 @@ export function sessionReducer(
     case "session_reset":
       return { ...INITIAL_SESSION_STATE, completedLessons: state.completedLessons };
 
-    case "checkpoint_clear":
-      return state.checkpoint ? { ...state, checkpoint: null } : state;
+    case "checkpoint_handled":
+      return { ...state, handledCheckpointId: action.id };
+
+    case "checkpoint_unhandled":
+      return state.handledCheckpointId === action.id
+        ? { ...state, handledCheckpointId: null }
+        : state;
+
+    case "set_checkpoint":
+      return { ...state, checkpoint: action.checkpoint };
 
     case "scroll":
       return state.page === action.page ? state : { ...state, page: action.page };
@@ -87,10 +111,6 @@ export function sessionReducer(
       return {
         ...state,
         topic: action.topic ? { name: action.topic, index: action.index } : state.topic,
-        /* سؤال الموضوع الجديد يحلّ محلّ القديم، وغيابه يمسحه */
-        checkpoint: action.question
-          ? { question: action.question, choices: action.choices }
-          : null,
       };
 
     case "topic_done":

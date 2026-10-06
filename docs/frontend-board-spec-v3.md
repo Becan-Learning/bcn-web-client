@@ -67,7 +67,7 @@ only items and groups in that region and preserve title and other regions. There
 clear scope; pinned items go away on `all` or individual remove.
 
 The topic boundary is deterministic and immediate: clear all → show if needed → set title. Pinned
-reference material survives a live turnover, not a topic boundary. `set_topic`/`topic_done` update
+reference material survives a live turnover, not a topic boundary. `set_topic`/`topic_done`/`set_checkpoint` update
 progress/checkpoints and must not themselves guess a board clear; consume the separate board events.
 
 ### 1.1 Frame messages
@@ -95,7 +95,8 @@ These existing packets have **no `rev`** and do not enter the board revision str
 
 ```json
 {"action":"set_lesson","lesson":"units_prefixes_and_conversion_ar","number_of_topics":6}
-{"action":"set_topic","topic":"2 · الوحدات الأساسية السبع","current_topic_index":3,"question":"وحدة الكتلة في النظام الدولي؟","choices":["باوند (Pound)","جرام (Gram)","كيلوجرام (Kilogram)","أونصة (Ounce)"]}
+{"action":"set_topic","topic":"2 · الوحدات الأساسية السبع","current_topic_index":3}
+{"action":"set_checkpoint","checkpoint":{"id":"t3-q:1","text":"وحدة الكتلة في النظام الدولي؟","choices":["باوند (Pound)","جرام (Gram)","كيلوجرام (Kilogram)","أونصة (Ounce)"]}}
 {"action":"topic_done","topic":"2 · الوحدات الأساسية السبع"}
 {"action":"scroll","page":4}
 {"action":"session_ending","message":"Session ending due to time limit."}
@@ -104,7 +105,8 @@ These existing packets have **no `rev`** and do not enter the board revision str
 | Action | Fields | Frontend responsibility |
 | --- | --- | --- |
 | `set_lesson` | `lesson: string` (slug), `number_of_topics: positive integer` | Store lesson and total; replace progress metadata for a new lesson. |
-| `set_topic` | `topic: string`, `current_topic_index: positive integer` (one-based), `question: string`, `choices: string[]` | Set current topic/checkpoint. Empty question/choices are possible. Preserve existing checkpoint UI. |
+| `set_topic` | `topic: string`, `current_topic_index: positive integer` (one-based) | Set the current topic. It no longer carries the checkpoint. |
+| `set_checkpoint` | `checkpoint: {id, text, choices} \| null` | Open or close the checkpoint. See [agent-contract-checkpoint.md](agent-contract-checkpoint.md). |
 | `topic_done` | `topic: string` | Mark completion in existing progression UI; do not invent another board mutation. |
 | `scroll` | `page: integer` | Existing PDF navigation; no board effect. |
 | `session_ending` | `message: string` | Existing session-ending UI/lifecycle and reason; not a board hide command. |
@@ -923,7 +925,7 @@ build commands, and live sessions in both languages after integration.
 
 - [ ] `frame-lifecycle`: clear/title/show/hide changes exactly the frame; clear preserves visibility,
   hide preserves state; live/temporary clear preserves pinned/title; all removes groups/title.
-- [ ] `progress-events`: checkpoint question/choices remain separate, topic_done updates completion,
+- [ ] `progress-events`: `set_checkpoint` opens and closes the checkpoint apart from `set_topic`, topic_done updates completion,
   scroll still navigates PDF, session_ending uses existing flow; no event enters board rev tracking.
 - [ ] `add-heading`, `add-text`, `add-bullet`, `add-step`: correct base typography/markers, per-region
   steps; `legacy-update-text` replaces text in place without deleting other state.

@@ -2,6 +2,7 @@ import type { LocalParticipant } from "livekit-client";
 import type { AgentState } from "@livekit/components-react";
 
 export type StudentQuestionStatus = { busy: boolean; startedAt: number | null };
+export type StudentQuestionOutcome = "sent" | "cancelled";
 type CloseMethod = "end_turn" | "cancel_turn" | null;
 
 /** Owns the mic gate and turn guards, including cancellation while start_turn is pending. */
@@ -9,6 +10,7 @@ export function createStudentQuestion(
   participant: Pick<LocalParticipant, "performRpc" | "setMicrophoneEnabled">,
   onChange: (status: StudentQuestionStatus) => void,
   onNoSpeech: () => void,
+  onClosed: (outcome: StudentQuestionOutcome) => void,
 ) {
   let turn: {
     destinationIdentity: string;
@@ -17,6 +19,7 @@ export function createStudentQuestion(
     method: CloseMethod;
     lastAgentState: AgentState;
     listened: boolean;
+    micOpened: boolean;
   } | null = null;
   let silenceTimer: ReturnType<typeof setTimeout> | undefined;
   let capTimer: ReturnType<typeof setTimeout> | undefined;
@@ -54,6 +57,7 @@ export function createStudentQuestion(
       } finally {
         turn = null;
         onChange({ busy: false, startedAt: null });
+        onClosed(current.micOpened && current.method !== "cancel_turn" ? "sent" : "cancelled");
       }
     })();
     return current.closing;
@@ -68,6 +72,7 @@ export function createStudentQuestion(
       method: null as CloseMethod,
       lastAgentState: agentState,
       listened: agentState === "listening",
+      micOpened: false,
     };
     turn = current;
     onChange({ busy: true, startedAt: null });
@@ -77,6 +82,7 @@ export function createStudentQuestion(
       acknowledged = true;
       if (current.closing) return;
       await participant.setMicrophoneEnabled(true);
+      current.micOpened = true;
       if (current.closing) return;
       onChange({ busy: false, startedAt: Date.now() });
       silenceTimer = setTimeout(() => {

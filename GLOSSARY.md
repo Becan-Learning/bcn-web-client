@@ -26,7 +26,10 @@ _Avoid_: course language, material language
 
 **Checkpoint** (سؤال الفهم):
 A question the tutor puts to the student during a session to confirm they understood a topic.
-_Avoid_: question (alone), quiz
+It is open from the moment the tutor has finished asking it until the tutor judges an answer or
+moves on. After a wrong answer the tutor explains again and asks again; each ask is opened and
+closed on its own. Topics without one end on a readiness question, which is not a checkpoint.
+_Avoid_: question (alone), quiz, assessment, open question
 
 **Student question** (سؤال الطالب):
 A spoken question the student deliberately starts by pressing Ask, cutting the tutor off

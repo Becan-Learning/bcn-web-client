@@ -40,6 +40,7 @@ import { getAnonId } from "@/lib/session/anon-id";
 import type { ChapterContent } from "@/lib/session/content";
 import {
   INITIAL_SESSION_STATE,
+  checkpointShown,
   parseAgentMessage,
   sessionReducer,
   type Lesson,
@@ -194,11 +195,20 @@ function SessionScreen({
     startedAt: null,
   });
   const [noSpeech, setNoSpeech] = useState(false);
+  const voiceAnswerId = useRef<string | null>(null);
   const studentQuestion = useMemo(
     () => createStudentQuestion(
       session.room.localParticipant,
       setStudentQuestionStatus,
       () => setNoSpeech(true),
+      // eslint-disable-next-line react-hooks/refs -- لا يُستدعى هذا النداء إلا بعد إغلاق سؤال الطالب.
+      (outcome) => {
+        const id = voiceAnswerId.current;
+        voiceAnswerId.current = null;
+        if (outcome === "cancelled" && id !== null) {
+          dispatch({ action: "checkpoint_unhandled", id });
+        }
+      },
     ),
     [session.room],
   );
@@ -381,7 +391,7 @@ function SessionScreen({
   else if (starting || cs !== ConnectionState.Connected) phase = "connecting";
   else if (agent.state === "speaking") phase = "live";
   else if (agent.state === "thinking") phase = "thinking";
-  else if (agentListening) phase = state.checkpoint ? "question" : "listening";
+  else if (agentListening) phase = checkpointShown(state, agent.state, studentQuestionStatus) ? "question" : "listening";
   else phase = "connecting";
 
   /* ————— الدروس ————— */
@@ -639,16 +649,22 @@ function SessionScreen({
         checkpoint={state.checkpoint}
         open={phase === "question"}
         onChoose={(choice) => {
-          dispatch({ action: "checkpoint_clear" });
+          if (!state.checkpoint) return;
+          dispatch({ action: "checkpoint_handled", id: state.checkpoint.id });
           void sendText(choice);
         }}
         canAnswerByVoice={canAsk}
         micUnavailable={micUnavailable}
         onAnswerByVoice={() => {
-          dispatch({ action: "checkpoint_clear" });
+          if (!state.checkpoint || !canAsk || finishing.current) return;
+          const id = state.checkpoint.id;
+          dispatch({ action: "checkpoint_handled", id });
+          voiceAnswerId.current = id;
           startStudentQuestion();
         }}
-        onDismiss={() => dispatch({ action: "checkpoint_clear" })}
+        onDismiss={() => {
+          if (state.checkpoint) dispatch({ action: "checkpoint_handled", id: state.checkpoint.id });
+        }}
       />
 
       <EndSessionDialog

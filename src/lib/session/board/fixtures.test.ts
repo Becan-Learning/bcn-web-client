@@ -1,4 +1,4 @@
-/* Fixtures: Becan-Learning/bcn-lk-agent-main feat/board-v3 @ 62d9b47ab3aa710e2d996ba89ee6ccd90434d2ec. */
+/* Fixtures: Becan-Learning/bcn-lk-agent-main feat/open-question @ 4a3428fa214d1c2a8a4e16c7b16e1d689f05111a. */
 import { describe, expect, it } from "vitest";
 import fixtures from "./__fixtures__/board-fixtures.json";
 import { INITIAL_SESSION_STATE, parseAgentMessage, sessionReducer, type SessionState } from "../session-reducer";
@@ -244,16 +244,21 @@ describe("contract fixture replay through session state", () => {
   it.each(fixtures.fixtures)("$name", ({ name, messages }) => {
     expect(summary(replay(messages).board)).toEqual(expected[name]);
   });
-  it("progress events preserve lesson, total, topic, checkpoint, ending and board rev", () => {
+  it("progress events open and close checkpoints while preserving progress and board rev", () => {
     const packets = fixture("progress-events").messages;
-    const checkpoint = replay(packets.slice(0, 4));
-    expect(checkpoint).toMatchObject({
+    const progress = replay(packets.slice(0, 7));
+    expect(progress).toMatchObject({
       lesson: { slug: "units_prefixes_and_conversion", totalTopics: 6 },
       topic: { name: "2 · السبع وحدات الأساسية (SI)", index: 3 },
-      checkpoint: { question: "وحدة الكتلة في النظام الدولي؟", choices: ["باوند (Pound)", "جرام (Gram)", "كيلوجرام (Kilogram)", "أونصة (Ounce)"] },
+      checkpoint: {
+        id: "t2-q:1",
+        question: "وحدة الكتلة في النظام الدولي؟",
+        choices: ["باوند (Pound)", "جرام (Gram)", "كيلوجرام (Kilogram)", "أونصة (Ounce)"],
+      },
       ending: false, endingMessage: null,
     });
-    const completedTopic = replay(packets.slice(0, 6));
+    expect(replay(packets.slice(0, 8)).checkpoint).toBeNull();
+    const completedTopic = replay(packets.slice(0, 9));
     expect(completedTopic.topic).toBeNull();
     const end = replay(packets);
     expect(end).toMatchObject({
@@ -262,8 +267,8 @@ describe("contract fixture replay through session state", () => {
       checkpoint: null, ending: true, endingMessage: "Session ending due to time limit.", page: 4,
     });
     expect(end.board.rev).toBe(3);
-    const beforeProgress = replay(packets.slice(0, 5));
-    expect(replay(packets.slice(5), beforeProgress).board).toBe(beforeProgress.board);
+    const beforeProgress = replay(packets.slice(0, 6));
+    expect(replay(packets.slice(6), beforeProgress).board).toBe(beforeProgress.board);
   });
   it("topic turnover keeps progress independent of the board clear", () => {
     expect(replay(fixture("sequence-topic-turnover").messages)).toMatchObject({

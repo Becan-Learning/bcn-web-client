@@ -772,7 +772,7 @@
       "covers": [
         "BRD-804"
       ],
-      "description": "Existing revision-free progression packets; topic index 3 of total 6, despite heading 2. PDF scroll and session ending stay on existing surfaces.",
+      "description": "Revision-free progression packets, including the `set_checkpoint` open and closed states (ADR-0007); topic index 3 of total 6, despite heading 2. PDF scroll and session ending stay on existing surfaces.",
       "messages": [
         {
           "action": "board_clear",
@@ -791,20 +791,34 @@
         {
           "action": "set_topic",
           "topic": "2 · السبع وحدات الأساسية (SI)",
-          "current_topic_index": 3,
-          "question": "وحدة الكتلة في النظام الدولي؟",
-          "choices": [
-            "باوند (Pound)",
-            "جرام (Gram)",
-            "كيلوجرام (Kilogram)",
-            "أونصة (Ounce)"
-          ]
+          "current_topic_index": 3
+        },
+        {
+          "action": "set_checkpoint",
+          "checkpoint": null
         },
         {
           "action": "board_set_title",
           "id": "board-title-si",
           "text": "2 · السبع وحدات الأساسية (SI)",
           "rev": 3
+        },
+        {
+          "action": "set_checkpoint",
+          "checkpoint": {
+            "id": "t2-q:1",
+            "text": "وحدة الكتلة في النظام الدولي؟",
+            "choices": [
+              "باوند (Pound)",
+              "جرام (Gram)",
+              "كيلوجرام (Kilogram)",
+              "أونصة (Ounce)"
+            ]
+          }
+        },
+        {
+          "action": "set_checkpoint",
+          "checkpoint": null
         },
         {
           "action": "topic_done",
@@ -817,9 +831,7 @@
         {
           "action": "set_topic",
           "topic": "3 · السوابق (Prefixes)",
-          "current_topic_index": 4,
-          "question": "",
-          "choices": []
+          "current_topic_index": 4
         },
         {
           "action": "session_ending",
@@ -5890,9 +5902,7 @@
         {
           "action": "set_topic",
           "topic": "4 · Converting units",
-          "current_topic_index": 5,
-          "question": "",
-          "choices": []
+          "current_topic_index": 5
         },
         {
           "action": "board_clear",

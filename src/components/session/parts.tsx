@@ -711,10 +711,14 @@ export function Toolbar({
                   disabled={!canAsk}
                   onClick={onAsk}
                   title={micUnavailable ? t("studentQuestionMicUnavailable") : t("studentQuestionShortcut")}
-                  className={`inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-pill px-3 text-sm font-semibold transition-transform motion-safe:active:scale-95 disabled:opacity-45 ${canStart ? "border border-line text-ink-2" : "bg-pressable text-on-pressable enabled:hover:bg-pressable/90"}`}
+                  className="group/ask flex h-11 shrink-0 items-center justify-center rounded-pill focus-visible:outline-none pointer-fine:md:h-8"
                 >
-                  <MicIcon className="h-[18px] w-[18px]" />
-                  {t("studentQuestionAsk")}
+                  <span
+                    className={`inline-flex h-[34px] items-center justify-center gap-1 rounded-pill px-2.5 text-sm font-semibold transition-[transform,background-color] group-focus-visible/ask:outline-2 group-focus-visible/ask:outline-offset-2 group-focus-visible/ask:outline-ring group-disabled/ask:opacity-45 motion-safe:group-enabled/ask:group-active/ask:scale-95 md:h-8 [&_svg]:h-[18px] [&_svg]:w-[18px] md:[&_svg]:h-4 md:[&_svg]:w-4 ${canStart ? "border border-line text-ink-2" : "bg-pressable text-on-pressable group-enabled/ask:group-hover/ask:bg-pressable/90"}`}
+                  >
+                    <MicIcon />
+                    {t("studentQuestionAsk")}
+                  </span>
                 </button>
                 <IconBtn label={t("chat")} onClick={onChat} active={chat}>
                   <ChatIcon />

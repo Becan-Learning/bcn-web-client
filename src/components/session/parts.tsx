@@ -581,9 +581,11 @@ export function ChatPanel({
 /* ————— شريط الأدوات ————— */
 
 function IconBtn({
-  label, onClick, active, disabled, children,
+  label, text, onClick, active, disabled, children,
 }: {
   label: string;
+  /** كلمة ظاهرة بجانب الأيقونة؛ بدونها يبقى الزرّ أيقونة وحدها. */
+  text?: string;
   onClick?: () => void;
   active?: boolean;
   disabled?: boolean;
@@ -600,10 +602,11 @@ function IconBtn({
       title={label}
       aria-pressed={active}
       disabled={disabled}
-      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill pointer-fine:md:h-8 pointer-fine:md:w-8"
+      className={`group/btn flex h-11 shrink-0 items-center justify-center rounded-pill pointer-fine:md:h-8 ${text ? "focus-visible:outline-none" : "w-11 pointer-fine:md:w-8"}`}
     >
-      <span className={`flex h-[34px] w-[34px] items-center justify-center rounded-pill transition-colors md:h-8 md:w-8 [&_svg]:h-[18px] [&_svg]:w-[18px] md:[&_svg]:h-4 md:[&_svg]:w-4 ${skin}`}>
+      <span className={`inline-flex h-[34px] items-center justify-center rounded-pill transition-colors md:h-8 [&_svg]:h-[18px] [&_svg]:w-[18px] md:[&_svg]:h-4 md:[&_svg]:w-4 ${text ? "gap-1 px-2.5 text-sm font-semibold group-focus-visible/btn:outline-2 group-focus-visible/btn:outline-offset-2 group-focus-visible/btn:outline-ring" : "w-[34px] md:w-8"} ${skin}`}>
         {children}
+        {text}
       </span>
     </button>
   );
@@ -704,7 +707,7 @@ export function Toolbar({
               transition={{ duration: 0.15 }}
               className="grid grid-cols-[1fr_auto_1fr] items-center gap-1"
             >
-              <div className="flex w-[8.75rem] items-center gap-1 pointer-fine:md:w-[7.5rem]">
+              <div className="flex items-center justify-start gap-1">
                 <button
                   ref={askRef}
                   type="button"
@@ -720,7 +723,7 @@ export function Toolbar({
                     {t("studentQuestionAsk")}
                   </span>
                 </button>
-                <IconBtn label={t("chat")} onClick={onChat} active={chat}>
+                <IconBtn label={t("chat")} text={t("chatShort")} onClick={onChat} active={chat}>
                   <ChatIcon />
                 </IconBtn>
               </div>
@@ -747,7 +750,7 @@ export function Toolbar({
                 )}
               </span>
 
-              <div className="flex w-[8.75rem] items-center gap-1 pointer-fine:md:w-[7.5rem]">
+              <div className="flex items-center justify-end gap-1">
                 <IconBtn label={t("slides")} onClick={onSlides} active={slides}>
                   <SlidesIcon />
                 </IconBtn>

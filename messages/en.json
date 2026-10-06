@@ -753,6 +753,7 @@
     "startHint": "Press here to start the explanation",
     "start": "Start explanation",
     "chat": "Chat",
+    "chatShort": "Chat",
     "slides": "Slides",
     "end": "End session",
     "questionTitle": "Understanding check",

@@ -5,6 +5,7 @@ import { BecanLogo } from "./logo";
 import { OfflineBar } from "./offline-bar";
 import { SupportButton } from "./support-button";
 import { LanguageSwitcher } from "./language-switcher";
+import { SiteAccountLink } from "./site-account-link";
 
 /* عناصر التصميم المعتمد. كل شاشة جديدة تُبنى منها فلا تعيد اختراعها. */
 
@@ -305,7 +306,6 @@ export function SiteHeader({
   nav?: readonly { href: string; label: string }[];
   loginAsButton?: boolean;
 }) {
-  const t = useTranslations("SiteHeader");
   return (
     <header className="border-b border-line">
       {/* الحشو الرأسي خفّ مع تكبير الشعار: الشعار تركيبة سطرين
@@ -336,18 +336,7 @@ export function SiteHeader({
             </nav>
           ) : null}
 
-          {minimal ? null : (
-            <Link
-              href="/join"
-              className={
-                loginAsButton
-                  ? "inline-flex min-h-11 min-w-11 items-center justify-center rounded-pill border border-line px-4 text-sm font-semibold text-ink md:text-base"
-                  : "inline-flex min-h-11 min-w-11 items-center justify-center px-2 font-semibold text-ink-2"
-              }
-            >
-              {t("login")}
-            </Link>
-          )}
+          {minimal ? null : <SiteAccountLink asButton={loginAsButton} />}
           <LanguageSwitcher />
         </div>
       </div>
@@ -393,21 +382,23 @@ export function PrimaryButton({
   onClick,
   children,
   className = "",
+  disabled = false,
 }: {
   href?: string;
   type?: "submit" | "button";
   onClick?: () => void;
   children: React.ReactNode;
   className?: string;
+  disabled?: boolean;
 }) {
-  const cls = `group inline-flex h-14 items-center justify-center gap-3 rounded-pill bg-pressable px-8 text-lg font-semibold text-on-pressable transition-transform duration-200 hover:-translate-y-1 hover:shadow-lift ${className}`;
+  const cls = `group inline-flex h-14 items-center justify-center gap-3 rounded-pill bg-pressable px-8 text-lg font-semibold text-on-pressable transition-transform duration-200 hover:-translate-y-1 hover:shadow-lift disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none ${className}`;
   return href ? (
     <Link href={href} className={cls}>
       {children}
       <ArrowForward className="h-5 w-5 transition-transform duration-200 rtl:group-hover:-translate-x-1 ltr:group-hover:translate-x-1" />
     </Link>
   ) : (
-    <button type={type ?? "button"} onClick={onClick} className={cls}>
+    <button type={type ?? "button"} onClick={onClick} disabled={disabled} className={cls}>
       {children}
       <ArrowForward className="h-5 w-5 transition-transform duration-200 rtl:group-hover:-translate-x-1 ltr:group-hover:translate-x-1" />
     </button>

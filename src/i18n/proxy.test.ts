@@ -92,6 +92,12 @@ describe("interface language routing", () => {
 });
 
 describe("Account route gating", () => {
+  it("keeps the English sign-in URL localized but its return path unprefixed", () => {
+    const response = proxy(request("/en/home?x=1"));
+    expect(response.headers.get("location")).toBe(
+      "https://becan.test/en/sign-in?next=%2Fhome%3Fx%3D1",
+    );
+  });
   it("redirects a signed-out Arabic session visit with its original query", () => {
     const response = proxy(request("/session/acct101/1?room=test&n=2"));
     const destination = new URL(response.headers.get("location")!);
@@ -106,7 +112,7 @@ describe("Account route gating", () => {
         const response = proxy(request(`${prefix}${path}`));
         const destination = new URL(response.headers.get("location")!);
         expect(destination.pathname).toBe(`${prefix}/sign-in`);
-        expect(destination.searchParams.get("next")).toBe(`${prefix}${path}`);
+        expect(destination.searchParams.get("next")).toBe(path);
       }
     },
   );
@@ -118,7 +124,7 @@ describe("Account route gating", () => {
   it("honors the explicit Arabic switcher prefix despite an English choice", () => {
     const destination = new URL(proxy(request("/ar/settings/account", "en")).headers.get("location")!);
     expect(destination.pathname).toBe("/sign-in");
-    expect(destination.searchParams.get("next")).toBe("/ar/settings/account");
+    expect(destination.searchParams.get("next")).toBe("/settings/account");
   });
   it.each(["/", "/join", "/en/sign-in", "/courses", "/homework", "/settings-guide", "/checkout-info", "/session-info"])(
     "does not gate public path %s",

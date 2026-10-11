@@ -2,6 +2,7 @@ import "server-only";
 
 import { z } from "zod";
 import type { Localized } from "@/i18n/localized";
+import { backendUrl } from "./backend";
 
 export type Institution = {
   id: string;
@@ -18,8 +19,7 @@ const institutionsSchema = z.array(z.object({
 
 export async function getInstitutions(): Promise<Institution[]> {
   try {
-    const backendUrl = process.env.BACKEND_URL?.trim().replace(/\/+$/, "") || "http://localhost:3000";
-    const response = await fetch(`${backendUrl}/api/v1/institutions`, { next: { revalidate: 300 } });
+    const response = await fetch(`${backendUrl()}/api/v1/institutions`, { next: { revalidate: 300 } });
     if (!response.ok) {
       console.error("Institutions request failed", { status: response.status });
       return [];

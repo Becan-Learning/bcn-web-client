@@ -22,7 +22,7 @@ export default function proxy(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = locale === "en" ? "/en/sign-in" : "/sign-in";
     url.search = "";
-    url.searchParams.set("next", pathname + request.nextUrl.search);
+    url.searchParams.set("next", path + request.nextUrl.search);
     return NextResponse.redirect(url);
   }
 

@@ -1,3 +1,4 @@
+/* next مسار بلا بادئة لغة؛ المتصلون يضيفونها عبر أدوات التنقّل. */
 export function safeNext(raw: string | null | undefined, fallback = "/home"): string {
   const hasControl = (value: string) => Array.from(value).some(
     (char) => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127,

@@ -6,6 +6,7 @@ import { z } from "zod";
 import { redirect } from "@/i18n/navigation";
 import type { AccountSession } from "./types";
 import { safeNext } from "./next-path";
+import { backendUrl } from "./backend";
 
 const accountSessionSchema = z.object({
   user: z.object({
@@ -35,8 +36,7 @@ const accountSessionSchema = z.object({
 
 export async function getAccountFromCookie(cookie: string): Promise<AccountSession | null> {
   try {
-    const backendUrl = process.env.BACKEND_URL?.trim().replace(/\/+$/, "") || "http://localhost:3000";
-    const response = await fetch(`${backendUrl}/api/auth/get-session`, {
+    const response = await fetch(`${backendUrl()}/api/auth/get-session`, {
       headers: { cookie },
       cache: "no-store",
     });

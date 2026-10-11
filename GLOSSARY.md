@@ -22,6 +22,14 @@ The language a course's own material happens to be in — lesson names, slides, 
 the university writes them. Neither the product nor the tutor translates it.
 _Avoid_: course language, material language
 
+## Account
+
+**Account** (الحساب):
+The student's one record with Becan: who they are (name, email, phone), how they sign in, and the
+study facts that shape what they see (university, major). Nothing about the student lives outside
+it. A student has exactly one Account.
+_Avoid_: user, profile, student account, member
+
 ## Session
 
 **Checkpoint** (سؤال الفهم):

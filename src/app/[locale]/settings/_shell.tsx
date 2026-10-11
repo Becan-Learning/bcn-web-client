@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ArrowBack } from "@/components/becan/icons";
 import { PageShell, Section, SiteHeader } from "@/components/becan/kit";
+import { SignOut } from "./_sign-out";
 
 /* تخطيط الإعدادات الموحَّد — الاشتراك والفواتير معه في نفس القشرة.
 
@@ -97,6 +98,7 @@ export async function SettingsShell({
                 );
               })}
             </ul>
+            <SignOut />
           </nav>
 
           <div className="mt-6 md:mt-0">

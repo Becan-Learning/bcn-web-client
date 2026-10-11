@@ -20,7 +20,7 @@ export default async function HomePage(props: PageProps<"/[locale]/home">) {
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  await requireAccount(locale, accountReturnPath("/home", await props.searchParams));
+  const { user: account } = await requireAccount(locale, accountReturnPath("/home", await props.searchParams));
 
-  return <HomeView />;
+  return <HomeView name={account.name} />;
 }

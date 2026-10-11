@@ -8,6 +8,8 @@ import { SessionView } from "@/components/session/session-view";
 import { chaptersOf, courseBySlug, slugOf } from "@/lib/data/catalog";
 import { contentFor, slidesUrl } from "@/lib/session/content";
 import { getLessons } from "@/lib/session/lessons";
+import { requireAccount } from "@/lib/auth/session";
+import { accountReturnPath } from "@/lib/auth/next-path";
 
 export async function generateMetadata(
   props: PageProps<"/[locale]/session/[code]/[n]">,
@@ -29,6 +31,7 @@ export default async function SessionPage(
   setRequestLocale(locale);
 
   const { code, n } = await props.params;
+  await requireAccount(locale, accountReturnPath(`/session/${code}/${n}`, await props.searchParams));
 
   const course = courseBySlug(code);
   if (!course) notFound();

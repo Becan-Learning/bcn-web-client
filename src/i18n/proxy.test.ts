@@ -52,7 +52,9 @@ describe("interface language routing", () => {
   it.each(["/", "/courses?subject=math&level=2", "/session/acct101/1?room=test"])(
     "returns an explicit English choice to %s with its query intact",
     (path) => {
-      const response = proxy(request(path, "en"));
+      const incoming = request(path, "en");
+      incoming.cookies.set("better-auth.session_token", "signed-token");
+      const response = proxy(incoming);
       expect(response.status).toBe(307);
       expect(response.headers.get("location")).toBe(
         `https://becan.test/en${path === "/" ? "" : path}`,
@@ -87,6 +89,50 @@ describe("interface language routing", () => {
     expect(response.headers.get("location")).toBeNull();
     expect(response.headers.get("set-cookie")).toBeNull();
   });
+});
+
+describe("Account route gating", () => {
+  it("redirects a signed-out Arabic session visit with its original query", () => {
+    const response = proxy(request("/session/acct101/1?room=test&n=2"));
+    const destination = new URL(response.headers.get("location")!);
+    expect(destination.pathname).toBe("/sign-in");
+    expect(destination.searchParams.get("next")).toBe("/session/acct101/1?room=test&n=2");
+    expect(response.headers.get("set-cookie")).toBeNull();
+  });
+  it.each(["/home", "/settings", "/settings/account", "/settings/invoices/inv-1", "/checkout?plan=pro", "/checkout/result?s=pending", "/session/acct101/1/done?room=test"])(
+    "gates Arabic and English visits to %s",
+    (path) => {
+      for (const prefix of ["", "/en"]) {
+        const response = proxy(request(`${prefix}${path}`));
+        const destination = new URL(response.headers.get("location")!);
+        expect(destination.pathname).toBe(`${prefix}/sign-in`);
+        expect(destination.searchParams.get("next")).toBe(`${prefix}${path}`);
+      }
+    },
+  );
+  it("uses the saved English choice on an unprefixed gated visit", () => {
+    const destination = new URL(proxy(request("/home?a=1", "en")).headers.get("location")!);
+    expect(destination.pathname).toBe("/en/sign-in");
+    expect(destination.searchParams.get("next")).toBe("/home?a=1");
+  });
+  it("honors the explicit Arabic switcher prefix despite an English choice", () => {
+    const destination = new URL(proxy(request("/ar/settings/account", "en")).headers.get("location")!);
+    expect(destination.pathname).toBe("/sign-in");
+    expect(destination.searchParams.get("next")).toBe("/ar/settings/account");
+  });
+  it.each(["/", "/join", "/en/sign-in", "/courses", "/homework", "/settings-guide", "/checkout-info", "/session-info"])(
+    "does not gate public path %s",
+    (path) => expect(proxy(request(path)).headers.get("location")).toBeNull(),
+  );
+  it.each(["better-auth.session_token", "__Secure-better-auth.session_token"])(
+    "passes a gated visit with cookie %s through to locale routing",
+    (name) => {
+      const incoming = request("/en/settings/account");
+      incoming.cookies.set(name, "signed-token");
+      expect(proxy(incoming).headers.get("location")).toBeNull();
+      expect(handleI18nRouting).toHaveBeenCalledWith(incoming);
+    },
+  );
 });
 
 describe("proxy matcher", () => {

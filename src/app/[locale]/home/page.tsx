@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import type { Metadata } from "next";
 import { HomeView } from "./home-view";
+import { requireAccount } from "@/lib/auth/session";
+import { accountReturnPath } from "@/lib/auth/next-path";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/home">): Promise<Metadata> {
   const { locale } = await params;
@@ -18,6 +20,7 @@ export default async function HomePage(props: PageProps<"/[locale]/home">) {
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  await requireAccount(locale, accountReturnPath("/home", await props.searchParams));
 
   return <HomeView />;
 }

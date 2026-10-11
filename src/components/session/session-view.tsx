@@ -36,7 +36,6 @@ import {
 } from "livekit-client";
 import { createStudentQuestion, type StudentQuestionStatus } from "./student-question";
 import { getExperience } from "@/lib/experience";
-import { getAnonId } from "@/lib/session/anon-id";
 import type { ChapterContent } from "@/lib/session/content";
 import {
   INITIAL_SESSION_STATE,
@@ -84,9 +83,6 @@ function LoadingSlides() {
   return <SlidesMessage text={t("loadingSlides")} />;
 }
 
-/* اسم مؤقّت حتى يُركَّب الحساب (Clerk) */
-const USER_NAME = "طالب بيكان";
-
 type SessionViewProps = {
   courseName: string;
   courseSlug: string;
@@ -123,8 +119,6 @@ export function SessionView(props: SessionViewProps) {
           course_id: courseId,
           chapter_id: chapterId,
           language,
-          user_name: USER_NAME,
-          user_id: getAnonId(),
           experience: getExperience(),
         });
         const res = await fetch(`/api/get-lk-token?${params}`, { cache: "no-store" });

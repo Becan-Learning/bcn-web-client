@@ -5,6 +5,8 @@ import { routing } from "@/i18n/routing";
 import type { Metadata } from "next";
 import { SettingsShell } from "../_shell";
 import { AccountView } from "./account-view";
+import { requireAccount } from "@/lib/auth/session";
+import { accountReturnPath } from "@/lib/auth/next-path";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/settings/account">): Promise<Metadata> {
   const { locale } = await params;
@@ -17,6 +19,7 @@ export default async function AccountPage(props: PageProps<"/[locale]/settings/a
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  await requireAccount(locale, accountReturnPath("/settings/account", await props.searchParams));
   const t = await getTranslations("Settings.Account");
 
   return (

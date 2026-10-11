@@ -5,6 +5,8 @@ import { routing } from "@/i18n/routing";
 import type { Metadata } from "next";
 import { SettingsShell } from "../_shell";
 import { NotificationsView } from "./notifications-view";
+import { requireAccount } from "@/lib/auth/session";
+import { accountReturnPath } from "@/lib/auth/next-path";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/settings/notifications">): Promise<Metadata> {
   const { locale } = await params;
@@ -17,6 +19,7 @@ export default async function NotificationsPage(props: PageProps<"/[locale]/sett
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  await requireAccount(locale, accountReturnPath("/settings/notifications", await props.searchParams));
   const t = await getTranslations("Settings.Notifications");
 
   return (

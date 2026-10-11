@@ -1,4 +1,22 @@
 {
+  "Auth": {
+    "Errors": {
+      "emailTaken": "This email is already registered. Sign in or use another email.",
+      "invalidCredentials": "Your email or password is incorrect. Check both and try again.",
+      "emailNotVerified": "Verify your email using the link we sent you first.",
+      "passwordTooShort": "Use a password with at least 8 characters.",
+      "passwordTooLong": "Your password is too long. Use 128 characters or fewer.",
+      "invalidEmail": "Enter a valid email address.",
+      "invalidPassword": "Your password is incorrect. Check it and try again.",
+      "invalidToken": "This link is invalid or has expired. Request a new link.",
+      "tooManyRequests": "You’ve tried too many times. Wait a little and try again.",
+      "invalidPhoneNumber": "Enter a 10-digit Saudi mobile number starting with 05.",
+      "phoneNumberTaken": "This number belongs to another account. Use another number.",
+      "invalidInstitution": "Choose a university from the list.",
+      "invalidMajor": "Choose a major offered by your university from the list.",
+      "generic": "We couldn’t complete your request. Please try again."
+    }
+  },
   "LanguageSwitcher": {
     "label": "عربي",
     "ariaLabel": "Switch interface language to Arabic"

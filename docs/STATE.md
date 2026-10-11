@@ -5,6 +5,36 @@
 
 ---
 
+## الحساب — Better Auth من الخادم · 2026-10-11
+
+**الحساب (Account)** صار حقيقيًا: بريد وكلمة مرور مع تأكيد البريد. خادم Better Auth
+يعيش في `bcn-backend-main` وحده، والويب **عميل فقط** — لا قاعدة بيانات ولا سرّ.
+`next.config.ts` يمرّر `/api/auth/*` إلى `BACKEND_URL` فتبقى الكوكي من أصل الموقع نفسه
+([ADR 0004](adr/0004-auth-lives-in-backend-behind-same-origin-proxy.md)).
+المواصفة: [specs/auth-account.md](specs/auth-account.md). ما على الخادم بناؤه:
+[backend-auth-handoff.md](backend-auth-handoff.md) — **الويب لا يعمل طرفًا لطرف قبله**.
+
+- `src/lib/auth/`: العميل و`useAccount` · `requireAccount` على الخادم · الكتالوج ·
+  `safeNext` · الجوال السعودي بصيغة E.164 · ترجمة رموز الأخطاء.
+- **المسارات المحميّة**: `/session/*` · `/home` · `/settings/*` · `/checkout`. الوسيط يفحص
+  وجود الكوكي فقط، والصفحة تتحقّق من الجلسة لدى الخادم.
+- **`next` بلا بادئة لغة دائمًا** — التنقّل بـ`@/i18n/navigation` يضيفها. وما يُسلَّم لـBetter Auth
+  (`callbackURL` · `redirectTo`) يُبادأ يدويًا لأنه يعيد التوجيه خارج next-intl.
+- **رمز LiveKit من الجلسة وحدها**: `user_id` معرّف الحساب و`user_name` اسمه. حُذف `becan:uid`.
+- **Google والجوال معلّقان في الكود** بلا «قريبًا»، حتى يُفعَّلا في الخادم.
+
+**انحراف مقصود عن بريف الشاشة 6:** البريف يمنع الاسم والجامعة والتخصص عند التسجيل.
+صاحب المنتج ألغى ذلك: الحساب كله يُجمع عند التسجيل (الاسم · البريد · كلمة المرور ·
+الجوال · الجامعة · التخصص)، على خطوتين في نموذج واحد. لا حقل تأكيد لكلمة المرور.
+
+**مزالق:**
+- `next.config.ts` يرمي بلا `BACKEND_URL` في أوامر الإنتاج — و`next typegen` منها، فنسخة
+  عمل جديدة تحتاج `BACKEND_URL=… pnpm exec next typegen` قبل `type-check`.
+- pnpm 12 يعيد كتابة `pnpm-lock.yaml` في كل تشغيل (`packageManagerDependencies`).
+- `.env*` مستثنى من git؛ `.env.example` مستثنى من الاستثناء عمدًا.
+
+---
+
 ## سؤال الفهم — الوكيل يفتحه ويغلقه · 2026-10-06
 
 **سؤال الفهم (Checkpoint)** لم يعد يصل مع `set_topic`. الوكيل يفتحه بـ`set_checkpoint` بعد أن
@@ -177,7 +207,7 @@ live · thinking · listening · question · ending · cut`.
 
 ### ما زال مؤقّتًا
 - **كل فصل جاهز يفتح `becan-test / ch_1`** — `src/lib/session/content.ts` حتى يصل الكتالوج الحقيقي.
-- **لا Clerk ولا Supabase**: المعرّف مجهول ثابت لكل متصفّح (`becan:uid`) والاسم «طالب بيكان».
+- ~~لا Clerk ولا Supabase~~ — حلّ محلّه الحساب (Better Auth) في 2026-10-11؛ انظر أعلى الملف.
 - ملخّص `/done` ما زال بيانات عرض (التعثّر · الأيام) — الوكيل لا يرسل ملخّصًا بعد.
 - «وقتك للمذاكرة» في `/settings/study` حقيقي (يُرسل `experience`)، وبقية التفضيلات عرض.
 - اعتماديات old-sanad غير المستعملة باقية في `package.json` (recharts · dnd-kit · tanstack…).

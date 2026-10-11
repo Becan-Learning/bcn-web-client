@@ -9,6 +9,7 @@ import { PageShell, Section, SiteHeader } from "@/components/becan/kit";
 import { SETTINGS_SECTIONS } from "./_shell";
 import { requireAccount } from "@/lib/auth/session";
 import { accountReturnPath } from "@/lib/auth/next-path";
+import { SignOut } from "./_sign-out";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/settings">): Promise<Metadata> {
   const { locale } = await params;
@@ -58,6 +59,7 @@ export default async function SettingsIndexPage(props: PageProps<"/[locale]/sett
             </li>
           ))}
         </ul>
+        <SignOut />
       </Section>
     </PageShell>
   );

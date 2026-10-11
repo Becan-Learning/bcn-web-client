@@ -3,7 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { CourseCardBody } from "@/app/[locale]/courses/course-card";
 import { TONES, slugOf } from "@/lib/data/catalog";
 import { GearIcon } from "@/components/becan/icons";
-import { GhostButton, PageShell } from "@/components/becan/kit";
+import { Copy, GhostButton, PageShell } from "@/components/becan/kit";
 import { enrolledCourses, type EnrolledCourse } from "@/lib/data/home";
 
 /* الشاشة ٨ — الداشبورد `/home`.
@@ -15,15 +15,15 @@ import { enrolledCourses, type EnrolledCourse } from "@/lib/data/home";
    والطبقة الثانية (المهام والترم) — محفوظ كاملًا في الحفظة `1c34c65`
    ويُسترجَع منها متى عادت الحاجة. */
 
-export async function HomeView() {
+export async function HomeView({ name }: { name: string }) {
   const t = await getTranslations("Home");
   const courses = enrolledCourses();
 
   return (
     <PageShell>
-      {/* تحية بالاسم الأول والإعدادات فقط — لا إشعارات ولا بحث */}
+      {/* التحية من الحساب والإعدادات فقط — لا إشعارات ولا بحث */}
       <header className="mx-auto flex w-full max-w-page items-center justify-between gap-3 px-4 pt-5 pb-2 md:px-8 xl:px-10">
-        <p className="text-ink">{t("greeting")}</p>
+        <p className="min-w-0 break-words text-ink"><Copy>{t("greeting", { name })}</Copy></p>
         <Link
           href="/settings"
           aria-label={t("settings")}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useRef, useState, useTransition } from "react";
+import { useCallback, useRef, useState, useTransition } from "react";
 import { localize } from "@/i18n/localized";
 import { useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth/client";
@@ -15,6 +15,8 @@ import { SaveNotice, useSaveNotice } from "../_controls";
 import { SettingsCard } from "../_shell";
 import { planAccountChange, type AccountChange, type SavedAccount } from "./account-changes";
 import { EmailForm, PasswordForm } from "./security-forms";
+import { runSettingsAuthMutation } from "../_auth-mutations";
+import { retryAccountInstitutions } from "./retry-catalog";
 
 /* الحفظ التلقائي للبيانات العادية فقط؛ البريد وكلمة المرور يحتاجان قرارًا صريحًا. */
 export function AccountView({ account, institutions }: { account: Account; institutions: Institution[] }) {
@@ -30,6 +32,7 @@ export function AccountView({ account, institutions }: { account: Account; insti
   const busy = useRef(false);
   const [pending, setPending] = useState(false);
   const [retrying, startRetry] = useTransition();
+  const [retryError, setRetryError] = useState("");
   const [name, setName] = useState(account.name);
   const [phone, setPhone] = useState(() => toLocalSaudi(account.phoneNumber));
   const [institutionId, setInstitutionId] = useState(account.institutionId);
@@ -37,6 +40,20 @@ export function AccountView({ account, institutions }: { account: Account; insti
   const [errors, setErrors] = useState<Partial<Record<keyof SavedAccount, string>>>({});
   const [changing, setChanging] = useState<"email" | "password" | null>(null);
   const [emailSent, setEmailSent] = useState(false);
+  const returnFocus = useRef<"email" | "password" | null>(null);
+  const focusEmailTrigger = useCallback((node: HTMLButtonElement | null) => {
+    if (node && returnFocus.current === "email") {
+      node.focus();
+      returnFocus.current = null;
+    }
+  }, []);
+  const focusPasswordTrigger = useCallback((node: HTMLButtonElement | null) => {
+    if (node && returnFocus.current === "password") {
+      node.focus();
+      returnFocus.current = null;
+    }
+  }, []);
+  const focusEmailNotice = useCallback((node: HTMLParagraphElement | null) => node?.focus(), []);
   const majors = institutions.find((i) => i.id === institutionId)?.majors ?? [];
 
   const setSecurityPending = (value: boolean) => {
@@ -77,7 +94,7 @@ export function AccountView({ account, institutions }: { account: Account; insti
       restore(change);
     };
     try {
-      const result = await authClient.updateUser(plan.values);
+      const result = await runSettingsAuthMutation(() => authClient.updateUser(plan.values));
       if (result.error) {
         fail(result.error);
         return;
@@ -114,7 +131,7 @@ export function AccountView({ account, institutions }: { account: Account; insti
           </div>
           <div>
             <FieldLabel htmlFor="acc-phone">{t("phone")}</FieldLabel>
-            <p id="acc-phone-hint" className="mt-1 text-xs text-ink-2">
+            <p id="acc-phone-hint" className="mt-1 text-xs leading-base text-ink-2">
               {t.rich("phoneHint", { number: (chunks) => <span dir="ltr">{chunks}</span> })}
             </p>
             <TextField id="acc-phone" name="tel" type="tel" dir="ltr" autoComplete="tel-national"
@@ -129,12 +146,13 @@ export function AccountView({ account, institutions }: { account: Account; insti
         <div className="mt-4">
           <FieldLabel htmlFor="acc-email">{t("email")}</FieldLabel>
           <TextField id="acc-email" dir="ltr" type="email" value={account.email} readOnly />
-          {emailSent ? <p role="status" className="mt-2 text-sm leading-base text-ink-2">{t("emailSent")}</p> : null}
+          {emailSent ? <p ref={focusEmailNotice} tabIndex={-1} role="status" className="mt-2 text-sm leading-base text-ink-2">{t("emailSent")}</p> : null}
           {changing === "email" ? (
             <EmailForm disabled={pending} onPendingChange={setSecurityPending}
-              onDone={() => { setChanging(null); setEmailSent(true); }} onCancel={() => setChanging(null)} />
+              onDone={() => { setChanging(null); setEmailSent(true); }}
+              onCancel={() => { returnFocus.current = "email"; setChanging(null); }} />
           ) : (
-            <button type="button" disabled={pending} onClick={() => { setChanging("email"); setEmailSent(false); }}
+            <button ref={focusEmailTrigger} type="button" disabled={pending} onClick={() => { setChanging("email"); setEmailSent(false); }}
               className="mt-2 inline-flex min-h-11 items-center px-2 font-semibold text-ink underline underline-offset-4">
               {t("changeEmail")}
             </button>
@@ -148,10 +166,19 @@ export function AccountView({ account, institutions }: { account: Account; insti
           <div className="mt-4">
             <p role="status" className="text-sm leading-base text-ink-2">{t("catalogError")}</p>
             <button type="button" disabled={retrying} aria-busy={retrying}
-              onClick={() => startRetry(() => router.refresh())}
+              onClick={() => startRetry(async () => {
+                setRetryError("");
+                try {
+                  await retryAccountInstitutions();
+                  router.refresh();
+                } catch {
+                  setRetryError(authErrors("generic"));
+                }
+              })}
               className="mt-2 inline-flex min-h-11 items-center rounded-pill border border-line px-4 font-semibold text-ink">
               {t("retry")}
             </button>
+            {retryError ? <div role="alert"><ErrorText id="acc-catalog-err">{retryError}</ErrorText></div> : null}
           </div>
         ) : (
           <fieldset disabled={pending} aria-busy={pending} className="mt-4 flex min-w-0 flex-col gap-4">
@@ -191,11 +218,12 @@ export function AccountView({ account, institutions }: { account: Account; insti
       <SettingsCard title={t("password")}>
         {changing === "password" ? (
           <PasswordForm disabled={pending} onPendingChange={setSecurityPending}
-            onDone={() => { setChanging(null); ping(); router.refresh(); }} onCancel={() => setChanging(null)} />
+            onDone={() => { returnFocus.current = "password"; setChanging(null); ping(); router.refresh(); }}
+            onCancel={() => { returnFocus.current = "password"; setChanging(null); }} />
         ) : (
           <>
             <p className="mt-2 max-w-measure text-sm leading-base text-ink-2">{t("passwordEffect")}</p>
-            <button type="button" disabled={pending} onClick={() => setChanging("password")}
+            <button ref={focusPasswordTrigger} type="button" disabled={pending} onClick={() => setChanging("password")}
               className="mt-4 inline-flex min-h-11 items-center px-2 font-semibold text-ink underline underline-offset-4">
               {t("changePassword")}
             </button>

@@ -7,6 +7,7 @@ import { Link, useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth/client";
 import { authErrorKey } from "@/lib/auth/errors";
 import { ErrorText, FieldLabel, TextField } from "@/components/becan/kit";
+import { runSettingsAuthMutation } from "../_auth-mutations";
 
 /* S4 — تأكيد حذف الحساب.
 
@@ -56,7 +57,7 @@ export function DeleteForm({ activeUntil }: { activeUntil: string | null }) {
     setPending(true);
     setError(null);
     try {
-      const result = await authClient.deleteUser({ password });
+      const result = await runSettingsAuthMutation(() => authClient.deleteUser({ password }));
       if (result.error) {
         setError({ field: "password", text: authErrors(authErrorKey(result.error)) });
       } else {
@@ -147,7 +148,10 @@ export function DeleteForm({ activeUntil }: { activeUntil: string | null }) {
 
         <Link
           href="/settings/data"
-          className="inline-flex min-h-11 items-center px-2 font-semibold text-ink"
+          aria-disabled={pending || undefined}
+          tabIndex={pending ? -1 : undefined}
+          onClick={(event) => { if (pending) event.preventDefault(); }}
+          className="inline-flex min-h-11 items-center px-2 font-semibold text-ink aria-disabled:opacity-60"
         >
           {t("cancel")}
         </Link>

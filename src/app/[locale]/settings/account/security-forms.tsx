@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth/client";
 import { authErrorKey } from "@/lib/auth/errors";
 import { ErrorText, FieldLabel, GhostButton, TextField } from "@/components/becan/kit";
+import { runSettingsAuthMutation } from "../_auth-mutations";
 
 type FormActions = {
   onDone: () => void;
@@ -13,41 +14,56 @@ type FormActions = {
   disabled: boolean;
 };
 
+function useSecurityRequest(onPendingChange: FormActions["onPendingChange"]) {
+  const [pending, setPending] = useState(false);
+  const busy = useRef(false);
+
+  const run = async (request: () => Promise<void>) => {
+    if (busy.current) return;
+    busy.current = true;
+    setPending(true);
+    onPendingChange(true);
+    try {
+      await request();
+    } finally {
+      busy.current = false;
+      setPending(false);
+      onPendingChange(false);
+    }
+  };
+
+  return { pending, run };
+}
+
 export function EmailForm({ onDone, onCancel, onPendingChange, disabled }: FormActions) {
   const t = useTranslations("Settings.Account");
   const errors = useTranslations("Auth.Errors");
   const locale = useLocale();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
-  const [pending, setPending] = useState(false);
-  const busy = useRef(false);
+  const { pending, run } = useSecurityRequest(onPendingChange);
   const focusEmail = useCallback((node: HTMLFieldSetElement | null) => node?.querySelector("input")?.focus(), []);
 
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (busy.current || disabled) return;
+    if (pending || disabled) return;
     const input = event.currentTarget.elements.namedItem("newEmail") as HTMLInputElement;
     if (!input.checkValidity()) {
       setError(errors("invalidEmail"));
       input.focus();
       return;
     }
-    busy.current = true;
-    setPending(true);
-    onPendingChange(true);
     setError("");
     try {
-      const result = await authClient.changeEmail({
-        newEmail: email.trim(), callbackURL: locale === "en" ? "/en/settings/account" : "/settings/account",
+      await run(async () => {
+        const result = await runSettingsAuthMutation(() => authClient.changeEmail({
+          newEmail: email.trim(), callbackURL: locale === "en" ? "/en/settings/account" : "/settings/account",
+        }));
+        if (result.error) setError(errors(authErrorKey(result.error)));
+        else onDone();
       });
-      if (result.error) setError(errors(authErrorKey(result.error)));
-      else onDone();
     } catch {
       setError(errors("generic"));
-    } finally {
-      busy.current = false;
-      setPending(false);
-      onPendingChange(false);
     }
   };
 
@@ -74,13 +90,12 @@ export function PasswordForm({ onDone, onCancel, onPendingChange, disabled }: Fo
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [error, setError] = useState<{ field: "current" | "next"; text: string } | null>(null);
-  const [pending, setPending] = useState(false);
-  const busy = useRef(false);
+  const { pending, run } = useSecurityRequest(onPendingChange);
   const focusCurrent = useCallback((node: HTMLFieldSetElement | null) => node?.querySelector("input")?.focus(), []);
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (busy.current || disabled) return;
+    if (pending || disabled) return;
     if (!current) {
       setError({ field: "current", text: t("currentRequired") });
       document.getElementById("acc-pass-current")?.focus();
@@ -91,22 +106,17 @@ export function PasswordForm({ onDone, onCancel, onPendingChange, disabled }: Fo
       document.getElementById("acc-pass-next")?.focus();
       return;
     }
-    busy.current = true;
-    setPending(true);
-    onPendingChange(true);
     setError(null);
     try {
-      const result = await authClient.changePassword({ currentPassword: current, newPassword: next, revokeOtherSessions: true });
-      if (result.error) {
-        const key = authErrorKey(result.error);
-        setError({ field: key === "passwordTooShort" || key === "passwordTooLong" ? "next" : "current", text: errors(key) });
-      } else onDone();
+      await run(async () => {
+        const result = await runSettingsAuthMutation(() => authClient.changePassword({ currentPassword: current, newPassword: next, revokeOtherSessions: true }));
+        if (result.error) {
+          const key = authErrorKey(result.error);
+          setError({ field: key === "passwordTooShort" || key === "passwordTooLong" ? "next" : "current", text: errors(key) });
+        } else onDone();
+      });
     } catch {
       setError({ field: "current", text: errors("generic") });
-    } finally {
-      busy.current = false;
-      setPending(false);
-      onPendingChange(false);
     }
   };
 

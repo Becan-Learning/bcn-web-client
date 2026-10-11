@@ -6,6 +6,7 @@ import { useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth/client";
 import { authErrorKey } from "@/lib/auth/errors";
 import { ErrorText } from "@/components/becan/kit";
+import { runSettingsAuthMutation } from "./_auth-mutations";
 
 export function SignOut() {
   const t = useTranslations("Settings");
@@ -21,7 +22,7 @@ export function SignOut() {
     setPending(true);
     setError("");
     try {
-      const result = await authClient.signOut();
+      const result = await runSettingsAuthMutation(() => authClient.signOut());
       if (result.error) {
         setError(errors(authErrorKey(result.error)));
         return;

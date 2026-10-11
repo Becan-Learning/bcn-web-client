@@ -26,7 +26,8 @@
     "description": "Becan explains your course by voice, asks questions to check your understanding, and identifies where you lose marks in exams."
   },
   "SiteHeader": {
-    "login": "Sign in"
+    "login": "Sign in",
+    "home": "Your courses"
   },
   "Brand": {
     "name": "Becan"
@@ -425,20 +426,40 @@
   "Join": {
     "Form": {
       "emailPlaceholder": "name@example.com",
-      "contactInvalid": "Check your email, or enter a 10-digit number starting with 05",
-      "contactRequired": "Enter your email or phone number",
       "google": "Continue with Google",
       "or": "or",
-      "contact": "Email or phone number",
-      "continue": "Continue",
+      "phoneSignIn": "Sign in with a phone number",
+      "name": "Name",
+      "nameRequired": "Enter your name.",
+      "email": "Email address",
+      "password": "Password",
+      "passwordHint": "Use at least 8 characters.",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "phone": "Mobile number",
+      "phonePlaceholder": "05XXXXXXXX",
+      "university": "University",
+      "major": "Major",
+      "chooseUniversity": "Choose your university",
+      "chooseMajor": "Choose your major",
+      "stepOne": "Step 1 of 2 — Sign-in details",
+      "stepTwo": "Step 2 of 2 — Your study details",
+      "next": "Next",
+      "back": "Back",
+      "submit": "Create your account",
+      "submitting": "You’re creating your account…",
+      "catalogUnavailable": "You couldn’t load the university list. Try again.",
+      "retry": "Try again",
+      "retrying": "You’re loading the list…",
+      "signIn": "Already have an account? Sign in",
       "agreement": "By continuing, you agree to the <terms>terms</terms> and <privacy>privacy policy</privacy>"
     },
-    "metadataTitle": "Sign in — Becan",
-    "metadataDescription": "Sign in and return to the chapter where you left off.",
-    "unlocksDefault": "Sign in to pick up your course where you left off",
-    "title": "Sign <word>in</word>",
+    "metadataTitle": "Create your account — Becan",
+    "metadataDescription": "Create your account and verify your email, then return to the chapter you chose.",
+    "unlocksDefault": "Signing up opens your course where you left off",
+    "title": "Create your <word>account</word>",
     "chapter": "Chapter {chapter}",
-    "unlocks": "Sign in to open: <context>{unlocks}</context>"
+    "unlocks": "Signing up opens: <context>{unlocks}</context>"
   },
   "Request": {
     "Form": {
@@ -1100,5 +1121,58 @@
       "updated": "2026-08-23",
       "translationNotice": "This is a translation for convenience. The Arabic version is the governing text. <arabic>Read the Arabic version</arabic>"
     }
+  },
+  "SignIn": {
+    "metadataTitle": "Sign in — Becan",
+    "metadataDescription": "Sign in and return to the chapter you chose.",
+    "title": "Sign <word>in</word>",
+    "email": "Email address",
+    "emailPlaceholder": "name@example.com",
+    "password": "Password",
+    "passwordRequired": "Enter your password.",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "submit": "Sign in",
+    "submitting": "You’re signing in…",
+    "forgotPassword": "Forgot your password?",
+    "createAccount": "Don’t have an account? Create one",
+    "resetSuccess": "You changed your password. Sign in with the new password."
+  },
+  "VerifyEmail": {
+    "metadataTitle": "Verify your email — Becan",
+    "metadataDescription": "Verify your email using the link to sign in to your account and pick up where you left off.",
+    "title": "Verify your <word>email</word>",
+    "body": "Check your inbox and open the verification link to sign in to your account. If you can’t find the message, check your spam folder.",
+    "email": "Email address",
+    "emailPlaceholder": "name@example.com",
+    "resend": "Resend the link",
+    "sending": "You’re requesting a new link…",
+    "sent": "You requested a new link. Check your inbox.",
+    "cooldown": "You can request a new link in {seconds} seconds.",
+    "signIn": "Back to sign in"
+  },
+  "ForgotPassword": {
+    "metadataTitle": "Recover access — Becan",
+    "metadataDescription": "Request a link to change your password.",
+    "title": "Recover <word>access</word>",
+    "body": "Enter your account’s email to request a password change link.",
+    "email": "Email address",
+    "emailPlaceholder": "name@example.com",
+    "submit": "Send the change link",
+    "sending": "You’re requesting the change link…",
+    "confirmation": "If you have an account with this email, you’ll receive a message with a password change link. Check your inbox and spam folder.",
+    "signIn": "Back to sign in"
+  },
+  "ResetPassword": {
+    "metadataTitle": "Change your password — Becan",
+    "metadataDescription": "Choose a new password for your account.",
+    "title": "Change your <word>password</word>",
+    "password": "New password",
+    "passwordHint": "Use at least 8 characters.",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "submit": "Save password",
+    "submitting": "You’re saving your password…",
+    "requestLink": "Request a new link"
   }
 }

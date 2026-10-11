@@ -26,7 +26,8 @@
     "description": "بيكان يشرح لك مقررك بصوته، ويسألك عشان يتأكد إنك فهمت، ويعرف وين تنكسر درجتك في الاختبار."
   },
   "SiteHeader": {
-    "login": "دخول"
+    "login": "دخول",
+    "home": "مقرراتك"
   },
   "Brand": {
     "name": "بيكان"
@@ -425,18 +426,38 @@
   "Join": {
     "Form": {
       "emailPlaceholder": "name@example.com",
-      "contactInvalid": "تأكد من البريد أو من أن الرقم 10 أرقام يبدأ بـ 05",
-      "contactRequired": "اكتب بريدك أو رقم جوالك",
       "google": "متابعة بحساب Google",
       "or": "أو",
-      "contact": "البريد أو رقم الجوال",
-      "continue": "متابعة",
+      "phoneSignIn": "الدخول برقم الجوال",
+      "name": "الاسم",
+      "nameRequired": "اكتب اسمك.",
+      "email": "البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "passwordHint": "استخدم 8 أحرف على الأقل.",
+      "showPassword": "أظهر كلمة المرور",
+      "hidePassword": "أخفِ كلمة المرور",
+      "phone": "رقم الجوال",
+      "phonePlaceholder": "05XXXXXXXX",
+      "university": "الجامعة",
+      "major": "التخصص",
+      "chooseUniversity": "اختر جامعتك",
+      "chooseMajor": "اختر تخصصك",
+      "stepOne": "الخطوة 1 من 2 — بيانات الدخول",
+      "stepTwo": "الخطوة 2 من 2 — بياناتك الدراسية",
+      "next": "التالي",
+      "back": "رجوع",
+      "submit": "أنشئ حسابك",
+      "submitting": "تُنشئ حسابك…",
+      "catalogUnavailable": "ما قدرت تحمّل قائمة الجامعات. حاول مرة أخرى.",
+      "retry": "أعد المحاولة",
+      "retrying": "تُحمّل القائمة…",
+      "signIn": "عندك حساب؟ سجّل دخولك",
       "agreement": "بالمتابعة أنت توافق على <terms>الشروط</terms> و<privacy>سياسة الخصوصية</privacy>"
     },
-    "metadataTitle": "سجّل دخولك — بيكان",
-    "metadataDescription": "ادخل وارجع إلى نفس الفصل الذي كنت فيه.",
+    "metadataTitle": "أنشئ حسابك — بيكان",
+    "metadataDescription": "أنشئ حسابك وأكّد بريدك، ثم ارجع إلى الفصل الذي اخترته.",
     "unlocksDefault": "تسجيلك يفتح مقررك من حيث وقفت",
-    "title": "سجّل <word>دخولك</word>",
+    "title": "أنشئ <word>حسابك</word>",
     "chapter": "الفصل {chapter}",
     "unlocks": "تسجيلك يفتح: <context>{unlocks}</context>"
   },
@@ -1100,5 +1121,58 @@
       "updated": "2026-08-23",
       "translationNotice": "هذه ترجمة للتيسير. النسخة العربية هي النصّ المعتمد. <arabic>اقرأ النسخة العربية</arabic>"
     }
+  },
+  "SignIn": {
+    "metadataTitle": "سجّل دخولك — بيكان",
+    "metadataDescription": "سجّل دخولك وارجع إلى الفصل الذي اخترته.",
+    "title": "سجّل <word>دخولك</word>",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "name@example.com",
+    "password": "كلمة المرور",
+    "passwordRequired": "اكتب كلمة المرور.",
+    "showPassword": "أظهر كلمة المرور",
+    "hidePassword": "أخفِ كلمة المرور",
+    "submit": "سجّل دخولك",
+    "submitting": "تسجّل دخولك…",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "createAccount": "ما عندك حساب؟ أنشئ حسابك",
+    "resetSuccess": "غيّرت كلمة المرور. سجّل دخولك بالكلمة الجديدة."
+  },
+  "VerifyEmail": {
+    "metadataTitle": "أكّد بريدك — بيكان",
+    "metadataDescription": "أكّد بريدك من الرابط لتدخل حسابك وتكمل من حيث وقفت.",
+    "title": "أكّد <word>بريدك</word>",
+    "body": "راجع بريدك وافتح رابط التأكيد لتدخل حسابك. إذا ما لقيت الرسالة، راجع البريد غير المرغوب فيه.",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "name@example.com",
+    "resend": "أعد إرسال الرابط",
+    "sending": "تطلب رابطًا جديدًا…",
+    "sent": "طلبت رابطًا جديدًا. راجع بريدك.",
+    "cooldown": "تقدر تطلب رابطًا جديدًا بعد {seconds} ثانية.",
+    "signIn": "ارجع لتسجيل الدخول"
+  },
+  "ForgotPassword": {
+    "metadataTitle": "استعد دخولك — بيكان",
+    "metadataDescription": "اطلب رابطًا لتغيّر كلمة المرور.",
+    "title": "استعد <word>دخولك</word>",
+    "body": "اكتب بريد حسابك لتطلب رابط تغيير كلمة المرور.",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "name@example.com",
+    "submit": "أرسل رابط التغيير",
+    "sending": "تطلب رابط التغيير…",
+    "confirmation": "إذا كان عندك حساب بهذا البريد، بتوصلك رسالة فيها رابط تغيير كلمة المرور. راجع بريدك والبريد غير المرغوب فيه.",
+    "signIn": "ارجع لتسجيل الدخول"
+  },
+  "ResetPassword": {
+    "metadataTitle": "غيّر كلمة المرور — بيكان",
+    "metadataDescription": "اختر كلمة مرور جديدة لحسابك.",
+    "title": "غيّر <word>كلمة المرور</word>",
+    "password": "كلمة المرور الجديدة",
+    "passwordHint": "استخدم 8 أحرف على الأقل.",
+    "showPassword": "أظهر كلمة المرور",
+    "hidePassword": "أخفِ كلمة المرور",
+    "submit": "احفظ كلمة المرور",
+    "submitting": "تحفظ كلمة المرور…",
+    "requestLink": "اطلب رابطًا جديدًا"
   }
 }

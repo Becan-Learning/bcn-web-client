@@ -7,6 +7,7 @@ import { BecanFace } from "@/components/becan/becan-face";
 import { TypedHeadline } from "@/components/becan/typed-headline";
 import { JoinForm } from "./join-form";
 import { PageShell, SiteHeader } from "@/components/becan/kit";
+import { getInstitutions } from "@/lib/auth/catalog";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/join">): Promise<Metadata> {
   const { locale } = await params;
@@ -31,6 +32,7 @@ export default async function JoinPage(props: PageProps<"/[locale]/join">) {
   const course = one(sp.course);
   const chapter = one(sp.chapter);
   const next = one(sp.next);
+  const institutions = await getInstitutions();
 
   /* سطر السياق إلزامي في البريف — يبقى ظاهرًا حتى بلا معاملات،
      فلو دخل الطالب مباشرة عرف ماذا يفتح له التسجيل. */
@@ -56,7 +58,7 @@ export default async function JoinPage(props: PageProps<"/[locale]/join">) {
               size="card"
               prefix={headlinePrefix.trimEnd()}
               word={headlineWord} suffix={headlineSuffix}
-              className="mt-0 whitespace-nowrap"
+              className="mt-0 min-w-0"
             />
           </div>
 
@@ -71,7 +73,7 @@ export default async function JoinPage(props: PageProps<"/[locale]/join">) {
             )}
           </p>
 
-          <JoinForm next={next} />
+          <JoinForm next={next} institutions={institutions} />
         </div>
       </main>
     </PageShell>

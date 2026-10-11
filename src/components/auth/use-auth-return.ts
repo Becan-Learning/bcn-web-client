@@ -5,6 +5,7 @@ import { useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useAccount } from "@/lib/auth/client";
 import { safeNext } from "@/lib/auth/next-path";
+import { buildVerifyCallbackURL } from "@/lib/auth/verify-callback";
 
 const NEXT_KEY = "becan:next";
 const subscribe = (notify: () => void) => {
@@ -18,15 +19,24 @@ const subscribe = (notify: () => void) => {
 
 export function useAuthReturn(next: string, remember = true) {
   const locale = useLocale();
-  const storedDestination = useSyncExternalStore(subscribe, () => {
-    try {
-      return safeNext(next || sessionStorage.getItem(NEXT_KEY));
-    } catch {
-      return safeNext(next);
-    }
-  }, () => safeNext(next));
-  const [consumedReturn, setConsumedReturn] = useState<{ next: string; destination: string } | null>(null);
-  const destination = consumedReturn?.next === next ? consumedReturn.destination : storedDestination;
+  const storedDestination = useSyncExternalStore(
+    subscribe,
+    () => {
+      try {
+        return safeNext(next || sessionStorage.getItem(NEXT_KEY));
+      } catch {
+        return safeNext(next);
+      }
+    },
+    () => safeNext(next),
+  );
+  const [consumedReturn, setConsumedReturn] = useState<{
+    next: string;
+    destination: string;
+  } | null>(null);
+  const destination = consumedReturn?.next === next
+    ? consumedReturn.destination
+    : storedDestination;
 
   /* الوجهة وحدها تُحفظ كي ينجو اختيار الفصل من رحلة رابط البريد. */
   useEffect(() => {
@@ -49,10 +59,18 @@ export function useAuthReturn(next: string, remember = true) {
     }
   }, [next, destination]);
 
-  return { destination, callbackURL: locale === "en" ? `/en${destination}` : destination, clearReturn };
+  return {
+    destination,
+    callbackURL: locale === "en" ? `/en${destination}` : destination,
+    verifyCallbackURL: buildVerifyCallbackURL(locale, destination),
+    clearReturn,
+  };
 }
 
-export function useSignedInRedirect(destination: string, clearReturn: () => void) {
+export function useSignedInRedirect(
+  destination: string,
+  clearReturn: () => void,
+) {
   const { account, isPending } = useAccount();
   const router = useRouter();
   useEffect(() => {

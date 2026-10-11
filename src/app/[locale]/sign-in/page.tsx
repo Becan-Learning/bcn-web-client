@@ -6,7 +6,9 @@ import { routing } from "@/i18n/routing";
 import { AuthCard } from "@/components/auth/auth-card";
 import { SignInForm } from "./sign-in-form";
 
-export async function generateMetadata({ params }: PageProps<"/[locale]/sign-in">): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/sign-in">): Promise<Metadata> {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   const t = await getTranslations({ locale, namespace: "SignIn" });

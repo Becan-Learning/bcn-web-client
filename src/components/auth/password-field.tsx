@@ -3,7 +3,17 @@
 import { useState } from "react";
 import { ErrorText, FieldLabel, TextField } from "@/components/becan/kit";
 
-export function PasswordField({ id, label, value, onChange, error, hint, showLabel, hideLabel, autoComplete = "new-password" }: {
+export function PasswordField({
+  id,
+  label,
+  value,
+  onChange,
+  error,
+  hint,
+  showLabel,
+  hideLabel,
+  autoComplete = "new-password",
+}: {
   id: string;
   label: string;
   value: string;
@@ -18,14 +28,37 @@ export function PasswordField({ id, label, value, onChange, error, hint, showLab
   return (
     <div>
       <FieldLabel htmlFor={id}>{label}</FieldLabel>
-      <TextField id={id} name="password" dir="ltr" type={visible ? "text" : "password"}
-        autoComplete={autoComplete} value={value} onChange={(event) => onChange(event.target.value)}
-        invalid={!!error} aria-describedby={[hint && `${id}-hint`, error && `${id}-error`].filter(Boolean).join(" ") || undefined} required />
+      <TextField
+        id={id}
+        name="password"
+        dir="ltr"
+        type={visible ? "text" : "password"}
+        autoComplete={autoComplete}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        invalid={!!error}
+        aria-describedby={
+          [hint && `${id}-hint`, error && `${id}-error`]
+            .filter(Boolean)
+            .join(" ") || undefined
+        }
+        required
+      />
       <div className="flex flex-wrap items-center justify-between gap-x-3">
-        {hint ? <p id={`${id}-hint`} className="text-sm leading-base text-ink-2">{hint}</p> : null}
-        <button type="button" aria-controls={id} aria-pressed={visible}
+        {hint ? (
+          <p id={`${id}-hint`} className="text-sm leading-base text-ink-2">
+            {hint}
+          </p>
+        ) : null}
+        <button
+          type="button"
+          aria-controls={id}
+          aria-pressed={visible}
           className="inline-flex min-h-11 min-w-11 items-center text-sm leading-base font-semibold text-ink-2 underline underline-offset-4"
-          onClick={() => setVisible(!visible)}>{visible ? hideLabel : showLabel}</button>
+          onClick={() => setVisible(!visible)}
+        >
+          {visible ? hideLabel : showLabel}
+        </button>
       </div>
       {error ? <ErrorText id={`${id}-error`}>{error}</ErrorText> : null}
     </div>

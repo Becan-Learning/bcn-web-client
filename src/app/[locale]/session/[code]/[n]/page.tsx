@@ -5,8 +5,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { SessionView } from "@/components/session/session-view";
-import { chaptersOf, courseBySlug, slugOf } from "@/lib/data/catalog";
-import { contentFor, slidesUrl } from "@/lib/session/content";
+import { getCourse, getEnrollments } from "@/lib/auth/courses";
+import { redirect } from "@/i18n/navigation";
 import { getLessons } from "@/lib/session/lessons";
 import { requireAccount } from "@/lib/auth/session";
 import { accountReturnPath } from "@/lib/auth/next-path";
@@ -17,8 +17,9 @@ export async function generateMetadata(
   const { code, n, locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   const t = await getTranslations({ locale, namespace: "Session" });
-  const course = courseBySlug(code);
-  const chapter = chaptersOf(course?.code ?? "").find((c) => String(c.n) === n);
+  const result = await getCourse(code);
+  const course = result.ok ? result.data : null;
+  const chapter = course?.chapters.find((c) => String(c.number) === n);
   if (!course || !chapter) return { title: t("metadataFallback")};
   return { title: t("metadata", { chapter: localize(chapter.title, locale), course: localize(course.name, locale) }) };
 }
@@ -33,25 +34,27 @@ export default async function SessionPage(
   const { code, n } = await props.params;
   await requireAccount(locale, accountReturnPath(`/session/${code}/${n}`, await props.searchParams));
 
-  const course = courseBySlug(code);
-  if (!course) notFound();
+  const [result, enrollments] = await Promise.all([getCourse(code), getEnrollments()]);
+  if (!result.ok) notFound();
+  const course = result.data;
+  const chapter = course.chapters.find((c) => String(c.number) === n);
+  if (!chapter || !chapter.published) notFound();
+  if (!enrollments.ok || !enrollments.data.some((e) => e.course.id === course.id)) {
+    return redirect({ locale, href: `/c/${course.id}` });
+  }
 
-  const chapter = chaptersOf(course.code).find((c) => String(c.n) === n);
-  /* الفصل غير الجاهز لا تُفتح جلسته — البريف يمنع الوعد به */
-  if (!chapter || !chapter.ready) notFound();
-
-  const content = contentFor(course.code, chapter.n);
+  const content = { courseId: course.id, chapterId: `ch_${chapter.number}` };
   const lessons = await getLessons(content);
 
   return (
     <SessionView
       courseName={localize(course.name, locale)}
-      courseSlug={slugOf(course.code)}
-      chapterNo={chapter.n}
+      courseSlug={course.id}
+      chapterNo={chapter.number}
       chapterTitle={localize(chapter.title, locale)}
       minutes={chapter.minutes}
       content={content}
-      pdfUrl={slidesUrl(content)}
+      pdfUrl={`/api/fetch-bunny/courses/${course.id}/${content.chapterId}/slides.pdf`}
       lessons={lessons}
     />
   );

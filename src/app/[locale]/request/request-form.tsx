@@ -6,7 +6,8 @@ import { localize } from "@/i18n/localized";
 
 import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
-import { UNIVERSITIES, COURSES } from "@/lib/data/catalog";
+import type { Institution } from "@/lib/auth/catalog";
+import type { CourseSummary } from "@/lib/courses/schema";
 import { UploadIcon } from "@/components/becan/icons";
 import {
   ErrorText,
@@ -26,7 +27,7 @@ type Errors = Partial<
   Record<"university" | "otherName" | "course" | "contact", string>
 >;
 
-export function RequestForm() {
+export function RequestForm({ institutions, courses }: { institutions: Institution[]; courses: CourseSummary[]; }) {
   const t = useTranslations("Request.Form");
   const router = useRouter();
   const locale = useLocale();
@@ -109,9 +110,9 @@ export function RequestForm() {
           }}
         >
           <option value="">{t("chooseUniversity")}</option>
-          {UNIVERSITIES.map((u) => (
-            <option key={u.ar} value={u.ar}>
-              {localize(u, locale)}
+          {institutions.map((u) => (
+            <option key={u.id} value={u.id}>
+              {localize(u.name, locale)}
             </option>
           ))}
           <option value="other">{t("other")}</option>
@@ -162,10 +163,10 @@ export function RequestForm() {
           }}
           placeholder={t("coursePlaceholder")}
         />
-        {/* اقتراح تلقائي من الطلبات السابقة */}
+        {/* اقتراح تلقائي من الكتالوج */}
         <datalist id="req-course-suggestions">
-          {COURSES.map((c) => (
-            <option dir="auto" key={c.code} value={`${localize(c.name, locale)} — ${c.code}`} />
+          {courses.map((c) => (
+            <option dir="auto" key={c.id} value={`${localize(c.name, locale)} — ${c.code}`} />
           ))}
         </datalist>
         {errors.course ? (

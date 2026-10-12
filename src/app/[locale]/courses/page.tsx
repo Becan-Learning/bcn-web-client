@@ -3,6 +3,9 @@ import { hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import type { Metadata } from "next";
+import { getInstitutions } from "@/lib/auth/catalog";
+import { getCourses } from "@/lib/auth/courses";
+import { getAccount } from "@/lib/auth/session";
 import { Finder } from "./finder";
 import { PageShell, SiteHeader } from "@/components/becan/kit";
 
@@ -18,10 +21,12 @@ export default async function CoursesPage(props: PageProps<"/[locale]/courses">)
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
+  const [institutions, courses, account] = await Promise.all([getInstitutions(), getCourses(), getAccount()]);
+
   return (
     <PageShell withFooter>
       <SiteHeader />
-      <Finder />
+      <Finder institutions={institutions} courses={courses.ok ? courses.data : []} institutionId={account?.user.institutionId} />
     </PageShell>
   );
 }

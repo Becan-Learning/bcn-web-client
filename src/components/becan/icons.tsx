@@ -64,32 +64,6 @@ export function CheckIcon({ className = "h-6 w-6" }: P) {
   );
 }
 
-/** حالة الفصل — دائرة تمتلئ بقدر ما أنجزه الطالب. */
-export function StatusIcon({
-  kind,
-  className = "h-4 w-4",
-}: {
-  kind: "none" | "next" | "almost" | "done";
-  className?: string;
-}) {
-  return (
-    <svg {...base} viewBox="0 0 24 24" className={className}>
-      <circle cx="12" cy="12" r="8.5" />
-      {kind === "next" ? (
-        <path d="M10.5 9 15 12l-4.5 3z" fill="currentColor" stroke="none" />
-      ) : null}
-      {kind === "almost" ? (
-        <path
-          d="M12 3.5a8.5 8.5 0 0 1 0 17z"
-          fill="currentColor"
-          stroke="none"
-        />
-      ) : null}
-      {kind === "done" ? <path d="m8.5 12 2.5 2.5 4.5-5" /> : null}
-    </svg>
-  );
-}
-
 /* ——— أيقونات أقسام اللاندينج ———
    كلها بنفس سُمك الحدّ (2) ونفس الـviewBox ونفس نهايات الخط، فتُقرأ
    عائلة واحدة لا رموزًا مجمّعة. */

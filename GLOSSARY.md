@@ -30,7 +30,39 @@ study facts that shape what they see (university, major). Nothing about the stud
 it. A student has exactly one Account.
 _Avoid_: user, profile, student account, member
 
+## Catalog
+
+**Catalog** (الكتالوج):
+Every Course Becan offers. Students choose from it; they never add to it.
+_Avoid_: library, materials
+
+**Course** (المقرر):
+One university course as one Institution teaches it, split into Chapters. The same subject at two
+Institutions is two Courses.
+_Avoid_: subject, material (مادة), class
+
+**Chapter** (الفصل):
+One numbered part of a Course, and the unit a session teaches. A Chapter is either published, so
+an enrolled student can open it, or announced as coming soon.
+_Avoid_: unit, module, section
+
+**Lesson** (الدرس):
+One of the ordered parts a Chapter is taught in; a session moves through a Chapter's Lessons in
+order. It is the smallest unit the student sees outside a session.
+_Avoid_: topic (outside a session), part
+
+**Enrollment** (التسجيل في المقرر):
+A student's hold on one Course that lets them open its Chapters. It is active from the moment
+they enroll until it ends; it ends when the student un-enrolls. An ended Enrollment is kept, never
+erased, and a student holds at most one active Enrollment per Course.
+_Avoid_: subscription, registration (that is creating an Account), membership
+
 ## Session
+
+**Topic** (الموضوع):
+One step inside a Lesson that the tutor marks while teaching it. It exists only inside a
+session; nothing outside a session counts or shows Topics.
+_Avoid_: lesson, section, step
 
 **Checkpoint** (سؤال الفهم):
 A question the tutor puts to the student during a session to confirm they understood a topic.

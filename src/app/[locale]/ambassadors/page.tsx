@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getInstitutions } from "@/lib/auth/catalog";
 import type { Metadata } from "next";
 import { PageShell, Scribbled, Section, SiteHeader } from "@/components/becan/kit";
 import { AmbassadorForm } from "./ambassador-form";
@@ -31,7 +32,7 @@ export default async function AmbassadorsPage(props: PageProps<"/[locale]/ambass
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  const t = await getTranslations("Ambassadors");
+  const [t, institutions] = await Promise.all([getTranslations("Ambassadors"), getInstitutions()]);
   const GETS = [
     {
       title: t("getsProTitle"),
@@ -112,7 +113,7 @@ export default async function AmbassadorsPage(props: PageProps<"/[locale]/ambass
               {t("applyBody")}</p>
 
             <div className="mt-6">
-              <AmbassadorForm />
+              <AmbassadorForm institutions={institutions} />
             </div>
           </div>
         </Section>

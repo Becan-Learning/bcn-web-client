@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations, useLocale, useFormatter } from "next-intl";
 import { localize } from "@/i18n/localized";
 
 import {
@@ -21,14 +21,9 @@ import { SubjectIcon } from "./subject-icon";
 import { ArrowForward, Chevron, SearchIcon } from "@/components/becan/icons";
 import { BecanFace, type LookPoint } from "@/components/becan/becan-face";
 import { TypedHeadline } from "@/components/becan/typed-headline";
-import {
-  COLLEGES,
-  COURSES,
-  TONES,
-  UNIVERSITIES,
-  type College,
-  type Course,
-} from "@/lib/data/catalog";
+import { TONES } from "@/lib/courses/presentation";
+import type { CourseSummary } from "@/lib/courses/schema";
+import type { Institution } from "@/lib/auth/catalog";
 
 const MotionLink = motion.create(Link);
 
@@ -131,11 +126,13 @@ function CourseCard({
   reduce,
   touch,
 }: {
-  course: Course;
+  course: CourseSummary;
   reduce: boolean;
   touch: boolean;
 }) {
   const locale = useLocale();
+  const t = useTranslations("Courses");
+  const format = useFormatter();
   const tone = TONES[course.tone];
   const ref = useRef<HTMLAnchorElement>(null);
   const inView = useInViewport(ref, 0.6);
@@ -161,7 +158,7 @@ function CourseCard({
   return (
     <MotionLink
       layout
-      href={`/c/${course.code.replace(" ", "-").toLowerCase()}`}
+      href={`/c/${course.id}`}
       ref={ref}
       variants={card}
       initial="hidden"
@@ -216,18 +213,25 @@ function CourseCard({
             {localize(course.name, locale)}
           </h3>
         </div>
-        <p className={`mt-1.5 text-[11px] ${tone.meta}`}>{localize(course.university, locale)}</p>
+        <p className={`mt-1.5 text-[11px] ${tone.meta}`}>{localize(course.institution.name, locale)}</p>
+        <p className={`mt-2 text-xs ${tone.meta}`}>
+          {course.publishedChapterCount === 0 ? t("soon") : t("readyChapters", { count: course.publishedChapterCount, countLabel: format.number(course.publishedChapterCount, { numberingSystem: "latn" }) })}
+        </p>
       </div>
     </MotionLink>
   );
 }
 
-export function Finder() {
+export function Finder({ institutions, courses, institutionId }: {
+  institutions: Institution[];
+  courses: CourseSummary[];
+  institutionId?: string;
+}) {
   const t = useTranslations("Courses");
   const locale = useLocale();
   const [query, setQuery] = useState("");
-  const [college, setCollege] = useState<College | "all">("all");
-  const [university, setUniversity] = useState("all");
+  const format = useFormatter();
+  const [university, setUniversity] = useState(institutionId ?? institutions[0]?.id ?? "all");
   const reduce = useReducedMotion() ?? false;
   const touch = useTouch();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -241,17 +245,16 @@ export function Finder() {
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return COURSES.filter((c) => {
-      const byCollege = college === "all" || c.college === college;
-      const byUniversity = university === "all" || c.university.ar === university;
+    return courses.filter((c) => {
+      const byUniversity = university === "all" || c.institution.id === university;
       const byQuery =
         !q ||
         localize(c.name, locale).toLowerCase().includes(q) ||
         c.code.toLowerCase().includes(q) ||
         c.code.replace(" ", "").toLowerCase().includes(q.replace(" ", ""));
-      return byCollege && byUniversity && byQuery;
+      return byUniversity && byQuery;
     });
-  }, [query, college, university, locale]);
+  }, [query, courses, university, locale]);
 
   const empty = results.length === 0;
   const [headlinePrefix, headlineWord, headlineSuffix] = t.markup("title", {
@@ -296,7 +299,7 @@ export function Finder() {
           />
         </div>
 
-        <div className="mt-4 grid max-w-measure grid-cols-2 gap-3">
+        <div className="mt-4 grid max-w-measure gap-3">
           <Select
             id="f-university"
             label={t("university")}
@@ -304,32 +307,20 @@ export function Finder() {
             onChange={setUniversity}
           >
             <option value="all">{t("allUniversities")}</option>
-            {UNIVERSITIES.map((u) => (
-              <option key={u.ar} value={u.ar}>
-                {localize(u, locale)}
+            {institutions.map((u) => (
+              <option key={u.id} value={u.id}>
+                {localize(u.name, locale)}
               </option>
             ))}
           </Select>
 
-          <Select
-            id="f-college"
-            label={t("college")}
-            value={college}
-            onChange={(v) => setCollege(v as College | "all")}
-          >
-            <option value="all">{t("allColleges")}</option>
-            {COLLEGES.map((c) => (
-              <option key={c.id} value={c.id}>
-                {localize(c.label, locale)}
-              </option>
-            ))}
-          </Select>
+
         </div>
       </section>
 
       <section className="mx-auto w-full max-w-page px-4 pb-16 md:px-8 xl:px-10">
         <p aria-live="polite" className="text-sm text-ink-2">
-          {empty ? t("noResults") : t("count", { count: results.length, countLabel: String(results.length) })}
+          {empty ? t("noResults") : t("count", { count: results.length, countLabel: format.number(results.length, { numberingSystem: "latn" }) })}
         </p>
 
         {empty ? (
@@ -352,7 +343,7 @@ export function Finder() {
             <AnimatePresence mode="popLayout">
               {results.map((c) => (
                 <CourseCard
-                  key={c.code}
+                  key={c.id}
                   course={c}
                   reduce={reduce}
                   touch={touch}

@@ -6,16 +6,7 @@ import { motion, type Variant, type Variants } from "motion/react";
    كل أيقونة تحمل حركتها الخاصة عند المرور — تنتقل إليها من البطاقة
    عبر متغيّر "hover" فلا تحتاج مستمعًا مستقلًا. */
 
-export type IconKey =
-  | "coins"
-  | "bars"
-  | "blocks"
-  | "torus"
-  | "flask"
-  | "atom"
-  | "donut"
-  | "cube"
-  | "bolt";
+import type { IconKey } from "@/lib/courses/presentation";
 
 const spring = { type: "spring" as const, stiffness: 300, damping: 14 };
 

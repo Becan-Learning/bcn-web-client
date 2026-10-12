@@ -676,8 +676,6 @@
     "searchPlaceholder": "Search by course name or code",
     "university": "University",
     "allUniversities": "All universities",
-    "college": "College / Major",
-    "allColleges": "All colleges",
     "noResults": "No results",
     "requestBody": "We prepare courses based on demand. Each request raises the course’s priority in the production queue.",
     "requestThis": "Request this course",
@@ -685,7 +683,9 @@
     "request": "Request your course",
     "title": "What’s your <word>course</word>?",
     "count": "{count, plural, one {{countLabel} course} other {{countLabel} courses}}",
-    "emptyTitle": "We couldn’t find <query>{search}</query>"
+    "emptyTitle": "We couldn’t find <query>{search}</query>",
+    "soon": "Coming soon",
+    "readyChapters": "{count, plural, one {{countLabel} chapter ready} other {{countLabel} chapters ready}}"
   },
   "Course": {
     "notFoundTitle": "Course not found — Becan",
@@ -698,8 +698,19 @@
     "metadataTitle": "{course} — Becan",
     "metadataDescription": "{university} · {count, plural, one {{countLabel} ready chapter} other {{countLabel} ready chapters}}.",
     "courseSummary": "{university} · {count, plural, one {{countLabel} chapter} other {{countLabel} chapters}}",
-    "topics": "{count, plural, one {{countLabel} topic} other {{countLabel} topics}}",
-    "minutes": "{count, plural, one {{countLabel} minute} other {{countLabel} minutes}}"
+    "minutes": "{count, plural, one {{countLabel} minute} other {{countLabel} minutes}}",
+    "enroll": "Enroll",
+    "unenroll": "Un-enroll",
+    "unenrollTitle": "Un-enroll from this course?",
+    "unenrollBody": "If you un-enroll from “{course}”, you can’t open its sessions. You can enroll again.",
+    "unenrollConfirm": "Confirm un-enrollment",
+    "unenrollCancel": "Keep my enrollment",
+    "enrolling": "Enrolling…",
+    "unenrolling": "Un-enrolling…",
+    "enrollError": "We couldn’t enroll you in this course. Try again.",
+    "unenrollError": "We couldn’t un-enroll you. Try again.",
+    "enrollmentLoadError": "We couldn’t check your enrollment. Reload the page to try again.",
+    "lessons": "{count, plural, one {{countLabel} lesson} other {{countLabel} lessons}}"
   },
   "Home": {
     "metadataTitle": "Your courses — Becan",
@@ -707,7 +718,10 @@
     "settings": "Settings",
     "title": "Your courses",
     "add": "Add a course",
-    "soon": "Coming soon"
+    "soon": "Coming soon",
+    "empty": "You haven’t enrolled in any courses yet.",
+    "browseCourses": "Browse courses",
+    "loadError": "We couldn’t load your courses. Reload the page to try again."
   },
   "Checkout": {
     "metadataTitle": "Checkout — Becan",

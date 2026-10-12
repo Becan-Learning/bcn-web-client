@@ -2,7 +2,8 @@ import { getLocale } from "next-intl/server";
 import { localize } from "@/i18n/localized";
 import { ArrowForward } from "@/components/becan/icons";
 import { SubjectIcon } from "./subject-icon";
-import { TONES, type Course } from "@/lib/data/catalog";
+import { TONES } from "@/lib/courses/presentation";
+import type { CourseSummary } from "@/lib/courses/schema";
 
 /* جسم بطاقة المقرر — مصدر واحد لـ/courses و/home.
 
@@ -17,7 +18,7 @@ import { TONES, type Course } from "@/lib/data/catalog";
 export async function CourseCardBody({
   course,
 }: {
-  course: Course;
+  course: CourseSummary;
 }) {
   const locale = await getLocale();
   const tone = TONES[course.tone];
@@ -62,7 +63,7 @@ export async function CourseCardBody({
         </div>
 
         <p className={`mt-1.5 text-[11px] ${tone.meta}`}>
-          {localize(course.university, locale)}
+          {localize(course.institution.name, locale)}
         </p>
       </div>
     </>

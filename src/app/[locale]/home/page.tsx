@@ -3,6 +3,7 @@ import { hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import type { Metadata } from "next";
+import { getEnrollments } from "@/lib/auth/courses";
 import { HomeView } from "./home-view";
 import { requireAccount } from "@/lib/auth/session";
 import { accountReturnPath } from "@/lib/auth/next-path";
@@ -22,5 +23,6 @@ export default async function HomePage(props: PageProps<"/[locale]/home">) {
   setRequestLocale(locale);
   const { user: account } = await requireAccount(locale, accountReturnPath("/home", await props.searchParams));
 
-  return <HomeView name={account.name} />;
+  const enrollments = await getEnrollments();
+  return <HomeView name={account.name} enrollments={enrollments.ok ? enrollments.data : null} />;
 }

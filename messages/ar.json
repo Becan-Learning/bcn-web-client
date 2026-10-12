@@ -676,8 +676,6 @@
     "searchPlaceholder": "ابحث باسم المقرر أو رمزه",
     "university": "الجامعة",
     "allUniversities": "كل الجامعات",
-    "college": "الكلية / التخصص",
-    "allColleges": "كل الكليات",
     "noResults": "لا نتائج",
     "requestBody": "نجهّز المقررات حسب الطلب، وكل طلب يرفع أولوية مقرره في قائمة الإنتاج.",
     "requestThis": "اطلب هذا المقرر",
@@ -685,7 +683,9 @@
     "request": "اطلب مقررك",
     "title": "وش <word>مقررك</word>؟",
     "count": "{count, plural, zero {لا مقررات} one {مقرر واحد} two {مقرران} few {{countLabel} مقررات} many {{countLabel} مقررًا} other {{countLabel} مقرر}}",
-    "emptyTitle": "ما لقينا <query>{search}</query>"
+    "emptyTitle": "ما لقينا <query>{search}</query>",
+    "soon": "قريبًا",
+    "readyChapters": "{count, plural, zero {{countLabel} فصول جاهزة} one {{countLabel} فصل جاهز} two {{countLabel} فصلان جاهزان} few {{countLabel} فصول جاهزة} many {{countLabel} فصلًا جاهزًا} other {{countLabel} فصل جاهز}}"
   },
   "Course": {
     "notFoundTitle": "المقرر غير موجود — بيكان",
@@ -698,8 +698,19 @@
     "metadataTitle": "{course} — بيكان",
     "metadataDescription": "{university} · {count, plural, zero {لا فصول جاهزة} one {فصل واحد جاهز} two {فصلان جاهزان} few {{countLabel} فصول جاهزة} many {{countLabel} فصلًا جاهزًا} other {{countLabel} فصل جاهز}}.",
     "courseSummary": "{university} · {count, plural, zero {{countLabel} فصل} one {فصل واحد} two {فصلان} few {{countLabel} فصول} many {{countLabel} فصلًا} other {{countLabel} فصل}}",
-    "topics": "{count, plural, zero {لا مواضيع} one {موضوع واحد} two {موضوعان} few {{countLabel} مواضيع} many {{countLabel} موضوعًا} other {{countLabel} موضوع}}",
-    "minutes": "{count, plural, zero {{countLabel} دقيقة} one {دقيقة واحدة} two {دقيقتان} few {{countLabel} دقائق} many {{countLabel} دقيقة} other {{countLabel} دقيقة}}"
+    "minutes": "{count, plural, zero {{countLabel} دقيقة} one {دقيقة واحدة} two {دقيقتان} few {{countLabel} دقائق} many {{countLabel} دقيقة} other {{countLabel} دقيقة}}",
+    "enroll": "سجّل في المقرر",
+    "unenroll": "ألغِ التسجيل في المقرر",
+    "unenrollTitle": "تلغي تسجيلك في المقرر؟",
+    "unenrollBody": "إذا ألغيت تسجيلك في «{course}»، لن تتمكّن من فتح جلساته. تقدر تسجّل فيه مرة ثانية.",
+    "unenrollConfirm": "ألغِ التسجيل",
+    "unenrollCancel": "احتفظ بتسجيلي",
+    "enrolling": "جارٍ التسجيل…",
+    "unenrolling": "جارٍ إلغاء التسجيل…",
+    "enrollError": "ما قدرنا نسجّلك في المقرر. حاول مرة ثانية.",
+    "unenrollError": "ما قدرنا نلغي تسجيلك. حاول مرة ثانية.",
+    "enrollmentLoadError": "ما قدرنا نتحقّق من تسجيلك في المقرر. أعد تحميل الصفحة للمحاولة.",
+    "lessons": "{count, plural, zero {{countLabel} دروس} one {{countLabel} درس} two {{countLabel} درسان} few {{countLabel} دروس} many {{countLabel} درسًا} other {{countLabel} درس}}"
   },
   "Home": {
     "metadataTitle": "مقرراتك — بيكان",
@@ -707,7 +718,10 @@
     "settings": "الإعدادات",
     "title": "مقرراتك",
     "add": "أضف مقررًا",
-    "soon": "قريبًا"
+    "soon": "قريبًا",
+    "empty": "ما سجّلت في أي مقرر بعد.",
+    "browseCourses": "تصفّح المقررات",
+    "loadError": "ما قدرنا نحمّل مقرراتك. أعد تحميل الصفحة للمحاولة."
   },
   "Checkout": {
     "metadataTitle": "الدفع — بيكان",

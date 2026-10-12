@@ -13,6 +13,9 @@ const nextConfig: NextConfig = {
     return [{
       source: "/api/auth/:path*",
       destination: `${backendUrl || "http://localhost:3000"}/api/auth/:path*`,
+    }, {
+      source: "/api/v1/:path*",
+      destination: `${backendUrl || "http://localhost:3000"}/api/v1/:path*`,
     }];
   },
   images: {

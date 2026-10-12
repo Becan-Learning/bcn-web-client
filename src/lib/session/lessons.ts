@@ -1,4 +1,4 @@
-import type { ChapterContent } from "./content";
+import type { ChapterContent } from "./types";
 import type { Lesson } from "./session-reducer";
 
 /* قائمة دروس الفصل — تُجلب على الخادم من تخزين Bunny، فتصل الصفحة

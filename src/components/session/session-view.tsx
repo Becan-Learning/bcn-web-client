@@ -36,7 +36,8 @@ import {
 } from "livekit-client";
 import { createStudentQuestion, type StudentQuestionStatus } from "./student-question";
 import { getExperience } from "@/lib/experience";
-import type { ChapterContent } from "@/lib/session/content";
+import type { ChapterContent } from "@/lib/session/types";
+import { tokenSchema } from "@/lib/courses/schema";
 import {
   INITIAL_SESSION_STATE,
   checkpointShown,
@@ -95,7 +96,8 @@ type SessionViewProps = {
 };
 
 export function SessionView(props: SessionViewProps) {
-  const { courseId, chapterId } = props.content;
+  const { courseId } = props.content;
+  const chapterNumber = props.chapterNo;
   const locale = useLocale();
   const stored = useSyncExternalStore(
     subscribeExplanationLanguage,
@@ -115,21 +117,17 @@ export function SessionView(props: SessionViewProps) {
   const tokenSource = useMemo(
     () =>
       TokenSource.custom(async () => {
-        const params = new URLSearchParams({
-          course_id: courseId,
-          chapter_id: chapterId,
-          language,
-          experience: getExperience(),
+        const res = await fetch("/api/v1/livekit/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ courseId, chapterNumber, language, experience: getExperience() }),
+          cache: "no-store",
         });
-        const res = await fetch(`/api/get-lk-token?${params}`, { cache: "no-store" });
         if (!res.ok) throw new Error(`Token request failed (${res.status})`);
-
-        const serverUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL;
-        if (!serverUrl) throw new Error("NEXT_PUBLIC_LIVEKIT_URL is not set");
-
-        return { serverUrl, participantToken: await res.text() };
+        const { serverUrl, token } = tokenSchema.parse(await res.json());
+        return { serverUrl, participantToken: token };
       }),
-    [courseId, chapterId, language],
+    [courseId, chapterNumber, language],
   );
 
   const session = useSession(tokenSource);

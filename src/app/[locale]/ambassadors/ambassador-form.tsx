@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { localize } from "@/i18n/localized";
 
 import { useState } from "react";
-import { UNIVERSITIES } from "@/lib/data/catalog";
+import type { Institution } from "@/lib/auth/catalog";
 import {
   ErrorText,
   FieldLabel,
@@ -21,7 +21,7 @@ import {
 
 type Errors = Partial<Record<"name" | "university" | "contact", string>>;
 
-export function AmbassadorForm() {
+export function AmbassadorForm({ institutions }: { institutions: Institution[]; }) {
   const t = useTranslations("Ambassadors.Form");
   const [name, setName] = useState("");
   const locale = useLocale();
@@ -115,9 +115,9 @@ export function AmbassadorForm() {
             }}
           >
             <option value="">{t("chooseUniversity")}</option>
-            {UNIVERSITIES.map((u) => (
-              <option key={u.ar} value={u.ar}>
-                {localize(u, locale)}
+            {institutions.map((u) => (
+              <option key={u.id} value={u.id}>
+                {localize(u.name, locale)}
               </option>
             ))}
             <option value="other">{t("other")}</option>

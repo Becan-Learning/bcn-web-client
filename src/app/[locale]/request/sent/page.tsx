@@ -1,10 +1,10 @@
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 import { hasLocale } from "next-intl";
 import { localize } from "@/i18n/localized";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import type { Metadata } from "next";
-import { UNIVERSITIES } from "@/lib/data/catalog";
+import { getInstitutions } from "@/lib/auth/catalog";
 import { BecanFace } from "@/components/becan/becan-face";
 import { ShareButton } from "./share-button";
 import { TypedHeadline } from "@/components/becan/typed-headline";
@@ -26,7 +26,7 @@ export default async function RequestSentPage(
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  const t = await getTranslations("Request.Sent");
+  const [t, format, institutions] = await Promise.all([getTranslations("Request.Sent"), getFormatter(), getInstitutions()]);
   const [headlinePrefix, headlineWord, headlineSuffix] = t.markup("title", {
     word: (chunks) => `\0${chunks}\0`,
   }).split("\0");
@@ -37,8 +37,8 @@ export default async function RequestSentPage(
 
   const course = one(sp.course);
   const universityValue = one(sp.university);
-  const universityRecord = UNIVERSITIES.find((u) => u.ar === universityValue || u.en === universityValue);
-  const university = universityRecord ? localize(universityRecord, locale) : universityValue;
+  const universityRecord = institutions.find((u) => u.id === universityValue);
+  const university = universityRecord ? localize(universityRecord.name, locale) : universityValue;
   const subject = [course, university].filter(Boolean).join(" — ");
 
   return (
@@ -49,7 +49,7 @@ export default async function RequestSentPage(
         {/* 1 — الشارة: الطلب ليس وحيدًا، وهذا ما يبقي الطالب */}
         {subject ? (
           <p className="inline-flex flex-wrap items-center gap-2 rounded-pill bg-tint-amber px-4 py-2 text-sm font-semibold text-ink">
-            <span>{t("peers", { count: PEERS, countLabel: String(PEERS) })}</span>
+            <span>{t("peers", { count: PEERS, countLabel: format.number(PEERS, { numberingSystem: "latn" }) })}</span>
             <span dir="auto" className="text-ink-2">«{subject}»</span>
           </p>
         ) : null}

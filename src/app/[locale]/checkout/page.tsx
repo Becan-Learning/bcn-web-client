@@ -7,6 +7,8 @@ import { notFound } from "next/navigation";
 import { PageShell, Section, SiteHeader } from "@/components/becan/kit";
 import { planById } from "@/lib/data/plans";
 import { CheckoutForm } from "./checkout-form";
+import { requireAccount } from "@/lib/auth/session";
+import { accountReturnPath } from "@/lib/auth/next-path";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/checkout">): Promise<Metadata> {
   const { locale } = await params;
@@ -27,6 +29,7 @@ export default async function CheckoutPage(props: PageProps<"/[locale]/checkout"
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  await requireAccount(locale, accountReturnPath("/checkout", await props.searchParams));
   const t = await getTranslations("Checkout");
 
   const sp = await props.searchParams;

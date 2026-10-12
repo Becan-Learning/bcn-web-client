@@ -5,6 +5,8 @@ import { routing } from "@/i18n/routing";
 import type { Metadata } from "next";
 import { SettingsShell } from "../_shell";
 import { DataView } from "./data-view";
+import { requireAccount } from "@/lib/auth/session";
+import { accountReturnPath } from "@/lib/auth/next-path";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/settings/data">): Promise<Metadata> {
   const { locale } = await params;
@@ -23,6 +25,7 @@ export default async function DataPage(props: PageProps<"/[locale]/settings/data
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  await requireAccount(locale, accountReturnPath("/settings/data", await props.searchParams));
   const t = await getTranslations("Settings.Data");
 
   return (

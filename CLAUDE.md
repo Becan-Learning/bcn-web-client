@@ -42,7 +42,7 @@ Next.js 16 · TypeScript · Tailwind 4 · Motion (الحزمة `motion`، الا
 - **صوت الطالب لا يبلغ الوكيل إلا عبر «سؤال الطالب»** (زر «اسأل»): المايك مكتوم طوال الجلسة،
   ولا وضع مايك مفتوح — [ADR 0003](docs/adr/0003-student-voice-only-through-student-questions.md)
   و[العقد](docs/agent-contract-student-question.md).
-- Clerk وSupabase **غير مركّبين بعد**؛ المعرّف مجهول (`becan:uid`) والكتالوج عرض.
+- **الحساب من Better Auth في الخادم** والويب عميل فقط ([ADR 0004](docs/adr/0004-auth-lives-in-backend-behind-same-origin-proxy.md))؛ كتالوج المواد ما زال عرضًا.
 - التحقق: `pnpm lint` ثم `pnpm type-check` ثم `pnpm build`.
 
 ## الهوية — مقفلة، لا تُقترح بدائل

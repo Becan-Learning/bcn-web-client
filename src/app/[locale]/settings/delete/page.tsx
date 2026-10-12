@@ -7,6 +7,8 @@ import type { Metadata } from "next";
 import { SettingsCard, SettingsShell } from "../_shell";
 import { SUBSCRIPTION } from "@/lib/data/billing";
 import { DeleteForm } from "./delete-form";
+import { requireAccount } from "@/lib/auth/session";
+import { accountReturnPath } from "@/lib/auth/next-path";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/settings/delete">): Promise<Metadata> {
   const { locale } = await params;
@@ -15,14 +17,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/settings
   return { title: t("metadataTitle") };
 }
 
-/* S4 — حذف الحساب، صفحة منفصلة كما يطلب البريف.
-
-   تشرح **ماذا يُحذف وماذا يبقى ومدة التنفيذ** قبل أي زرّ، فالقرار
-   مبنيّ على معرفة لا على تحذير عام.
-
-   ⚠️ المدد هنا (30 يومًا للحذف، 7 أيام للتراجع، مدة حفظ الفواتير)
-   تحتاج تثبيتها مع الفريق التقني ومراجعة المستشار القانوني وفق
-   نظام حماية البيانات الشخصية. */
+/* تسبق آثار الحذف التأكيد حتى يبني الطالب قراره على معرفة. */
 
 const DELETED = [
   "deletedAccount",
@@ -41,6 +36,7 @@ export default async function DeletePage(props: PageProps<"/[locale]/settings/de
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  await requireAccount(locale, accountReturnPath("/settings/delete", await props.searchParams));
   const t = await getTranslations("Settings.Delete");
 
   return (

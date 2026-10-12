@@ -15,6 +15,8 @@ import {
 } from "@/lib/data/billing";
 import { VAT } from "@/lib/data/plans";
 import { PrintButton } from "./print-button";
+import { requireAccount } from "@/lib/auth/session";
+import { accountReturnPath } from "@/lib/auth/next-path";
 
 export async function generateMetadata(
   props: PageProps<"/[locale]/settings/invoices/[id]">,
@@ -39,9 +41,10 @@ export default async function InvoicePage(
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  const { id } = await props.params;
+  await requireAccount(locale, accountReturnPath(`/settings/invoices/${id}`, await props.searchParams));
   const t = await getTranslations("Settings.Invoice");
 
-  const { id } = await props.params;
   const found = INVOICES.find((i) => i.id === id);
   if (!found) notFound();
 

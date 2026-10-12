@@ -15,6 +15,8 @@ import {
 } from "@/components/becan/kit";
 import { resumePoint } from "@/lib/data/home";
 import { planById } from "@/lib/data/plans";
+import { requireAccount } from "@/lib/auth/session";
+import { accountReturnPath } from "@/lib/auth/next-path";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/checkout/result">): Promise<Metadata> {
   const { locale } = await params;
@@ -68,6 +70,7 @@ export default async function ResultPage(props: PageProps<"/[locale]/checkout/re
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  await requireAccount(locale, accountReturnPath("/checkout/result", await props.searchParams));
 
   const sp = await props.searchParams;
   const rawState = Array.isArray(sp.s) ? sp.s[0] : sp.s;

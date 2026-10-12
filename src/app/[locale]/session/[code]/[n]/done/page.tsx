@@ -19,6 +19,8 @@ import {
 } from "@/components/becan/kit";
 import { ArrowForward } from "@/components/becan/icons";
 import { FeedbackForm } from "./feedback-form";
+import { requireAccount } from "@/lib/auth/session";
+import { accountReturnPath } from "@/lib/auth/next-path";
 
 /* الشاشة ٩ — ملخص الجلسة.
 
@@ -57,13 +59,14 @@ export default async function SummaryPage(
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  const { code, n } = await props.params;
+  await requireAccount(locale, accountReturnPath(`/session/${code}/${n}/done`, await props.searchParams));
   const [t, format] = await Promise.all([
     getTranslations("SessionSummary"),
     getFormatter(),
   ]);
   const number = (value: number) => format.number(value, { numberingSystem: "latn" });
 
-  const { code, n } = await props.params;
   const sp = await props.searchParams;
   const raw = Array.isArray(sp.s) ? sp.s[0] : sp.s;
   const state: SummaryState = isState(raw) ? raw : "done";

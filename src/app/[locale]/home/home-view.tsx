@@ -6,14 +6,7 @@ import { GearIcon } from "@/components/becan/icons";
 import { Copy, GhostButton, PageShell } from "@/components/becan/kit";
 import { enrolledCourses, type EnrolledCourse } from "@/lib/data/home";
 
-/* الشاشة ٨ — الداشبورد `/home`.
-
-   مقصورة الآن على المقررات المسجَّلة والتقدّم فيها بطلب صريح.
-
-   ما بُني من البريف ثم رُفع — كتلة الإلحاح بالأيام حتى أقرب اختبار،
-   والحالات الست، واقتراح تاريخ الاختبار من المجتمع، وطبقة الأحداث،
-   والطبقة الثانية (المهام والترم) — محفوظ كاملًا في الحفظة `1c34c65`
-   ويُسترجَع منها متى عادت الحاجة. */
+/* الشاشة ٨ — الداشبورد `/home`، مقصور على المقررات المسجَّلة. */
 
 export async function HomeView({ name }: { name: string }) {
   const t = await getTranslations("Home");
@@ -55,7 +48,7 @@ export async function HomeView({ name }: { name: string }) {
 }
 
 /* البطاقة هي بطاقة /courses نفسها — نفس الجسم من `CourseCardBody`
-   لا نسخةً منه — ويزيد عليها شريط التقدّم.
+   لا نسخةً منه.
 
    والمقرر الذي لم تجهز فصوله لا يُخفى: تظهر بوسم «قريبًا» ولا
    تكون رابطًا، فالضغط لا يعد بما ليس موجودًا. */
@@ -83,10 +76,7 @@ async function EnrolledCard({ c }: { c: EnrolledCourse }) {
       href={`/c/${slugOf(c.code)}`}
       className={`${shell} transition-transform duration-200 hover:-translate-y-1 hover:shadow-lift`}
     >
-      <CourseCardBody
-        course={c.course}
-        progress={{ done: c.done, total: c.ready }}
-      />
+      <CourseCardBody course={c.course} />
     </Link>
   );
 }

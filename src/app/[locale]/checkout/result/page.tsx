@@ -1,4 +1,4 @@
-import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { hasLocale } from "next-intl";
 import { localize } from "@/i18n/localized";
 import { notFound } from "next/navigation";
@@ -13,7 +13,6 @@ import {
   Section,
   SiteHeader,
 } from "@/components/becan/kit";
-import { resumePoint } from "@/lib/data/home";
 import { planById } from "@/lib/data/plans";
 import { requireAccount } from "@/lib/auth/session";
 import { accountReturnPath } from "@/lib/auth/next-path";
@@ -34,8 +33,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/checkout
    الفشل يذكر **سببًا محدّدًا** لا «حدث خطأ»: الطالب لا يستطيع تصحيح
    ما لا يعرفه. والسبب يأتي من البوابة في الإنتاج، ويُعايَن هنا بـ`?r=`.
 
-   النجاح **يعيده إلى ما كان يفعله** لا إلى الصفحة الرئيسية — ودفع
-   وسط المذاكرة يعني أن الفصل ما زال مفتوحًا في ذهنه. */
+   النجاح والدفع المعلّق يعيدان الطالب إلى مقرراته. */
 
 const STATES = ["success", "failed", "pending"] as const;
 type ResultState = (typeof STATES)[number];
@@ -80,7 +78,6 @@ export default async function ResultPage(props: PageProps<"/[locale]/checkout/re
   const state: ResultState = isState(rawState) ? rawState : "success";
   const plan = planById(rawPlan ?? "") ?? planById("pro")!;
   const reason = Object.hasOwn(REASONS, rawReason ?? "") ? REASONS[rawReason as keyof typeof REASONS] : FALLBACK;
-  const resume = resumePoint();
 
   return (
     <PageShell withFooter>
@@ -89,11 +86,11 @@ export default async function ResultPage(props: PageProps<"/[locale]/checkout/re
       <Section className="pt-12 pb-16 md:pt-16">
         <div className="mx-auto w-full max-w-[34rem]">
           {state === "success" ? (
-            <Success plan={localize(plan.name, locale)} minutes={plan.minutes} resume={resume} />
+            <Success plan={localize(plan.name, locale)} minutes={plan.minutes} />
           ) : state === "failed" ? (
             <Failed planId={plan.id} reason={reason} />
           ) : (
-            <Pending resume={resume} />
+            <Pending />
           )}
         </div>
       </Section>
@@ -106,14 +103,11 @@ export default async function ResultPage(props: PageProps<"/[locale]/checkout/re
 async function Success({
   plan,
   minutes,
-  resume,
 }: {
   plan: string;
   minutes: number;
-  resume: ReturnType<typeof resumePoint>;
 }) {
   const t = await getTranslations("Checkout.Result");
-  const locale = await getLocale();
   return (
     <div>
       {/* رقم واحد بارز: الحصّة الجديدة — لا لوحة إحصائيات */}
@@ -125,26 +119,9 @@ async function Success({
         {t("successBody", { plan, minutes, minutesLabel: String(minutes) })}
       </p>
 
-      {/* الفعل الوحيد: يرجعه إلى الفصل الذي كان فيه، لا إلى الرئيسية */}
-      {resume ? (
-        <div className="mt-8">
-          <p className="text-sm font-semibold text-ink-2">{t("resumeLabel")}</p>
-          <p className="mt-1 text-lg font-bold text-ink">
-            {t("resumeChapter", { course: localize(resume.courseName, locale), number: String(resume.chapterNo), title: localize(resume.chapterTitle, locale) })}
-          </p>
-
-          <PrimaryButton
-            href={`/session/${resume.slug}/${resume.chapterNo}`}
-            className="mt-5 w-full sm:w-fit"
-          >
-            {t("resume")}
-          </PrimaryButton>
-        </div>
-      ) : (
-        <PrimaryButton href="/home" className="mt-8 w-full sm:w-fit">
-          {t("home")}
-        </PrimaryButton>
-      )}
+      <PrimaryButton href="/home" className="mt-8 w-full sm:w-fit">
+        {t("home")}
+      </PrimaryButton>
 
       <div className="mt-6 flex flex-wrap items-center gap-x-6">
         <QuietLink href="/settings/invoices">{t("invoice")}</QuietLink>
@@ -203,9 +180,8 @@ async function Failed({
 
 /* ————— معلّق ————— */
 
-async function Pending({ resume }: { resume: ReturnType<typeof resumePoint> }) {
+async function Pending() {
   const t = await getTranslations("Checkout.Result");
-  const locale = await getLocale();
   return (
     <div>
       {/* ماذا حدث · لماذا — بلا لون خطأ: هذه ليست حالة خطأ */}
@@ -221,24 +197,13 @@ async function Pending({ resume }: { resume: ReturnType<typeof resumePoint> }) {
       <section className="mt-8 rounded-xl bg-tint-amber p-5">
         <h2 className="text-lg font-bold text-ink">{t("continueTitle")}</h2>
         <p className="mt-2 leading-base text-ink-2">
-          {resume
-            ? t("pendingResume", { course: localize(resume.courseName, locale), number: String(resume.chapterNo) })
-            : t("pendingDefault")}
+          {t("pendingDefault")}
         </p>
       </section>
 
-      {resume ? (
-        <PrimaryButton
-          href={`/session/${resume.slug}/${resume.chapterNo}`}
-          className="mt-6 w-full sm:w-fit"
-        >
-          {t("resume")}
-        </PrimaryButton>
-      ) : (
-        <PrimaryButton href="/home" className="mt-6 w-full sm:w-fit">
-          {t("home")}
-        </PrimaryButton>
-      )}
+      <PrimaryButton href="/home" className="mt-6 w-full sm:w-fit">
+        {t("home")}
+      </PrimaryButton>
 
       <div className="mt-6">
         <QuietLink href="/settings/subscription">{t("status")}</QuietLink>

@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/settings
 const DELETED = [
   "deletedAccount",
   "deletedSessions",
-  "deletedProgress",
+  "deletedEnrollments",
   "deletedPreferences",
   "deletedAudio",
 ] as const;

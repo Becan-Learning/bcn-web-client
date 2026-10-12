@@ -181,7 +181,7 @@
       "lede": "اقرأ الجزئين تحت قبل ما تقرّر — بعد الحذف ما فيه رجعة.",
       "deletedAccount": "حسابك واسمك وبريدك وجوالك.",
       "deletedSessions": "جلساتك كلها: وش شرحه لك بيكان، وأسئلتك وإجاباتك، ووين تعثّرت.",
-      "deletedProgress": "تقدّمك في كل مقرر، ومواعيد اختباراتك المحفوظة.",
+      "deletedEnrollments": "تسجيلك في مقرراتك.",
       "deletedPreferences": "تفضيلاتك وإعدادات إشعاراتك.",
       "deletedAudio": "أي تسجيل صوتي باقٍ لك عندنا.",
       "keptInvoices": "فواتيرك ومبالغ مدفوعاتك — تلزمنا الأنظمة الضريبية بحفظها، وما فيها محتوى مذاكرتك.",
@@ -692,26 +692,14 @@
     "chapters": "الفصول",
     "checks": "اختبارات التحقق",
     "sources": "مصادر أخرى",
-    "notStarted": "ما بدأت",
-    "nextStatus": "الخطوة الجاية",
-    "almost": "باقي له شوي",
-    "done": "أنجزته",
-    "notStartedMastery": "لم تبدأ",
-    "progress": "تقدّمك في المقرر",
-    "exam": "اختبارك المتوقّع",
-    "resume": "أكمل",
     "start": "ابدأ الشرح",
     "soon": "قريبًا",
-    "continue": "كمّل مذاكرة",
     "content": "محتوى المقرر",
-    "completed": "أنجزت {doneLabel} من {total, plural, zero {{totalLabel} فصل} one {فصل واحد} two {فصلين} few {{totalLabel} فصول} many {{totalLabel} فصلًا} other {{totalLabel} فصل}}",
     "metadataTitle": "{course} — بيكان",
     "metadataDescription": "{university} · {count, plural, zero {لا فصول جاهزة} one {فصل واحد جاهز} two {فصلان جاهزان} few {{countLabel} فصول جاهزة} many {{countLabel} فصلًا جاهزًا} other {{countLabel} فصل جاهز}}.",
     "courseSummary": "{university} · {count, plural, zero {{countLabel} فصل} one {فصل واحد} two {فصلان} few {{countLabel} فصول} many {{countLabel} فصلًا} other {{countLabel} فصل}}",
     "topics": "{count, plural, zero {لا مواضيع} one {موضوع واحد} two {موضوعان} few {{countLabel} مواضيع} many {{countLabel} موضوعًا} other {{countLabel} موضوع}}",
-    "mastery": "{percent}% إتقان",
-    "nextStep": "الخطوة التالية: {next}",
-    "nextChapter": "الفصل {number} · {title}"
+    "minutes": "{count, plural, zero {{countLabel} دقيقة} one {دقيقة واحدة} two {دقيقتان} few {{countLabel} دقائق} many {{countLabel} دقيقة} other {{countLabel} دقيقة}}"
   },
   "Home": {
     "metadataTitle": "مقرراتك — بيكان",
@@ -750,8 +738,6 @@
       "onlineWhy": "الشراء عبر الإنترنت غير مفعّل على بطاقتك.",
       "onlineFix": "فعّله من تطبيق بنكك — عادةً تحت «إعدادات البطاقة» — ثم أعد المحاولة.",
       "successTitle": "تمت الترقية",
-      "resumeLabel": "كنت في",
-      "resume": "كمّل من وين وقفت",
       "home": "ارجع لمقرراتك",
       "invoice": "شوف فاتورتك",
       "subscription": "إدارة الاشتراك",
@@ -765,9 +751,7 @@
       "pendingDefault": "دقائق خطتك الحالية باقية، وتقدر تذاكر بها إلى أن يكتمل الدفع.",
       "status": "تابع حالة الاشتراك",
       "successBody": "صرت على خطة {plan} — {minutes, plural, zero {{minutesLabel} دقيقة} one {دقيقة واحدة} two {دقيقتان} few {{minutesLabel} دقائق} many {{minutesLabel} دقيقة} other {{minutesLabel} دقيقة}} شهريًا، وكل مقرراتك مفتوحة. وصلتك الفاتورة على بريدك.",
-      "resumeChapter": "{course} · الفصل {number} — {title}",
-      "help": "تكرّر معك؟ <contact>راسلنا على واتساب</contact> ونتابعها معك.",
-      "pendingResume": "دقائق خطتك الحالية باقية، وتقدر تكمّل {course} — الفصل {number} إلى أن يكتمل الدفع."
+      "help": "تكرّر معك؟ <contact>راسلنا على واتساب</contact> ونتابعها معك."
     },
     "planSummary": "خطة {plan} — {minutes, plural, zero {{minutesLabel} دقيقة} one {دقيقة واحدة} two {دقيقتان} few {{minutesLabel} دقائق} many {{minutesLabel} دقيقة} other {{minutesLabel} دقيقة}} شهريًا، {courses}.",
     "planMonth": "خطة {plan} — شهر واحد",
@@ -777,9 +761,6 @@
     "numberPlaceholder": "0000 0000 0000 0000",
     "expiryPlaceholder": "MM/YY",
     "cvcPlaceholder": "123"
-  },
-  "CourseCard": {
-    "completed": "أنجزت {doneLabel} من {total, plural, zero {{totalLabel} فصل} one {فصل واحد} two {فصلين} few {{totalLabel} فصول} many {{totalLabel} فصلًا} other {{totalLabel} فصل}}"
   },
   "Session": {
     "loadingSlides": "تجهيز الشرائح…",
@@ -875,22 +856,10 @@
   },
   "SessionSummary": {
     "metadata": "ملخص الجلسة — بيكان",
-    "setExamDate": "حدّد تاريخ اختبارك",
-    "courseFinished": "خلّصت {course} كاملة",
     "limit": "خلص وقت الجلسة المسموح. قيّم جلستك تحت، وتقدر تبدأ جلسة جديدة بعدها.",
-    "struggled": "تعثّرت في:",
-    "stumbleAsset": "تعريف الأصل",
-    "stumbleControl": "الفرق بين السيطرة والملكية",
-    "penalty": "<strong>ما يفقد الدرجة: </strong>تكتب «تملكه» بدل «تسيطر عليه»",
-    "continueChapter": "كمّل الفصل",
-    "plan": "شوف خطتك",
-    "reviewStumbles": "راجع اللي تعثّرت فيه",
     "nextChapter": "الفصل التالي",
-    "daysLeft": "{count, plural, zero {اليوم اختبار {course}} one {باقي يوم واحد على اختبار {course}} two {باقي يومان على اختبار {course}} few {باقي {countLabel} أيام على اختبار {course}} many {باقي {countLabel} يومًا على اختبار {course}} other {باقي {countLabel} يوم على اختبار {course}}}",
-    "covered": "{total, plural, zero {غطّيت {covered} من {totalLabel} مواضيع} one {غطّيت {covered} من موضوع واحد} two {غطّيت {covered} من موضوعين} few {غطّيت {covered} من {totalLabel} مواضيع} many {غطّيت {covered} من {totalLabel} موضوعًا} other {غطّيت {covered} من {totalLabel} موضوع}}",
-    "chapterFinished": "خلّصت الفصل {number}",
     "sessionEnded": "انتهت جلستك في الفصل {number}",
-    "progress": "{total, plural, zero {أنجزت {doneLabel} من {totalLabel} فصول} one {أنجزت {doneLabel} من فصل واحد} two {أنجزت {doneLabel} من فصلين} few {أنجزت {doneLabel} من {totalLabel} فصول} many {أنجزت {doneLabel} من {totalLabel} فصلًا} other {أنجزت {doneLabel} من {totalLabel} فصل}}"
+    "backToCourse": "ارجع للمقرر"
   },
   "SessionFeedback": {
     "sent": "وصل تقييمك. نقرأ كل ملاحظة.",

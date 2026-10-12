@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/home">):
 }
 
 /* الشاشة ٨ — الداشبورد `/home`.
-   مقصورة الآن على المقررات المسجَّلة والتقدّم فيها. */
+   مقصورة الآن على المقررات المسجَّلة. */
 export default async function HomePage(props: PageProps<"/[locale]/home">) {
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();

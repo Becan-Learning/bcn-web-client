@@ -1,12 +1,11 @@
 "use client";
 
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations, useLocale, useFormatter } from "next-intl";
 import { localize } from "@/i18n/localized";
 
 import { useState } from "react";
 import { Link } from "@/i18n/navigation";
-import { ArrowForward, StatusIcon } from "@/components/becan/icons";
-import { PrimaryButton } from "@/components/becan/kit";
+import { ArrowForward } from "@/components/becan/icons";
 import { SubjectIcon } from "@/app/[locale]/courses/subject-icon";
 import type { Chapter, Course } from "@/lib/data/catalog";
 import { TONES } from "@/lib/data/catalog";
@@ -21,7 +20,7 @@ const TABS = [
   { id: "sources", label: "sources", ready: false },
 ] as const;
 
-export type ViewState = "guest" | "new" | "progress";
+export type ViewState = "guest" | "new";
 
 /* بطاقات الفصول داكنة. اللوحة لا تملك كهرمانيًا أو جوزيًا داكنًا
    يصلح تعبئةً تحمل نصًا، فالعائلتان المتاحتان: الباذنجاني والزيتي.
@@ -30,147 +29,31 @@ const SKINS = {
   purple: {
     fills: ["bg-aubergine-base", "bg-aubergine-deep"],
     meta: "text-aubergine-tint",
-    bar: "bg-aubergine-tint",
     arrow: "border-aubergine-soft text-on-dominant",
   },
   olive: {
     fills: ["bg-olive-dark", "bg-olive-deep"],
     meta: "text-olive-soft",
-    bar: "bg-olive-soft",
     arrow: "border-olive-soft text-on-dominant",
   },
-} as const;
-
-type Status = "none" | "next" | "almost" | "done";
-
-const STATUS_LABEL = {
-  none: "notStarted",
-  next: "nextStatus",
-  almost: "almost",
-  done: "done",
 } as const;
 
 const skinOf = (tone: Course["tone"]) =>
   tone === "olive" || tone === "oliveDark" ? SKINS.olive : SKINS.purple;
 
-/** شريط الإتقان — يظهر للمسجّل فقط، وفارغ قبل أن يبدأ. */
-function MasteryBar({
-  percent,
-  skin,
-}: {
-  percent: number;
-  skin: { meta: string; bar: string };
-}) {
-  const t = useTranslations("Course");
-  return (
-    <div className="flex items-center gap-2">
-      <span
-        aria-hidden="true"
-        className="h-1.5 flex-1 overflow-hidden rounded-pill bg-on-dominant/20"
-      >
-        <span
-          className={`block h-full rounded-pill ${skin.bar}`}
-          style={{ inlineSize: `${percent}%` }}
-        />
-      </span>
-      <span className={`shrink-0 text-xs ${skin.meta}`}>
-        {percent > 0 ? t("mastery", { percent: String(percent) }) : t("notStartedMastery")}
-      </span>
-    </div>
-  );
-}
-
-/* لوحة مصغّرة. رقم واحد يهيمن وشريط يترجمه بصريًا — نمط 1 في
-   CLAUDE.md يمنع لوحة إحصائيات متساوية الأوزان. */
-function MiniDashboard({
-  percent,
-  done,
-  total,
-  examDate,
-  action,
-}: {
-  percent: number;
-  done: number;
-  total: number;
-  examDate: string;
-  action: { href: string; label: string; next: string };
-}) {
-  const t = useTranslations("Course");
-  return (
-    <div className="mt-8 rounded-xl border border-line bg-surface p-5 shadow-soft md:p-6">
-      <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-ink-2">{t("progress")}</p>
-
-          {/* الرقم البارز الوحيد */}
-          <p className="mt-1 font-display text-5xl leading-none font-bold text-ink md:text-6xl">
-            {percent}%
-          </p>
-
-          {/* الشريط يترجم الرقم بصريًا */}
-          <div
-            role="progressbar"
-            aria-valuenow={percent}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label={t("progress")}
-            className="mt-4 h-2.5 max-w-measure overflow-hidden rounded-pill bg-line"
-          >
-            <span
-              className="block h-full rounded-pill bg-aubergine-base"
-              style={{ inlineSize: `${percent}%` }}
-            />
-          </div>
-
-          <div className="mt-3 flex flex-wrap items-center gap-3">
-            <p className="text-ink-2">
-              {t("completed", { doneLabel: String(done), total, totalLabel: String(total) })}
-            </p>
-            <span className="inline-flex items-center gap-2 rounded-pill border border-aubergine-mid bg-tint-aubergine px-3 py-1 text-sm text-ink">
-              {t("exam")}
-              <span className="font-semibold">{examDate}</span>
-            </span>
-          </div>
-        </div>
-
-        <div className="shrink-0">
-          <PrimaryButton href={action.href} className="w-full md:w-auto">
-            {action.label}
-          </PrimaryButton>
-          {/* الخطوة التالية صراحةً — يعرف إلى أين يأخذه الزر قبل ضغطه.
-              مسحة كهرمانية خفيفة تميّزها بلا أن تنافس الرقم البارز. */}
-          <p className="mt-3 md:text-end">
-            {/* الحافة أخضر سولد، والخلفية نفس الأخضر بشفافية خفيفة.
-                النص عائد إلى ink: على الخليط الفاتح يعطي 12.5:1. */}
-            <span className="inline-block rounded-md border-s-4 border-s-success bg-success/15 px-3 py-1.5 text-sm font-semibold text-ink">
-              {t("nextStep", { next: action.next })}
-            </span>
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function ChapterCard({
   chapter,
   course,
-  state,
-  mastery,
   href,
-  resume,
-  status,
 }: {
   chapter: Chapter;
   course: Course;
-  state: ViewState;
-  mastery: number;
   href: string;
-  resume: boolean;
-  status: Status;
 }) {
   const t = useTranslations("Course");
   const locale = useLocale();
+  const format = useFormatter();
+  const number = (value: number) => format.number(value, { numberingSystem: "latn" });
   const skin = skinOf(course.tone);
   const fill = skin.fills[(chapter.n - 1) % skin.fills.length];
 
@@ -190,7 +73,7 @@ function ChapterCard({
         aria-hidden="true"
         className="pointer-events-none absolute -bottom-5 start-3 z-0 font-display text-[8rem] leading-none font-bold text-on-dominant opacity-[0.14] transition-opacity duration-200 select-none group-hover:opacity-25"
       >
-        {chapter.n}
+        {number(chapter.n)}
       </span>
 
       <div className="relative z-10">
@@ -198,27 +81,13 @@ function ChapterCard({
           <h3 className="font-display text-lg font-semibold text-on-dominant">
             {localize(chapter.title, locale)}
           </h3>
-          {chapter.ready ? (
-            <span
-              className={`inline-flex shrink-0 items-center gap-1.5 rounded-pill px-2.5 py-1 text-xs font-semibold ${
-                status === "next"
-                  ? "bg-on-dominant/15 text-on-dominant"
-                  : skin.meta
-              }`}
-            >
-              <StatusIcon kind={status} />
-              {t(STATUS_LABEL[status])}
-            </span>
-          ) : null}
         </div>
 
-        <p className={`mt-1 text-sm ${skin.meta}`}>{t("topics", { count: chapter.topics, countLabel: String(chapter.topics) })}</p>
-
-        {chapter.ready && state !== "guest" ? (
-          <div className="mt-3">
-            <MasteryBar percent={mastery} skin={skin} />
-          </div>
-        ) : null}
+        <p className={`mt-1 text-sm ${skin.meta}`}>
+          {t("minutes", { count: chapter.minutes, countLabel: number(chapter.minutes) })}
+          {" · "}
+          {t("topics", { count: chapter.topics, countLabel: number(chapter.topics) })}
+        </p>
       </div>
 
       <div className="relative z-10 mt-auto flex justify-end pt-4">
@@ -227,7 +96,7 @@ function ChapterCard({
             href={href}
             className={`inline-flex h-11 items-center gap-2 rounded-pill border px-5 font-semibold transition-colors hover:bg-pressable hover:text-on-pressable ${skin.arrow}`}
           >
-            {resume ? t("resume") : t("start")}
+            {t("start")}
             <ArrowForward />
           </Link>
         ) : (
@@ -247,13 +116,11 @@ export function CourseView({
   chapters,
   readyCount,
   state,
-  examDate,
 }: {
   course: Course;
   chapters: Chapter[];
   readyCount: number;
   state: ViewState;
-  examDate: string;
 }) {
   const t = useTranslations("Course");
   const locale = useLocale();
@@ -261,41 +128,12 @@ export function CourseView({
   const tone = TONES[course.tone];
   const slug = course.code.replace(" ", "-").toLowerCase();
 
-  /* حالة «في التقدّم»: الفصلان الأولان مُتقنان والثالث جارٍ */
-  const masteryOf = (n: number) => {
-    if (state !== "progress") return 0;
-    if (n <= 2) return 100;
-    if (n === 3) return 40;
-    if (n === 4) return 80;
-    return 0;
-  };
-
-  const ready = chapters.filter((c) => c.ready);
-  const done = ready.filter((c) => masteryOf(c.n) === 100).length;
-  const percent = Math.round(
-    ready.reduce((sum, c) => sum + masteryOf(c.n), 0) / ready.length,
-  );
-
-  /* نقطة الوقوف: أول فصل بدأه ولم يُتقنه، وإلا أول فصل لم يبدأه */
-  const resumeCh =
-    ready.find((c) => masteryOf(c.n) > 0 && masteryOf(c.n) < 100) ??
-    ready.find((c) => masteryOf(c.n) === 0) ??
-    ready[0];
-
   /* الزائر يُساق إلى التسجيل حاملًا مادته وفصله، والمسجَّل يدخل
      الجلسة مباشرةً. */
   const linkFor = (n: number) =>
     state === "guest"
       ? `/join?course=${encodeURIComponent(localize(course.name, locale))}&chapter=${n}&next=${encodeURIComponent(`/c/${slug}`)}`
       : `/session/${slug}/${n}`;
-
-  const statusOf = (n: number): Status => {
-    const m = masteryOf(n);
-    if (m === 100) return "done";
-    if (n === resumeCh.n) return "next";
-    if (m > 0) return "almost";
-    return "none";
-  };
 
   return (
     <>
@@ -322,18 +160,6 @@ export function CourseView({
           </p>
         </div>
       </div>
-
-      <MiniDashboard
-        percent={percent}
-        done={done}
-        total={readyCount}
-        examDate={examDate}
-        action={{
-          href: linkFor(resumeCh.n),
-          label: t("continue"),
-          next: t("nextChapter", { number: String(resumeCh.n), title: localize(resumeCh.title, locale) }),
-        }}
-      />
 
       {/* ————— التبويبات ————— */}
       <div
@@ -382,11 +208,7 @@ export function CourseView({
               key={ch.n}
               chapter={ch}
               course={course}
-              state={state}
-              mastery={masteryOf(ch.n)}
               href={linkFor(ch.n)}
-              resume={ch.n === resumeCh.n && masteryOf(ch.n) > 0}
-              status={statusOf(ch.n)}
             />
           ))}
         </ul>

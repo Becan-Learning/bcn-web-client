@@ -121,10 +121,6 @@ export const TONES: Record<
     icon: string;
     chip: string;
     arrow: string;
-    /* شريط التقدّم داخل البطاقة — من ألوان البطاقة نفسها.
-       لا أخضر: الأخضر حالة لا سطح. */
-    track: string;
-    fill: string;
   }
 > = {
   lilac: {
@@ -135,8 +131,6 @@ export const TONES: Record<
     icon: "text-aubergine-base",
     chip: "border-aubergine-mid text-aubergine-base",
     arrow: "border-aubergine-mid text-aubergine-base",
-    track: "bg-aubergine-mid/25",
-    fill: "bg-aubergine-base",
   },
   amber: {
     card: "bg-tint-amber border-warmth",
@@ -146,8 +140,6 @@ export const TONES: Record<
     icon: "text-aubergine-base",
     chip: "border-warmth text-ink",
     arrow: "border-warmth text-ink",
-    track: "bg-warmth/25",
-    fill: "bg-warmth",
   },
   walnut: {
     card: "bg-tint-walnut border-warmth",
@@ -157,8 +149,6 @@ export const TONES: Record<
     icon: "text-aubergine-base",
     chip: "border-warmth text-ink",
     arrow: "border-warmth text-ink",
-    track: "bg-warmth/25",
-    fill: "bg-warmth",
   },
   olive: {
     card: "bg-olive-tint border-olive",
@@ -168,8 +158,6 @@ export const TONES: Record<
     icon: "text-olive-deep",
     chip: "border-olive text-olive-deep",
     arrow: "border-olive text-olive-deep",
-    track: "bg-olive/25",
-    fill: "bg-olive-deep",
   },
   base: {
     card: "bg-aubergine-base border-aubergine-soft",
@@ -179,8 +167,6 @@ export const TONES: Record<
     icon: "text-aubergine-tint",
     chip: "border-aubergine-soft text-aubergine-tint",
     arrow: "border-aubergine-soft text-on-dominant",
-    track: "bg-aubergine-soft/30",
-    fill: "bg-aubergine-tint",
   },
   deep: {
     card: "bg-aubergine-deep border-aubergine-mid",
@@ -190,8 +176,6 @@ export const TONES: Record<
     icon: "text-amber-bright",
     chip: "border-aubergine-soft text-aubergine-tint",
     arrow: "border-aubergine-soft text-on-dominant",
-    track: "bg-aubergine-soft/30",
-    fill: "bg-aubergine-tint",
   },
   oliveDark: {
     card: "bg-olive-dark border-olive-soft",
@@ -201,8 +185,6 @@ export const TONES: Record<
     icon: "text-olive-soft",
     chip: "border-olive-soft text-olive-soft",
     arrow: "border-olive-soft text-on-dominant",
-    track: "bg-olive-soft/30",
-    fill: "bg-olive-soft",
   },
 };
 

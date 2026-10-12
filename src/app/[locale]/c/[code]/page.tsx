@@ -43,22 +43,9 @@ export default async function CoursePage(props: PageProps<"/[locale]/c/[code]">)
   const course = courseBySlug(code);
   if (!course) notFound();
 
-  /* حالات البريف الأربع. الافتراضي «زائر غير مسجّل» — وهو الحال
-     الحقيقي لأي قادم من صفحة البحث. */
-  /* تاريخ الاختبار المتوقّع — يُحسب على الخادم فيصل نصًّا جاهزًا،
-     فلا يختلف بين الخادم والعميل. أرقام لاتينية صراحةً بـ nu-latn
-     لأن لغة ar تعطي أرقامًا هندية في بعض البيئات. */
-  const exam = new Date();
-  exam.setDate(exam.getDate() + 21);
-  const examDate = new Intl.DateTimeFormat(locale === "ar" ? "ar-u-nu-latn-ca-gregory" : "en", {
-    numberingSystem: "latn",
-    calendar: "gregory",
-    day: "numeric",
-    month: "long",
-  }).format(exam);
-
+  /* الافتراضي زائر غير مسجّل، وحالة «جديد» تُعايَن بـ ?state=new. */
   const raw = Array.isArray(sp.state) ? sp.state[0] : sp.state;
-  const state: ViewState = raw === "new" || raw === "progress" ? raw : "guest";
+  const state: ViewState = raw === "new" ? "new" : "guest";
 
   return (
     <PageShell withFooter>
@@ -70,7 +57,6 @@ export default async function CoursePage(props: PageProps<"/[locale]/c/[code]">)
           chapters={chaptersOf(course.code)}
           readyCount={readyCount(course.code)}
           state={state}
-          examDate={examDate}
         />
       </Section>
     </PageShell>

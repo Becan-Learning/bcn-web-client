@@ -181,7 +181,7 @@
       "lede": "Read both sections below before deciding. Deletion can’t be undone.",
       "deletedAccount": "Your account, name, email and phone number.",
       "deletedSessions": "All your sessions: what Becan explained, your questions and answers, and where you struggled.",
-      "deletedProgress": "Your progress in each course and your saved exam dates.",
+      "deletedEnrollments": "Your enrollments in your courses.",
       "deletedPreferences": "Your preferences and notification settings.",
       "deletedAudio": "Any voice recordings we still have for you.",
       "keptInvoices": "Your invoices and payment amounts — tax regulations require us to keep them. They contain no study content.",
@@ -692,26 +692,14 @@
     "chapters": "Chapters",
     "checks": "Understanding checks",
     "sources": "Other resources",
-    "notStarted": "You haven’t started",
-    "nextStatus": "Your next step",
-    "almost": "You’re nearly there",
-    "done": "You finished it",
-    "notStartedMastery": "You haven’t started",
-    "progress": "Your course progress",
-    "exam": "Your expected exam date",
-    "resume": "Continue",
     "start": "Start the explanation",
     "soon": "Coming soon",
-    "continue": "Keep studying",
     "content": "Course content",
-    "completed": "You finished {doneLabel} of {total, plural, one {{totalLabel} chapter} other {{totalLabel} chapters}}",
     "metadataTitle": "{course} — Becan",
     "metadataDescription": "{university} · {count, plural, one {{countLabel} ready chapter} other {{countLabel} ready chapters}}.",
     "courseSummary": "{university} · {count, plural, one {{countLabel} chapter} other {{countLabel} chapters}}",
     "topics": "{count, plural, one {{countLabel} topic} other {{countLabel} topics}}",
-    "mastery": "{percent}% mastery",
-    "nextStep": "Next step: {next}",
-    "nextChapter": "Chapter {number} · {title}"
+    "minutes": "{count, plural, one {{countLabel} minute} other {{countLabel} minutes}}"
   },
   "Home": {
     "metadataTitle": "Your courses — Becan",
@@ -750,8 +738,6 @@
       "onlineWhy": "Online purchases aren’t enabled on your card.",
       "onlineFix": "Enable them in your bank’s app — usually under “Card settings” — then try again.",
       "successTitle": "You’ve upgraded",
-      "resumeLabel": "You were studying",
-      "resume": "Continue where you left off",
       "home": "Back to your courses",
       "invoice": "View your invoice",
       "subscription": "Manage subscription",
@@ -765,9 +751,7 @@
       "pendingDefault": "Your current plan’s minutes are still available. You can study with them while payment is being processed.",
       "status": "Check subscription status",
       "successBody": "You’re on the {plan} plan — {minutes, plural, one {{minutesLabel} minute} other {{minutesLabel} minutes}} a month, with all your courses unlocked. Your invoice has been emailed to you.",
-      "resumeChapter": "{course} · Chapter {number} — {title}",
-      "help": "Happening again? <contact>Message us on WhatsApp</contact> and we’ll help you follow it up.",
-      "pendingResume": "Your current plan’s minutes are still available. You can continue {course} — Chapter {number} while payment is being processed."
+      "help": "Happening again? <contact>Message us on WhatsApp</contact> and we’ll help you follow it up."
     },
     "planSummary": "{plan} plan — {minutes, plural, one {{minutesLabel} minute} other {{minutesLabel} minutes}} a month, {courses}.",
     "planMonth": "{plan} plan — one month",
@@ -777,9 +761,6 @@
     "numberPlaceholder": "0000 0000 0000 0000",
     "expiryPlaceholder": "MM/YY",
     "cvcPlaceholder": "123"
-  },
-  "CourseCard": {
-    "completed": "You finished {doneLabel} of {total, plural, one {{totalLabel} chapter} other {{totalLabel} chapters}}"
   },
   "Session": {
     "loadingSlides": "Preparing slides…",
@@ -875,22 +856,10 @@
   },
   "SessionSummary": {
     "metadata": "Session summary — Becan",
-    "setExamDate": "Set your exam date",
-    "courseFinished": "You finished the whole {course} course",
     "limit": "Your session time is up. Rate your session below, then you can start a new one.",
-    "struggled": "You struggled with:",
-    "stumbleAsset": "The definition of an asset",
-    "stumbleControl": "The difference between control and ownership",
-    "penalty": "<strong>What loses marks: </strong>writing “own it” instead of “control it”",
-    "continueChapter": "Continue the chapter",
-    "plan": "See your plan",
-    "reviewStumbles": "Review what you struggled with",
     "nextChapter": "Next chapter",
-    "daysLeft": "{count, plural, one {{countLabel} day left until your {course} exam} other {{countLabel} days left until your {course} exam}}",
-    "covered": "{total, plural, one {You covered {covered} of {totalLabel} topic} other {You covered {covered} of {totalLabel} topics}}",
-    "chapterFinished": "You finished chapter {number}",
     "sessionEnded": "Your session in chapter {number} ended",
-    "progress": "{total, plural, one {You finished {doneLabel} of {totalLabel} chapter} other {You finished {doneLabel} of {totalLabel} chapters}}"
+    "backToCourse": "Back to the course"
   },
   "SessionFeedback": {
     "sent": "Your feedback has arrived. We read every note.",

@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import { SettingsCard, SettingsShell } from "../_shell";
 import { localize } from "@/i18n/localized";
 import { getAllowance } from "@/lib/allowance/server";
+import { formatRenewalDate } from "@/lib/allowance/format";
 import { minutesLeft, usedUp } from "@/lib/allowance/rules";
 import { requireAccount } from "@/lib/auth/session";
 import { accountReturnPath } from "@/lib/auth/next-path";
@@ -55,15 +56,7 @@ export default async function SubscriptionPage(
     { label: t("minutesUsed"), value: usage(Math.ceil(allowance.usage.seconds / 60), allowance.limits.seconds === null ? null : Math.floor(allowance.limits.seconds / 60)) },
     { label: t("courses"), value: usage(allowance.usage.enrollments, allowance.limits.enrollments) },
   ];
-  const renewal = format.dateTime(new Date(allowance.period.end), {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    calendar: "gregory",
-    numberingSystem: "latn",
-    /* الدورة لحظة زمنية؛ تُعرض بتوقيت الرياض كي لا يتقدّم اليوم أو يتأخر. */
-    timeZone: "Asia/Riyadh",
-  });
+  const renewal = formatRenewalDate(format, new Date(allowance.period.end));
 
   return (
     <SettingsShell active="subscription" title={t("title")} lede={t("lede")}>

@@ -224,20 +224,25 @@
       "minutesUsed": "Minutes used",
       "courses": "Courses",
       "usage": "{used} of {limit}",
-      "renewal": "Your limits renew on {date}",
+      "renewal": "Your usage limits renew on {date}",
       "errorTitle": "We couldn’t load your plan",
       "errorBody": "We couldn’t get your limits and usage right now. Try again.",
-      "lede": "Your limits for this period and what you've used of them",
-      "usedUp": "You can't start a new session before {date}",
+      "lede": "Your usage limits for this period and what you've used of them",
+      "usedUp": "You've reached your usage limits for this period. You can't start a new session before {date}",
       "retry": "Try again"
     }
   },
   "Quota": {
-    "title": "You’ve used this month’s minutes",
-    "progress": "You studied <strong>{studied, plural, one {{studiedLabel} minute} other {{studiedLabel} minutes}}</strong> — you have <strong>{chaptersLeft, plural, one {{chaptersLabel} chapter} other {{chaptersLabel} chapters}}</strong> left before your exam.",
-    "continue": "Keep studying for SAR {price}/month",
-    "plans": "See plans",
-    "allowance": "{minutes, plural, one {{minutesLabel} minute} other {{minutesLabel} minutes}} per month · Your courses"
+    "usedUp": {
+      "progress": "You studied {minutes, plural, one {{minutesLabel} minute} other {{minutesLabel} minutes}} in {sessions, plural, one {{sessionsLabel} session} other {{sessionsLabel} sessions}}",
+      "renewal": "Your usage limits renew on {date}",
+      "limit": "You've reached your usage limits for this period"
+    },
+    "slotsFull": {
+      "enrolled": "You're enrolled in <courses></courses>",
+      "release": "{count, plural, one {Un-enroll from it to enroll here} other {Un-enroll from one of these courses to enroll here}}",
+      "rule": "Your usage limits allow {count, plural, one {{countLabel} course} other {{countLabel} courses}} at a time"
+    }
   },
   "Error": {
     "title": "The page didn’t open",
@@ -574,6 +579,7 @@
     "metadataDescription": "{university} · {count, plural, one {{countLabel} ready chapter} other {{countLabel} ready chapters}}.",
     "courseSummary": "{university} · {count, plural, one {{countLabel} chapter} other {{countLabel} chapters}}",
     "minutes": "{count, plural, one {{countLabel} minute} other {{countLabel} minutes}}",
+    "slotsFullHint": "Course limit reached",
     "enroll": "Enroll",
     "unenroll": "Un-enroll",
     "unenrollTitle": "Un-enroll from this course?",

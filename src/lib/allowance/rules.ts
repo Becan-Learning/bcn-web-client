@@ -1,3 +1,4 @@
+import type { Enrollment } from "@/lib/courses/schema";
 import type { Allowance } from "./schema";
 
 export function minutesLeft({ limits, usage }: Allowance): number | null {
@@ -12,4 +13,10 @@ export function usedUp({ limits, usage }: Allowance): boolean {
 export function nearlyOut(allowance: Allowance): boolean {
   const remaining = minutesLeft(allowance);
   return !usedUp(allowance) && remaining !== null && remaining < 15;
+}
+
+export function slotsFull(allowance: Allowance | null, enrollments: Enrollment[], courseId: string): boolean {
+  if (!allowance || enrollments.some((enrollment) => enrollment.course.id === courseId)) return false;
+  const { limits, usage } = allowance;
+  return limits.enrollments !== null && usage.enrollments >= limits.enrollments;
 }

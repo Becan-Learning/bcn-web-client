@@ -133,7 +133,7 @@ describe("Plan page", () => {
   it.each(["ar", "en"] as const)("uses the Riyadh date when the renewal crosses midnight in %s", async (locale) => {
     const data = { ...allowance, period: { ...allowance.period, end: "2026-10-30T22:00:00Z" } };
     const text = textOf(await render(locale, { ok: true, data }));
-    expect(text).toContain(locale === "ar" ? "تتجدد حدودك في 31 أكتوبر 2026" : "Your limits renew on October 31, 2026");
+    expect(text).toContain(locale === "ar" ? "تتجدد حدود استخدامك في 31 أكتوبر 2026" : "Your usage limits renew on October 31, 2026");
   });
 
   it("ignores the old canceled preview", async () => {

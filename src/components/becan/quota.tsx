@@ -4,7 +4,7 @@ import { Link } from "@/i18n/navigation";
 
 /* حدود الاستخدام — كتلة لا نافذة، لا تقطع الحصة الجارية.
 
-   - كهرمانية لا حمراء: إلحاح هادئ (النمط ٧)، والأحمر محجوز للخطأ.
+   - كهرمانية في الموقع، وسطح هادئ في الحصة؛ الأحمر محجوز للخطأ.
    - ما أنجزه قبل ما ينقصه: نذكر المذاكرة أو التسجيل قبل الخطوة التالية.
    - روابط المقررات هادئة: يبقى زر كهرماني أساسي واحد للشاشة (النمط ٨).
 
@@ -14,7 +14,7 @@ export type HeldCourse = { id: string; name: string };
 
 export type CourseSlotQuota = { courses: HeldCourse[]; limit: number };
 
-type QuotaBlockProps = { id?: string } & (
+type QuotaBlockProps = { id?: string; surface?: "site" | "session" } & (
   | { kind: "used-up"; minutesStudied: number; sessionsUsed: number; renewalDate: Date }
   | ({ kind: "slots-full" } & CourseSlotQuota)
 );
@@ -23,9 +23,10 @@ export function QuotaBlock(props: QuotaBlockProps) {
   const t = useTranslations("Quota");
   const format = useFormatter();
   const number = (value: number) => format.number(value, { numberingSystem: "latn" });
+  const skin = (props.surface ?? "site") === "session" ? "border border-line bg-panel" : "bg-tint-amber";
 
   return (
-    <section id={props.id} className="max-w-2xl scroll-mt-6 rounded-xl bg-tint-amber p-5 text-ink md:p-6">
+    <section id={props.id} className={`max-w-2xl scroll-mt-6 rounded-xl p-5 text-ink md:p-6 ${skin}`}>
       {props.kind === "used-up" ? (
         <>
           <p className="text-lg leading-base font-semibold">
@@ -36,8 +37,14 @@ export function QuotaBlock(props: QuotaBlockProps) {
               sessionsLabel: number(props.sessionsUsed),
             })}
           </p>
-          <p className="mt-3 leading-base text-ink-2">{t("usedUp.limit")}</p>
-          <p className="mt-3 leading-base text-ink-2">{t("usedUp.renewal", { date: formatRenewalDate(format, props.renewalDate) })}</p>
+          {props.surface === "session" ? (
+            <p className="mt-3 leading-base text-ink-2">{t("usedUp.nextSession", { date: formatRenewalDate(format, props.renewalDate) })}</p>
+          ) : (
+            <>
+              <p className="mt-3 leading-base text-ink-2">{t("usedUp.limit")}</p>
+              <p className="mt-3 leading-base text-ink-2">{t("usedUp.renewal", { date: formatRenewalDate(format, props.renewalDate) })}</p>
+            </>
+          )}
         </>
       ) : (
         <>

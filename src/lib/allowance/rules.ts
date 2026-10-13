@@ -12,7 +12,7 @@ export function usedUp({ limits, usage }: Allowance): boolean {
 
 export function nearlyOut(allowance: Allowance): boolean {
   const remaining = minutesLeft(allowance);
-  return !usedUp(allowance) && remaining !== null && remaining < 15;
+  return !usedUp(allowance) && remaining !== null && remaining > 0 && remaining < 15;
 }
 
 export function slotsFull(allowance: Allowance | null, enrollments: Enrollment[], courseId: string): boolean {

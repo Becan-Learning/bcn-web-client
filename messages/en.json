@@ -236,7 +236,8 @@
     "usedUp": {
       "progress": "You studied {minutes, plural, one {{minutesLabel} minute} other {{minutesLabel} minutes}} in {sessions, plural, one {{sessionsLabel} session} other {{sessionsLabel} sessions}}",
       "renewal": "Your usage limits renew on {date}",
-      "limit": "You've reached your usage limits for this period"
+      "limit": "You've reached your usage limits for this period",
+      "nextSession": "You can start your next session on {date}"
     },
     "slotsFull": {
       "enrolled": "You're enrolled in <courses></courses>",
@@ -682,6 +683,7 @@
     "comingSoon": "Coming soon",
     "startHint": "Press here to start the explanation",
     "start": "Start explanation",
+    "minutesRemaining": "You have {countLabel} {count, plural, one {minute} other {minutes}} left in this usage period",
     "chat": "Chat",
     "chatShort": "Chat",
     "slides": "Slides",

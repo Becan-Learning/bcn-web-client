@@ -236,7 +236,8 @@
     "usedUp": {
       "progress": "ذاكرت {minutes, plural, zero {{minutesLabel} دقيقة} one {دقيقة واحدة} two {دقيقتين} few {{minutesLabel} دقائق} many {{minutesLabel} دقيقةً} other {{minutesLabel} دقيقة}} في {sessions, plural, zero {{sessionsLabel} حصة} one {حصة واحدة} two {حصتين} few {{sessionsLabel} حصص} many {{sessionsLabel} حصةً} other {{sessionsLabel} حصة}}",
       "renewal": "تتجدد حدود استخدامك في {date}",
-      "limit": "وصلت لحدود استخدامك في دورة الاستخدام هذي"
+      "limit": "وصلت لحدود استخدامك في دورة الاستخدام هذي",
+      "nextSession": "تقدر تبدأ حصتك الجاية في {date}"
     },
     "slotsFull": {
       "enrolled": "مسجّل في <courses></courses>",
@@ -682,6 +683,7 @@
     "comingSoon": "قريبًا",
     "startHint": "اضغط هنا لتبدأ الشرح",
     "start": "ابدأ الشرح",
+    "minutesRemaining": "باقي لك {count, plural, zero {{countLabel} دقيقة} one {دقيقة واحدة} two {دقيقتين} few {{countLabel} دقائق} many {{countLabel} دقيقةً} other {{countLabel} دقيقة}} في دورة الاستخدام هذي",
     "chat": "الشات",
     "chatShort": "شات",
     "slides": "الشرائح",

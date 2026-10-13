@@ -98,6 +98,17 @@ describe("usedUp", () => {
 });
 
 describe("nearlyOut", () => {
+  it.each([
+    [3599, { minStartSeconds: null }],
+    [60, { seconds: 119, minStartSeconds: 30 }],
+    [3600, { minStartSeconds: 0 }],
+  ] as const)("does not report zero rounded minutes while starting is still allowed (%i seconds used)", (seconds, limits) => {
+    const data = withSeconds(seconds, limits);
+    expect(usedUp(data)).toBe(false);
+    expect(minutesLeft(data)).toBe(0);
+    expect(nearlyOut(data)).toBe(false);
+  });
+
   it.each([[2700, false], [2701, true], [3420, true], [3421, false]])("handles the 15-minute and minimum-start edges (%i seconds used)", (seconds, expected) => {
     expect(nearlyOut(withSeconds(seconds))).toBe(expected);
   });

@@ -19,8 +19,13 @@ function render(locale: "ar" | "en", props: ComponentProps<typeof QuotaBlock>) {
   );
 }
 const textOf = (html: string) => html.replace(/<[^>]*>/g, "").replace(/&#x27;/g, "'");
-function expectQuiet(html: string) {
-  expect(html).toContain("bg-tint-amber");
+function expectQuiet(html: string, surface: "site" | "session" = "site") {
+  if (surface === "session") {
+    expect(html).toContain("border border-line bg-panel");
+    expect(html).not.toContain("amber");
+  } else {
+    expect(html).toContain("bg-tint-amber");
+  }
   expect(html).not.toMatch(/<button|\/plans|\/checkout|SAR|ريال|ترقية|upgrade|للأسف|text-error|bg-error|bg-pressable/);
   expect(html).not.toMatch(/[٠-٩]/);
 }
@@ -35,6 +40,29 @@ const plurals = [
 ] as const;
 
 describe("QuotaBlock", () => {
+  it("defaults to the site surface and accepts it explicitly", () => {
+    const props = { kind: "used-up", minutesStudied: 38, sessionsUsed: 6, renewalDate: new Date("2026-10-30T22:00:00Z") } as const;
+    const html = render("ar", props);
+    expect(render("ar", { ...props, surface: "site" })).toBe(html);
+    expectQuiet(html);
+  });
+
+  it.each(["ar", "en"] as const)("shows achievement first and one next-session date on the session panel in %s", (locale) => {
+    const props = { kind: "used-up", minutesStudied: 38, sessionsUsed: 6, renewalDate: new Date("2026-10-30T22:00:00Z") } as const;
+    const html = render(locale, { ...props, surface: "session" });
+    const paragraphs = html.match(/<p\b[^>]*>.*?<\/p>/g)!;
+    const siteParagraphs = render(locale, props).match(/<p\b[^>]*>.*?<\/p>/g)!;
+    expect(paragraphs).toHaveLength(2);
+    expect(paragraphs[0]).toBe(siteParagraphs[0]);
+    expect(textOf(paragraphs[1])).toBe(locale === "ar"
+      ? "تقدر تبدأ حصتك الجاية في 31 أكتوبر 2026"
+      : "You can start your next session on October 31, 2026");
+    expect(textOf(html)).not.toContain((locale === "ar" ? ar : en).Quota.usedUp.limit);
+    expect(html).toContain("text-ink");
+    expect(html).toContain("text-ink-2");
+    expectQuiet(html, "session");
+  });
+
   it.each(plurals)("renders Arabic plurals for %i minutes and sessions", (count, minutes, sessions) => {
     const html = render("ar", { kind: "used-up", minutesStudied: count, sessionsUsed: count, renewalDate: new Date("2026-10-30T22:00:00Z") });
     const text = textOf(html);

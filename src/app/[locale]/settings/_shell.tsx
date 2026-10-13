@@ -15,7 +15,7 @@ import { SignOut } from "./_sign-out";
    في عمود جانبي ملازم، وعلى الجوال يعود منها برابط رجوع واحد. */
 
 export type SectionId =
-  "account" | "study" | "notifications" | "subscription" | "invoices" | "data";
+  "account" | "study" | "subscription" | "invoices" | "data";
 
 export const SETTINGS_SECTIONS: {
   id: SectionId;
@@ -28,10 +28,6 @@ export const SETTINGS_SECTIONS: {
   {
     id: "study",
     href: "/settings/study",
-  },
-  {
-    id: "notifications",
-    href: "/settings/notifications",
   },
   {
     id: "subscription",

@@ -114,8 +114,6 @@
     "accountHint": "Your name, email and university",
     "study": "Study preferences",
     "studyHint": "Explanation speed and test format",
-    "notifications": "Notifications",
-    "notificationsHint": "WhatsApp and email, with a switch for each type",
     "subscription": "Subscription",
     "subscriptionHint": "Your plan, minutes and renewal",
     "invoices": "Invoices",
@@ -147,22 +145,6 @@
       "quick": "In a hurry",
       "relaxed": "I have time"
     },
-    "Notifications": {
-      "metadataTitle": "Notifications — Becan",
-      "title": "Notifications",
-      "lede": "Each type has its own switch. There’s no single switch that turns everything off.",
-      "whatsapp": "WhatsApp",
-      "email": "Email",
-      "inapp": "In the app",
-      "examTitle": "Exam reminder",
-      "examEffect": "Arrives one week and two days before your exam, with the chapters you still need to finish.",
-      "readyTitle": "Your course is ready",
-      "readyEffect": "Arrives when a course you requested becomes available.",
-      "quotaTitle": "Minutes running low",
-      "quotaEffect": "Alerts you in the app when less than 20% of your monthly minutes remain. We don’t send it by WhatsApp or email.",
-      "billingAlways": "Invoices and payment confirmations are always sent. They concern your money, so they stay on.",
-      "channelLabel": "{kind} via {channel}"
-    },
     "Data": {
       "metadataTitle": "Your data — Becan",
       "title": "Your data",
@@ -182,7 +164,7 @@
       "deletedAccount": "Your account, name, email and phone number.",
       "deletedSessions": "All your sessions: what Becan explained, your questions and answers, and where you struggled.",
       "deletedEnrollments": "Your enrollments in your courses.",
-      "deletedPreferences": "Your preferences and notification settings.",
+      "deletedPreferences": "Your study preferences.",
       "deletedAudio": "Any voice recordings we still have for you.",
       "keptInvoices": "Your invoices and payment amounts — tax regulations require us to keep them. They contain no study content.",
       "keptStats": "Aggregated statistics that can’t be traced back to you or identify you, such as how many students studied a particular chapter.",
@@ -494,7 +476,7 @@
       "universityPlaceholder": "Enter the university name",
       "course": "Course name or code",
       "coursePlaceholder": "For example: Accounting 2 or ACCT 201",
-      "contact": "Where should we notify you when it’s ready?",
+      "contact": "Contact details",
       "preferPhone": "Use my phone number",
       "preferEmail": "Use my email",
       "optional": "Optional",
@@ -509,10 +491,10 @@
     "intro": "We prepare courses based on demand. Each request raises the course’s priority in the production queue.",
     "Sent": {
       "metadataTitle": "Request received — Becan",
-      "metadataDescription": "We’ll notify you on WhatsApp when the course is ready.",
+      "metadataDescription": "Each new request raises the course’s priority in the production queue.",
       "tryAnother": "Try another course",
       "title": "Got your <word>request</word>",
-      "body": "We’ll notify you on WhatsApp when the course is ready.<br></br>Each new request raises its priority in the production queue.",
+      "body": "Each new request raises the course’s priority in the production queue.",
       "shareSubject": "I requested “{subject}” on Becan. Request it too to raise its priority.",
       "shareDefault": "I requested my course on Becan. Request yours to raise its priority.",
       "peers": "{count, plural, one {{countLabel} student requested this too} other {{countLabel} students requested this too}}"
@@ -930,7 +912,6 @@
           "points1": {
             "item1": "To run the service: show your course, resume where you stopped, and count your minutes.",
             "item2": "To improve explanations: identify topics most students struggle with and rebuild them.",
-            "item3": "To keep you informed: reminders before your exam and a notification when your course is ready — you choose the channels in Notifications.",
             "item4": "To protect the service: detect misuse and account sharing."
           }
         },

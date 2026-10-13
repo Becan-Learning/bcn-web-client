@@ -38,7 +38,6 @@
     "faq": "FAQs",
     "contact": "Contact us",
     "status": "System status",
-    "ambassadors": "Ambassadors",
     "login": "Sign in",
     "terms": "Terms and conditions",
     "privacy": "Privacy policy",
@@ -333,90 +332,6 @@
         "date": "19 July 2026",
         "title": "Scheduled maintenance",
         "what": "A server update, announced two days in advance."
-      }
-    }
-  },
-  "Ambassadors": {
-    "Form": {
-      "universityRequired": "Choose your university from the list",
-      "chooseUniversity": "Choose your university",
-      "universityName": "University name",
-      "other": "Other",
-      "phonePlaceholder": "05xxxxxxxx",
-      "contactInvalid": "Check your email, or enter a 10-digit number starting with 05",
-      "nameRequired": "Enter your name",
-      "sentTitle": "We’ve received your request",
-      "name": "Your name",
-      "university": "Your university",
-      "contactRequired": "Enter your phone number or email",
-      "contact": "Phone number or email",
-      "reachHint": "Optional — helps us prioritize applications",
-      "reach": "How do you reach your classmates?",
-      "reachPlaceholder": "Year group chat, Twitter account, college club…",
-      "submit": "Apply to be an ambassador",
-      "sentBody": "We review applications weekly and reply within five days. If accepted, you’ll receive your referral link and a dashboard to track sign-ups."
-    },
-    "metadataTitle": "Becan ambassadors",
-    "metadataDescription": "Share Becan with your classmates and earn a commission.",
-    "title": "Be a Becan <word>ambassador</word> at your university",
-    "intro": "Students listen to students. If Becan helped you, share it with your classmates and earn a commission.",
-    "commission": "20%",
-    "commissionBody": "of each subscription through your link",
-    "commissionNote": "Plus a free Pro subscription while you’re an ambassador.",
-    "doesTitle": "What you’ll do",
-    "getsTitle": "What you’ll get",
-    "applyTitle": "Apply",
-    "applyBody": "Four fields. We’ll review your application and reply within five days.",
-    "doesShare": "Share Becan with your year group — in a chat, on your account, or during a group study session.",
-    "doesTry": "Try new courses before release and tell us what’s missing.",
-    "doesRequest": "Tell us which courses your department needs so we can prepare them before next term.",
-    "getsProTitle": "Free Pro subscription",
-    "getsProBody": "While you’re an ambassador — 500 minutes a month and all your courses.",
-    "getsCommissionTitle": "Commission on each subscription",
-    "getsCommissionBody": "20% of each subscription through your link, including renewals during the first year.",
-    "getsBadgeTitle": "Ambassador badge",
-    "getsBadgeBody": "A badge on your account and profile, plus a certificate you can add to your CV."
-  },
-  "Investors": {
-    "Form": {
-      "emailInvalid": "Check your email address",
-      "emailPlaceholder": "name@fund.com",
-      "nameRequired": "Enter your name",
-      "sentTitle": "We’ve received your request",
-      "orgRequired": "Enter your organization or fund name",
-      "name": "Name",
-      "organization": "Organization",
-      "email": "Email",
-      "sentBody": "We’ll email you the <latin>deck</latin> within one business day, with a suggested time for a short call if you’d like.",
-      "submit": "Request the <latin>deck</latin>"
-    },
-    "metadataTitle": "For investors — Becan",
-    "metadataDescription": "Voice explanations, an interactive board and questions to check understanding. Built first for Saudi university students.",
-    "title": "Becan — for investors",
-    "intro": "An Arabic-first web product where university students study their course through voice explanations on an interactive board, then answer questions to check understanding. Our first market is Saudi university students.",
-    "metricsNote": "Operational figures as of 23 August 2026, from actual use rather than expressions of interest.",
-    "deckBody": "Includes the market, product, revenue model, team and financial plan. We’ll send it within one business day.",
-    "deckTitle": "Request the <latin>deck</latin>",
-    "Metrics": {
-      "students": {
-        "note": "Registered and active",
-        "amount": "{count, plural, one {<value>{countLabel}</value> <unit>student</unit>} other {<value>{countLabel}</value> <unit>students</unit>}}"
-      },
-      "sessions": {
-        "note": "Completed explanation sessions",
-        "amount": "{count, plural, one {<value>{countLabel}</value> <unit>session</unit>} other {<value>{countLabel}</value> <unit>sessions</unit>}}"
-      },
-      "hours": {
-        "note": "Study time in sessions",
-        "amount": "{count, plural, one {<value>{countLabel}</value> <unit>hour</unit>} other {<value>{countLabel}</value> <unit>hours</unit>}}"
-      },
-      "return": {
-        "note": "Return for a second session",
-        "amount": "<value>{countLabel}%</value> <unit>return</unit>"
-      },
-      "rating": {
-        "note": "Student session rating",
-        "amount": "<value>{countLabel}</value> <unit>out of 5</unit>"
       }
     }
   },

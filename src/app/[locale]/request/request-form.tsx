@@ -4,11 +4,10 @@ import { useLocale, useTranslations } from "next-intl";
 
 import { localize } from "@/i18n/localized";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import type { Institution } from "@/lib/auth/catalog";
 import type { CourseSummary } from "@/lib/courses/schema";
-import { UploadIcon } from "@/components/becan/icons";
 import {
   ErrorText,
   FieldLabel,
@@ -16,9 +15,17 @@ import {
   SelectField,
   TextField,
 } from "@/components/becan/kit";
+import { sendRequest } from "@/lib/forms/request-client";
+import {
+  isValidRequestContact,
+  OTHER_UNIVERSITY,
+} from "@/lib/forms/request-validation";
 
 /* بريف الشاشة 2: الهدف إرسال الطلب في أقل من 30 ثانية.
-   ثلاثة حقول إلزامية، ثم حقل ملفّات اختياري لا يمنع الإرسال أبدًا.
+   ثلاثة حقول إلزامية، لا غير.
+
+   يُرسل النموذج إلى `/api/forms/request` لا إلى Google مباشرة. الفخّ
+   `website` مخفيّ عن الشخص ويملؤه الروبوت وحده، و`startedAt` لحظة العرض.
 
    `noValidate` على النموذج مقصود: يعطّل رسائل المتصفّح الافتراضية
    لأنها بلغة النظام لا بالعربية، ونعرض رسائلنا بدلًا منها. */
@@ -31,15 +38,23 @@ export function RequestForm({ institutions, courses }: { institutions: Instituti
   const t = useTranslations("Request.Form");
   const router = useRouter();
   const locale = useLocale();
+  const interfaceLocale = locale === "en" ? "en" : "ar";
   const [university, setUniversity] = useState("");
   const [otherName, setOtherName] = useState("");
   const [course, setCourse] = useState("");
   const [contact, setContact] = useState("");
   const [byEmail, setByEmail] = useState(false);
-  const [files, setFiles] = useState<string[]>([]);
   const [errors, setErrors] = useState<Errors>({});
+  const [website, setWebsite] = useState("");
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
+  const startedAt = useRef(0);
 
-  const otherUniversity = university === "other";
+  useEffect(() => {
+    startedAt.current = Date.now();
+  }, []);
+
+  const otherUniversity = university === OTHER_UNIVERSITY;
 
   const clear = (key: keyof Errors) =>
     setErrors((prev) => {
@@ -59,18 +74,15 @@ export function RequestForm({ institutions, courses }: { institutions: Instituti
 
     if (!value) {
       e.contact = byEmail ? t("emailRequired") : t("phoneRequired");
-    } else if (byEmail) {
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-        e.contact = t("emailInvalid");
-      }
-    } else if (!/^0\d{9}$/.test(value.replace(/[\s-]/g, ""))) {
-      e.contact = t("phoneInvalid");
+    } else if (!isValidRequestContact(value, byEmail)) {
+      e.contact = byEmail ? t("emailInvalid") : t("phoneInvalid");
     }
     return e;
   };
 
-  const submit = (event: React.FormEvent) => {
+  const submit = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (sending) return;
     const found = validate();
     setErrors(found);
 
@@ -85,10 +97,26 @@ export function RequestForm({ institutions, courses }: { institutions: Instituti
       return;
     }
 
-    const params = new URLSearchParams();
-    params.set("course", course.trim());
-    params.set("university", otherUniversity ? otherName.trim() : university);
-    router.push("/request/sent?" + params.toString());
+    setSendError(null);
+    setSending(true);
+    const result = await sendRequest({
+      university,
+      universityOther: otherName.trim(),
+      course: course.trim(),
+      contact: contact.trim(),
+      byEmail,
+      locale: interfaceLocale,
+      website,
+      startedAt: startedAt.current,
+    });
+
+    /* عند الفشل يبقى كل ما كتبه الطالب كما هو ليعيد المحاولة */
+    if (result === "sent") {
+      router.push("/request/sent");
+      return;
+    }
+    setSending(false);
+    setSendError(t(result === "rate-limited" ? "sendRateLimited" : "sendFailed"));
   };
 
   const hasErrors = Object.keys(errors).length > 0;
@@ -209,47 +237,30 @@ export function RequestForm({ institutions, courses }: { institutions: Instituti
         </button>
       </div>
 
-      {/* اختياري — بلا نجمة، بلا تحذير، ولا يعطّل الإرسال */}
-      <div className="mt-8 rounded-xl border border-line bg-surface p-4 shadow-soft">
-        <FieldLabel htmlFor="req-files" hint={t("optional")}>
-          {t("files")}
-        </FieldLabel>
-        <label
-          htmlFor="req-files"
-          className="mt-3 flex min-h-28 cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-aubergine-mid bg-tint-aubergine p-4 text-center"
-        >
-          <UploadIcon className="h-7 w-7 text-aubergine-base" />
-          <span className="text-sm font-semibold text-aubergine-base">
-            {t("chooseFiles")}
-          </span>
-        </label>
+      {/* فخّ الروبوتات: لا يراه الشخص ولا يصل إليه التركيز */}
+      <div aria-hidden="true" className="sr-only">
         <input
-          id="req-files"
-          name="files"
-          type="file"
-          multiple
-          className="sr-only"
-          onChange={(e) =>
-            setFiles(Array.from(e.target.files ?? []).map((f) => f.name))
-          }
+          type="text"
+          name="website"
+          tabIndex={-1}
+          autoComplete="off"
+          value={website}
+          onChange={(e) => setWebsite(e.target.value)}
         />
-        {files.length ? (
-          <ul className="mt-3 flex flex-col gap-1">
-            {files.map((f) => (
-              <li key={f} dir="auto" className="text-sm text-ink-2">
-                {f}
-              </li>
-            ))}
-          </ul>
-        ) : null}
       </div>
 
       <p role="alert" className="mt-6 min-h-6 text-sm font-semibold text-error">
         {hasErrors ? t("errors") : ""}
       </p>
 
-      <PrimaryButton type="submit" className="w-full md:w-auto">
-        {t("submit")}
+      {sendError ? (
+        <div role="alert" className="mb-4">
+          <ErrorText id="err-send">{sendError}</ErrorText>
+        </div>
+      ) : null}
+
+      <PrimaryButton type="submit" disabled={sending} className="w-full md:w-auto">
+        {sending ? t("sending") : t("submit")}
       </PrimaryButton>
     </form>
   );

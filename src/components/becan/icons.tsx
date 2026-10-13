@@ -47,15 +47,6 @@ export function ArrowBack({ className = "h-4 w-4" }: P) {
   );
 }
 
-export function UploadIcon({ className = "h-6 w-6" }: P) {
-  return (
-    <svg {...base} viewBox="0 0 24 24" className={className}>
-      <path d="M12 16V4m0 0L7 9m5-5 5 5" />
-      <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
-    </svg>
-  );
-}
-
 export function CheckIcon({ className = "h-6 w-6" }: P) {
   return (
     <svg {...base} viewBox="0 0 24 24" className={className} strokeWidth={2.5}>

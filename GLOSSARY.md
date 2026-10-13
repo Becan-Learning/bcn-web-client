@@ -59,6 +59,11 @@ _Avoid_: subscription, registration (that is creating an Account), membership
 
 ## Session
 
+**Session** (الحصة):
+One sitting in which the tutor teaches one student one Chapter, from the moment it starts until it
+ends. A student has at most one Session open at a time.
+_Avoid_: lesson, call, room, class; and never the sign-in sense of "session" (a Device session)
+
 **Topic** (الموضوع):
 One step inside a Lesson that the tutor marks while teaching it. It exists only inside a
 session; nothing outside a session counts or shows Topics.
@@ -75,3 +80,24 @@ _Avoid_: question (alone), quiz, assessment, open question
 A spoken question the student deliberately starts by pressing Ask, cutting the tutor off
 mid-explanation. Outside a student question the tutor does not hear the student's voice.
 _Avoid_: question (alone), interruption, voice message
+
+## Plans
+
+**Plan** (الباقة):
+A named set of limits on what a student may use. Every student is on exactly one Plan at a time;
+at launch every student is on the Free Plan.
+_Avoid_: tier, subscription, package, خطة
+
+**Allowance** (حدود الاستخدام):
+What a Plan lets a student use in one Period: how many Sessions they may start, how many minutes
+of Session time, and how many Courses they may hold an Enrollment in at once.
+_Avoid_: quota, credits, balance, الحصة (that is a Session)
+
+**Usage** (الاستخدام):
+How much of the Allowance the student has used in the current Period.
+_Avoid_: consumption, spend
+
+**Period** (دورة الاستخدام):
+The 30-day window an Allowance applies to. When one Period ends the next begins and Usage starts
+again from zero.
+_Avoid_: month, billing cycle, cycle (alone)

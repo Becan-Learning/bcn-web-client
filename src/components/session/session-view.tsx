@@ -20,7 +20,6 @@ import {
 } from "./explanation-language";
 import dynamic from "next/dynamic";
 import { useRouter } from "@/i18n/navigation";
-import { motion } from "motion/react";
 import {
   RoomAudioRenderer,
   SessionProvider,
@@ -38,6 +37,9 @@ import { createStudentQuestion, type StudentQuestionStatus } from "./student-que
 import { getExperience } from "@/lib/experience";
 import type { ChapterContent } from "@/lib/session/types";
 import { tokenSchema } from "@/lib/courses/schema";
+import { AllowanceUsedUpError, tokenErrorOutcome } from "@/lib/session/token-error";
+import { SessionShell as Shell } from "./session-start";
+import { RemainingMinutes } from "./remaining-minutes";
 import {
   INITIAL_SESSION_STATE,
   checkpointShown,
@@ -93,6 +95,7 @@ type SessionViewProps = {
   content: ChapterContent;
   pdfUrl: string;
   lessons: Lesson[];
+  minutesRemaining: number | null;
 };
 
 export function SessionView(props: SessionViewProps) {
@@ -123,7 +126,11 @@ export function SessionView(props: SessionViewProps) {
           body: JSON.stringify({ courseId, chapterNumber, language, experience: getExperience() }),
           cache: "no-store",
         });
-        if (!res.ok) throw new Error(`Token request failed (${res.status})`);
+        if (!res.ok) {
+          const body: unknown = await res.json().catch(() => null);
+          if (tokenErrorOutcome(res.status, body) === "used-up") throw new AllowanceUsedUpError();
+          throw new Error(`Token request failed (${res.status})`);
+        }
         const { serverUrl, token } = tokenSchema.parse(await res.json());
         return { serverUrl, participantToken: token };
       }),
@@ -157,6 +164,7 @@ function SessionScreen({
   minutes,
   pdfUrl,
   lessons,
+  minutesRemaining,
 }: SessionViewProps & {
   session: ReturnType<typeof useSession>;
   language: ExplanationLanguage;
@@ -331,6 +339,12 @@ function SessionScreen({
         throw error;
       }
     } catch (error) {
+      if (error instanceof AllowanceUsedUpError) {
+        /* رُفض البدء بعد قراءة الصفحة؛ نعيد قراءة الاستخدام وموعد التجدد من الخادم. */
+        setStarted(false);
+        router.refresh();
+        return;
+      }
       console.error("Failed to start session:", error);
       setFailed(true);
     } finally {
@@ -532,6 +546,7 @@ function SessionScreen({
               estimate: (chunks) => <span dir="ltr">{chunks}</span>,
             })}
           </p>
+          {minutesRemaining !== null ? <RemainingMinutes count={minutesRemaining} /> : null}
           <LanguageChoice value={language} onChange={onLanguage} />
           {lessons.length > 0 ? (
             <p className="mt-6 text-sm text-ink-2">{t("chooseLesson")}</p>
@@ -668,21 +683,5 @@ function SessionScreen({
       <RoomAudioRenderer />
       <PacketRecorderButtons recorder={recorder} />
     </Shell>
-  );
-}
-
-/* الغلاف — سطح الجلسة الداكن، والدخول تلاشٍ 250ms */
-function Shell({ children, reduce }: { children: React.ReactNode; reduce: boolean }) {
-  return (
-    <motion.div
-      data-theme="dark"
-      data-surface="session"
-      initial={reduce ? false : { opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.25 }}
-      className="relative flex h-dvh flex-col bg-ground text-ink"
-    >
-      {children}
-    </motion.div>
   );
 }

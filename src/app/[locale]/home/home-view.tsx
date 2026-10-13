@@ -5,10 +5,12 @@ import { TONES } from "@/lib/courses/presentation";
 import { GearIcon } from "@/components/becan/icons";
 import { Copy, GhostButton, PageShell, PrimaryButton } from "@/components/becan/kit";
 import type { Enrollment } from "@/lib/courses/schema";
+import { QuotaBlock } from "@/components/becan/quota";
+import type { UsedUpQuota } from "@/lib/allowance/presentation";
 
 /* الشاشة ٨ — الداشبورد `/home`، مقصور على المقررات المسجَّلة. */
 
-export async function HomeView({ name, enrollments }: { name: string; enrollments: Enrollment[] | null }) {
+export async function HomeView({ name, enrollments, quota }: { name: string; enrollments: Enrollment[] | null; quota: UsedUpQuota | null }) {
   const t = await getTranslations("Home");
 
   return (
@@ -26,6 +28,8 @@ export async function HomeView({ name, enrollments }: { name: string; enrollment
       </header>
 
       <main className="mx-auto w-full max-w-page px-4 pt-4 pb-16 md:px-8 xl:px-10">
+        {quota ? <div className="mb-6"><QuotaBlock {...quota} /></div> : null}
+
         <h1 className="font-display text-3xl leading-tight font-bold text-ink md:text-4xl">
           {t("title")}
         </h1>

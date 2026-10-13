@@ -10,6 +10,10 @@ import { redirect } from "@/i18n/navigation";
 import { getLessons } from "@/lib/session/lessons";
 import { requireAccount } from "@/lib/auth/session";
 import { accountReturnPath } from "@/lib/auth/next-path";
+import { getAllowance } from "@/lib/allowance/server";
+import { minutesLeft, nearlyOut } from "@/lib/allowance/rules";
+import { usedUpQuota } from "@/lib/allowance/presentation";
+import { SessionUsedUp } from "@/components/session/session-start";
 
 export async function generateMetadata(
   props: PageProps<"/[locale]/session/[code]/[n]">,
@@ -34,13 +38,25 @@ export default async function SessionPage(
   const { code, n } = await props.params;
   await requireAccount(locale, accountReturnPath(`/session/${code}/${n}`, await props.searchParams));
 
-  const [result, enrollments] = await Promise.all([getCourse(code), getEnrollments()]);
+  const [result, enrollments, allowanceResult] = await Promise.all([getCourse(code), getEnrollments(), getAllowance()]);
   if (!result.ok) notFound();
   const course = result.data;
   const chapter = course.chapters.find((c) => String(c.number) === n);
   if (!chapter || !chapter.published) notFound();
   if (!enrollments.ok || !enrollments.data.some((e) => e.course.id === course.id)) {
     return redirect({ locale, href: `/c/${course.id}` });
+  }
+
+  const allowance = allowanceResult.ok ? allowanceResult.data : null;
+  const quota = usedUpQuota(allowance);
+  if (quota) {
+    return <SessionUsedUp
+      courseName={localize(course.name, locale)}
+      courseSlug={course.id}
+      chapterNo={chapter.number}
+      chapterTitle={localize(chapter.title, locale)}
+      quota={quota}
+    />;
   }
 
   const content = { courseId: course.id, chapterId: `ch_${chapter.number}` };
@@ -56,6 +72,7 @@ export default async function SessionPage(
       content={content}
       pdfUrl={`/api/fetch-bunny/courses/${course.id}/${content.chapterId}/slides.pdf`}
       lessons={lessons}
+      minutesRemaining={allowance && nearlyOut(allowance) ? minutesLeft(allowance) : null}
     />
   );
 }

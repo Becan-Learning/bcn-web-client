@@ -7,6 +7,8 @@ import { getEnrollments } from "@/lib/auth/courses";
 import { HomeView } from "./home-view";
 import { requireAccount } from "@/lib/auth/session";
 import { accountReturnPath } from "@/lib/auth/next-path";
+import { getAllowance } from "@/lib/allowance/server";
+import { usedUpQuota } from "@/lib/allowance/presentation";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/home">): Promise<Metadata> {
   const { locale } = await params;
@@ -23,6 +25,7 @@ export default async function HomePage(props: PageProps<"/[locale]/home">) {
   setRequestLocale(locale);
   const { user: account } = await requireAccount(locale, accountReturnPath("/home", await props.searchParams));
 
-  const enrollments = await getEnrollments();
-  return <HomeView name={account.name} enrollments={enrollments.ok ? enrollments.data : null} />;
+  const [enrollments, allowance] = await Promise.all([getEnrollments(), getAllowance()]);
+  return <HomeView name={account.name} enrollments={enrollments.ok ? enrollments.data : null}
+    quota={usedUpQuota(allowance.ok ? allowance.data : null)} />;
 }

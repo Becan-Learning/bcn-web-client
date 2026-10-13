@@ -10,6 +10,10 @@ export type UsedUpQuota = {
 
 export function usedUpQuota(allowance: Allowance | null): UsedUpQuota | null {
   if (!allowance || !usedUp(allowance)) return null;
+  return reachedAllowanceQuota(allowance);
+}
+
+export function reachedAllowanceQuota(allowance: Allowance): UsedUpQuota {
   return {
     kind: "used-up",
     minutesStudied: Math.ceil(allowance.usage.seconds / 60),

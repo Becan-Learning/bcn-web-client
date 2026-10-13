@@ -14,6 +14,9 @@ import { ArrowForward } from "@/components/becan/icons";
 import { FeedbackForm } from "./feedback-form";
 import { requireAccount } from "@/lib/auth/session";
 import { accountReturnPath } from "@/lib/auth/next-path";
+import { getAllowance } from "@/lib/allowance/server";
+import { usedUpQuota } from "@/lib/allowance/presentation";
+import { QuotaBlock } from "@/components/becan/quota";
 
 /* الشاشة ٩ — نهاية الجلسة على السطح الفاتح.
    تعرض الفصل والحدّ الزمني إن بلغته الجلسة، والتقييم عند وصول اسم الغرفة.
@@ -35,20 +38,23 @@ export default async function SummaryPage(
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
   const { code, n } = await props.params;
-  await requireAccount(locale, accountReturnPath(`/session/${code}/${n}/done`, await props.searchParams));
-  const [t, format, result, enrollments] = await Promise.all([
+  const sp = await props.searchParams;
+  await requireAccount(locale, accountReturnPath(`/session/${code}/${n}/done`, sp));
+  /* اسم الغرفة يصل من الحصة الحقيقية، لا من معاينة الملخّص. */
+  const roomRaw = Array.isArray(sp.room) ? sp.room[0] : sp.room;
+  const room = typeof roomRaw === "string" && roomRaw ? roomRaw : null;
+  const [t, format, result, enrollments, allowance] = await Promise.all([
     getTranslations("SessionSummary"),
     getFormatter(),
     getCourse(code),
     getEnrollments(),
+    room ? getAllowance() : null,
   ]);
   const number = (value: number) => format.number(value, { numberingSystem: "latn" });
 
-  const sp = await props.searchParams;
   /* تصل من الجلسة الحقيقية: اسم غرفة LiveKit للتقييم، وبلوغ الحدّ الزمني */
-  const roomRaw = Array.isArray(sp.room) ? sp.room[0] : sp.room;
-  const room = typeof roomRaw === "string" && roomRaw ? roomRaw : null;
   const hitLimit = (Array.isArray(sp.limit) ? sp.limit[0] : sp.limit) === "1";
+  const quota = usedUpQuota(allowance?.ok ? allowance.data : null);
   if (!result.ok) notFound();
   const course = result.data;
   const chapter = course.chapters.find((c) => String(c.number) === n);
@@ -67,7 +73,9 @@ export default async function SummaryPage(
           </h1>
 
           {/* الحدّ الزمني — كهرماني هادئ مع فعل ممكن، لا إنذار أحمر (النمط 7) */}
-          {hitLimit ? (
+          {quota ? (
+            <div className="mt-6"><QuotaBlock {...quota} /></div>
+          ) : hitLimit ? (
             <p className="mt-6 rounded-lg bg-tint-amber px-4 py-3 leading-base text-ink">
               {t("limit")}
             </p>

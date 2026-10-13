@@ -38,6 +38,10 @@ import { getExperience } from "@/lib/experience";
 import type { ChapterContent } from "@/lib/session/types";
 import { tokenSchema } from "@/lib/courses/schema";
 import { AllowanceUsedUpError, tokenErrorOutcome } from "@/lib/session/token-error";
+import { readSessionAllowance } from "@/lib/allowance/client";
+import type { Allowance } from "@/lib/allowance/schema";
+import { sessionEndingQuota } from "@/lib/session/ending";
+import { QuotaBlock } from "@/components/becan/quota";
 import { SessionShell as Shell } from "./session-start";
 import { RemainingMinutes } from "./remaining-minutes";
 import {
@@ -179,6 +183,9 @@ function SessionScreen({
   const isMobile = useIsMobile();
   const agent = useAgent(session);
   const [state, dispatch] = useReducer(sessionReducer, INITIAL_SESSION_STATE);
+  const [endingAllowance, setEndingAllowance] = useState<Allowance | null>(null);
+  const allowanceRead = useRef<Promise<Allowance | null> | null>(null);
+  const allowanceRequest = useRef<AbortController | null>(null);
   const recorder = usePacketRecorder();
   const { record } = recorder;
 
@@ -265,12 +272,23 @@ function SessionScreen({
       }
       record(parsed, room.name);
       const message = parseAgentMessage(parsed);
+      if (message?.action === "allowance_reached" && !allowanceRead.current) {
+        const request = new AbortController();
+        allowanceRequest.current = request;
+        allowanceRead.current = readSessionAllowance(
+          AbortSignal.any([request.signal, AbortSignal.timeout(5_000)]),
+        ).then((allowance) => {
+          if (!request.signal.aborted) setEndingAllowance(allowance);
+          return allowance;
+        });
+      }
       if (message) dispatch(message);
     };
     const onDisconnected = () => dispatch({ action: "board_reset" });
     room.on(RoomEvent.Disconnected, onDisconnected);
     room.on(RoomEvent.DataReceived, onData);
     return () => {
+      allowanceRequest.current?.abort();
       room.off(RoomEvent.Disconnected, onDisconnected);
       room.off(RoomEvent.DataReceived, onData);
     };
@@ -303,6 +321,9 @@ function SessionScreen({
   const start = async (lessonSlug: string | null = null) => {
     if (starting) return;
     onLockLanguage();
+    allowanceRequest.current?.abort();
+    allowanceRead.current = null;
+    setEndingAllowance(null);
     dispatch({ action: "session_reset" });
     pendingLesson.current = lessonSlug;
     setFailed(false);
@@ -360,6 +381,8 @@ function SessionScreen({
       const room = sessionRef.current.room.name;
       await studentQuestion.close("cancel_turn");
       await sessionRef.current.end().catch(() => undefined);
+      /* القراءة بدأت مع الإشارة؛ لا مؤقّت جديد ولا مسار إنهاء ثانٍ. */
+      if (reason === "limit") await allowanceRead.current;
       const q = new URLSearchParams();
       if (room) q.set("room", room);
       if (reason === "limit") q.set("limit", "1");
@@ -385,6 +408,7 @@ function SessionScreen({
   /* ————— المرحلة المعروضة — اشتقاق نقيّ ————— */
   const cs = session.connectionState;
   const ending = state.ending || userEnding;
+  const endingQuota = sessionEndingQuota(state, endingAllowance);
   let phase: Phase;
   if (ending) phase = "ending";
   else if (
@@ -596,22 +620,26 @@ function SessionScreen({
 
         {/* السبورة — الثلثان، والشريط يسبح فوقها */}
         <main className="relative flex min-w-0 flex-[2] flex-col">
-          <Board
+          {endingQuota ? (
+            <div role="status" className="flex min-h-0 flex-1 flex-col justify-center overflow-y-auto p-5 md:p-8">
+              <QuotaBlock {...endingQuota} surface="session" />
+            </div>
+          ) : <Board
             board={state.board}
             speaking={phase === "live"}
             intro={intro}
             reduce={reduce}
             language={language}
-          />
+          />}
 
-          {chat && inRoom ? (
+          {!endingQuota && chat && inRoom ? (
             <ChatPanel
               onSend={sendText}
               onClose={() => setChat(false)}
             />
           ) : null}
 
-          <Toolbar
+          {!endingQuota ? <Toolbar
             phase={phase}
             hint={phase === "idle"}
             canAsk={canAsk}
@@ -632,7 +660,7 @@ function SessionScreen({
             onSlides={() => setShowSlides((v) => !v)}
             onTopics={onTopics}
             onEnd={() => setConfirmEnd(true)}
-          />
+          /> : null}
         </main>
 
         {/* الثلث — الشرائح تملأ العمود كاملًا */}

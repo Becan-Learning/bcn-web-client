@@ -24,6 +24,8 @@ export type UIControlEvent =
       checkpoint: { id: string; question: string; choices: string[] } | null;
     }
   | { action: "topic_done" }
+  /** حدود الاستخدام هي سبب نهاية الحصة القادمة */
+  | { action: "allowance_reached" }
   /** بلغت الجلسة حدّها الزمني */
   | { action: "session_ending"; message: string };
 
@@ -65,6 +67,8 @@ export function parseUIControlEvent(value: unknown): UIControlEvent | null {
     }
     case "topic_done":
       return { action: "topic_done" };
+    case "allowance_reached":
+      return { action: "allowance_reached" };
     case "session_ending":
       return typeof value.message === "string" ? { action: "session_ending", message: value.message } : null;
     default:

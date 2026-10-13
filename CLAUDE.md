@@ -34,7 +34,7 @@ Next.js 16 · TypeScript · Tailwind 4 · Motion (الحزمة `motion`، الا
 - نصوص الصفحات في `messages/` — **ممنوع نصّ ظاهر للطالب ثابت في المكوّنات** (عربي أو إنجليزي).
   التنقّل بـ`Link` و`useRouter` من `@/i18n/navigation`؛ **ممنوع `next/link`**.
 - **عقد الوكيل لا يُغيَّر من طرف واحد:** الوكيل ينشر على موضوع `ui-control`
-  (`scroll` · `set_lesson` · `set_topic` · `topic_done` · `session_ending` · `board_*`)،
+  (`scroll` · `set_lesson` · `set_topic` · `topic_done` · `allowance_reached` · `session_ending` · `board_*`) — [عقد حدود الاستخدام ونهاية الحصة](docs/agent-contract-allowance.md)،
   والطالب يكتب على `lk.chat` ويستدعي `start_turn` · `end_turn` · `cancel_turn` بـRPC. سمات المشارك يصدرها الخادم في `/api/v1/livekit/token` — [العقد](docs/backend-courses-handoff.md).
 - **Radix للآليات فقط** (حبس التركيز · Escape · البوابات) ويُلوَّن بالتوكنات. لا مظهر shadcn.
   نوافذ الجلسة داخل البوابة تعيد `data-theme="dark" data-surface="session"`.

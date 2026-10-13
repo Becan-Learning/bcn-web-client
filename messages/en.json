@@ -376,14 +376,14 @@
       "universityPlaceholder": "Enter the university name",
       "course": "Course name or code",
       "coursePlaceholder": "For example: Accounting 2 or ACCT 201",
-      "contact": "Contact details",
+      "contact": "Where can we reach you when it’s ready?",
       "preferPhone": "Use my phone number",
       "preferEmail": "Use my email",
-      "optional": "Optional",
-      "files": "Have course files? Upload them to get it ready faster",
-      "chooseFiles": "Drop files or choose them",
       "errors": "Complete the highlighted fields above, then submit",
-      "submit": "Send request"
+      "submit": "Send request",
+      "sending": "Sending…",
+      "sendFailed": "We couldn’t send your request. Check your connection and try again — everything you wrote is still here.",
+      "sendRateLimited": "You’ve sent several requests in a short time. Wait a moment and try again."
     },
     "metadataTitle": "Request your course — Becan",
     "metadataDescription": "We prepare courses based on demand. Each request raises a course’s priority.",
@@ -395,9 +395,7 @@
       "tryAnother": "Try another course",
       "title": "Got your <word>request</word>",
       "body": "Each new request raises the course’s priority in the production queue.",
-      "shareSubject": "I requested “{subject}” on Becan. Request it too to raise its priority.",
-      "shareDefault": "I requested my course on Becan. Request yours to raise its priority.",
-      "peers": "{count, plural, one {{countLabel} student requested this too} other {{countLabel} students requested this too}}"
+      "shareDefault": "I requested my course on Becan. Request yours to raise its priority."
     },
     "title": "Request your <word>course</word>",
     "Share": {
@@ -765,7 +763,7 @@
     "title": "How was the session?",
     "notes": "What can we improve?",
     "error": "Your feedback didn’t arrive. Check your connection and try again.",
-    "sending": "Sending…",
+      "sending": "Sending…",
     "submit": "Send feedback",
     "rating": {
       "bad": "Bad",
@@ -1028,7 +1026,7 @@
     "email": "Email address",
     "emailPlaceholder": "name@example.com",
     "resend": "Resend the link",
-    "sending": "You’re requesting a new link…",
+      "sending": "You’re requesting a new link…",
     "sent": "You requested a new link. Check your inbox.",
     "cooldown": "You can request a new link in {seconds} seconds.",
     "signIn": "Back to sign in"
@@ -1041,7 +1039,7 @@
     "email": "Email address",
     "emailPlaceholder": "name@example.com",
     "submit": "Send the change link",
-    "sending": "You’re requesting the change link…",
+      "sending": "You’re requesting the change link…",
     "confirmation": "If you have an account with this email, you’ll receive a message with a password change link. Check your inbox and spam folder.",
     "signIn": "Back to sign in"
   },

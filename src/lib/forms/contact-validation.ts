@@ -8,10 +8,18 @@ export const MESSAGE_MIN_LENGTH = 10;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const SAUDI_MOBILE = /^0\d{9}$/;
 
-/** بريد أو جوال سعودي بصيغة 05xxxxxxxx (تُزال المسافات والشرطات). */
+export function isValidEmail(value: string): boolean {
+  return EMAIL.test(value.trim());
+}
+
+/** جوال سعودي بصيغة 05xxxxxxxx (تُزال المسافات والشرطات). */
+export function isValidSaudiMobile(value: string): boolean {
+  return SAUDI_MOBILE.test(value.trim().replace(/[\s-]/g, ""));
+}
+
+/** بريد أو جوال سعودي. */
 export function isValidContact(value: string): boolean {
-  const v = value.trim();
-  return EMAIL.test(v) || SAUDI_MOBILE.test(v.replace(/[\s-]/g, ""));
+  return isValidEmail(value) || isValidSaudiMobile(value);
 }
 
 export function isValidMessage(value: string): boolean {

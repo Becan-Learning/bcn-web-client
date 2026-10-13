@@ -428,22 +428,24 @@ export function GhostButton({
   href,
   type,
   onClick,
+  disabled = false,
   children,
   className = "",
 }: {
   href?: string;
   type?: "submit" | "button";
   onClick?: () => void;
+  disabled?: boolean;
   children: React.ReactNode;
   className?: string;
 }) {
-  const cls = `inline-flex h-14 items-center justify-center rounded-pill border border-aubergine-mid px-8 text-lg font-semibold text-aubergine-base ${className}`;
+  const cls = `inline-flex h-14 items-center justify-center rounded-pill border border-aubergine-mid px-8 text-lg font-semibold text-aubergine-base disabled:cursor-not-allowed disabled:opacity-60 ${className}`;
   return href ? (
     <Link href={href} className={cls}>
       {children}
     </Link>
   ) : (
-    <button type={type ?? "button"} onClick={onClick} className={cls}>
+    <button type={type ?? "button"} onClick={onClick} disabled={disabled} className={cls}>
       {children}
     </button>
   );

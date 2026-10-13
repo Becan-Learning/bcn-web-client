@@ -420,9 +420,11 @@
       "messageHint": "For a session issue, include the course and chapter — it cuts our follow-up in half",
       "message": "Your message",
       "submit": "Send message",
+      "sending": "Sending…",
+      "sendFailed": "We couldn’t send your message. Check your connection and try again — everything you wrote is still here.",
+      "sendRateLimited": "You’ve sent several messages in a short time. Wait a moment and try again, or message us on WhatsApp.",
       "topicCourse": "Missing course or unfinished chapter",
       "topicSession": "Session or microphone issue",
-      "topicBilling": "Payment, subscription or refund",
       "topicAccount": "My account and data",
       "topicOther": "Something else"
     },

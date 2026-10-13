@@ -17,7 +17,7 @@ import { runSettingsAuthMutation } from "../_auth-mutations";
    **الزرّ ليس أحمر**: `--error` للخطأ وحده في هذي الهوية، والحذف قرار
    الطالب لا خطؤه. الحارس هو الجملة المكتوبة لا لون الزرّ. */
 
-export function DeleteForm({ activeUntil }: { activeUntil: string | null }) {
+export function DeleteForm() {
   const t = useTranslations("Settings.Delete");
   const authErrors = useTranslations("Auth.Errors");
   const router = useRouter();
@@ -104,12 +104,6 @@ export function DeleteForm({ activeUntil }: { activeUntil: string | null }) {
       onSubmit={submit}
       noValidate
     >
-      {activeUntil ? (
-        <p className="mb-5 max-w-measure leading-base text-ink-2">
-          {t.rich("activeSubscription", { date: activeUntil, strong: (chunks) => <span className="font-semibold text-ink">{chunks}</span>, cancel: (chunks) => <Link href="/settings/subscription" className="font-semibold text-pressable underline underline-offset-4">{chunks}</Link> })}
-        </p>
-      ) : null}
-
       <fieldset disabled={pending} aria-busy={pending} className="min-w-0">
       <FieldLabel htmlFor="del-confirm" hint={t("phraseHint", { phrase })}>
         {t("confirmLabel")}

@@ -1,7 +1,74 @@
 # حالة المشروع — تسليم لجلسة جديدة
 
-> آخر تحديث: 2026-10-13 (البريد المستخدَم عند إنشاء الحساب) · 2026-10-12 (الكتالوج والتسجيل) · 2026-10-06 (سؤال الفهم) · 2026-10-05 (سؤال الطالب) · 2026-10-04 (السبورة v3) · 2026-09-14 (الدمج) · ما تحت قسم الدمج منقول من becan-design كما هو (2026-08-24)
+> آخر تحديث: 2026-10-13 (مسودّات الدفع، البريد المستخدَم عند إنشاء الحساب) · 2026-10-12 (الكتالوج والتسجيل) · 2026-10-06 (سؤال الفهم) · 2026-10-05 (سؤال الطالب) · 2026-10-04 (السبورة v3) · 2026-09-14 (الدمج) · ما تحت قسم الدمج منقول من becan-design كما هو (2026-08-24)
 > اقرأ هذا الملف أولًا مع `CLAUDE.md` و`AGENTS.md`، ثم البريفات في `docs/`.
+
+---
+
+## مسودّات الدفع — معطّلة حتى بوابة الدفع · 2026-10-13
+
+الإطلاق الأولي بلا بوابة دفع وبخطة مجانية واحدة. صفحات الدفع محفوظة
+كمسودّات، مع تعليق عربي في رأس كل ملف؛ منطقها باقٍ كما هو.
+العمل مرتبط بالقضية [#27](https://github.com/Becan-Learning/bcn-web-client/issues/27).
+
+**الملفات المحفوظة:**
+
+- `src/app/[locale]/plans/page.tsx`
+- `src/app/[locale]/plans/plan-card.tsx`
+- `src/app/[locale]/checkout/page.tsx`
+- `src/app/[locale]/checkout/checkout-form.tsx`
+- `src/app/[locale]/checkout/result/page.tsx`
+- `src/app/[locale]/settings/invoices/page.tsx`
+- `src/app/[locale]/settings/invoices/[id]/page.tsx`
+- `src/app/[locale]/settings/invoices/[id]/print-button.tsx`
+- `src/app/[locale]/refunds/page.tsx`
+- `src/lib/data/plans.ts`
+- `src/lib/data/billing.ts`
+
+**التحويلات:** `redirects()` في `next.config.ts` مع `permanent: false`
+(HTTP 307). تعمل قبل `src/proxy.ts`، فلا يصل الطلب إلى صفحة الدفع أو حارسها؛
+بادئة `/en` صريحة في المصدر والوجهة، و`rewrites()` باقية كما هي.
+وجهة الاشتراك نفسها تبقى محميّة بالحساب.
+
+| المصدر | الوجهة |
+|---|---|
+| `/plans` | `/settings/subscription` |
+| `/checkout` | `/settings/subscription` |
+| `/checkout/result` | `/settings/subscription` |
+| `/settings/invoices` | `/settings/subscription` |
+| `/settings/invoices/:id` | `/settings/subscription` |
+| `/refunds` | `/terms` |
+| `/en/plans` | `/en/settings/subscription` |
+| `/en/checkout` | `/en/settings/subscription` |
+| `/en/checkout/result` | `/en/settings/subscription` |
+| `/en/settings/invoices` | `/en/settings/subscription` |
+| `/en/settings/invoices/:id` | `/en/settings/subscription` |
+| `/en/refunds` | `/en/terms` |
+
+**ما أُخفي:**
+
+- استدعاء `Pricing` من اللاندينج ومداخل `#pricing` من تنقّلها والفوتر؛
+  المكوّن في `src/app/[locale]/_home/sections.tsx` و`PlanCard` ونصوصهما باقية.
+- قسم «الاشتراك والدفع / Subscriptions and payments» من صفحة الأسئلة
+  واللاندينج. بياناته في `src/lib/data/faq.ts` تحت `PARKED_PAYMENT_FAQ`
+  خارج `FAQ` المعروضة؛ اللاندينج يعرض الأسئلة الثلاثة غير المالية فقط.
+- مدخل الفواتير من قشرة الإعدادات، مع إبقاء مدخل الإشعارات.
+- رابط `/refunds` من الفوتر، وروابط `/plans` و`/refunds` من الشروط؛
+  الجملتان المرتبطتان بهما تصفان الخطة المجانية وغياب بوابة الدفع في اللغتين.
+- روابط المقارنة والترقية والدفع والفواتير من عرض الاشتراك.
+  مفاتيح المداخل المحذوفة أُزيلت من ملفَي الرسائل؛ نصوص المسودّات باقية.
+- تحذير الاشتراك المدفوع من حذف الحساب؛ أُزيلت خاصيّة `activeUntil`
+  وربط التدفق ببيانات الفوترة ومفتاح `Settings.Delete.activeSubscription`
+  من ملفَي الرسائل، مع إبقاء بقية تدفق الحذف كما هو.
+
+**حدود هذه الدفعة:** محتوى `/settings/subscription` المالي باقٍ للتذكرة
+اللاحقة الخاصة بالخادم، عدا إزالة الروابط؛ لذلك ما زال يعرض أسعارًا ووسيلة
+دفع وتجديدًا. الصياغة القانونية خارج الجملتين المعدّلتين، والإشعارات
+والسفراء والمستثمرون لم تتغيّر. `QuotaBlock` غير مركّب؛ ملفّه باقٍ بروابطه.
+
+**إعادة التفعيل:** بعد تجهيز بوابة الدفع والفوترة، أزل التحويلات وتعليقات
+المسودّات، وأعد استدعاء `Pricing` ومداخله وقسم الأسئلة المحفوظ وروابط
+الفواتير والفوتر؛ راجع نصوص الشروط ومحتوى الاشتراك مع تلك الدفعة.
 
 ---
 
@@ -47,7 +114,7 @@
 
 - `src/lib/auth/`: العميل و`useAccount` · `requireAccount` على الخادم · الكتالوج ·
   `safeNext` · الجوال السعودي بصيغة E.164 · ترجمة رموز الأخطاء.
-- **المسارات المحميّة**: `/session/*` · `/home` · `/settings/*` · `/checkout`. الوسيط يفحص
+- **المسارات المحميّة الحيّة**: `/session/*` · `/home` · `/settings/*` (عدا مسودّات الفواتير المحوّلة). الوسيط يفحص
   وجود الكوكي فقط، والصفحة تتحقّق من الجلسة لدى الخادم.
 - **`next` بلا بادئة لغة دائمًا** — التنقّل بـ`@/i18n/navigation` يضيفها. وما يُسلَّم لـBetter Auth
   (`callbackURL` · `redirectTo`) يُبادأ يدويًا لأنه يعيد التوجيه خارج next-intl.

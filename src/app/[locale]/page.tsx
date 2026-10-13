@@ -8,7 +8,6 @@ import { SessionScene } from "./_home/session-scene";
 import {
   HowItWorks,
   LandingFaq,
-  Pricing,
   Proof,
   ThreePoints,
   TwoWayVoice,
@@ -45,7 +44,6 @@ export default async function Home(props: PageProps<"/[locale]">) {
   const CTA = t("cta");
 
   const NAV = [
-    { href: "#pricing", label: t("pricingNav") },
     { href: "#how", label: t("howNav") },
   ] as const;
 
@@ -117,7 +115,6 @@ export default async function Home(props: PageProps<"/[locale]">) {
         <TwoWayVoice />
         <HowItWorks cta={CTA} />
         <Proof />
-        <Pricing />
         <LandingFaq />
 
         <CaptureBand

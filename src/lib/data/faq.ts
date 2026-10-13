@@ -89,36 +89,38 @@ export const FAQ: FaqGroup[] = [
       },
     ],
   },
-  {
-    id: "money",
-    title: { ar: "الاشتراك والدفع", en: "Subscriptions and payments" },
-    questions: [
-      {
-        q: { ar: "كيف ألغي الاشتراك؟", en: "How do I cancel my subscription?" },
-        a: [
-          { ar: "من الإعدادات ← الاشتراك ← «ألغِ التجديد»، بخطوة تأكيد واحدة. ما نطلب سبب ولا نحوّلك على أحد.", en: "Go to Settings → Subscription → “Cancel renewal”, then confirm once. You don’t need to give a reason or contact anyone." },
-          { ar: "الإلغاء يوقف التجديد الجاي فقط: خطتك تكمل شغّالة بدقائقها إلى نهاية المدة اللي دفعتها، والتاريخ مكتوب لك في نفس الصفحة.", en: "Cancellation stops the next renewal. You keep your plan and minutes until the end of your paid period; the date is shown on the same page." },
-        ],
-      },
-      {
-        q: { ar: "وش يصير لو خلصت دقائقي؟", en: "What happens if I run out of minutes?" },
-        a: [
-          { ar: "الجلسة اللي أنت فيها تكمل إلى آخرها — ما نقطعها عليك.", en: "You can finish the session you’re in without interruption." },
-          { ar: "بعدها تشوف كم ذاكرت وكم باقي عليك قبل اختبارك، وتختار: ترقّي، أو تنتظر تجديد حصتك في بداية الشهر.", en: "Afterwards, see how much you’ve studied and what’s left before your exam. You can upgrade or wait for your minutes to renew at the start of the month." },
-        ],
-      },
-      {
-        q: { ar: "أقدر أدفع بمدى؟", en: "Can I pay with mada?" },
-        a: [
-          { ar: "إي، ومدى هي الخيار الأول في صفحة الدفع. وفيه Apple Pay والبطاقات الائتمانية.", en: "Yes. mada is the first option at checkout. Apple Pay and credit cards are also available." },
-        ],
-      },
-      {
-        q: { ar: "الأسعار شاملة الضريبة؟", en: "Do prices include VAT?" },
-        a: [
-          { ar: "إي، السعر اللي تشوفه هو اللي ينخصم — ما فيه رسوم تنضاف عند الدفع. والفاتورة تفصل لك الصافي عن ضريبة القيمة المضافة.", en: "Yes. You pay the price shown, with no added charges at checkout. Your invoice lists the net amount and VAT separately." },
-        ],
-      },
-    ],
-  },
 ];
+
+/* أسئلة الاشتراك والدفع مسودّة معطّلة حتى تتوفّر بوابة دفع؛ خارج FAQ المعروضة. */
+export const PARKED_PAYMENT_FAQ: FaqGroup = {
+  id: "money",
+  title: { ar: "الاشتراك والدفع", en: "Subscriptions and payments" },
+  questions: [
+    {
+      q: { ar: "كيف ألغي الاشتراك؟", en: "How do I cancel my subscription?" },
+      a: [
+        { ar: "من الإعدادات ← الاشتراك ← «ألغِ التجديد»، بخطوة تأكيد واحدة. ما نطلب سبب ولا نحوّلك على أحد.", en: "Go to Settings → Subscription → “Cancel renewal”, then confirm once. You don’t need to give a reason or contact anyone." },
+        { ar: "الإلغاء يوقف التجديد الجاي فقط: خطتك تكمل شغّالة بدقائقها إلى نهاية المدة اللي دفعتها، والتاريخ مكتوب لك في نفس الصفحة.", en: "Cancellation stops the next renewal. You keep your plan and minutes until the end of your paid period; the date is shown on the same page." },
+      ],
+    },
+    {
+      q: { ar: "وش يصير لو خلصت دقائقي؟", en: "What happens if I run out of minutes?" },
+      a: [
+        { ar: "الجلسة اللي أنت فيها تكمل إلى آخرها — ما نقطعها عليك.", en: "You can finish the session you’re in without interruption." },
+        { ar: "بعدها تشوف كم ذاكرت وكم باقي عليك قبل اختبارك، وتختار: ترقّي، أو تنتظر تجديد حصتك في بداية الشهر.", en: "Afterwards, see how much you’ve studied and what’s left before your exam. You can upgrade or wait for your minutes to renew at the start of the month." },
+      ],
+    },
+    {
+      q: { ar: "أقدر أدفع بمدى؟", en: "Can I pay with mada?" },
+      a: [
+        { ar: "إي، ومدى هي الخيار الأول في صفحة الدفع. وفيه Apple Pay والبطاقات الائتمانية.", en: "Yes. mada is the first option at checkout. Apple Pay and credit cards are also available." },
+      ],
+    },
+    {
+      q: { ar: "الأسعار شاملة الضريبة؟", en: "Do prices include VAT?" },
+      a: [
+        { ar: "إي، السعر اللي تشوفه هو اللي ينخصم — ما فيه رسوم تنضاف عند الدفع. والفاتورة تفصل لك الصافي عن ضريبة القيمة المضافة.", en: "Yes. You pay the price shown, with no added charges at checkout. Your invoice lists the net amount and VAT separately." },
+      ],
+    },
+  ],
+};

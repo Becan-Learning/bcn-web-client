@@ -34,14 +34,12 @@
   },
   "SiteFooter": {
     "how": "How it works",
-    "pricing": "Pricing",
     "faq": "FAQs",
     "contact": "Contact us",
     "status": "System status",
     "login": "Sign in",
     "terms": "Terms and conditions",
     "privacy": "Privacy policy",
-    "refunds": "Refunds and cancellations",
     "cookies": "Cookies",
     "contactInfo": "Contact information",
     "emailLabel": "Email: ",
@@ -115,8 +113,6 @@
     "studyHint": "Explanation speed and test format",
     "subscription": "Subscription",
     "subscriptionHint": "Your plan, minutes and renewal",
-    "invoices": "Invoices",
-    "invoicesHint": "Your payment history with VAT shown separately",
     "data": "Your data",
     "dataHint": "Download your data or delete your account",
     "saved": "Saved",
@@ -182,8 +178,7 @@
       "delete": "Permanently delete my account",
       "cancel": "Cancel",
       "phraseInvalid": "Type “{phrase}” exactly to confirm this is intentional",
-      "phraseHint": "Type this exactly: {phrase}",
-      "activeSubscription": "You have a paid subscription active until <strong>{date}</strong>. Deleting your account stops it now, and we don’t refund the remaining period. <cancel>Canceling without deleting</cancel> lets you use it until the end."
+      "phraseHint": "Type this exactly: {phrase}"
     },
     "Invoices": {
       "metadataTitle": "Invoices — Becan",
@@ -238,7 +233,6 @@
       "keep": "Keep my plan",
       "cancelBody": "You can cancel renewal anytime. Your plan stays active until the end of your paid period.",
       "cancel": "Cancel renewal",
-      "compare": "Compare all plans",
       "canceledBody": "Your {plan} plan stays active until <strong>{date}</strong>, then you return to the free plan. You won’t be charged.",
       "monthlyPrice": "SAR {price} / month",
       "vatNote": "The price includes VAT. See the breakdown in <invoices>your invoices</invoices>.",
@@ -248,9 +242,7 @@
       "otherPlan": "{price} · {count, plural, one {{countLabel} minute} other {{countLabel} minutes}}",
       "loseMinutes": "Your minutes go from {fromLabel} to {to, plural, one {{toLabel} minute} other {{toLabel} minutes}} a month.",
       "loseCourses": "Your course allowance goes from “{from}” to “{to}”.",
-      "activeUntil": "Your {plan} plan stays active until {date}.",
-      "upgrade": "Upgrade to {plan}",
-      "downgrade": "Downgrade to {plan}"
+      "activeUntil": "Your {plan} plan stays active until {date}."
     }
   },
   "Quota": {
@@ -510,7 +502,6 @@
     "metadataTitle": "Becan — Your personal course tutor",
     "metadataDescription": "Study your course by voice, check your understanding with questions, and see which mistakes could cost you marks.",
     "cta": "Choose your course for free",
-    "pricingNav": "Pricing",
     "howNav": "How it works",
     "heroTitle": "Stop studying in ways that",
     "wrong": "don’t work",
@@ -912,8 +903,8 @@
         },
         "money": {
           "title": "Subscriptions and payment",
-          "paragraph1": "Prices shown on the <plans>Plans page</plans> include VAT. Your subscription renews automatically each month until you cancel it.",
-          "paragraph2": "Full details of cancellation and refunds are in the <refunds>Refunds and cancellation policy</refunds>.",
+          "paragraph1": "Becan offers one free Plan during the soft launch.",
+          "paragraph2": "There is currently no payment gateway, and no charges are collected for the Plan.",
           "paragraph3": "We may change prices. If we do, we will give you at least 30 days’ notice. The new price applies from the renewal after that notice — not partway through your current paid period."
         },
         "availability": {

@@ -487,6 +487,7 @@ export async function Proof() {
    **عدد الفصول محذوف من البطاقة** بطلب صريح، وباقٍ في جدول `/plans`.
    والدقائق وترجمتها إلى ساعات باقيتان — البريف يشترط الترجمة. */
 
+/* قسم الأسعار مسودّة معطّلة ولا يُعرض حتى تتوفّر بوابة دفع. */
 export async function Pricing() {
   const t = await getTranslations("Landing.Sections");
   return (
@@ -515,7 +516,7 @@ export async function Pricing() {
 
 /* ————— الأسئلة الشائعة على اللاندينج —————
 
-   خمسة أسئلة من `app/faq/faq-data.ts` نفسه — **لا نسخة ثانية من
+   ثلاثة أسئلة من `src/lib/data/faq.ts` نفسه — **لا نسخة ثانية من
    النصّ**: تُنتقى بسؤالها فإن غُيّر في المصدر ظهر الخطأ في البناء لا
    في الصفحة.
 
@@ -527,7 +528,7 @@ export async function Pricing() {
    وموضعه **قبل شريط الالتقاط مباشرة**: الاعتراض يُرفع من الطريق في
    اللحظة التي تسبق الطلب، لا بعده. */
 
-const LANDING_FAQ = [FAQ[0].questions[0], FAQ[1].questions[0], FAQ[0].questions[1], FAQ[3].questions[1], FAQ[3].questions[0]];
+const LANDING_FAQ = [FAQ[0].questions[0], FAQ[1].questions[0], FAQ[0].questions[1]];
 
 export async function LandingFaq() {
   const t = await getTranslations("Landing.Sections");

@@ -1,8 +1,8 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ErrorText,
   FieldLabel,
@@ -10,43 +10,57 @@ import {
   SelectField,
   TextField,
 } from "@/components/becan/kit";
+import { sendContact } from "@/lib/forms/contact-client";
+import {
+  CONTACT_TOPICS,
+  isValidContact,
+  isValidMessage,
+  type ContactTopic,
+} from "@/lib/forms/contact-validation";
 
 /* H2 — نموذج البريد، وهو **البديل الاحتياطي** لا القناة الأولى.
 
    لهذا زرّه محدَّد الإطار لا كهرماني: الكهرماني الوحيد في الشاشة زرّ
-   واتساب. */
+   واتساب.
+
+   يُرسل النموذج إلى `/api/forms/contact` لا إلى Google مباشرة. الفخّ
+   `website` مخفيّ عن الشخص ويملؤه الروبوت وحده، و`startedAt` لحظة العرض. */
 
 type Errors = Partial<Record<"contact" | "message", string>>;
 
 export function ContactForm() {
   const t = useTranslations("Contact.Form");
-  const TOPICS = [
-    { id: "course", label: t("topicCourse") },
-    { id: "session", label: t("topicSession") },
-    { id: "billing", label: t("topicBilling") },
-    { id: "account", label: t("topicAccount") },
-    { id: "other", label: t("topicOther") },
-  ];
-  const [topic, setTopic] = useState(TOPICS[0].id);
+  const locale = useLocale() === "en" ? "en" : "ar";
+  const TOPIC_LABELS: Record<ContactTopic, string> = {
+    course: t("topicCourse"),
+    session: t("topicSession"),
+    account: t("topicAccount"),
+    other: t("topicOther"),
+  };
+  const [topic, setTopic] = useState<ContactTopic>(CONTACT_TOPICS[0]);
   const [contact, setContact] = useState("");
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<Errors>({});
+  const [website, setWebsite] = useState("");
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
+  const startedAt = useRef(0);
 
-  const submit = (event: React.FormEvent) => {
+  useEffect(() => {
+    startedAt.current = Date.now();
+  }, []);
+
+  const submit = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (sending) return;
     const e: Errors = {};
     const v = contact.trim();
 
     if (!v) e.contact = t("contactRequired");
-    else if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) &&
-      !/^0\d{9}$/.test(v.replace(/[\s-]/g, ""))
-    ) {
-      e.contact = t("contactInvalid");
-    }
+    else if (!isValidContact(v)) e.contact = t("contactInvalid");
 
-    if (message.trim().length < 10) {
+    if (!isValidMessage(message)) {
       e.message = t("messageRequired");
     }
 
@@ -57,7 +71,22 @@ export function ContactForm() {
       document.getElementById(`ct-${first}`)?.focus();
       return;
     }
-    setSent(true);
+
+    setSendError(null);
+    setSending(true);
+    const result = await sendContact({
+      topic,
+      contact: v,
+      message: message.trim(),
+      locale,
+      website,
+      startedAt: startedAt.current,
+    });
+    setSending(false);
+
+    /* عند الفشل يبقى كل ما كتبه الطالب كما هو ليعيد المحاولة */
+    if (result === "sent") setSent(true);
+    else setSendError(t(result === "rate-limited" ? "sendRateLimited" : "sendFailed"));
   };
 
   if (sent) {
@@ -83,11 +112,11 @@ export function ContactForm() {
             id="ct-topic"
             name="topic"
             value={topic}
-            onChange={(e) => setTopic(e.target.value)}
+            onChange={(e) => setTopic(e.target.value as ContactTopic)}
           >
-            {TOPICS.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.label}
+            {CONTACT_TOPICS.map((id) => (
+              <option key={id} value={id}>
+                {TOPIC_LABELS[id]}
               </option>
             ))}
           </SelectField>
@@ -139,10 +168,28 @@ export function ContactForm() {
             <ErrorText id="ct-err-message">{errors.message}</ErrorText>
           ) : null}
         </div>
+
+        {/* فخّ الروبوتات: لا يراه الشخص ولا يصل إليه التركيز */}
+        <div aria-hidden="true" className="sr-only">
+          <input
+            type="text"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+          />
+        </div>
       </div>
 
-      <GhostButton type="submit" className="mt-6 w-full sm:w-fit">
-        {t("submit")}</GhostButton>
+      {sendError ? (
+        <div role="alert" className="mt-4">
+          <ErrorText id="ct-err-send">{sendError}</ErrorText>
+        </div>
+      ) : null}
+
+      <GhostButton type="submit" disabled={sending} className="mt-6 w-full sm:w-fit">
+        {sending ? t("sending") : t("submit")}</GhostButton>
     </form>
   );
 }

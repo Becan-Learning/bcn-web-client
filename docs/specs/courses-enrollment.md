@@ -105,7 +105,7 @@ It becomes a plain end screen:
 
 The "resume" target (`resumePoint`) is removed, and the success and pending buttons go to `/home`.
 
-### `/request`, `/request/sent`, `/ambassadors`
+### `/request`, `/request/sent`
 
 Institutions come from `getInstitutions()`. The `/request` course list comes from `GET /courses`.
 

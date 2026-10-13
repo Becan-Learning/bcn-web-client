@@ -179,7 +179,6 @@ const FOOTER_LINKS = [
   { href: "/faq", label: "faq" },
   { href: "/contact", label: "contact" },
   { href: "/status", label: "status" },
-  { href: "/ambassadors", label: "ambassadors" },
   { href: "/join", label: "login" },
 ] as const;
 

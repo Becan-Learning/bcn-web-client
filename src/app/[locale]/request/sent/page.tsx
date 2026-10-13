@@ -61,7 +61,7 @@ export default async function RequestSentPage(
         </div>
 
         <p className="mt-6 max-w-measure text-lg leading-relaxed text-ink-2">
-          {t.rich("body", { br: () => <br /> })}
+          {t("body")}
         </p>
 
         {/* 3 — مخرجان، كلاهما يبقيه داخل بيكان.

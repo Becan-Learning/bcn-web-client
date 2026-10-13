@@ -309,7 +309,6 @@ live · thinking · listening · question · ending · cut`.
 | P5 | الفواتير | `/settings/invoices` · والفاتورة الواحدة `/settings/invoices/[id]` |
 | S1 | الحساب | `/settings/account` |
 | S2 | تفضيلات المذاكرة | `/settings/study` |
-| S3 | الإشعارات | `/settings/notifications` |
 | S4 | بياناتك · حذف الحساب | `/settings/data` · `/settings/delete` |
 | L1–L4 | السياسات | `/terms` · `/privacy` · `/refunds` · `/cookies` |
 | H1–H3 | الدعم | `/faq` · `/contact` · `/status` |

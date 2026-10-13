@@ -175,7 +175,6 @@ export function Plain({ children }: { children: React.ReactNode }) {
    الخاصة داخلها، فلا يجتمع شريطان على شاشة واحدة. */
 const FOOTER_LINKS = [
   { href: "/#how", label: "how" },
-  { href: "/#pricing", label: "pricing" },
   { href: "/faq", label: "faq" },
   { href: "/contact", label: "contact" },
   { href: "/status", label: "status" },
@@ -186,7 +185,6 @@ const FOOTER_LINKS = [
 const LEGAL_LINKS = [
   { href: "/terms", label: "terms" },
   { href: "/privacy", label: "privacy" },
-  { href: "/refunds", label: "refunds" },
   { href: "/cookies", label: "cookies" },
 ] as const;
 

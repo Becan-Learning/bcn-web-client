@@ -1,3 +1,4 @@
+/* مسودّة معطّلة وغير قابلة للوصول حتى تتوفّر بوابة دفع. */
 import type { Localized } from "@/i18n/localized";
 import { breakdown, planById, PLANS, type Plan } from "./plans";
 

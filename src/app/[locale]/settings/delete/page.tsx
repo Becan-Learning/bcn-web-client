@@ -1,11 +1,9 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { hasLocale } from "next-intl";
-import { localize } from "@/i18n/localized";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import type { Metadata } from "next";
 import { SettingsCard, SettingsShell } from "../_shell";
-import { SUBSCRIPTION } from "@/lib/data/billing";
 import { DeleteForm } from "./delete-form";
 import { requireAccount } from "@/lib/auth/session";
 import { accountReturnPath } from "@/lib/auth/next-path";
@@ -68,9 +66,7 @@ export default async function DeletePage(props: PageProps<"/[locale]/settings/de
           </p>
         </SettingsCard>
 
-        <DeleteForm
-          activeUntil={SUBSCRIPTION.canceled ? null : localize(SUBSCRIPTION.renewsOn, locale)}
-        />
+        <DeleteForm />
       </div>
     </SettingsShell>
   );

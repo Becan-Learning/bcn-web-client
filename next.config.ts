@@ -9,6 +9,25 @@ if (process.env.NODE_ENV === "production" && !backendUrl) {
 }
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    /* مسودّات الدفع محجوبة بتحويل مؤقّت يسبق الوسيط، مع إبقاء بادئة الإنجليزية. */
+    const parkedRoutes = [
+      ["/plans", "/settings/subscription"],
+      ["/checkout", "/settings/subscription"],
+      ["/checkout/result", "/settings/subscription"],
+      ["/settings/invoices", "/settings/subscription"],
+      ["/settings/invoices/:id", "/settings/subscription"],
+      ["/refunds", "/terms"],
+    ];
+
+    return ["", "/en"].flatMap((prefix) =>
+      parkedRoutes.map(([source, destination]) => ({
+        source: `${prefix}${source}`,
+        destination: `${prefix}${destination}`,
+        permanent: false,
+      })),
+    );
+  },
   async rewrites() {
     return [{
       source: "/api/auth/:path*",

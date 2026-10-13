@@ -5,9 +5,8 @@ import { useTranslations, useLocale } from "next-intl";
 import { localize } from "@/i18n/localized";
 
 import { useCallback, useState } from "react";
-import { Link } from "@/i18n/navigation";
-import { GhostButton, PrimaryButton, QuietLink } from "@/components/becan/kit";
-import { PLANS, planById, type Plan } from "@/lib/data/plans";
+import { GhostButton, PrimaryButton } from "@/components/becan/kit";
+import { PLANS, planById } from "@/lib/data/plans";
 import { METHODS, SUBSCRIPTION, whatYouLose } from "@/lib/data/billing";
 import { SettingsCard } from "../_shell";
 
@@ -99,7 +98,7 @@ export function SubscriptionView({
         </dl>
 
         <p className="mt-4 text-sm text-ink-2">
-          {t.rich("vatNote", { invoices: (chunks) => <Link href="/settings/invoices" className="font-semibold text-pressable underline underline-offset-4">{chunks}</Link> })}
+          {t.rich("vatNote", { invoices: (chunks) => <>{chunks}</> })}
         </p>
       </SettingsCard>
 
@@ -145,8 +144,6 @@ export function SubscriptionView({
                   {t("otherPlan", { price: p.price === 0 ? t("free") : t("monthlyPrice", { price: String(p.price) }), count: p.minutes, countLabel: String(p.minutes) })}
                 </span>
               </span>
-
-              <ChangeAction plan={p} current={plan} />
             </li>
           ))}
         </ul>
@@ -209,29 +206,7 @@ export function SubscriptionView({
           )}
         </SettingsCard>
       )}
-
-      <div>
-        <QuietLink href="/plans">{t("compare")}</QuietLink>
-      </div>
     </div>
-  );
-}
-
-/** ترقية أو تخفيض — الاسم يتبع اتجاه السعر لا يُكتب واحدًا للطرفين. */
-function ChangeAction({ plan, current }: { plan: Plan; current: Plan }) {
-  const t = useTranslations("Settings.Subscription");
-  const locale = useLocale();
-  const up = plan.price > current.price;
-
-  return (
-    <Link
-      href={`/checkout?plan=${plan.id}`}
-      className={`inline-flex min-h-11 items-center rounded-pill border px-4 font-semibold ${
-        up ? "border-aubergine-mid text-aubergine-base" : "border-line text-ink"
-      }`}
-    >
-      {up ? t("upgrade", { plan: localize(plan.name, locale) }) : t("downgrade", { plan: localize(plan.name, locale) })}
-    </Link>
   );
 }
 

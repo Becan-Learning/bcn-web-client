@@ -224,20 +224,25 @@
       "minutesUsed": "الدقائق المستخدمة",
       "courses": "المقررات",
       "usage": "{used} من {limit}",
-      "renewal": "تتجدد حدودك في {date}",
+      "renewal": "تتجدد حدود استخدامك في {date}",
       "errorTitle": "ما قدرنا نعرض باقتك",
       "errorBody": "ما قدرنا نجيب حدودك واستخدامك الحين. حاول مرة ثانية.",
-      "lede": "حدودك في هذه الدورة وما استخدمته منها",
-      "usedUp": "ما تقدر تبدأ حصة جديدة قبل {date}",
+      "lede": "حدود استخدامك في دورة الاستخدام هذي وما استخدمته منها",
+      "usedUp": "وصلت لحدود استخدامك في دورة الاستخدام هذي؛ ما تقدر تبدأ حصة جديدة قبل {date}",
       "retry": "حاول مرة ثانية"
     }
   },
   "Quota": {
-    "title": "خلّصت دقائق هذا الشهر",
-    "progress": "ذاكرت <strong>{studied, plural, zero {{studiedLabel} دقيقة} one {دقيقة واحدة} two {دقيقتان} few {{studiedLabel} دقائق} many {{studiedLabel} دقيقة} other {{studiedLabel} دقيقة}}</strong> — وباقي لك <strong>{chaptersLeft, plural, zero {{chaptersLabel} فصل} one {فصل واحد} two {فصلان} few {{chaptersLabel} فصول} many {{chaptersLabel} فصلًا} other {{chaptersLabel} فصل}}</strong> قبل الاختبار.",
-    "continue": "كمّل بـ {price} ريال/شهر",
-    "plans": "شوف الباقات",
-    "allowance": "{minutes, plural, zero {{minutesLabel} دقيقة} one {دقيقة واحدة} two {دقيقتان} few {{minutesLabel} دقائق} many {{minutesLabel} دقيقة} other {{minutesLabel} دقيقة}} شهريًا · كل مقرراتك"
+    "usedUp": {
+      "progress": "ذاكرت {minutes, plural, zero {{minutesLabel} دقيقة} one {دقيقة واحدة} two {دقيقتين} few {{minutesLabel} دقائق} many {{minutesLabel} دقيقةً} other {{minutesLabel} دقيقة}} في {sessions, plural, zero {{sessionsLabel} حصة} one {حصة واحدة} two {حصتين} few {{sessionsLabel} حصص} many {{sessionsLabel} حصةً} other {{sessionsLabel} حصة}}",
+      "renewal": "تتجدد حدود استخدامك في {date}",
+      "limit": "وصلت لحدود استخدامك في دورة الاستخدام هذي"
+    },
+    "slotsFull": {
+      "enrolled": "مسجّل في <courses></courses>",
+      "release": "{count, plural, one {ألغِ تسجيلك فيه لتسجّل هنا} two {ألغِ تسجيلك في أحد المقررَين لتسجّل هنا} other {ألغِ تسجيلك في أحد هذه المقررات لتسجّل هنا}}",
+      "rule": "حدود استخدامك تسمح {count, plural, zero {بـ{countLabel} مقرر} one {بمقرر واحد} two {بمقررَين} few {بـ{countLabel} مقررات} many {بـ{countLabel} مقررًا} other {بـ{countLabel} مقرر}} في وقت واحد"
+    }
   },
   "Error": {
     "title": "الصفحة ما فتحت",
@@ -574,6 +579,7 @@
     "metadataDescription": "{university} · {count, plural, zero {لا فصول جاهزة} one {فصل واحد جاهز} two {فصلان جاهزان} few {{countLabel} فصول جاهزة} many {{countLabel} فصلًا جاهزًا} other {{countLabel} فصل جاهز}}.",
     "courseSummary": "{university} · {count, plural, zero {{countLabel} فصل} one {فصل واحد} two {فصلان} few {{countLabel} فصول} many {{countLabel} فصلًا} other {{countLabel} فصل}}",
     "minutes": "{count, plural, zero {{countLabel} دقيقة} one {دقيقة واحدة} two {دقيقتان} few {{countLabel} دقائق} many {{countLabel} دقيقة} other {{countLabel} دقيقة}}",
+    "slotsFullHint": "حدّ التسجيل مكتمل",
     "enroll": "سجّل في المقرر",
     "unenroll": "ألغِ التسجيل في المقرر",
     "unenrollTitle": "تلغي تسجيلك في المقرر؟",

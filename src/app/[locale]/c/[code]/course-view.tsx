@@ -6,7 +6,8 @@ import { localize } from "@/i18n/localized";
 import { useRef, useState, useTransition } from "react";
 import { Dialog } from "radix-ui";
 import { PrimaryButton } from "@/components/becan/kit";
-import { enrollmentSchema, backendErrorSchema } from "@/lib/courses/schema";
+import { QuotaBlock, type CourseSlotQuota } from "@/components/becan/quota";
+import { mutateEnrollment } from "./enrollment-mutation";
 import { Link, useRouter } from "@/i18n/navigation";
 import { ArrowForward } from "@/components/becan/icons";
 import { SubjectIcon } from "@/app/[locale]/courses/subject-icon";
@@ -50,6 +51,7 @@ function ChapterCard({
   pending,
   disabled,
   onEnroll,
+  quotaReached,
 }: {
   chapter: Chapter;
   course: Course;
@@ -58,6 +60,7 @@ function ChapterCard({
   pending: boolean;
   disabled: boolean;
   onEnroll: () => void;
+  quotaReached: boolean;
 }) {
   const t = useTranslations("Course");
   const locale = useLocale();
@@ -100,15 +103,19 @@ function ChapterCard({
       </div>
 
       <div className="relative z-10 mt-auto flex justify-end pt-4">
-        {state === "enrolled" ? chapter.published ? (
+        {!chapter.published ? (
+          <span className={`rounded-pill border px-4 py-2 text-xs font-semibold ${skin.arrow}`}>{t("soon")}</span>
+        ) : state === "enrolled" ? (
           <Link href={`/session/${course.id}/${chapter.number}`}
             className={`inline-flex min-h-11 items-center gap-2 rounded-pill border px-5 font-semibold transition-colors hover:bg-pressable hover:text-on-pressable ${skin.arrow}`}>
             {t("start")}<ArrowForward />
           </Link>
-        ) : (
-          <span className={`rounded-pill border px-4 py-2 text-xs font-semibold ${skin.arrow}`}>{t("soon")}</span>
         ) : state === "guest" ? (
           <Link href={joinHref} className={`inline-flex min-h-11 items-center gap-2 rounded-pill border px-5 font-semibold ${skin.arrow}`}>{t("enroll")}</Link>
+        ) : quotaReached ? (
+          <Link href="#quota" className={`inline-flex min-h-11 items-center rounded-pill border px-5 font-semibold ${skin.arrow}`}>
+            {t("slotsFullHint")}
+          </Link>
         ) : (
           <button type="button" disabled={pending || disabled} onClick={onEnroll}
             className={`inline-flex min-h-11 items-center rounded-pill border px-5 font-semibold disabled:opacity-60 ${skin.arrow}`}>
@@ -125,11 +132,13 @@ export function CourseView({
   chapters,
   enrollmentError,
   state,
+  slotQuota,
 }: {
   course: Course;
   chapters: Chapter[];
   enrollmentError: boolean;
   state: ViewState;
+  slotQuota: CourseSlotQuota | null;
 }) {
   const t = useTranslations("Course");
   const locale = useLocale();
@@ -148,21 +157,8 @@ export function CourseView({
     setError(null);
     startTransition(async () => {
       try {
-        const response = await fetch(`/api/v1/me/enrollments/${encodeURIComponent(course.id)}`, { method, cache: "no-store" });
-        if (!response.ok) {
-          const parsed = backendErrorSchema.safeParse(await response.json());
-          console.error("Enrollment request failed", { status: response.status, code: parsed.success ? parsed.data.error.code : undefined });
-          throw new Error("Enrollment request failed");
-        }
-        if (method === "PUT") {
-          if (response.status !== 200 && response.status !== 201) throw new Error("Invalid enroll response");
-          const enrollment = enrollmentSchema.parse(await response.json());
-          if (enrollment.course.id !== course.id) throw new Error("Invalid enrollment course");
-        } else if (response.status !== 204) {
-          throw new Error("Invalid un-enroll response");
-        }
+        await mutateEnrollment(course.id, method, () => router.refresh());
         setConfirmOpen(false);
-        router.refresh();
       } catch {
         setError(method === "PUT" ? "enrollError" : "unenrollError");
       }
@@ -198,7 +194,9 @@ export function CourseView({
       <div className="mt-6">
         {state === "guest" ? (
           <PrimaryButton href={joinHref}>{t("enroll")}</PrimaryButton>
-        ) : state === "new" ? (
+        ) : state === "new" ? slotQuota !== null ? (
+          <QuotaBlock id="quota" kind="slots-full" {...slotQuota} />
+        ) : (
           <PrimaryButton type="button" disabled={pending || enrollmentError} onClick={() => mutate("PUT")}>
             {t(pending ? "enrolling" : "enroll")}
           </PrimaryButton>
@@ -279,6 +277,7 @@ export function CourseView({
               joinHref={joinHref}
               pending={pending}
               disabled={enrollmentError}
+              quotaReached={slotQuota !== null}
               onEnroll={() => mutate("PUT")}
             />
           ))}

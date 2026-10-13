@@ -30,7 +30,7 @@ export type Plan = {
 export const PLANS: Plan[] = [
   {
     id: "free",
-    name: { ar: "مجاني", en: "Free" },
+    name: { ar: "مجانية", en: "Free" },
     price: 0,
     minutes: 60,
     hours: { ar: "≈ ساعة مذاكرة موجّهة", en: "≈ 1 hour of guided study" },

@@ -14,7 +14,11 @@
       "phoneNumberTaken": "This number belongs to another account. Use another number.",
       "invalidInstitution": "Choose a university from the list.",
       "invalidMajor": "Choose a major offered by your university from the list.",
+      "accountBanned": "Your account has been suspended. Contact support to find out why.",
       "generic": "We couldn’t complete your request. Please try again."
+    },
+    "Banned": {
+      "contact": "Open the contact page"
     }
   },
   "LanguageSwitcher": {

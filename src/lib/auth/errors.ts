@@ -3,6 +3,8 @@ const ERROR_KEYS = {
   USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL: "emailTaken",
   INVALID_EMAIL_OR_PASSWORD: "invalidCredentials",
   EMAIL_NOT_VERIFIED: "emailNotVerified",
+  /* رسالة الخادم الإنجليزية لهذا الرمز لا تُعرض أبدًا؛ نعرض نصّنا المترجم. */
+  BANNED_USER: "accountBanned",
   PASSWORD_TOO_SHORT: "passwordTooShort",
   PASSWORD_TOO_LONG: "passwordTooLong",
   INVALID_EMAIL: "invalidEmail",

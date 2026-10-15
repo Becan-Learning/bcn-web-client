@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { allowanceSchema, type Allowance } from "./schema";
-import { minutesLeft, nearlyOut, usedUp } from "./rules";
+import { minutesLeft, nearlyOut, slotsFull, startDecision, usedUp } from "./rules";
 
 const allowance: Allowance = {
+  unlimited: false,
   plan: { id: "free", name: { ar: "الباقة المجانية", en: "Free plan" } },
   period: { start: "2026-10-01T00:00:00Z", end: "2026-10-31T00:00:00Z" },
   limits: { sessions: 6, seconds: 3600, enrollments: 1, sessionSeconds: 1800, minStartSeconds: 180 },
@@ -19,6 +20,18 @@ describe("allowance backend contract", () => {
   it("parses the real contract and timezone offsets", () => {
     expect(allowanceSchema.parse(allowance)).toEqual(allowance);
     expect(allowanceSchema.safeParse({ ...allowance, period: { ...allowance.period, end: "2026-10-31T03:00:00+03:00" } }).success).toBe(true);
+  });
+  it("defaults unlimited to false when an older backend omits it", () => {
+    const older: Record<string, unknown> = { ...allowance };
+    delete older.unlimited;
+    expect(allowanceSchema.parse(older).unlimited).toBe(false);
+  });
+  it("parses an explicit unlimited flag", () => {
+    expect(allowanceSchema.parse({ ...allowance, unlimited: true }).unlimited).toBe(true);
+    expect(allowanceSchema.parse({ ...allowance, unlimited: false }).unlimited).toBe(false);
+  });
+  it("rejects a non-boolean unlimited flag", () => {
+    expect(allowanceSchema.safeParse({ ...allowance, unlimited: "yes" }).success).toBe(false);
   });
   it.each(limitKeys)("accepts a null %s limit", (key) => {
     expect(allowanceSchema.parse({ ...allowance, limits: { ...allowance.limits, [key]: null } }).limits[key]).toBeNull();
@@ -117,5 +130,52 @@ describe("nearlyOut", () => {
   });
   it("is false for unlimited minutes", () => {
     expect(nearlyOut(withSeconds(10000, { seconds: null }))).toBe(false);
+  });
+});
+
+const spent: Allowance = withSeconds(3600);
+const unlimited = (data: Allowance): Allowance => ({ ...data, unlimited: true });
+
+describe("unlimited accounts", () => {
+  it("never read as used up, nearly out, or slot-limited", () => {
+    const data = unlimited({ ...withSeconds(3600), usage: { sessions: 6, seconds: 3600, enrollments: 1 } });
+    expect(usedUp(data)).toBe(false);
+    expect(nearlyOut(unlimited(withSeconds(3000)))).toBe(false);
+    expect(minutesLeft(data)).toBeNull();
+    expect(slotsFull(data, [], "math-101")).toBe(false);
+  });
+});
+
+describe("startDecision", () => {
+  const student = { ...allowance };
+  it("lets an enrolled student with allowance left start a published chapter", () => {
+    expect(startDecision({ allowance: student, enrolled: true, published: true })).toEqual({ ok: true });
+  });
+  it("lets an enrolled student start when the allowance could not be read", () => {
+    expect(startDecision({ allowance: null, enrolled: true, published: true })).toEqual({ ok: true });
+  });
+  it("refuses a student who is not enrolled", () => {
+    expect(startDecision({ allowance: student, enrolled: false, published: true })).toEqual({ ok: false, reason: "not-enrolled" });
+    expect(startDecision({ allowance: null, enrolled: false, published: true })).toEqual({ ok: false, reason: "not-enrolled" });
+  });
+  it("refuses an enrolled student whose usage is used up", () => {
+    expect(startDecision({ allowance: spent, enrolled: true, published: true })).toEqual({ ok: false, reason: "used-up" });
+  });
+  it("reports not-enrolled before used-up for a student who is both", () => {
+    expect(startDecision({ allowance: spent, enrolled: false, published: true })).toEqual({ ok: false, reason: "not-enrolled" });
+  });
+  it("refuses an unpublished chapter for a student", () => {
+    expect(startDecision({ allowance: student, enrolled: true, published: false })).toEqual({ ok: false, reason: "unpublished" });
+  });
+  it("lets an unlimited account start a published chapter without enrolling", () => {
+    expect(startDecision({ allowance: unlimited(student), enrolled: false, published: true })).toEqual({ ok: true });
+  });
+  it("lets an unlimited account start with usage used up", () => {
+    expect(startDecision({ allowance: unlimited(spent), enrolled: true, published: true })).toEqual({ ok: true });
+    expect(startDecision({ allowance: unlimited(spent), enrolled: false, published: true })).toEqual({ ok: true });
+  });
+  it("still refuses an unpublished chapter for an unlimited account", () => {
+    expect(startDecision({ allowance: unlimited(student), enrolled: true, published: false })).toEqual({ ok: false, reason: "unpublished" });
+    expect(startDecision({ allowance: unlimited(student), enrolled: false, published: false })).toEqual({ ok: false, reason: "unpublished" });
   });
 });

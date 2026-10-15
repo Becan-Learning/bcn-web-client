@@ -7,7 +7,7 @@ export function sessionEndingQuota(
   allowance: Allowance | null,
 ) {
   /* الإشارة تسبق انتهاء الميزانية؛ الاستخدام الحقيقي قد لا يبلغ الحدّ بعد. */
-  return state.ending && state.allowanceReached && allowance
+  return state.ending && state.allowanceReached && allowance && !allowance.unlimited
     ? reachedAllowanceQuota(allowance)
     : null;
 }

@@ -4,6 +4,7 @@ import type { Enrollment } from "@/lib/courses/schema";
 import { slotsFull } from "./rules";
 
 const allowance: Allowance = {
+  unlimited: false,
   plan: { id: "free", name: { ar: "مجانية", en: "Free" } },
   period: { start: "2026-10-01T00:00:00Z", end: "2026-10-31T00:00:00Z" },
   limits: { sessions: 6, seconds: 3600, enrollments: 1, sessionSeconds: 1800, minStartSeconds: 180 },

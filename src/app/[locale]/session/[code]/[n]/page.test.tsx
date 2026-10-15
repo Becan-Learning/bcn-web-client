@@ -7,6 +7,7 @@ import type { Allowance } from "@/lib/allowance/schema";
 import type { Course } from "@/lib/courses/schema";
 import { SessionView } from "@/components/session/session-view";
 import { RemainingMinutes } from "@/components/session/remaining-minutes";
+import { redirect } from "@/i18n/navigation";
 import SessionPage from "./page";
 
 const backend = vi.hoisted(() => ({ course: vi.fn(), enrollments: vi.fn(), allowance: vi.fn(), lessons: vi.fn(), account: vi.fn(), push: vi.fn() }));
@@ -29,6 +30,7 @@ const course: Course = {
   chapters: [{ number: 1, title: { ar: "الفصل الأول", en: "First chapter" }, minutes: 30, lessonCount: 1, published: true }],
 };
 const allowance: Allowance = {
+  unlimited: false,
   plan: { id: "free", name: { ar: "مجانية", en: "Free" } },
   period: { start: "2026-10-01T00:00:00Z", end: "2026-10-30T22:00:00Z" },
   limits: { sessions: 6, seconds: 3600, enrollments: 1, sessionSeconds: 1800, minStartSeconds: 180 },
@@ -115,6 +117,51 @@ describe("Session page allowance gate", () => {
     expect(await render()).toContain("تقدر تبدأ حصتك الجاية في 31 أكتوبر 2026");
     expect(SessionView).not.toHaveBeenCalled();
     expect(backend.allowance).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("Session page start gates", () => {
+  const unlimited = { ...allowance, unlimited: true };
+  const spent = { ...allowance, usage: { ...allowance.usage, seconds: 3600 } };
+  const call = () => SessionPage({ params: Promise.resolve({ locale: "ar", code: course.id, n: "1" }), searchParams: Promise.resolve({}) });
+
+  it("redirects a student who is not enrolled to the Course page", async () => {
+    backend.enrollments.mockResolvedValue({ ok: true, data: [] });
+    await call();
+    expect(redirect).toHaveBeenCalledWith({ locale: "ar", href: "/c/math-101" });
+    expect(SessionView).not.toHaveBeenCalled();
+    expect(backend.lessons).not.toHaveBeenCalled();
+  });
+  it("redirects when enrollments cannot be read", async () => {
+    backend.enrollments.mockResolvedValue({ ok: false, kind: "network" });
+    await call();
+    expect(redirect).toHaveBeenCalledOnce();
+  });
+  it("redirects a student who is both not enrolled and used up", async () => {
+    backend.enrollments.mockResolvedValue({ ok: true, data: [] });
+    backend.allowance.mockResolvedValue({ ok: true, data: spent });
+    await call();
+    expect(redirect).toHaveBeenCalledOnce();
+  });
+  it("opens the session for an unlimited account that is not enrolled", async () => {
+    backend.enrollments.mockResolvedValue({ ok: true, data: [] });
+    backend.allowance.mockResolvedValue({ ok: true, data: unlimited });
+    expect(await render()).toContain("data-session-view");
+    expect(redirect).not.toHaveBeenCalled();
+    expect(vi.mocked(SessionView).mock.calls[0][0]).toMatchObject({ minutesRemaining: null });
+  });
+  it("opens the session for an unlimited account whose usage is used up", async () => {
+    backend.allowance.mockResolvedValue({ ok: true, data: { ...unlimited, usage: spent.usage } });
+    const html = await render();
+    expect(html).toContain("data-session-view");
+    expect(html).not.toContain(ar.Quota.usedUp.limit);
+  });
+  it.each([false, true])("still returns 404 for an unpublished chapter (unlimited: %s)", async (isUnlimited) => {
+    const draft = { ...course, chapters: [{ ...course.chapters[0], published: false }] };
+    backend.course.mockResolvedValue({ ok: true, data: draft });
+    backend.allowance.mockResolvedValue({ ok: true, data: { ...allowance, unlimited: isUnlimited } });
+    await expect(call()).rejects.toThrow();
+    expect(SessionView).not.toHaveBeenCalled();
   });
 });
 

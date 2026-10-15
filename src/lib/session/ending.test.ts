@@ -4,6 +4,7 @@ import { INITIAL_SESSION_STATE, sessionReducer } from "./session-reducer";
 import { sessionEndingQuota } from "./ending";
 
 const allowance: Allowance = {
+  unlimited: false,
   plan: { id: "free", name: { ar: "مجانية", en: "Free" } },
   period: { start: "2026-10-01T00:00:00Z", end: "2026-10-30T22:00:00Z" },
   limits: { sessions: 6, seconds: 3600, enrollments: 1, sessionSeconds: 1800, minStartSeconds: 180 },
@@ -27,6 +28,10 @@ describe("session ending presentation", () => {
   it("keeps a generic ending without the marker, even if the allowance is used up", () => {
     const generic = sessionReducer(INITIAL_SESSION_STATE, { action: "session_ending", message: "cap" });
     expect(sessionEndingQuota(generic, { ...allowance, usage: { ...allowance.usage, seconds: 3600 } })).toBeNull();
+  });
+
+  it("never shows a used-up block to an unlimited account", () => {
+    expect(sessionEndingQuota(ended, { ...allowance, unlimited: true })).toBeNull();
   });
 
   it("does not invent usage for a pending or failed read", () => {

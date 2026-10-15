@@ -11,6 +11,7 @@ import {
   TextField,
 } from "@/components/becan/kit";
 import { useAuthReturn } from "@/components/auth/use-auth-return";
+import { BannedSupportLink } from "@/components/auth/banned-support-link";
 import { AuthCard } from "@/components/auth/auth-card";
 import { authClient, useAccount } from "@/lib/auth/client";
 import { authErrorKey } from "@/lib/auth/errors";
@@ -103,6 +104,9 @@ export function VerifyEmailForm({
           <ErrorText id="verify-email-link-error">
             {errors(authErrorKey({ code: queryError }))}
           </ErrorText>
+          {authErrorKey({ code: queryError }) === "accountBanned" ? (
+            <BannedSupportLink />
+          ) : null}
         </div>
       ) : null}
       <form onSubmit={resend} noValidate aria-busy={pending} className="mt-5">

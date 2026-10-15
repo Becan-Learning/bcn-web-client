@@ -15,6 +15,7 @@ import {
   useAuthReturn,
   useSignedInRedirect,
 } from "@/components/auth/use-auth-return";
+import { BannedSupportLink } from "@/components/auth/banned-support-link";
 import { authClient } from "@/lib/auth/client";
 import { authErrorKey } from "@/lib/auth/errors";
 
@@ -36,6 +37,7 @@ export function SignInForm({
   const [issue, setIssue] = useState<{
     field: "email" | "password" | "form";
     message: string;
+    banned?: boolean;
   } | null>(null);
   useEffect(() => {
     if (issue) document.getElementById(`sign-in-${issue.field}`)?.focus();
@@ -78,6 +80,7 @@ export function SignInForm({
               ? "password"
               : "form",
           message: errors(key),
+          banned: key === "accountBanned",
         });
       } else {
         clearReturn();
@@ -140,7 +143,10 @@ export function SignInForm({
           />
           <div id="sign-in-form" tabIndex={-1} aria-live="polite">
             {issue?.field === "form" ? (
-              <ErrorText id="sign-in-form-error">{issue.message}</ErrorText>
+              <>
+                <ErrorText id="sign-in-form-error">{issue.message}</ErrorText>
+                {issue.banned ? <BannedSupportLink /> : null}
+              </>
             ) : null}
           </div>
           <PrimaryButton type="submit" disabled={pending} className="w-full">

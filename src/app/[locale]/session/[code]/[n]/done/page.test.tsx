@@ -6,6 +6,7 @@ import ar from "../../../../../../../messages/ar.json";
 import en from "../../../../../../../messages/en.json";
 import type { Allowance } from "@/lib/allowance/schema";
 import type { Course } from "@/lib/courses/schema";
+import { redirect } from "@/i18n/navigation";
 import SummaryPage from "./page";
 
 const backend = vi.hoisted(() => ({
@@ -37,6 +38,7 @@ const course: Course = {
   ],
 };
 const allowance: Allowance = {
+  unlimited: false,
   plan: { id: "free", name: { ar: "مجانية", en: "Free" } },
   period: { start: "2026-10-01T00:00:00Z", end: "2026-10-30T22:00:00Z" },
   limits: { sessions: 6, seconds: 3600, enrollments: 1, sessionSeconds: 1800, minStartSeconds: 180 },
@@ -114,5 +116,38 @@ describe("done allowance decision", () => {
     backend.account.mockRejectedValueOnce(new Error("Redirect to sign in"));
     await expect(render()).rejects.toThrow("Redirect to sign in");
     expect(backend.allowance).not.toHaveBeenCalled();
+  });
+});
+
+describe("done page enrollment gate", () => {
+  const unlimited = { ...allowance, unlimited: true, usage: { ...allowance.usage, seconds: 3600 } };
+  const call = (searchParams: Record<string, string> = { room: "real-room" }) =>
+    SummaryPage({ params: Promise.resolve({ locale: "ar", code: course.id, n: "1" }), searchParams: Promise.resolve(searchParams) });
+
+  it("redirects a student who is not enrolled to the Course page", async () => {
+    backend.enrollments.mockResolvedValue({ ok: true, data: [] });
+    await call();
+    expect(redirect).toHaveBeenCalledWith({ locale: "ar", href: "/c/math-101" });
+  });
+  it("shows the summary to an unlimited account that is not enrolled, without a used-up block", async () => {
+    backend.enrollments.mockResolvedValue({ ok: true, data: [] });
+    backend.allowance.mockResolvedValue({ ok: true, data: unlimited });
+    const html = await render();
+    expect(redirect).not.toHaveBeenCalled();
+    expect(html).toContain("<form");
+    expect(html).not.toContain(ar.Quota.usedUp.limit);
+  });
+  it("reads the allowance for a not-enrolled account even without a room", async () => {
+    backend.enrollments.mockResolvedValue({ ok: true, data: [] });
+    backend.allowance.mockResolvedValue({ ok: true, data: unlimited });
+    await render("ar", {});
+    expect(redirect).not.toHaveBeenCalled();
+    expect(backend.allowance).toHaveBeenCalledOnce();
+  });
+  it("still returns 404 for an unpublished chapter", async () => {
+    const draft = { ...course, chapters: [{ ...course.chapters[0], published: false }] };
+    backend.course.mockResolvedValue({ ok: true, data: draft });
+    backend.allowance.mockResolvedValue({ ok: true, data: unlimited });
+    await expect(call()).rejects.toThrow();
   });
 });

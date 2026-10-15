@@ -7,7 +7,7 @@ import { notFound } from "next/navigation";
 import { CourseView, type ViewState } from "./course-view";
 import { getCourse, getEnrollments } from "@/lib/auth/courses";
 import { getAllowance } from "@/lib/allowance/server";
-import { slotsFull } from "@/lib/allowance/rules";
+import { slotsFull, startDecision } from "@/lib/allowance/rules";
 import { getAccount } from "@/lib/auth/session";
 import { PageShell, Section, SiteHeader } from "@/components/becan/kit";
 
@@ -38,9 +38,14 @@ export default async function CoursePage(props: PageProps<"/[locale]/c/[code]">)
   const course = result.data;
   const enrollments = account ? await getEnrollments() : null;
   const enrollmentError = enrollments !== null && !enrollments.ok;
-  const state: ViewState = !account ? "guest" : enrollments?.ok && enrollments.data.some((e) => e.course.id === course.id) ? "enrolled" : "new";
+  const baseState: ViewState = !account ? "guest" : enrollments?.ok && enrollments.data.some((e) => e.course.id === course.id) ? "enrolled" : "new";
 
-  const allowance = state === "new" ? await getAllowance() : null;
+  const allowance = baseState === "new" ? await getAllowance() : null;
+  /* الحساب غير المحدود يبدأ فصلًا منشورًا دون تسجيل. */
+  const state: ViewState = baseState === "new"
+    && startDecision({ allowance: allowance?.ok ? allowance.data : null, enrolled: false, published: true }).ok
+    ? "open"
+    : baseState;
   const slotQuota = allowance?.ok && allowance.data.limits.enrollments !== null && enrollments?.ok && slotsFull(allowance.data, enrollments.data, course.id)
     ? {
       limit: allowance.data.limits.enrollments,

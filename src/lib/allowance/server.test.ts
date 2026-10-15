@@ -6,6 +6,7 @@ const incoming = vi.hoisted(() => vi.fn());
 vi.mock("next/headers", () => ({ headers: incoming }));
 
 const allowance = {
+  unlimited: false,
   plan: { id: "free", name: { ar: "الباقة المجانية", en: "Free plan" } },
   period: { start: "2026-10-01T00:00:00Z", end: "2026-10-31T00:00:00Z" },
   limits: { sessions: 6, seconds: 3600, enrollments: 1, sessionSeconds: 1800, minStartSeconds: 180 },

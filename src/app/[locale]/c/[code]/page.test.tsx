@@ -36,6 +36,7 @@ const course: Course = {
 };
 const held = { enrolledAt: "2026-10-01T00:00:00Z", course: { ...course, id: "acct-101", name: { ar: "المحاسبة", en: "Accounting" } } };
 const allowance: Allowance = {
+  unlimited: false,
   plan: { id: "free", name: { ar: "مجانية", en: "Free" } },
   period: { start: "2026-10-01T00:00:00Z", end: "2026-10-31T00:00:00Z" },
   limits: { sessions: 6, seconds: 3600, enrollments: 1, sessionSeconds: 1800, minStartSeconds: 180 },
@@ -128,5 +129,39 @@ describe("Course page slot limit", () => {
     expect(html).toContain(ar.Course.enrollmentLoadError);
     expect(html).toMatch(/<button[^>]*disabled=""[^>]*>/);
     expect(html).not.toContain('href="/c/acct-101"');
+  });
+});
+
+describe("Course page for an unlimited account", () => {
+  beforeEach(() => {
+    backend.enrollments.mockResolvedValue({ ok: true, data: [] });
+    backend.allowance.mockResolvedValue({ ok: true, data: { ...allowance, unlimited: true } });
+  });
+  it.each(["ar", "en"] as const)("lets a published chapter start without enrolling and shows no enroll or quota UI in %s", async (locale) => {
+    const html = await render(locale);
+    const messages = locale === "ar" ? ar : en;
+    expect(html).toContain('href="/session/math-101/1"');
+    expect(html).not.toContain(`>${messages.Course.enroll}<`);
+    expect(html).not.toContain('id="quota"');
+    expect(html).not.toContain(messages.Course.slotsFullHint);
+    expect(html).not.toContain(messages.Course.unenroll);
+  });
+  it("starts a chapter even when the held courses fill every slot", async () => {
+    backend.enrollments.mockResolvedValue({ ok: true, data: [held] });
+    const html = await render();
+    expect(html).toContain('href="/session/math-101/1"');
+    expect(html).not.toContain('id="quota"');
+  });
+  it("keeps the unpublished chapter inert", async () => {
+    const unpublished = (await render()).match(/<li id="ch-2"[\s\S]*?<\/li>/)![0];
+    expect(unpublished).toContain(ar.Course.soon);
+    expect(unpublished).not.toMatch(/<a |<button/);
+  });
+  it("leaves a student who is not enrolled with the enroll buttons and no start link", async () => {
+    backend.enrollments.mockResolvedValue({ ok: true, data: [] });
+    backend.allowance.mockResolvedValue({ ok: true, data: { ...allowance, usage: { ...allowance.usage, enrollments: 0 } } });
+    const html = await render();
+    expect(html).not.toContain('href="/session/math-101/1"');
+    expect(html.match(new RegExp(`>${ar.Course.enroll}</button>`, "g"))).toHaveLength(2);
   });
 });

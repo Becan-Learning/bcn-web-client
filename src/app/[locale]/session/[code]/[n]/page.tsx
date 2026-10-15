@@ -11,7 +11,7 @@ import { getLessons } from "@/lib/session/lessons";
 import { requireAccount } from "@/lib/auth/session";
 import { accountReturnPath } from "@/lib/auth/next-path";
 import { getAllowance } from "@/lib/allowance/server";
-import { minutesLeft, nearlyOut } from "@/lib/allowance/rules";
+import { minutesLeft, nearlyOut, startDecision } from "@/lib/allowance/rules";
 import { usedUpQuota } from "@/lib/allowance/presentation";
 import { SessionUsedUp } from "@/components/session/session-start";
 
@@ -42,21 +42,27 @@ export default async function SessionPage(
   if (!result.ok) notFound();
   const course = result.data;
   const chapter = course.chapters.find((c) => String(c.number) === n);
-  if (!chapter || !chapter.published) notFound();
-  if (!enrollments.ok || !enrollments.data.some((e) => e.course.id === course.id)) {
-    return redirect({ locale, href: `/c/${course.id}` });
-  }
+  if (!chapter) notFound();
 
   const allowance = allowanceResult.ok ? allowanceResult.data : null;
-  const quota = usedUpQuota(allowance);
-  if (quota) {
-    return <SessionUsedUp
-      courseName={localize(course.name, locale)}
-      courseSlug={course.id}
-      chapterNo={chapter.number}
-      chapterTitle={localize(chapter.title, locale)}
-      quota={quota}
-    />;
+  const decision = startDecision({
+    allowance,
+    enrolled: enrollments.ok && enrollments.data.some((e) => e.course.id === course.id),
+    published: chapter.published,
+  });
+  if (!decision.ok) {
+    if (decision.reason === "unpublished") notFound();
+    if (decision.reason === "not-enrolled") return redirect({ locale, href: `/c/${course.id}` });
+    const quota = usedUpQuota(allowance);
+    if (quota) {
+      return <SessionUsedUp
+        courseName={localize(course.name, locale)}
+        courseSlug={course.id}
+        chapterNo={chapter.number}
+        chapterTitle={localize(chapter.title, locale)}
+        quota={quota}
+      />;
+    }
   }
 
   const content = { courseId: course.id, chapterId: `ch_${chapter.number}` };

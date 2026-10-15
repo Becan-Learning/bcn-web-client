@@ -22,7 +22,8 @@ const TABS = [
   { id: "sources", label: "sources", ready: false },
 ] as const;
 
-export type ViewState = "guest" | "new" | "enrolled";
+/* "open": حساب غير محدود (مشرف) غير مسجَّل — يبدأ الفصول المنشورة مباشرة. */
+export type ViewState = "guest" | "new" | "enrolled" | "open";
 
 /* بطاقات الفصول داكنة. اللوحة لا تملك كهرمانيًا أو جوزيًا داكنًا
    يصلح تعبئةً تحمل نصًا، فالعائلتان المتاحتان: الباذنجاني والزيتي.
@@ -105,7 +106,7 @@ function ChapterCard({
       <div className="relative z-10 mt-auto flex justify-end pt-4">
         {!chapter.published ? (
           <span className={`rounded-pill border px-4 py-2 text-xs font-semibold ${skin.arrow}`}>{t("soon")}</span>
-        ) : state === "enrolled" ? (
+        ) : state === "enrolled" || state === "open" ? (
           <Link href={`/session/${course.id}/${chapter.number}`}
             className={`inline-flex min-h-11 items-center gap-2 rounded-pill border px-5 font-semibold transition-colors hover:bg-pressable hover:text-on-pressable ${skin.arrow}`}>
             {t("start")}<ArrowForward />
@@ -194,7 +195,7 @@ export function CourseView({
       <div className="mt-6">
         {state === "guest" ? (
           <PrimaryButton href={joinHref}>{t("enroll")}</PrimaryButton>
-        ) : state === "new" ? slotQuota !== null ? (
+        ) : state === "open" ? null : state === "new" ? slotQuota !== null ? (
           <QuotaBlock id="quota" kind="slots-full" {...slotQuota} />
         ) : (
           <PrimaryButton type="button" disabled={pending || enrollmentError} onClick={() => mutate("PUT")}>

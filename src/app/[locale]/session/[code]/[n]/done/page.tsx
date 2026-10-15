@@ -15,6 +15,7 @@ import { FeedbackForm } from "./feedback-form";
 import { requireAccount } from "@/lib/auth/session";
 import { accountReturnPath } from "@/lib/auth/next-path";
 import { getAllowance } from "@/lib/allowance/server";
+import { startDecision } from "@/lib/allowance/rules";
 import { usedUpQuota } from "@/lib/allowance/presentation";
 import { QuotaBlock } from "@/components/becan/quota";
 
@@ -54,14 +55,18 @@ export default async function SummaryPage(
 
   /* تصل من الجلسة الحقيقية: اسم غرفة LiveKit للتقييم، وبلوغ الحدّ الزمني */
   const hitLimit = (Array.isArray(sp.limit) ? sp.limit[0] : sp.limit) === "1";
-  const quota = usedUpQuota(allowance?.ok ? allowance.data : null);
   if (!result.ok) notFound();
   const course = result.data;
   const chapter = course.chapters.find((c) => String(c.number) === n);
-  if (!chapter || !chapter.published) notFound();
-  if (!enrollments.ok || !enrollments.data.some((e) => e.course.id === course.id)) {
-    return redirect({ locale, href: `/c/${course.id}` });
-  }
+  if (!chapter) notFound();
+  const enrolled = enrollments.ok && enrollments.data.some((e) => e.course.id === course.id);
+  /* غير المسجَّل يحتاج الحدود ليُعرف أهو حساب غير محدود (مشرف) أم يعود إلى المقرر. */
+  const allowanceResult = allowance ?? (enrolled ? null : await getAllowance());
+  const allowanceData = allowanceResult?.ok ? allowanceResult.data : null;
+  const decision = startDecision({ allowance: allowanceData, enrolled, published: chapter.published });
+  if (!decision.ok && decision.reason === "unpublished") notFound();
+  if (!decision.ok && decision.reason === "not-enrolled") return redirect({ locale, href: `/c/${course.id}` });
+  const quota = usedUpQuota(allowanceData);
   const nextChapter = course.chapters.find((c) => c.number === chapter.number + 1);
 
   return (

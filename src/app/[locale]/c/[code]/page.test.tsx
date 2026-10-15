@@ -28,7 +28,7 @@ vi.mock("@/components/becan/kit", () => ({
 const course: Course = {
   id: "11111111-1111-4111-8111-111111111111", slug: "math-101", code: "MATH 101", name: { ar: "الرياضيات", en: "Mathematics" },
   institution: { id: "university", name: { ar: "الجامعة", en: "University" } },
-  icon: "blocks", tone: "lilac", chapterCount: 2, publishedChapterCount: 1,
+  icon: "blocks", tone: "lilac", chapterCount: 2, publishedChapterCount: 1, status: "published",
   chapters: [
     { id: "aaaaaaaa-0000-4000-8000-000000000001", number: 1, title: { ar: "الأول", en: "First" }, minutes: 30, lessonCount: 3, state: "published", contentPath: "courses/math-101/ch_1/" },
     { id: "aaaaaaaa-0000-4000-8000-000000000002", number: 2, title: { ar: "الثاني", en: "Second" }, minutes: 30, lessonCount: 3, state: "coming_soon", contentPath: null },
@@ -163,5 +163,71 @@ describe("Course page for an unlimited account", () => {
     const html = await render();
     expect(html).not.toContain('href="/session/math-101/aaaaaaaa-0000-4000-8000-000000000001"');
     expect(html.match(new RegExp(`>${ar.Course.enroll}</button>`, "g"))).toHaveLength(2);
+  });
+});
+
+describe("Course page for an archived course", () => {
+  const archived: Course = { ...course, status: "archived" };
+  const startHref = 'href="/session/math-101/aaaaaaaa-0000-4000-8000-000000000001"';
+  beforeEach(() => {
+    backend.course.mockResolvedValue({ ok: true, data: archived });
+    backend.enrollments.mockResolvedValue({ ok: true, data: [{ ...held, course: archived }] });
+  });
+  it.each(["ar", "en"] as const)("marks it archived and lets an enrolled student start a published chapter in %s", async (locale) => {
+    const messages = locale === "ar" ? ar : en;
+    const html = await render(locale);
+    expect(html).toContain(`>${messages.Course.archived}</span>`);
+    expect(html).toContain(messages.Course.archivedEnrolled);
+    expect(html).not.toContain(messages.Course.archivedClosed);
+    expect(html).toContain(startHref);
+    expect(html).not.toContain(`>${messages.Course.enroll}<`);
+    expect(html).toContain(messages.Course.unenroll);
+    expect(html).not.toContain('id="quota"');
+    expect(backend.allowance).not.toHaveBeenCalled();
+    const unpublished = html.match(/<li id="ch-2"[\s\S]*?<\/li>/)![0];
+    expect(unpublished).not.toMatch(/<a |<button/);
+  });
+  it.each(["ar", "en"] as const)("gives a student who is not enrolled an explanation and no enroll or start action in %s", async (locale) => {
+    const messages = locale === "ar" ? ar : en;
+    backend.enrollments.mockResolvedValue({ ok: true, data: [] });
+    backend.allowance.mockResolvedValue({ ok: true, data: { ...allowance, usage: { ...allowance.usage, enrollments: 0 } } });
+    const html = await render(locale);
+    expect(html).toContain(`>${messages.Course.archived}</span>`);
+    expect(html).toContain(messages.Course.archivedClosed);
+    expect(html).not.toContain(startHref);
+    expect(html).not.toContain(messages.Course.enroll);
+    expect(html).not.toContain(messages.Course.unenroll);
+    expect(html.match(/<ul[\s\S]*<\/ul>/)![0]).not.toMatch(/<a |<button/);
+    expect(html).not.toContain("aria-haspopup");
+    expect(html).not.toContain('id="quota"');
+  });
+  it("does not offer a slot-limited student a quota block for a course they cannot join anyway", async () => {
+    backend.enrollments.mockResolvedValue({ ok: true, data: [held] });
+    const html = await render();
+    expect(html).toContain(ar.Course.archivedClosed);
+    expect(html).not.toContain('id="quota"');
+    expect(html).not.toContain(ar.Course.slotsFullHint);
+  });
+  it("shows a guest the same explanation instead of a sign-up prompt", async () => {
+    backend.account.mockResolvedValue(null);
+    const html = await render();
+    expect(html).toContain(ar.Course.archivedClosed);
+    expect(html).not.toContain("/join?course=");
+    expect(html).not.toContain(startHref);
+    expect(backend.enrollments).not.toHaveBeenCalled();
+  });
+  it("lets an unlimited account start without enrolling", async () => {
+    backend.enrollments.mockResolvedValue({ ok: true, data: [] });
+    backend.allowance.mockResolvedValue({ ok: true, data: { ...allowance, unlimited: true } });
+    const html = await render();
+    expect(html).toContain(startHref);
+    expect(html).not.toContain(`>${ar.Course.enroll}<`);
+  });
+  it("says nothing about archiving for a published course", async () => {
+    backend.course.mockResolvedValue({ ok: true, data: course });
+    const html = await render();
+    expect(html).not.toContain(ar.Course.archived);
+    expect(html).not.toContain(ar.Course.archivedClosed);
+    expect(html).not.toContain(ar.Course.archivedEnrolled);
   });
 });

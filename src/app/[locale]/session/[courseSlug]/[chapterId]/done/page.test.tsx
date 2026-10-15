@@ -31,7 +31,7 @@ vi.mock("@/components/becan/kit", () => ({
 const course: Course = {
   id: "11111111-1111-4111-8111-111111111111", slug: "math-101", code: "MATH 101", name: { ar: "الرياضيات", en: "Mathematics" },
   institution: { id: "university", name: { ar: "الجامعة", en: "University" } },
-  icon: "blocks", tone: "lilac", chapterCount: 2, publishedChapterCount: 2,
+  icon: "blocks", tone: "lilac", chapterCount: 2, publishedChapterCount: 2, status: "published",
   chapters: [
     { id: "aaaaaaaa-0000-4000-8000-000000000001", number: 1, title: { ar: "الفصل الأول", en: "First chapter" }, minutes: 30, lessonCount: 1, state: "published", contentPath: "courses/math-101/ch_1/" },
     { id: "aaaaaaaa-0000-4000-8000-000000000002", number: 2, title: { ar: "الفصل الثاني", en: "Second chapter" }, minutes: 30, lessonCount: 1, state: "published", contentPath: "courses/math-101/ch_2/" },
@@ -158,5 +158,21 @@ describe("done page enrollment gate", () => {
     backend.target.mockResolvedValue({ kind: "found", course: { ...course, chapters: [soon] }, chapter: soon });
     backend.allowance.mockResolvedValue({ ok: true, data: unlimited });
     await expect(call()).rejects.toThrow();
+  });
+  describe("for an archived course", () => {
+    const archived: Course = { ...course, status: "archived" };
+    beforeEach(() => backend.target.mockResolvedValue({ kind: "found", course: archived, chapter: archived.chapters[0] }));
+    it("shows the summary to a student with an active enrollment", async () => {
+      backend.enrollments.mockResolvedValue({ ok: true, data: [{ course: archived }] });
+      const html = await render();
+      expect(redirect).not.toHaveBeenCalled();
+      expect(html).toContain('href="/c/math-101"');
+      expect(html).toContain("<form");
+    });
+    it("sends a student who is not enrolled to the Course page", async () => {
+      backend.enrollments.mockResolvedValue({ ok: true, data: [] });
+      await call();
+      expect(redirect).toHaveBeenCalledWith({ locale: "ar", href: "/c/math-101" });
+    });
   });
 });

@@ -15,7 +15,7 @@ const enrollment: Enrollment = {
   course: {
     id: "33333333-3333-4333-8333-333333333333", slug: "acct-101", code: "ACCT 101", name: { ar: "المحاسبة", en: "Accounting" },
     institution: { id: "university", name: { ar: "الجامعة", en: "University" } },
-    icon: "coins", tone: "lilac", chapterCount: 3, publishedChapterCount: 2,
+    icon: "coins", tone: "lilac", chapterCount: 3, publishedChapterCount: 2, status: "published",
   },
 };
 

@@ -66,8 +66,15 @@ async function EnrolledCard({ c }: { c: Enrollment }) {
       className={`group relative flex min-h-36 flex-col justify-between overflow-hidden rounded-lg border p-3 shadow-soft transition-transform duration-200 hover:-translate-y-1 hover:shadow-lift ${tone.card}`}
     >
       <CourseCardBody course={c.course} />
-      {c.course.publishedChapterCount === 0 ? (
-        <span className={`relative mt-2 w-fit rounded-pill border px-2 py-0.5 text-[11px] font-semibold ${tone.chip}`}>{t("soon")}</span>
+      {c.course.status === "archived" || c.course.publishedChapterCount === 0 ? (
+        <span className="relative mt-2 flex flex-wrap gap-1.5">
+          {c.course.status === "archived" ? (
+            <span className={`w-fit rounded-pill border px-2 py-0.5 text-[11px] font-semibold ${tone.chip}`}>{t("archived")}</span>
+          ) : null}
+          {c.course.publishedChapterCount === 0 ? (
+            <span className={`w-fit rounded-pill border px-2 py-0.5 text-[11px] font-semibold ${tone.chip}`}>{t("soon")}</span>
+          ) : null}
+        </span>
       ) : null}
     </Link>
   );

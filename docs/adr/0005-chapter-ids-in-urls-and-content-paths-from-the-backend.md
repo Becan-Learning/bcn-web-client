@@ -15,8 +15,9 @@ from the publicly cached Catalog endpoints.
 
 ## Implementation notes (#54)
 
-- The session page resolves by `chapterId` through the Catalog (`findSessionTarget`, with the pure decision in
-  `src/lib/session/resolve.ts`). A stale slug redirects to the current one; an unknown id is not found.
+- The session page resolves by `chapterId` (`findSessionTarget`, with the pure decision in `src/lib/session/resolve.ts`). A stale slug redirects
+  to the current one; an unknown id is not found. W1 first scanned the Catalog for this; since W3 (#57) it is one read of the backend's
+  `GET /chapters/:chapterId`, which also answers for Archived Courses.
 - Before the student presses Start there is no token, and the token opens a Session, so the page reads the lessons and shows the slides
   from the Catalog's `contentPath`. When the token arrives, the client adopts its **pinned** `contentPath` and, if it differs, re-reads
   both from it.

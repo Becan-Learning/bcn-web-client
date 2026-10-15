@@ -26,7 +26,7 @@ vi.mock("@/components/session/session-view", () => ({
 const course: Course = {
   id: "11111111-1111-4111-8111-111111111111", slug: "math-101", code: "MATH 101", name: { ar: "الرياضيات", en: "Mathematics" },
   institution: { id: "university", name: { ar: "الجامعة", en: "University" } },
-  icon: "blocks", tone: "lilac", chapterCount: 1, publishedChapterCount: 1,
+  icon: "blocks", tone: "lilac", chapterCount: 1, publishedChapterCount: 1, status: "published",
   chapters: [{ id: "aaaaaaaa-0000-4000-8000-000000000001", number: 1, title: { ar: "الفصل الأول", en: "First chapter" }, minutes: 30, lessonCount: 1, state: "published", contentPath: "courses/math-101/ch_1/" }],
 };
 const allowance: Allowance = {
@@ -131,6 +131,34 @@ describe("Session page start gates", () => {
     expect(redirect).toHaveBeenCalledWith({ locale: "ar", href: "/c/math-101" });
     expect(SessionView).not.toHaveBeenCalled();
     expect(backend.lessons).not.toHaveBeenCalled();
+  });
+  describe("for an archived course", () => {
+    const archived: Course = { ...course, status: "archived" };
+    beforeEach(() => backend.target.mockResolvedValue({ kind: "found", course: archived, chapter: archived.chapters[0] }));
+    it("opens the session for a student with an active enrollment", async () => {
+      backend.enrollments.mockResolvedValue({ ok: true, data: [{ course: archived }] });
+      expect(await render()).toContain("data-session-view");
+      expect(redirect).not.toHaveBeenCalled();
+      expect(vi.mocked(SessionView).mock.calls[0][0]).toMatchObject({ courseSlug: "math-101", contentPath: "courses/math-101/ch_1/" });
+    });
+    it("sends a student who is not enrolled to the Course page, which explains it", async () => {
+      backend.enrollments.mockResolvedValue({ ok: true, data: [] });
+      await call();
+      expect(redirect).toHaveBeenCalledWith({ locale: "ar", href: "/c/math-101" });
+      expect(SessionView).not.toHaveBeenCalled();
+      expect(backend.lessons).not.toHaveBeenCalled();
+    });
+    it("still blocks an enrolled student whose usage is used up", async () => {
+      backend.enrollments.mockResolvedValue({ ok: true, data: [{ course: archived }] });
+      backend.allowance.mockResolvedValue({ ok: true, data: spent });
+      expect(await render()).not.toContain("data-session-view");
+      expect(SessionView).not.toHaveBeenCalled();
+    });
+    it("opens the session for an unlimited account that is not enrolled", async () => {
+      backend.enrollments.mockResolvedValue({ ok: true, data: [] });
+      backend.allowance.mockResolvedValue({ ok: true, data: unlimited });
+      expect(await render()).toContain("data-session-view");
+    });
   });
   it("redirects when enrollments cannot be read", async () => {
     backend.enrollments.mockResolvedValue({ ok: false, kind: "network" });

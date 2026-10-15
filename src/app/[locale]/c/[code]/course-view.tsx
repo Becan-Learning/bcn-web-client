@@ -23,8 +23,9 @@ const TABS = [
   { id: "sources", label: "sources", ready: false },
 ] as const;
 
-/* "open": حساب غير محدود (مشرف) غير مسجَّل — يبدأ الفصول المنشورة مباشرة. */
-export type ViewState = "guest" | "new" | "enrolled" | "open";
+/* "open": حساب غير محدود (مشرف) غير مسجَّل — يبدأ الفصول المنشورة مباشرة.
+   "closed": مقرر مؤرشف وغير مسجَّل فيه — لا تسجيل ولا بدء، وشرح بدلهما. */
+export type ViewState = "guest" | "new" | "enrolled" | "open" | "closed";
 
 /* بطاقات الفصول داكنة. اللوحة لا تملك كهرمانيًا أو جوزيًا داكنًا
    يصلح تعبئةً تحمل نصًا، فالعائلتان المتاحتان: الباذنجاني والزيتي.
@@ -113,7 +114,7 @@ function ChapterCard({
             className={`inline-flex min-h-11 items-center gap-2 rounded-pill border px-5 font-semibold transition-colors hover:bg-pressable hover:text-on-pressable ${skin.arrow}`}>
             {t("start")}<ArrowForward />
           </Link>
-        ) : state === "guest" ? (
+        ) : state === "closed" ? null : state === "guest" ? (
           <Link href={joinHref} className={`inline-flex min-h-11 items-center gap-2 rounded-pill border px-5 font-semibold ${skin.arrow}`}>{t("enroll")}</Link>
         ) : quotaReached ? (
           <Link href="#quota" className={`inline-flex min-h-11 items-center rounded-pill border px-5 font-semibold ${skin.arrow}`}>
@@ -153,6 +154,7 @@ export function CourseView({
   const [error, setError] = useState<"enrollError" | "unenrollError" | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const cancelRef = useRef<HTMLButtonElement>(null);
+  const archived = course.status === "archived";
   const joinHref = `/join?course=${encodeURIComponent(localize(course.name, locale))}&next=${encodeURIComponent(`/c/${course.slug}`)}`;
 
   const mutate = (method: "PUT" | "DELETE") => {
@@ -188,16 +190,25 @@ export function CourseView({
               {course.code}
             </span>
           </h1>
+          {archived ? (
+            <span className="mt-3 inline-flex rounded-pill border border-line px-3 py-0.5 text-sm font-semibold text-ink-2">{t("archived")}</span>
+          ) : null}
           <p className="mt-2 text-ink-2">
             {t("courseSummary", { university: localize(course.institution.name, locale), count: course.publishedChapterCount, countLabel: format.number(course.publishedChapterCount, { numberingSystem: "latn" }) })}
           </p>
         </div>
       </div>
 
+      {archived ? (
+        <p id="archived-note" className="mt-6 max-w-measure rounded-lg bg-tint-aubergine px-4 py-3 leading-base text-ink">
+          {t(state === "enrolled" ? "archivedEnrolled" : "archivedClosed")}
+        </p>
+      ) : null}
+
       <div className="mt-6">
         {state === "guest" ? (
           <PrimaryButton href={joinHref}>{t("enroll")}</PrimaryButton>
-        ) : state === "open" ? null : state === "new" ? slotQuota !== null ? (
+        ) : state === "open" || state === "closed" ? null : state === "new" ? slotQuota !== null ? (
           <QuotaBlock id="quota" kind="slots-full" {...slotQuota} />
         ) : (
           <PrimaryButton type="button" disabled={pending || enrollmentError} onClick={() => mutate("PUT")}>
@@ -214,7 +225,7 @@ export function CourseView({
                 onOpenAutoFocus={(event) => { event.preventDefault(); cancelRef.current?.focus(); }}
                 className="fixed top-1/2 start-1/2 z-50 w-[calc(100%_-_2rem)] max-w-md -translate-y-1/2 rounded-xl border border-line bg-surface p-6 ltr:-translate-x-1/2 rtl:translate-x-1/2">
                 <Dialog.Title className="font-display text-2xl font-bold text-ink">{t("unenrollTitle")}</Dialog.Title>
-                <Dialog.Description className="mt-3 leading-base text-ink-2">{t("unenrollBody", { course: localize(course.name, locale) })}</Dialog.Description>
+                <Dialog.Description className="mt-3 leading-base text-ink-2">{t(archived ? "unenrollBodyArchived" : "unenrollBody", { course: localize(course.name, locale) })}</Dialog.Description>
                 {error ? <p role="alert" className="mt-4 text-error">{t(error)}</p> : null}
                 <div className="mt-6 flex flex-wrap gap-3">
                   <PrimaryButton type="button" disabled={pending} onClick={() => mutate("DELETE")}>{t(pending ? "unenrolling" : "unenrollConfirm")}</PrimaryButton>

@@ -1,7 +1,8 @@
 # Backend handoff: Catalog, Enrollment and the session token
 
 Status: agreed 2026-10-12. Target repo: `Becan-Learning/bcn-backend-main@dev`.
-**Superseded in part on 2026-10-15 by B1** (`Becan-Learning/bcn-backend-main#42`, issue #38; web side: #54, [ADR 0005](adr/0005-chapter-ids-in-urls-and-content-paths-from-the-backend.md)).
+**Superseded in part on 2026-10-15 by B1** (`Becan-Learning/bcn-backend-main#42`, issue #38; web side: #54, [ADR 0005](adr/0005-chapter-ids-in-urls-and-content-paths-from-the-backend.md))
+and **B5** (`Becan-Learning/bcn-backend-main#45`, issue #44; web side: #57): Archived Courses and the Chapter lookup by id.
 The current contract is §0 below. The numbered sections that follow are the original design and are kept as history; each section the
 migration changed is marked **Superseded**. Where they disagree with §0, §0 wins.
 Builds on the Account work ([backend-auth-handoff.md](backend-auth-handoff.md), merged in web
@@ -18,13 +19,15 @@ Content paths come from the backend, so the web builds no `ch_{n}` paths. The Ma
 
 ### Catalog (`GET /api/v1/courses`, `GET /api/v1/courses/:slug`, `public, max-age=60, s-maxage=300`)
 
-Only `published` Courses, and only `coming_soon` and `published` Chapters. The detail route takes the **slug** (a UUID is 404
-`COURSE_NOT_FOUND`). There is no `published` boolean any more.
+The list holds only `published` Courses, and Chapters are only `coming_soon` and `published`. The detail route takes the **slug**
+(a UUID is 404 `COURSE_NOT_FOUND`) and also answers for an **Archived** Course (B5). There is no `published` boolean any more.
+Every Course carries `status`. When a slug is shared, the non-Archived Course wins; among Archived ones the newest does.
 
 ```ts
 type CourseSummary = {
   id: string;                     // uuid
   slug: string;                   // /c/{slug}, /session/{slug}/…
+  status: "published" | "archived"; // B5. The list is always "published"; "archived" = retired, closed to new Enrollments
   code: string; name: Localized;
   institution: { id: string; name: Localized };
   icon: IconKey; tone: Tone;
@@ -40,11 +43,18 @@ type ChapterDto = {
 };
 ```
 
+### Chapter lookup (`GET /api/v1/chapters/:chapterId`, B5, same cache headers)
+
+`:chapterId` is the Chapter uuid. 200 `{ chapter: ChapterDto, course: CourseSummary & { chapters: ChapterDto[] } }`, where `course` is exactly
+the body of `GET /courses/:slug` and `chapter` equals its matching entry. It answers only for a `coming_soon` or `published` Chapter of a
+`published` or `archived` Course. Anything else (Draft or Archived Chapter, Draft Course, unknown or malformed id) is 404
+`CHAPTER_NOT_FOUND`.
+
 ### Enrollment
 
 `PUT|DELETE /api/v1/me/enrollments/:courseId` takes the **Course UUID** (`course.id`, never the slug). `GET /me/enrollments` and `PUT`
-return `{ enrolledAt, course: CourseSummary }`. PUT into a Course that is not `published` is 404 `COURSE_NOT_FOUND`.
-Active Enrollments in an `archived` Course keep working.
+return `{ enrolledAt, course: CourseSummary }`, and `course.status` is `"published"` or `"archived"`. PUT into a Course that is not `published`
+is 404 `COURSE_NOT_FOUND`. Active Enrollments in an `archived` Course keep working, and the token is issued for their `published` Chapters.
 
 ### Token (`POST /api/v1/livekit/token`)
 
@@ -71,10 +81,18 @@ went live since. Participant attributes: `course_id` and `chapter_id` are UUIDs;
 
 ### How the web uses it
 
-- URLs: `/c/{slug}`, `/session/{slug}/{chapterId}`, `/session/{slug}/{chapterId}/done`. The session page resolves by `chapterId`: it
-  reads the URL's Course first and, if that Course doesn't hold the Chapter (a renamed slug), reads the rest of the Catalog to find
-  it and redirects to the Course's current slug. An unknown or malformed id is not found. The backend has no lookup-by-Chapter-id
-  endpoint, so this is the only way; the reads are cached for 5 minutes.
+- URLs: `/c/{slug}`, `/session/{slug}/{chapterId}`, `/session/{slug}/{chapterId}/done`. The session page and `done` resolve by `chapterId`
+  with **one** read of `GET /chapters/:chapterId` (`findSessionTarget`; the pure decision is `resolveSessionTarget` in
+  `src/lib/session/resolve.ts`). The Course in the answer holds the Chapter, so: the URL's slug equals `course.slug` = found; a different slug
+  (a renamed Course) = redirect to `course.slug`, keeping the query; 404 `CHAPTER_NOT_FOUND`, a malformed id (no request is made), or any
+  failed read = not found. The Catalog scan of B1 is gone. The read is cached for 5 minutes, like the Catalog.
+- Archived Courses: `/c/{slug}` renders them (`GET /courses/:slug` answers), marked archived. Enrolling is hidden. A student with an active
+  Enrollment starts the `published` Chapters as usual; a student without one gets an explanation and no start (`startDecision` returns
+  `reason: "archived"` for a not-enrolled student of an archived Course, so the session and `done` pages send them back to the Course page).
+  An unlimited account (Admin) is the same as before: it starts any `published` Chapter without enrolling. Un-enrolling stays possible
+  (it frees a Course slot), with a note that the Course can't be joined again. "My courses" marks each Enrollment whose `course.status` is
+  `archived`. A slug shared by an Archived and a non-Archived Course resolves `/c/{slug}` to the non-Archived one, so the "back to the Course"
+  link of an Archived Course's session can land on that other Course (rare, and the backend's rule).
 - Content: the page renders before the student presses Start, and the token (which opens a Session and charges against the
   Allowance) can only be requested then. So before Start the page reads `lessons_list.json` on the server, and shows `slides.pdf`,
   from the Catalog's `contentPath`. When the token arrives, the client switches to the **pinned** `contentPath` and, if it differs,

@@ -149,33 +149,52 @@ describe("unlimited accounts", () => {
 describe("startDecision", () => {
   const student = { ...allowance };
   it("lets an enrolled student with allowance left start a published chapter", () => {
-    expect(startDecision({ allowance: student, enrolled: true, published: true })).toEqual({ ok: true });
+    expect(startDecision({ allowance: student, enrolled: true, published: true, courseStatus: "published" })).toEqual({ ok: true });
   });
   it("lets an enrolled student start when the allowance could not be read", () => {
-    expect(startDecision({ allowance: null, enrolled: true, published: true })).toEqual({ ok: true });
+    expect(startDecision({ allowance: null, enrolled: true, published: true, courseStatus: "published" })).toEqual({ ok: true });
   });
   it("refuses a student who is not enrolled", () => {
-    expect(startDecision({ allowance: student, enrolled: false, published: true })).toEqual({ ok: false, reason: "not-enrolled" });
-    expect(startDecision({ allowance: null, enrolled: false, published: true })).toEqual({ ok: false, reason: "not-enrolled" });
+    expect(startDecision({ allowance: student, enrolled: false, published: true, courseStatus: "published" })).toEqual({ ok: false, reason: "not-enrolled" });
+    expect(startDecision({ allowance: null, enrolled: false, published: true, courseStatus: "published" })).toEqual({ ok: false, reason: "not-enrolled" });
   });
   it("refuses an enrolled student whose usage is used up", () => {
-    expect(startDecision({ allowance: spent, enrolled: true, published: true })).toEqual({ ok: false, reason: "used-up" });
+    expect(startDecision({ allowance: spent, enrolled: true, published: true, courseStatus: "published" })).toEqual({ ok: false, reason: "used-up" });
   });
   it("reports not-enrolled before used-up for a student who is both", () => {
-    expect(startDecision({ allowance: spent, enrolled: false, published: true })).toEqual({ ok: false, reason: "not-enrolled" });
+    expect(startDecision({ allowance: spent, enrolled: false, published: true, courseStatus: "published" })).toEqual({ ok: false, reason: "not-enrolled" });
   });
   it("refuses an unpublished chapter for a student", () => {
-    expect(startDecision({ allowance: student, enrolled: true, published: false })).toEqual({ ok: false, reason: "unpublished" });
+    expect(startDecision({ allowance: student, enrolled: true, published: false, courseStatus: "published" })).toEqual({ ok: false, reason: "unpublished" });
+  });
+  it("lets an enrolled student start a published chapter of an archived course", () => {
+    expect(startDecision({ allowance: student, enrolled: true, published: true, courseStatus: "archived" })).toEqual({ ok: true });
+    expect(startDecision({ allowance: null, enrolled: true, published: true, courseStatus: "archived" })).toEqual({ ok: true });
+  });
+  it("refuses a student who is not enrolled in an archived course, with its own reason", () => {
+    expect(startDecision({ allowance: student, enrolled: false, published: true, courseStatus: "archived" })).toEqual({ ok: false, reason: "archived" });
+    expect(startDecision({ allowance: null, enrolled: false, published: true, courseStatus: "archived" })).toEqual({ ok: false, reason: "archived" });
+    expect(startDecision({ allowance: spent, enrolled: false, published: true, courseStatus: "archived" })).toEqual({ ok: false, reason: "archived" });
+  });
+  it("still stops an enrolled student of an archived course whose usage is used up", () => {
+    expect(startDecision({ allowance: spent, enrolled: true, published: true, courseStatus: "archived" })).toEqual({ ok: false, reason: "used-up" });
+  });
+  it("refuses an unpublished chapter of an archived course before anything else", () => {
+    expect(startDecision({ allowance: student, enrolled: true, published: false, courseStatus: "archived" })).toEqual({ ok: false, reason: "unpublished" });
+    expect(startDecision({ allowance: unlimited(student), enrolled: true, published: false, courseStatus: "archived" })).toEqual({ ok: false, reason: "unpublished" });
+  });
+  it("lets an unlimited account start a chapter of an archived course without enrolling", () => {
+    expect(startDecision({ allowance: unlimited(student), enrolled: false, published: true, courseStatus: "archived" })).toEqual({ ok: true });
   });
   it("lets an unlimited account start a published chapter without enrolling", () => {
-    expect(startDecision({ allowance: unlimited(student), enrolled: false, published: true })).toEqual({ ok: true });
+    expect(startDecision({ allowance: unlimited(student), enrolled: false, published: true, courseStatus: "published" })).toEqual({ ok: true });
   });
   it("lets an unlimited account start with usage used up", () => {
-    expect(startDecision({ allowance: unlimited(spent), enrolled: true, published: true })).toEqual({ ok: true });
-    expect(startDecision({ allowance: unlimited(spent), enrolled: false, published: true })).toEqual({ ok: true });
+    expect(startDecision({ allowance: unlimited(spent), enrolled: true, published: true, courseStatus: "published" })).toEqual({ ok: true });
+    expect(startDecision({ allowance: unlimited(spent), enrolled: false, published: true, courseStatus: "published" })).toEqual({ ok: true });
   });
   it("still refuses an unpublished chapter for an unlimited account", () => {
-    expect(startDecision({ allowance: unlimited(student), enrolled: true, published: false })).toEqual({ ok: false, reason: "unpublished" });
-    expect(startDecision({ allowance: unlimited(student), enrolled: false, published: false })).toEqual({ ok: false, reason: "unpublished" });
+    expect(startDecision({ allowance: unlimited(student), enrolled: true, published: false, courseStatus: "published" })).toEqual({ ok: false, reason: "unpublished" });
+    expect(startDecision({ allowance: unlimited(student), enrolled: false, published: false, courseStatus: "published" })).toEqual({ ok: false, reason: "unpublished" });
   });
 });

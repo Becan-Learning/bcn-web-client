@@ -38,15 +38,17 @@ export default async function CoursePage(props: PageProps<"/[locale]/c/[code]">)
   const course = result.data;
   const enrollments = account ? await getEnrollments() : null;
   const enrollmentError = enrollments !== null && !enrollments.ok;
+  const archived = course.status === "archived";
   const baseState: ViewState = !account ? "guest" : enrollments?.ok && enrollments.data.some((e) => e.course.id === course.id) ? "enrolled" : "new";
 
   const allowance = baseState === "new" ? await getAllowance() : null;
-  /* الحساب غير المحدود يبدأ فصلًا منشورًا دون تسجيل. */
-  const state: ViewState = baseState === "new"
-    && startDecision({ allowance: allowance?.ok ? allowance.data : null, enrolled: false, published: true }).ok
-    ? "open"
-    : baseState;
-  const slotQuota = allowance?.ok && allowance.data.limits.enrollments !== null && enrollments?.ok && slotsFull(allowance.data, enrollments.data, course.id)
+  /* الحساب غير المحدود يبدأ فصلًا منشورًا دون تسجيل. المقرر المؤرشف لا يقبل تسجيلًا جديدًا:
+     غير المسجَّل فيه ("closed") لا يرى تسجيلًا ولا بدءًا، بل شرحًا. */
+  const state: ViewState = baseState === "enrolled" ? baseState
+    : startDecision({ allowance: allowance?.ok ? allowance.data : null, enrolled: false, published: true, courseStatus: course.status }).ok && baseState === "new"
+      ? "open"
+      : archived ? "closed" : baseState;
+  const slotQuota = !archived && allowance?.ok && allowance.data.limits.enrollments !== null && enrollments?.ok && slotsFull(allowance.data, enrollments.data, course.id)
     ? {
       limit: allowance.data.limits.enrollments,
       courses: enrollments.data.map(({ course: held }) => ({ slug: held.slug, name: localize(held.name, locale) })),

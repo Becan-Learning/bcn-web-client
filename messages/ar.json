@@ -596,7 +596,11 @@
     "enrollError": "ما قدرنا نسجّلك في المقرر. حاول مرة ثانية.",
     "unenrollError": "ما قدرنا نلغي تسجيلك. حاول مرة ثانية.",
     "enrollmentLoadError": "ما قدرنا نتحقّق من تسجيلك في المقرر. أعد تحميل الصفحة للمحاولة.",
-    "lessons": "{count, plural, zero {{countLabel} دروس} one {{countLabel} درس} two {{countLabel} درسان} few {{countLabel} دروس} many {{countLabel} درسًا} other {{countLabel} درس}}"
+    "lessons": "{count, plural, zero {{countLabel} دروس} one {{countLabel} درس} two {{countLabel} درسان} few {{countLabel} دروس} many {{countLabel} درسًا} other {{countLabel} درس}}",
+    "archived": "مؤرشف",
+    "archivedEnrolled": "هذا المقرر مؤرشف ولم يعد يقبل تسجيلًا جديدًا. تسجيلك فيه باقٍ، وتقدر تكمل فصوله المنشورة.",
+    "archivedClosed": "هذا المقرر مؤرشف ولم يعد يقبل تسجيلًا جديدًا. فصوله متاحة فقط لمن سجّل فيه قبل أرشفته.",
+    "unenrollBodyArchived": "إذا ألغيت تسجيلك في «{course}»، لن تتمكّن من فتح حصصه، ولن تقدر تسجّل فيه مرة ثانية لأنه مؤرشف."
   },
   "Home": {
     "metadataTitle": "مقرراتك — بيكان",
@@ -607,7 +611,8 @@
     "soon": "قريبًا",
     "empty": "ما سجّلت في أي مقرر بعد.",
     "browseCourses": "تصفّح المقررات",
-    "loadError": "ما قدرنا نحمّل مقرراتك. أعد تحميل الصفحة للمحاولة."
+    "loadError": "ما قدرنا نحمّل مقرراتك. أعد تحميل الصفحة للمحاولة.",
+    "archived": "مؤرشف"
   },
   "Checkout": {
     "metadataTitle": "الدفع — بيكان",

@@ -61,62 +61,60 @@ it("keeps incoming-header dynamic rendering signals outside network error handli
 });
 
 const CH_A = "aaaaaaaa-0000-4000-8000-000000000001";
-const CH_B = "bbbbbbbb-0000-4000-8000-000000000001";
-const summary = (slug: string) => ({
-  id: slug === "alpha" ? "11111111-1111-4111-8111-111111111111" : "22222222-2222-4222-8222-222222222222", slug, code: "X 101",
+const detail = (slug: string, chapterId: string, status: "published" | "archived" = "published") => ({
+  id: "11111111-1111-4111-8111-111111111111", slug, status, code: "X 101",
   name: { ar: "مقرر", en: "Course" }, institution: { id: "ksu", name: { ar: "جامعة", en: "University" } },
   icon: "atom", tone: "deep", chapterCount: 1, publishedChapterCount: 1,
-});
-const detail = (slug: string, chapterId: string) => ({
-  ...summary(slug),
   chapters: [{ id: chapterId, number: 1, title: { ar: "فصل", en: "Chapter" }, minutes: 20, lessonCount: 2, state: "published", contentPath: `courses/${slug}/ch_1/` }],
 });
-/* خادم وهمي: الكتالوج alpha وbeta، وslug قديم "old" غير معروف. */
-function mockCatalog() {
+const lookupBody = (slug: string, chapterId: string, status: "published" | "archived" = "published") => {
+  const course = detail(slug, chapterId, status);
+  return { chapter: course.chapters[0], course };
+};
+function mockLookup(response: Response) {
   vi.spyOn(console, "error").mockImplementation(() => {});
   vi.stubEnv("BACKEND_URL", "https://backend.example.com");
-  const request = vi.fn(async (url: string) => {
-    const path = new URL(url).pathname;
-    if (path === "/api/v1/courses") return Response.json([summary("alpha"), summary("beta")]);
-    if (path === "/api/v1/courses/alpha") return Response.json(detail("alpha", CH_A));
-    if (path === "/api/v1/courses/beta") return Response.json(detail("beta", CH_B));
-    return Response.json({ error: { message: "Course not found", code: "COURSE_NOT_FOUND" } }, { status: 404 });
-  });
+  const request = vi.fn().mockResolvedValue(response);
   vi.stubGlobal("fetch", request);
   return request;
 }
 
-it("finds a session chapter with one read when the URL's course holds it", async () => {
-  const request = mockCatalog();
+it("finds a session chapter with a single cached read of GET /chapters/:chapterId", async () => {
+  const request = mockLookup(Response.json(lookupBody("alpha", CH_A)));
   const target = await findSessionTarget("alpha", CH_A);
   expect(target.kind).toBe("found");
   expect(request).toHaveBeenCalledTimes(1);
+  expect(request).toHaveBeenCalledWith(`https://backend.example.com/api/v1/chapters/${CH_A}`, { next: { revalidate: 300 } });
 });
 
-it("redirects a stale slug to the current one after reading the rest of the catalog", async () => {
-  mockCatalog();
+it("finds a chapter of an archived course", async () => {
+  mockLookup(Response.json(lookupBody("alpha", CH_A, "archived")));
+  const target = await findSessionTarget("alpha", CH_A);
+  expect(target.kind === "found" && target.course.status).toBe("archived");
+});
+
+it("redirects a stale slug to the current one with that same single read", async () => {
+  const request = mockLookup(Response.json(lookupBody("alpha", CH_A)));
   expect(await findSessionTarget("old", CH_A)).toEqual({ kind: "redirect", slug: "alpha" });
+  expect(request).toHaveBeenCalledTimes(1);
 });
 
-it("redirects when the chapter lives in another course than the URL's", async () => {
-  mockCatalog();
-  expect(await findSessionTarget("alpha", CH_B)).toEqual({ kind: "redirect", slug: "beta" });
-});
-
-it("is not found for an unknown chapter id", async () => {
-  mockCatalog();
+it("is not found for an unknown chapter id (CHAPTER_NOT_FOUND)", async () => {
+  const request = mockLookup(Response.json({ error: { message: "Chapter not found", code: "CHAPTER_NOT_FOUND" } }, { status: 404 }));
   expect(await findSessionTarget("alpha", "cccccccc-0000-4000-8000-000000000009")).toEqual({ kind: "not-found" });
+  expect(request).toHaveBeenCalledTimes(1);
 });
 
 it("is not found, with no request, for a malformed chapter id", async () => {
-  const request = mockCatalog();
+  const request = mockLookup(Response.json({}));
   expect(await findSessionTarget("alpha", "ch_1")).toEqual({ kind: "not-found" });
   expect(request).not.toHaveBeenCalled();
 });
 
-it("does not scan the catalog when the backend is unreachable", async () => {
-  const request = mockCatalog();
-  request.mockRejectedValue(new Error("Unreachable"));
+it("is not found when the backend is unreachable or answers with an unexpected body", async () => {
+  const request = mockLookup(Response.json({}));
+  request.mockRejectedValueOnce(new Error("Unreachable"));
   expect(await findSessionTarget("alpha", CH_A)).toEqual({ kind: "not-found" });
-  expect(request).toHaveBeenCalledTimes(1);
+  expect(await findSessionTarget("alpha", CH_A)).toEqual({ kind: "not-found" });
+  expect(request).toHaveBeenCalledTimes(2);
 });

@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { backendErrorSchema, chapterSchema, courseSchema, coursesSchema, enrollmentsSchema, tokenSchema } from "./schema";
+import { backendErrorSchema, chapterLookupSchema, chapterSchema, courseSchema, coursesSchema, enrollmentsSchema, tokenSchema } from "./schema";
 
 const summary = {
   id: "11111111-1111-4111-8111-111111111111", slug: "course-101", code: "COURSE 101", name: { ar: "مقرر", en: "Course" },
   institution: { id: "ksu", name: { ar: "جامعة", en: "University" } },
-  icon: "atom", tone: "deep", chapterCount: 2, publishedChapterCount: 1,
+  icon: "atom", tone: "deep", chapterCount: 2, publishedChapterCount: 1, status: "published",
 };
 const chapter = {
   id: "aaaaaaaa-0000-4000-8000-000000000001", number: 1, title: { ar: "فصل", en: "Chapter" }, minutes: 20, lessonCount: 2,
@@ -19,6 +19,23 @@ describe("courses backend contract", () => {
     expect(enrollmentsSchema.parse([enrollment])).toEqual([enrollment]);
     expect(enrollmentsSchema.parse([])).toEqual([]);
   });
+  it("parses an archived course in the detail, the list and the enrollments", () => {
+    const archived = { ...summary, status: "archived" };
+    expect(coursesSchema.parse([archived])[0].status).toBe("archived");
+    expect(courseSchema.parse({ ...archived, chapters: [chapter] }).status).toBe("archived");
+    expect(enrollmentsSchema.parse([{ enrolledAt: "2026-10-12T10:00:00.000Z", course: archived }])[0].course.status).toBe("archived");
+  });
+  it.each(["draft", "Archived", "", null, 1, undefined])("rejects the course status %j", (status) => {
+    expect(coursesSchema.safeParse([{ ...summary, status }]).success).toBe(false);
+  });
+  it("parses the chapter lookup: the chapter beside its whole course", () => {
+    const body = { chapter, course: { ...summary, status: "archived", chapters: [chapter] } };
+    expect(chapterLookupSchema.parse(body)).toEqual(body);
+  });
+  it.each([{ chapter }, { course: { ...summary, chapters: [chapter] } }, { chapter, course: summary }, { chapter: { ...chapter, id: "ch_1" }, course: { ...summary, chapters: [chapter] } }])(
+    "rejects a malformed chapter lookup %j", (body) => {
+      expect(chapterLookupSchema.safeParse(body).success).toBe(false);
+    });
   it("accepts unknown presentation strings with safe defaults", () => {
     const [course] = coursesSchema.parse([{ ...summary, icon: "new-icon", tone: "new-tone" }]);
     expect(course.icon).toBe("blocks");

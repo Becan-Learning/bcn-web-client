@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Chapter, Course } from "@/lib/courses/schema";
+import type { Chapter, ChapterLookup, Course } from "@/lib/courses/schema";
 import { chapterIsPublished, resolveSessionTarget, sessionHref } from "./resolve";
 
 const chapter = (id: string, number: number, state: Chapter["state"] = "published"): Chapter => ({
@@ -9,8 +9,9 @@ const chapter = (id: string, number: number, state: Chapter["state"] = "publishe
 const course = (slug: string, id: string, chapters: Chapter[]): Course => ({
   id, slug, code: "X 101", name: { ar: "مقرر", en: "Course" },
   institution: { id: "ksu", name: { ar: "جامعة", en: "University" } },
-  icon: "atom", tone: "deep", chapterCount: chapters.length, publishedChapterCount: chapters.length, chapters,
+  icon: "atom", tone: "deep", status: "published", chapterCount: chapters.length, publishedChapterCount: chapters.length, chapters,
 });
+const lookup = (c: Course, chapterId: string): ChapterLookup => ({ course: c, chapter: c.chapters.find((x) => x.id === chapterId)! });
 
 const A1 = "aaaaaaaa-0000-4000-8000-000000000001";
 const A2 = "aaaaaaaa-0000-4000-8000-000000000002";
@@ -20,34 +21,39 @@ const courseB = course("beta", "22222222-2222-4222-8222-222222222222", [chapter(
 
 describe("resolveSessionTarget", () => {
   it("finds the chapter in the course named by the URL", () => {
-    expect(resolveSessionTarget({ slug: "alpha", chapterId: A1, courses: [courseA, courseB] }))
+    expect(resolveSessionTarget({ slug: "alpha", chapterId: A1, lookup: lookup(courseA, A1) }))
       .toEqual({ kind: "found", course: courseA, chapter: courseA.chapters[0] });
   });
-  it("resolves by chapter id, not by number: renumbering never lands on another chapter", () => {
+  it("uses the chapter the backend returned, so renumbering never lands on another chapter", () => {
     const renumbered = course("alpha", courseA.id, [chapter(A1, 5), chapter(A2, 1, "coming_soon")]);
-    const target = resolveSessionTarget({ slug: "alpha", chapterId: A1, courses: [renumbered] });
+    const target = resolveSessionTarget({ slug: "alpha", chapterId: A1, lookup: lookup(renumbered, A1) });
     expect(target.kind === "found" && target.chapter.number).toBe(5);
   });
   it("redirects a stale slug to the course's current slug", () => {
-    expect(resolveSessionTarget({ slug: "old-alpha", chapterId: A1, courses: [courseA, courseB] }))
+    expect(resolveSessionTarget({ slug: "old-alpha", chapterId: A1, lookup: lookup(courseA, A1) }))
       .toEqual({ kind: "redirect", slug: "alpha" });
   });
   it("redirects when the chapter belongs to a different course than the URL says", () => {
-    expect(resolveSessionTarget({ slug: "alpha", chapterId: B1, courses: [courseA, courseB] }))
+    expect(resolveSessionTarget({ slug: "alpha", chapterId: B1, lookup: lookup(courseB, B1) }))
       .toEqual({ kind: "redirect", slug: "beta" });
   });
-  it("returns found for a coming-soon chapter so the caller decides (it renders as not startable)", () => {
-    expect(resolveSessionTarget({ slug: "alpha", chapterId: A2, courses: [courseA] }).kind).toBe("found");
+  it("finds a chapter of an archived course, and redirects its stale slug too", () => {
+    const archived = { ...courseB, status: "archived" as const };
+    const target = resolveSessionTarget({ slug: "beta", chapterId: B1, lookup: lookup(archived, B1) });
+    expect(target.kind === "found" && target.course.status).toBe("archived");
+    expect(resolveSessionTarget({ slug: "old-beta", chapterId: B1, lookup: lookup(archived, B1) })).toEqual({ kind: "redirect", slug: "beta" });
   });
-  it("is not found for an unknown chapter id", () => {
-    expect(resolveSessionTarget({ slug: "alpha", chapterId: "cccccccc-0000-4000-8000-000000000009", courses: [courseA, courseB] }))
-      .toEqual({ kind: "not-found" });
+  it("returns found for a coming-soon chapter so the caller decides (it renders as not startable)", () => {
+    expect(resolveSessionTarget({ slug: "alpha", chapterId: A2, lookup: lookup(courseA, A2) }).kind).toBe("found");
+  });
+  it("is not found when the backend has no such chapter", () => {
+    expect(resolveSessionTarget({ slug: "alpha", chapterId: A1, lookup: null })).toEqual({ kind: "not-found" });
+  });
+  it("is not found when the lookup answers for a different chapter than the URL's", () => {
+    expect(resolveSessionTarget({ slug: "alpha", chapterId: A2, lookup: lookup(courseA, A1) })).toEqual({ kind: "not-found" });
   });
   it.each(["1", "ch_1", "", "../x", `${A1}/done`])("is not found for the malformed chapter id %j", (chapterId) => {
-    expect(resolveSessionTarget({ slug: "alpha", chapterId, courses: [courseA, courseB] })).toEqual({ kind: "not-found" });
-  });
-  it("is not found when the catalog is empty", () => {
-    expect(resolveSessionTarget({ slug: "alpha", chapterId: A1, courses: [] })).toEqual({ kind: "not-found" });
+    expect(resolveSessionTarget({ slug: "alpha", chapterId, lookup: lookup(courseA, A1) })).toEqual({ kind: "not-found" });
   });
 });
 

@@ -596,7 +596,11 @@
     "enrollError": "We couldn’t enroll you in this course. Try again.",
     "unenrollError": "We couldn’t un-enroll you. Try again.",
     "enrollmentLoadError": "We couldn’t check your enrollment. Reload the page to try again.",
-    "lessons": "{count, plural, one {{countLabel} lesson} other {{countLabel} lessons}}"
+    "lessons": "{count, plural, one {{countLabel} lesson} other {{countLabel} lessons}}",
+    "archived": "Archived",
+    "archivedEnrolled": "This course is archived and no longer open for new enrollment. Your enrollment stays active, and you can keep studying its published chapters.",
+    "archivedClosed": "This course is archived and no longer open for new enrollment. Its chapters are available only to students who enrolled before it was archived.",
+    "unenrollBodyArchived": "If you un-enroll from “{course}”, you can’t open its sessions, and you can’t enroll again because it’s archived."
   },
   "Home": {
     "metadataTitle": "Your courses — Becan",
@@ -607,7 +611,8 @@
     "soon": "Coming soon",
     "empty": "You haven’t enrolled in any courses yet.",
     "browseCourses": "Browse courses",
-    "loadError": "We couldn’t load your courses. Reload the page to try again."
+    "loadError": "We couldn’t load your courses. Reload the page to try again.",
+    "archived": "Archived"
   },
   "Checkout": {
     "metadataTitle": "Checkout — Becan",

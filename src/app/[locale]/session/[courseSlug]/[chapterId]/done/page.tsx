@@ -64,9 +64,9 @@ export default async function SummaryPage(
   /* غير المسجَّل يحتاج الحدود ليُعرف أهو حساب غير محدود (مشرف) أم يعود إلى المقرر. */
   const allowanceResult = allowance ?? (enrolled ? null : await getAllowance());
   const allowanceData = allowanceResult?.ok ? allowanceResult.data : null;
-  const decision = startDecision({ allowance: allowanceData, enrolled, published: chapterIsPublished(chapter) });
+  const decision = startDecision({ allowance: allowanceData, enrolled, published: chapterIsPublished(chapter), courseStatus: course.status });
   if (!decision.ok && decision.reason === "unpublished") notFound();
-  if (!decision.ok && decision.reason === "not-enrolled") return redirect({ locale, href: `/c/${course.slug}` });
+  if (!decision.ok && (decision.reason === "not-enrolled" || decision.reason === "archived")) return redirect({ locale, href: `/c/${course.slug}` });
   const quota = usedUpQuota(allowanceData);
   const nextChapter = course.chapters.find((c) => c.number === chapter.number + 1);
 

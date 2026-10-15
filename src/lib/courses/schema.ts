@@ -6,10 +6,13 @@ const slugSchema = z.string().regex(/^[a-z0-9][a-z0-9_-]{0,79}$/);
 /* معرّف الفصل والمقرر uuid من الخادم؛ لا نفترض نسخة بعينها. */
 export const uuidSchema = z.string().uuid();
 const countSchema = z.number().int().nonnegative();
+/* المقرر المؤرشف يبقى لمن سجّل فيه؛ الكتالوج والتسجيل الجديد لا يعرضانه. المسوّدة لا تصل الويب أبدًا. */
+export const courseStatusSchema = z.enum(["published", "archived"]);
 
 export const courseSummarySchema = z.object({
   id: uuidSchema,
   slug: slugSchema,
+  status: courseStatusSchema,
   code: z.string().min(1),
   name: localizedSchema,
   institution: z.object({ id: slugSchema, name: localizedSchema }),
@@ -33,6 +36,8 @@ export const chapterSchema = z.object({
   contentPath: contentPathSchema.nullable(),
 });
 export const courseSchema = courseSummarySchema.extend({ chapters: z.array(chapterSchema) });
+/* `GET /chapters/:chapterId`: الفصل ومقرره كاملًا (جسم `GET /courses/:slug` نفسه). */
+export const chapterLookupSchema = z.object({ chapter: chapterSchema, course: courseSchema });
 export const coursesSchema = z.array(courseSummarySchema);
 export const enrollmentSchema = z.object({
   enrolledAt: z.string().datetime({ offset: true }),
@@ -52,6 +57,8 @@ export const backendErrorSchema = z.object({
 
 export type CourseSummary = z.infer<typeof courseSummarySchema>;
 export type Course = z.infer<typeof courseSchema>;
+export type CourseStatus = z.infer<typeof courseStatusSchema>;
+export type ChapterLookup = z.infer<typeof chapterLookupSchema>;
 export type Chapter = z.infer<typeof chapterSchema>;
 export type ChapterState = z.infer<typeof chapterStateSchema>;
 export type Enrollment = z.infer<typeof enrollmentSchema>;

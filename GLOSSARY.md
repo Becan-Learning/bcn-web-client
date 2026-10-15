@@ -57,6 +57,11 @@ they enroll until it ends; it ends when the student un-enrolls. An ended Enrollm
 erased, and a student holds at most one active Enrollment per Course.
 _Avoid_: subscription, registration (that is creating an Account), membership
 
+**Archived Course** (مقرر مؤرشف):
+A retired Course. It is out of the Catalog and closed to new Enrollments, but a student who is still enrolled keeps their
+Enrollment and can open its published Chapters. The student sees it marked «مؤرشف» / Archived.
+_Avoid_: deleted, disabled course, closed course
+
 ## Session
 
 **Session** (الحصة):

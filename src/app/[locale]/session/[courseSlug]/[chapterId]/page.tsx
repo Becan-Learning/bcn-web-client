@@ -50,10 +50,12 @@ export default async function SessionPage(
     allowance,
     enrolled: enrollments.ok && enrollments.data.some((e) => e.course.id === course.id),
     published: chapterIsPublished(chapter),
+    courseStatus: course.status,
   });
   if (!decision.ok) {
     if (decision.reason === "unpublished") notFound();
-    if (decision.reason === "not-enrolled") return redirect({ locale, href: `/c/${course.slug}` });
+    /* المقرر المؤرشف لا يخدم إلا تسجيلاته النشطة؛ صفحته تشرح ذلك. */
+    if (decision.reason === "not-enrolled" || decision.reason === "archived") return redirect({ locale, href: `/c/${course.slug}` });
     const quota = usedUpQuota(allowance);
     if (quota) {
       return <SessionUsedUp

@@ -753,7 +753,17 @@
     "studentQuestionCancel": "إلغاء",
     "studentQuestionNoSpeech": "ما وصلنا صوتك",
     "studentQuestionMicUnavailable": "المايك غير متاح أو إذنه مرفوض — تقدر تكتب في الشات.",
-    "studentQuestionShortcut": "اسأل: Space · أرسل: Space مرة ثانية · إلغاء: Escape"
+    "studentQuestionShortcut": "اسأل: Space · أرسل: Space مرة ثانية · إلغاء: Escape",
+    "unavailable": {
+      "content-unavailable": {
+        "title": "المحتوى مو جاهز بعد",
+        "body": "هذا الفصل ما له محتوى جاهز الحين، وعشان كذا ما نقدر نفتح حصته. ارجع للمقرر وجرّب فصلًا ثانيًا، أو عُد بعدين."
+      },
+      "not-published": {
+        "title": "الفصل مو متاح الآن",
+        "body": "هذا الفصل مو منشور حاليًا، وعشان كذا ما نقدر نفتح له حصة. ارجع للمقرر واختر فصلًا متاحًا."
+      }
+    }
   },
   "SessionSummary": {
     "metadata": "ملخص الحصة — بيكان",

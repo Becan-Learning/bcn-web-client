@@ -95,18 +95,18 @@ describe("QuotaBlock", () => {
 
   it.each(["ar", "en"] as const)("links to each held course with singular and plural guidance in %s", (locale) => {
     const courses = [
-      { id: "acct-101", name: locale === "ar" ? "المحاسبة" : "Accounting" },
-      { id: "math-101", name: locale === "ar" ? "الرياضيات" : "Mathematics" },
-      { id: "physics-101", name: locale === "ar" ? "الفيزياء" : "Physics" },
+      { slug: "acct-101", name: locale === "ar" ? "المحاسبة" : "Accounting" },
+      { slug: "math-101", name: locale === "ar" ? "الرياضيات" : "Mathematics" },
+      { slug: "physics-101", name: locale === "ar" ? "الفيزياء" : "Physics" },
     ];
     for (const count of [1, 2, 3]) {
       link.mockClear();
       const html = render(locale, { kind: "slots-full", courses: courses.slice(0, count), limit: count });
       expect(textOf(html)).toContain(locale === "ar" ? "مسجّل في" : "You're enrolled in");
       for (const course of courses.slice(0, count)) {
-        expect(html).toContain(`href="/c/${course.id}"`);
+        expect(html).toContain(`href="/c/${course.slug}"`);
         expect(textOf(html)).toContain(course.name);
-        expect(link).toHaveBeenCalledWith(`/c/${course.id}`);
+        expect(link).toHaveBeenCalledWith(`/c/${course.slug}`);
       }
       expect((html.match(/<a /g) ?? []).length).toBe(count);
       expect(textOf(html)).toContain(locale === "ar"
@@ -124,21 +124,21 @@ describe("QuotaBlock", () => {
     [0, "بـ0 مقرر"], [1, "بمقرر واحد"], [2, "بمقررَين"],
     [3, "بـ3 مقررات"], [11, "بـ11 مقررًا"], [100, "بـ100 مقرر"],
   ] as const)("explains the Arabic allowance limit of %i courses", (limit, label) => {
-    const html = render("ar", { kind: "slots-full", courses: [{ id: "acct-101", name: "ACCT 101" }], limit });
+    const html = render("ar", { kind: "slots-full", courses: [{ slug: "acct-101", name: "ACCT 101" }], limit });
     expect(textOf(html)).toContain(`حدود استخدامك تسمح ${label} في وقت واحد`);
     expect(html).not.toContain("باقة");
     expectQuiet(html);
   });
 
   it.each([1, 2, 3, 11])("explains the English allowance limit of %i courses", (limit) => {
-    const html = render("en", { kind: "slots-full", courses: [{ id: "acct-101", name: "المحاسبة" }], limit });
+    const html = render("en", { kind: "slots-full", courses: [{ slug: "acct-101", name: "المحاسبة" }], limit });
     expect(textOf(html)).toContain(`Your usage limits allow ${limit} ${limit === 1 ? "course" : "courses"} at a time`);
     expectQuiet(html);
   });
 
   it.each(["ar", "en"] as const)("keeps a course name in the other content language isolated in %s", (locale) => {
     const name = locale === "ar" ? "ACCT 101" : "المحاسبة";
-    const html = render(locale, { id: "quota", kind: "slots-full", courses: [{ id: "acct-101", name }], limit: 2 });
+    const html = render(locale, { id: "quota", kind: "slots-full", courses: [{ slug: "acct-101", name }], limit: 2 });
     expect(html).toMatch(/<a[^>]*dir="auto"[^>]*>/);
     expect(textOf(html)).toContain(name);
     expect(html).toContain('id="quota"');

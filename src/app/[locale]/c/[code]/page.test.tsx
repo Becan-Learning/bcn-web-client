@@ -26,15 +26,15 @@ vi.mock("@/components/becan/kit", () => ({
 }));
 
 const course: Course = {
-  id: "math-101", code: "MATH 101", name: { ar: "الرياضيات", en: "Mathematics" },
+  id: "11111111-1111-4111-8111-111111111111", slug: "math-101", code: "MATH 101", name: { ar: "الرياضيات", en: "Mathematics" },
   institution: { id: "university", name: { ar: "الجامعة", en: "University" } },
   icon: "blocks", tone: "lilac", chapterCount: 2, publishedChapterCount: 1,
   chapters: [
-    { number: 1, title: { ar: "الأول", en: "First" }, minutes: 30, lessonCount: 3, published: true },
-    { number: 2, title: { ar: "الثاني", en: "Second" }, minutes: 30, lessonCount: 3, published: false },
+    { id: "aaaaaaaa-0000-4000-8000-000000000001", number: 1, title: { ar: "الأول", en: "First" }, minutes: 30, lessonCount: 3, state: "published", contentPath: "courses/math-101/ch_1/" },
+    { id: "aaaaaaaa-0000-4000-8000-000000000002", number: 2, title: { ar: "الثاني", en: "Second" }, minutes: 30, lessonCount: 3, state: "coming_soon", contentPath: null },
   ],
 };
-const held = { enrolledAt: "2026-10-01T00:00:00Z", course: { ...course, id: "acct-101", name: { ar: "المحاسبة", en: "Accounting" } } };
+const held = { enrolledAt: "2026-10-01T00:00:00Z", course: { ...course, id: "33333333-3333-4333-8333-333333333333", slug: "acct-101", name: { ar: "المحاسبة", en: "Accounting" } } };
 const allowance: Allowance = {
   unlimited: false,
   plan: { id: "free", name: { ar: "مجانية", en: "Free" } },
@@ -51,7 +51,7 @@ beforeEach(() => {
   backend.allowance.mockResolvedValue({ ok: true, data: allowance });
 });
 async function render(locale: "ar" | "en" = "ar") {
-  const page = await CoursePage({ params: Promise.resolve({ locale, code: course.id }), searchParams: Promise.resolve({}) });
+  const page = await CoursePage({ params: Promise.resolve({ locale, code: course.slug }), searchParams: Promise.resolve({}) });
   return renderToStaticMarkup(<NextIntlClientProvider locale={locale} messages={locale === "ar" ? ar : en} timeZone="Asia/Riyadh">{page}</NextIntlClientProvider>);
 }
 function expectEnrollButtons(html: string, locale: "ar" | "en" = "ar") {
@@ -96,7 +96,7 @@ describe("Course page slot limit", () => {
     backend.enrollments.mockResolvedValue({ ok: true, data: [{ ...held, course }] });
     const html = await render();
     expect(html).toContain(ar.Course.unenroll);
-    expect(html).toContain('href="/session/math-101/1"');
+    expect(html).toContain('href="/session/math-101/aaaaaaaa-0000-4000-8000-000000000001"');
     expect(html).not.toContain(ar.Quota.slotsFull.release);
     expect(backend.allowance).not.toHaveBeenCalled();
   });
@@ -140,7 +140,7 @@ describe("Course page for an unlimited account", () => {
   it.each(["ar", "en"] as const)("lets a published chapter start without enrolling and shows no enroll or quota UI in %s", async (locale) => {
     const html = await render(locale);
     const messages = locale === "ar" ? ar : en;
-    expect(html).toContain('href="/session/math-101/1"');
+    expect(html).toContain('href="/session/math-101/aaaaaaaa-0000-4000-8000-000000000001"');
     expect(html).not.toContain(`>${messages.Course.enroll}<`);
     expect(html).not.toContain('id="quota"');
     expect(html).not.toContain(messages.Course.slotsFullHint);
@@ -149,7 +149,7 @@ describe("Course page for an unlimited account", () => {
   it("starts a chapter even when the held courses fill every slot", async () => {
     backend.enrollments.mockResolvedValue({ ok: true, data: [held] });
     const html = await render();
-    expect(html).toContain('href="/session/math-101/1"');
+    expect(html).toContain('href="/session/math-101/aaaaaaaa-0000-4000-8000-000000000001"');
     expect(html).not.toContain('id="quota"');
   });
   it("keeps the unpublished chapter inert", async () => {
@@ -161,7 +161,7 @@ describe("Course page for an unlimited account", () => {
     backend.enrollments.mockResolvedValue({ ok: true, data: [] });
     backend.allowance.mockResolvedValue({ ok: true, data: { ...allowance, usage: { ...allowance.usage, enrollments: 0 } } });
     const html = await render();
-    expect(html).not.toContain('href="/session/math-101/1"');
+    expect(html).not.toContain('href="/session/math-101/aaaaaaaa-0000-4000-8000-000000000001"');
     expect(html.match(new RegExp(`>${ar.Course.enroll}</button>`, "g"))).toHaveLength(2);
   });
 });

@@ -62,7 +62,7 @@ async function EnrolledCard({ c }: { c: Enrollment }) {
   const tone = TONES[c.course.tone];
   return (
     <Link
-      href={`/c/${c.course.id}`}
+      href={`/c/${c.course.slug}`}
       className={`group relative flex min-h-36 flex-col justify-between overflow-hidden rounded-lg border p-3 shadow-soft transition-transform duration-200 hover:-translate-y-1 hover:shadow-lift ${tone.card}`}
     >
       <CourseCardBody course={c.course} />

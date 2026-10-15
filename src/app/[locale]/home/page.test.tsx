@@ -29,7 +29,7 @@ vi.mock("@/components/becan/kit", () => ({
 const enrollment: Enrollment = {
   enrolledAt: "2026-10-01T00:00:00Z",
   course: {
-    id: "math-101", code: "MATH 101", name: { ar: "الرياضيات", en: "Mathematics" },
+    id: "11111111-1111-4111-8111-111111111111", slug: "math-101", code: "MATH 101", name: { ar: "الرياضيات", en: "Mathematics" },
     institution: { id: "university", name: { ar: "الجامعة", en: "University" } },
     icon: "blocks", tone: "lilac", chapterCount: 1, publishedChapterCount: 1,
   },

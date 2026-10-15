@@ -49,7 +49,7 @@ export default async function CoursePage(props: PageProps<"/[locale]/c/[code]">)
   const slotQuota = allowance?.ok && allowance.data.limits.enrollments !== null && enrollments?.ok && slotsFull(allowance.data, enrollments.data, course.id)
     ? {
       limit: allowance.data.limits.enrollments,
-      courses: enrollments.data.map(({ course: held }) => ({ id: held.id, name: localize(held.name, locale) })),
+      courses: enrollments.data.map(({ course: held }) => ({ slug: held.slug, name: localize(held.name, locale) })),
     }
     : null;
 

@@ -753,7 +753,17 @@
     "studentQuestionCancel": "Cancel",
     "studentQuestionNoSpeech": "We didn't hear anything",
     "studentQuestionMicUnavailable": "The microphone is unavailable or permission was denied — you can type in chat.",
-    "studentQuestionShortcut": "Ask: Space · Send: Space again · Cancel: Escape"
+    "studentQuestionShortcut": "Ask: Space · Send: Space again · Cancel: Escape",
+    "unavailable": {
+      "content-unavailable": {
+        "title": "The content isn’t ready yet",
+        "body": "This chapter has no content ready right now, so we can’t open its session. Go back to the course and try another chapter, or come back later."
+      },
+      "not-published": {
+        "title": "This chapter isn’t available right now",
+        "body": "This chapter isn’t published at the moment, so we can’t open a session for it. Go back to the course and pick an available chapter."
+      }
+    }
   },
   "SessionSummary": {
     "metadata": "Session summary — Becan",

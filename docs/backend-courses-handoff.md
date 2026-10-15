@@ -1,12 +1,84 @@
 # Backend handoff: Catalog, Enrollment and the session token
 
 Status: agreed 2026-10-12. Target repo: `Becan-Learning/bcn-backend-main@dev`.
+**Superseded in part on 2026-10-15 by B1** (`Becan-Learning/bcn-backend-main#42`, issue #38; web side: #54, [ADR 0005](adr/0005-chapter-ids-in-urls-and-content-paths-from-the-backend.md)).
+The current contract is §0 below. The numbered sections that follow are the original design and are kept as history; each section the
+migration changed is marked **Superseded**. Where they disagree with §0, §0 wins.
 Builds on the Account work ([backend-auth-handoff.md](backend-auth-handoff.md), merged in web
 PR #21). Terms: **Catalog, Course, Chapter, Lesson, Enrollment** in [GLOSSARY.md](../GLOSSARY.md).
 The web side of the same feature: [specs/courses-enrollment.md](specs/courses-enrollment.md).
 
 Out of scope here: subscriptions, payment, quota and progress. Each one gets a hook below (§7) so
 it can be added later without reshaping these tables.
+
+## 0. Current contract (B1, 2026-10-15)
+
+Courses and Chapters now have UUID ids. A Course also has a `slug` (its URL), and a Chapter's `number` is an editable position.
+Content paths come from the backend, so the web builds no `ch_{n}` paths. The Maintenance window deploys every repo together.
+
+### Catalog (`GET /api/v1/courses`, `GET /api/v1/courses/:slug`, `public, max-age=60, s-maxage=300`)
+
+Only `published` Courses, and only `coming_soon` and `published` Chapters. The detail route takes the **slug** (a UUID is 404
+`COURSE_NOT_FOUND`). There is no `published` boolean any more.
+
+```ts
+type CourseSummary = {
+  id: string;                     // uuid
+  slug: string;                   // /c/{slug}, /session/{slug}/…
+  code: string; name: Localized;
+  institution: { id: string; name: Localized };
+  icon: IconKey; tone: Tone;
+  chapterCount: number;           // coming_soon + published
+  publishedChapterCount: number;  // published
+};
+type ChapterDto = {
+  id: string;                     // uuid, the id in session URLs
+  number: number;                 // position; "Chapter N" on screen
+  title: Localized; minutes: number; lessonCount: number;
+  state: "coming_soon" | "published";
+  contentPath: string | null;     // live version prefix when published ("courses/becan-test/ch_1/"), else null
+};
+```
+
+### Enrollment
+
+`PUT|DELETE /api/v1/me/enrollments/:courseId` takes the **Course UUID** (`course.id`, never the slug). `GET /me/enrollments` and `PUT`
+return `{ enrolledAt, course: CourseSummary }`. PUT into a Course that is not `published` is 404 `COURSE_NOT_FOUND`.
+Active Enrollments in an `archived` Course keep working.
+
+### Token (`POST /api/v1/livekit/token`)
+
+```jsonc
+// request (courseId / chapterNumber are rejected as 400)
+{ "chapterId": "<uuid>", "language": "Arabic" | "English", "experience": "quick" | "relaxed" }
+// 200, Cache-Control: no-store
+{ "token": "<jwt>", "serverUrl": "wss://…", "contentPath": "courses/becan-test/ch_1/", "courseContentPath": "courses/becan-test/" }
+```
+
+`contentPath` and `courseContentPath` are the prefixes **pinned** to the Session; a continued Session keeps them even if another version
+went live since. Participant attributes: `course_id` and `chapter_id` are UUIDs; new `content_path`, `course_content_path`,
+`chapter_number` (decimal) and `chapter_title` (`title_ar` when `language` is `Arabic`, else `title_en`). See
+[agent-contract-allowance.md](agent-contract-allowance.md).
+
+| status | code | web behaviour |
+|---|---|---|
+| 404 | `CHAPTER_NOT_FOUND` | generic connection failure (the page already 404s an unknown Chapter) |
+| 403 | `NOT_ENROLLED` | generic connection failure (the page redirects the not-enrolled to the Course page) |
+| 409 | `CHAPTER_NOT_PUBLISHED` | localized "chapter isn't available" screen, back to the Course |
+| 409 | `CONTENT_NOT_AVAILABLE` | localized "content isn't ready" screen, back to the Course |
+| 403 | `SESSIONS_USED_UP`, `MINUTES_USED_UP` | refresh the server gate (Allowance screen) |
+| 404 | `COURSE_NOT_FOUND` | Course detail / PUT enrollment: the Course page is not found |
+
+### How the web uses it
+
+- URLs: `/c/{slug}`, `/session/{slug}/{chapterId}`, `/session/{slug}/{chapterId}/done`. The session page resolves by `chapterId`: it
+  reads the URL's Course first and, if that Course doesn't hold the Chapter (a renamed slug), reads the rest of the Catalog to find
+  it and redirects to the Course's current slug. An unknown or malformed id is not found. The backend has no lookup-by-Chapter-id
+  endpoint, so this is the only way; the reads are cached for 5 minutes.
+- Content: the page renders before the student presses Start, and the token (which opens a Session and charges against the
+  Allowance) can only be requested then. So before Start the page reads `lessons_list.json` on the server, and shows `slides.pdf`,
+  from the Catalog's `contentPath`. When the token arrives, the client switches to the **pinned** `contentPath` and, if it differs,
+  re-reads the lessons and the slides from it. Both go through `/api/fetch-bunny/{contentPath}{file}`.
 
 ## 1. What changes, in one paragraph
 
@@ -35,6 +107,8 @@ snake_case columns, `timestamp(...)` the same way the current tables use it, and
 
 ### 3.1 `course`
 
+> **Superseded by §0.** `id` is now a uuid and the slug moved to `slug`.
+
 | Column | Type | Notes |
 |---|---|---|
 | `id` | text PK | Stable slug, `^[a-z0-9][a-z0-9_-]{0,79}$`. **One id everywhere:** the URL segment (`/c/acct-101`), the Bunny folder (`courses/{id}/…`) and the agent's `course_id`. Never renamed; add a new row instead. |
@@ -49,6 +123,8 @@ snake_case columns, `timestamp(...)` the same way the current tables use it, and
 Index: `course_institution_id_sort_idx` on `(institution_id, sort_order)`.
 
 ### 3.2 `chapter`
+
+> **Superseded by §0.** Chapters have a uuid `id`, a `state` instead of `published`, and no `ch_{number}` convention.
 
 | Column | Type | Notes |
 |---|---|---|
@@ -99,6 +175,8 @@ check constraints are present) → `pnpm db:migrate`.
 
 ## 4. Seed
 
+> **Superseded in part by §0.** The seed still creates the same Courses, now keyed by `slug`, and `becan-test` Chapter 1 is registered as Content version 1.
+
 New `src/db/seed-data/catalog.ts` and a `seedCatalog()` in `src/db/seed.ts`, run after
 `seedInstitutions()` in the same `pnpm db:seed` (and therefore in the Vitest global setup). It
 upserts Courses by `id` and Chapters by `(course_id, number)`, and **never deletes** rows, because
@@ -132,7 +210,7 @@ through `AppError` and Zod, which `errorHandler` maps to 400. Names are returned
 `Localized = { ar, en }`, the same as Institutions, so the web renders them without mapping.
 Layering is the usual `routes/` → `controllers/` → `services/` → `repositories/`.
 
-Shared shapes:
+Shared shapes (**superseded by §0**):
 
 ```ts
 type CourseSummary = {
@@ -203,6 +281,8 @@ type EnrollmentDto = {
 - It's **idempotent**: 204 whether or not a row was active, including for an unknown course id.
 
 ### 5.6 `POST /livekit/token` (`requireSession`)
+
+> **Superseded by §0.** The request is `{ chapterId, language, experience }`; the response adds the pinned content paths; the attributes and error codes changed.
 
 Body (Zod):
 

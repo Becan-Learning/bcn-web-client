@@ -158,7 +158,7 @@ function CourseCard({
   return (
     <MotionLink
       layout
-      href={`/c/${course.id}`}
+      href={`/c/${course.slug}`}
       ref={ref}
       variants={card}
       initial="hidden"

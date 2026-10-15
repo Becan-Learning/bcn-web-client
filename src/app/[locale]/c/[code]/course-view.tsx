@@ -13,6 +13,7 @@ import { ArrowForward } from "@/components/becan/icons";
 import { SubjectIcon } from "@/app/[locale]/courses/subject-icon";
 import type { Chapter, Course } from "@/lib/courses/schema";
 import { TONES } from "@/lib/courses/presentation";
+import { chapterIsPublished, sessionHref } from "@/lib/session/resolve";
 
 /* صفحة المقرر قابلة للتصفّح، وفتح الفصل يتطلّب تسجيلًا نشطًا في المقرر. */
 
@@ -69,13 +70,14 @@ function ChapterCard({
   const number = (value: number) => format.number(value, { numberingSystem: "latn" });
   const skin = skinOf(course.tone);
   const fill = skin.fills[(chapter.number - 1) % skin.fills.length];
+  const published = chapterIsPublished(chapter);
 
   return (
     <li
       id={`ch-${chapter.number}`}
       data-theme="dark"
       className={`group relative flex scroll-mt-6 flex-col overflow-hidden rounded-xl p-4 shadow-soft transition-transform duration-200 ${fill} ${
-        chapter.published
+        published
           ? "hover:-translate-y-1.5 hover:shadow-lift"
           : "opacity-45"
       }`}
@@ -104,10 +106,10 @@ function ChapterCard({
       </div>
 
       <div className="relative z-10 mt-auto flex justify-end pt-4">
-        {!chapter.published ? (
+        {!published ? (
           <span className={`rounded-pill border px-4 py-2 text-xs font-semibold ${skin.arrow}`}>{t("soon")}</span>
         ) : state === "enrolled" || state === "open" ? (
-          <Link href={`/session/${course.id}/${chapter.number}`}
+          <Link href={sessionHref(course.slug, chapter.id)}
             className={`inline-flex min-h-11 items-center gap-2 rounded-pill border px-5 font-semibold transition-colors hover:bg-pressable hover:text-on-pressable ${skin.arrow}`}>
             {t("start")}<ArrowForward />
           </Link>
@@ -151,7 +153,7 @@ export function CourseView({
   const [error, setError] = useState<"enrollError" | "unenrollError" | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const cancelRef = useRef<HTMLButtonElement>(null);
-  const joinHref = `/join?course=${encodeURIComponent(localize(course.name, locale))}&next=${encodeURIComponent(`/c/${course.id}`)}`;
+  const joinHref = `/join?course=${encodeURIComponent(localize(course.name, locale))}&next=${encodeURIComponent(`/c/${course.slug}`)}`;
 
   const mutate = (method: "PUT" | "DELETE") => {
     if (pending || enrollmentError) return;
@@ -271,7 +273,7 @@ export function CourseView({
         <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {chapters.map((ch) => (
             <ChapterCard
-              key={ch.number}
+              key={ch.id}
               chapter={ch}
               course={course}
               state={state}

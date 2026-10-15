@@ -4,7 +4,8 @@ import { getFormatter, getTranslations, setRequestLocale } from "next-intl/serve
 import type { Metadata } from "next";
 import { Link, redirect } from "@/i18n/navigation";
 import { notFound } from "next/navigation";
-import { getCourse, getEnrollments } from "@/lib/auth/courses";
+import { findSessionTarget, getEnrollments } from "@/lib/auth/courses";
+import { chapterIsPublished, sessionHref } from "@/lib/session/resolve";
 import {
   PageShell,
   PrimaryButton,
@@ -24,7 +25,7 @@ import { QuotaBlock } from "@/components/becan/quota";
    الفعل الأساسي يعود إلى المقرر، والثانوي يفتح الفصل التالي إن كان جاهزًا. */
 
 export async function generateMetadata(
-  props: PageProps<"/[locale]/session/[code]/[n]/done">,
+  props: PageProps<"/[locale]/session/[courseSlug]/[chapterId]/done">,
 ): Promise<Metadata> {
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
@@ -33,21 +34,21 @@ export async function generateMetadata(
 }
 
 export default async function SummaryPage(
-  props: PageProps<"/[locale]/session/[code]/[n]/done">,
+  props: PageProps<"/[locale]/session/[courseSlug]/[chapterId]/done">,
 ) {
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  const { code, n } = await props.params;
+  const { courseSlug, chapterId } = await props.params;
   const sp = await props.searchParams;
-  await requireAccount(locale, accountReturnPath(`/session/${code}/${n}/done`, sp));
+  await requireAccount(locale, accountReturnPath(sessionHref(courseSlug, chapterId, true), sp));
   /* اسم الغرفة يصل من الحصة الحقيقية، لا من معاينة الملخّص. */
   const roomRaw = Array.isArray(sp.room) ? sp.room[0] : sp.room;
   const room = typeof roomRaw === "string" && roomRaw ? roomRaw : null;
-  const [t, format, result, enrollments, allowance] = await Promise.all([
+  const [t, format, target, enrollments, allowance] = await Promise.all([
     getTranslations("SessionSummary"),
     getFormatter(),
-    getCourse(code),
+    findSessionTarget(courseSlug, chapterId),
     getEnrollments(),
     room ? getAllowance() : null,
   ]);
@@ -55,17 +56,17 @@ export default async function SummaryPage(
 
   /* تصل من الجلسة الحقيقية: اسم غرفة LiveKit للتقييم، وبلوغ الحدّ الزمني */
   const hitLimit = (Array.isArray(sp.limit) ? sp.limit[0] : sp.limit) === "1";
-  if (!result.ok) notFound();
-  const course = result.data;
-  const chapter = course.chapters.find((c) => String(c.number) === n);
-  if (!chapter) notFound();
+  if (target.kind === "not-found") notFound();
+  /* الملخّص يخصّ الفصل بمعرّفه: لو غُيّر رقمه أو رابط مقرره أثناء الحصة بقي هو نفسه. */
+  if (target.kind === "redirect") return redirect({ locale, href: accountReturnPath(sessionHref(target.slug, chapterId, true), sp) });
+  const { course, chapter } = target;
   const enrolled = enrollments.ok && enrollments.data.some((e) => e.course.id === course.id);
   /* غير المسجَّل يحتاج الحدود ليُعرف أهو حساب غير محدود (مشرف) أم يعود إلى المقرر. */
   const allowanceResult = allowance ?? (enrolled ? null : await getAllowance());
   const allowanceData = allowanceResult?.ok ? allowanceResult.data : null;
-  const decision = startDecision({ allowance: allowanceData, enrolled, published: chapter.published });
+  const decision = startDecision({ allowance: allowanceData, enrolled, published: chapterIsPublished(chapter) });
   if (!decision.ok && decision.reason === "unpublished") notFound();
-  if (!decision.ok && decision.reason === "not-enrolled") return redirect({ locale, href: `/c/${course.id}` });
+  if (!decision.ok && decision.reason === "not-enrolled") return redirect({ locale, href: `/c/${course.slug}` });
   const quota = usedUpQuota(allowanceData);
   const nextChapter = course.chapters.find((c) => c.number === chapter.number + 1);
 
@@ -87,13 +88,13 @@ export default async function SummaryPage(
           ) : null}
 
           <div className="mt-9 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-            <PrimaryButton href={`/c/${course.id}`} className="w-full sm:w-fit">
+            <PrimaryButton href={`/c/${course.slug}`} className="w-full sm:w-fit">
               {t("backToCourse")}
             </PrimaryButton>
 
-            {nextChapter?.published ? (
+            {nextChapter && chapterIsPublished(nextChapter) ? (
               <Link
-                href={`/session/${course.id}/${nextChapter.number}`}
+                href={sessionHref(course.slug, nextChapter.id)}
                 className="group inline-flex min-h-11 items-center gap-2 px-2 font-semibold text-ink"
               >
                 {t("nextChapter")}

@@ -2,11 +2,14 @@ import { describe, expect, it } from "vitest";
 import { backendErrorSchema, chapterSchema, courseSchema, coursesSchema, enrollmentsSchema, tokenSchema } from "./schema";
 
 const summary = {
-  id: "course-101", code: "COURSE 101", name: { ar: "مقرر", en: "Course" },
+  id: "11111111-1111-4111-8111-111111111111", slug: "course-101", code: "COURSE 101", name: { ar: "مقرر", en: "Course" },
   institution: { id: "ksu", name: { ar: "جامعة", en: "University" } },
   icon: "atom", tone: "deep", chapterCount: 2, publishedChapterCount: 1,
 };
-const chapter = { number: 1, title: { ar: "فصل", en: "Chapter" }, minutes: 20, lessonCount: 2, published: true };
+const chapter = {
+  id: "aaaaaaaa-0000-4000-8000-000000000001", number: 1, title: { ar: "فصل", en: "Chapter" }, minutes: 20, lessonCount: 2,
+  state: "published", contentPath: "courses/course-101/ch_1/",
+};
 
 describe("courses backend contract", () => {
   it("parses catalog, detail and timestamped active enrollments", () => {
@@ -22,13 +25,21 @@ describe("courses backend contract", () => {
     expect(course.tone).toBe("lilac");
   });
   it.each([
-    { id: "../course" }, { name: { ar: "مقرر" } }, { institution: { id: "ksu" } },
+    { id: "course-101" }, { slug: "../course" }, { slug: "11111111-1111-4111-8111-111111111111/x" }, { name: { ar: "مقرر" } }, { institution: { id: "ksu" } },
     { chapterCount: -1 }, { publishedChapterCount: 1.5 }, { icon: null }, { tone: 2 },
   ])("rejects malformed catalog fields %j", (fields) => {
     expect(coursesSchema.safeParse([{ ...summary, ...fields }]).success).toBe(false);
   });
-  it.each([{ number: 0 }, { minutes: 0 }, { lessonCount: -1 }, { published: "true" }])("rejects malformed chapter fields %j", (fields) => {
+  it.each([{ number: 0 }, { minutes: 0 }, { lessonCount: -1 }, { id: "ch_1" }, { state: "draft" }, { state: undefined },
+    { published: true, state: undefined }, { contentPath: "/courses/x/" }, { contentPath: "courses/../x/" }, { contentPath: "courses/x" }])("rejects malformed chapter fields %j", (fields) => {
     expect(chapterSchema.safeParse({ ...chapter, ...fields }).success).toBe(false);
+  });
+  it("parses a coming-soon chapter with no content path", () => {
+    const soon = { ...chapter, state: "coming_soon", contentPath: null };
+    expect(chapterSchema.parse(soon)).toEqual(soon);
+  });
+  it("has no published boolean any more", () => {
+    expect(chapterSchema.parse(chapter)).not.toHaveProperty("published");
   });
   it("rejects partial details and invalid enrollment dates", () => {
     expect(courseSchema.safeParse(summary).success).toBe(false);
@@ -36,9 +47,12 @@ describe("courses backend contract", () => {
     expect(enrollmentsSchema.safeParse([{ enrolledAt: "2026-10-12T10:00:00Z" }]).success).toBe(false);
   });
   it("parses tokens and error envelopes without exposing malformed payloads", () => {
-    expect(tokenSchema.parse({ token: "jwt", serverUrl: "wss://session.example.com" }).token).toBe("jwt");
-    expect(tokenSchema.safeParse({ token: "", serverUrl: "not-a-url" }).success).toBe(false);
+    const token = { token: "jwt", serverUrl: "wss://session.example.com", contentPath: "courses/becan-test/ch_1/", courseContentPath: "courses/becan-test/" };
+    expect(tokenSchema.parse(token)).toEqual(token);
+    expect(tokenSchema.safeParse({ ...token, token: "", serverUrl: "not-a-url" }).success).toBe(false);
     expect(tokenSchema.safeParse({ token: "jwt" }).success).toBe(false);
+    expect(tokenSchema.safeParse({ token: "jwt", serverUrl: token.serverUrl }).success).toBe(false);
+    expect(tokenSchema.safeParse({ ...token, contentPath: "courses/../ch_1/" }).success).toBe(false);
     expect(backendErrorSchema.parse({ error: { message: "Enrollment required", code: "NOT_ENROLLED" } }).error.code).toBe("NOT_ENROLLED");
     expect(backendErrorSchema.safeParse({ message: "Enrollment required" }).success).toBe(false);
   });

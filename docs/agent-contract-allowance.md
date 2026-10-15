@@ -11,6 +11,22 @@ The backend grants every Session a budget when it issues the LiveKit token, and 
 
 They sit alongside the existing `course_id`, `chapter_id`, `language`, `experience`, `user_id` and `user_name`.
 
+### Identity and content attributes (B1, 2026-10-15)
+
+Backend `bcn-backend-main#42` changes two existing values and adds four attributes. No attribute is renamed. All values are strings.
+
+| Attribute | Value |
+|---|---|
+| `course_id` | The Course **UUID** (it was the slug). |
+| `chapter_id` | The Chapter **UUID** (it was `ch_{n}`). |
+| `content_path` | The Chapter version prefix pinned to this Session, with a trailing `/` (e.g. `courses/becan-test/ch_1/`). The agent reads `lessons_list.json` and the lesson plans from it. |
+| `course_content_path` | The Course version prefix pinned to this Session (e.g. `courses/becan-test/`). |
+| `chapter_number` | The Chapter's current number, decimal. |
+| `chapter_title` | `title_ar` when `language` is `Arabic`, otherwise `title_en`. |
+
+The web reads `slides.pdf` and `lessons_list.json` from the same `content_path` (it receives it in the token response), so the student sees
+the content the agent teaches. The agent must not rebuild `courses/{course_id}/{chapter_id}/` from the ids, since neither is a path segment any more.
+
 ## `ui-control` packet
 
 ```json

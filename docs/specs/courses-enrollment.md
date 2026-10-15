@@ -1,6 +1,7 @@
 # Web spec: real Catalog, Enrollment and the backend session token
 
-Status: agreed 2026-10-12. The backend half, with every endpoint and response shape, is in
+Status: agreed 2026-10-12. **Updated 2026-10-15 (B1, web #54):** Courses and Chapters have UUID ids, session URLs use the Chapter id and
+content paths come from the backend; the places below that still say `{id}`/`{n}`/`ch_{n}` are marked. The backend half, with every endpoint and response shape, is in
 [../backend-courses-handoff.md](../backend-courses-handoff.md). The removed progress UI is recorded
 in [../progress-feature.md](../progress-feature.md). Terms: **Catalog, Course, Chapter, Lesson,
 Enrollment, Topic** in [GLOSSARY.md](../../GLOSSARY.md).
@@ -10,9 +11,9 @@ Enrollment, Topic** in [GLOSSARY.md](../../GLOSSARY.md).
 1. The Catalog comes from the backend (`GET /api/v1/courses`, `GET /api/v1/courses/:id`). The web
    keeps **no** catalog data. Only presentation stays in the web: the `TONES` class map and
    `SubjectIcon`, both keyed by the `tone`/`icon` the backend returns.
-2. A Course's id is one slug used everywhere: the URL (`/c/{id}`, `/session/{id}/{n}`), the Bunny
-   folder (`courses/{id}/ch_{n}/…`) and the agent's `course_id`. The `slugOf(code)` and
-   `courseBySlug` helpers go away.
+2. ~~A Course's id is one slug used everywhere.~~ **Superseded (B1):** a Course has a UUID `id` and a `slug`. The URL uses the slug
+   (`/c/{slug}`, `/session/{slug}/{chapterId}`), Enrollment calls use the UUID, and the agent's `course_id` is the UUID. Bunny paths come
+   from the backend's `contentPath`, never from the ids. The `slugOf(code)` and `courseBySlug` helpers still go away.
 3. A Course belongs to one Institution. The `college` field and the college filter are removed.
 4. Enrolling and un-enrolling are real. Un-enrolling **ends** an Enrollment (the backend keeps the
    row). Only a signed-in student with an active Enrollment can open a session.
@@ -78,25 +79,25 @@ Enrollment, Topic** in [GLOSSARY.md](../../GLOSSARY.md).
 - The "add a course" ghost button stays when the list isn't empty.
 - Removed: progress bars and the exam-date sort.
 
-### `/session/[id]/[n]`
+### `/session/[courseSlug]/[chapterId]`
 
 - `requireAccount`, then `GET /courses/:id` and `GET /me/enrollments` in parallel.
-  - The Course or Chapter is missing, or the Chapter is unpublished → `notFound()`.
+  - The Chapter id is unknown, or the Chapter isn't `published` → `notFound()`. A stale slug → `redirect` to the Course's current slug.
   - The student isn't enrolled → `redirect` to `/c/{id}`.
-- Content ids: `courseId = course.id`, `chapterId = ch_{n}`. Lessons come from Bunny
-  (`getLessons`) and slides from `/api/fetch-bunny/courses/{id}/ch_{n}/slides.pdf`.
-  `src/lib/session/content.ts` is deleted.
+- Content: lessons (`getLessons`) and slides come from the Chapter's `contentPath` (Catalog before Start, the token's pinned
+  `contentPath` after), via `/api/fetch-bunny/{contentPath}{file}`. `src/lib/session/content.ts` now holds the path building.
 - Token: `TokenSource.custom` sends `POST /api/v1/livekit/token` with
-  `{ courseId, chapterNumber, language, experience }` and uses `serverUrl` and `token` from the
-  response. A non-OK response goes down the existing connection-error path.
+  `{ chapterId, language, experience }` and uses `serverUrl`, `token` and `contentPath` from the
+  response. 409 `CONTENT_NOT_AVAILABLE` / `CHAPTER_NOT_PUBLISHED` show a localized message; any other non-OK response goes down
+  the existing connection-error path.
 
-### `/session/[id]/[n]/done`
+### `/session/[courseSlug]/[chapterId]/done`
 
 It becomes a plain end screen:
 
 - The heading is "Session ended: chapter N", and the time-limit notice is shown when `?limit=1`.
 - The feedback form is shown when `?room=`.
-- The secondary link **Next chapter** appears only if chapter N+1 exists and is published.
+- The secondary link **Next chapter** appears only if the Chapter numbered N+1 exists and is published.
 - The primary button goes **back to the course** (`/c/{id}`).
 - The `?s=` preview states, days-to-exam, progress bar, struggles and penalty are removed.
 - The same gating as the session page applies: unknown → 404, not enrolled → redirect.
@@ -117,7 +118,7 @@ Enrollments instead.
 ## Files that go away
 
 - `src/lib/data/home.ts`.
-- `src/lib/session/content.ts`.
+- ~~`src/lib/session/content.ts`~~ (re-created in #54 for content path building).
 - `src/app/api/get-lk-token/`.
 - From `src/lib/data/catalog.ts`: `COLLEGES`, `UNIVERSITIES`, `COURSES`, `ROWS`, `chaptersOf`,
   `slugOf`, `courseBySlug` and `readyCount`. What remains (the `Tone` → class map) moves to a

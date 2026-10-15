@@ -47,10 +47,16 @@ beforeEach(() => {
 });
 afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
 
+const CHAPTER_ID = "aaaaaaaa-0000-4000-8000-000000000001";
+const tokenResponse = {
+  token: "jwt", serverUrl: "wss://session.example.com",
+  contentPath: "courses/math-101/ch_1/", courseContentPath: "courses/math-101/",
+};
+
 function render(minutesRemaining: number | null = null) {
   return renderToStaticMarkup(<NextIntlClientProvider locale="ar" messages={ar} timeZone="UTC">
     <SessionView courseName="الرياضيات" courseSlug="math-101" chapterNo={1} chapterTitle="الأول"
-      minutes={30} content={{ courseId: "math-101", chapterId: "ch_1" }} pdfUrl="/slides.pdf" lessons={[]} minutesRemaining={minutesRemaining} />
+      minutes={30} chapterId={CHAPTER_ID} contentPath="courses/math-101/ch_1/" lessons={[]} minutesRemaining={minutesRemaining} />
   </NextIntlClientProvider>);
 }
 
@@ -82,6 +88,7 @@ describe("Token refusal at session start", () => {
   it.each([
     [403, JSON.stringify({ error: { code: "NOT_ENROLLED", message: "Refused" } })],
     [409, JSON.stringify({ error: { code: "MINUTES_USED_UP", message: "Refused" } })],
+    [404, JSON.stringify({ error: { code: "CHAPTER_NOT_FOUND", message: "Refused" } })],
     [500, "Not JSON"],
   ])("keeps other failures on today's connection failure path (%i)", async (status, body) => {
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
@@ -91,5 +98,36 @@ describe("Token refusal at session start", () => {
     await vi.waitFor(() => expect(error).toHaveBeenCalledWith("Failed to start session:", expect.any(Error)));
     expect(controls.refresh).not.toHaveBeenCalled();
     expect(controls.stop).toHaveBeenCalledOnce();
+  });
+
+  it("requests the token with the chapter id only, never a course id or chapter number", async () => {
+    controls.fetch.mockResolvedValue(Response.json(tokenResponse));
+    render();
+    controls.primary();
+    await vi.waitFor(() => expect(controls.fetch).toHaveBeenCalledOnce());
+    const [url, init] = controls.fetch.mock.calls[0];
+    expect(url).toBe("/api/v1/livekit/token");
+    const body = JSON.parse(init.body);
+    expect(body).toEqual({ chapterId: CHAPTER_ID, language: expect.any(String), experience: expect.any(String) });
+    expect(body).not.toHaveProperty("courseId");
+    expect(body).not.toHaveProperty("chapterNumber");
+  });
+
+  it.each(["CONTENT_NOT_AVAILABLE", "CHAPTER_NOT_PUBLISHED"])("stops quietly, without a connection error, for 409 %s", async (code) => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    controls.fetch.mockResolvedValue(new Response(JSON.stringify({ error: { code, message: "Refused" } }), { status: 409 }));
+    render();
+    controls.primary();
+    await vi.waitFor(() => expect(controls.stop).toHaveBeenCalledOnce());
+    expect(error).not.toHaveBeenCalled();
+    expect(controls.refresh).not.toHaveBeenCalled();
+  });
+
+  it("treats a token response without pinned content paths as a connection failure", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    controls.fetch.mockResolvedValue(Response.json({ token: "jwt", serverUrl: "wss://session.example.com" }));
+    render();
+    controls.primary();
+    await vi.waitFor(() => expect(error).toHaveBeenCalledWith("Failed to start session:", expect.anything()));
   });
 });

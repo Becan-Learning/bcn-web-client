@@ -5,8 +5,10 @@ import { routing } from "@/i18n/routing";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CourseView, type ViewState } from "./course-view";
-import { getCourse, getEnrollments } from "@/lib/auth/courses";
+import { getCourseFor, getEnrollments } from "@/lib/auth/courses";
+import { readsPreview } from "@/lib/preview/rules";
 import { getAllowance } from "@/lib/allowance/server";
+import { viewerReadsPreview } from "@/lib/preview/viewer";
 import { slotsFull, startDecision } from "@/lib/allowance/rules";
 import { getAccount } from "@/lib/auth/session";
 import { PageShell, Section, SiteHeader } from "@/components/becan/kit";
@@ -17,7 +19,7 @@ export async function generateMetadata(
   const { code, locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   const t = await getTranslations({ locale, namespace: "Course" });
-  const result = await getCourse(code);
+  const { result } = await getCourseFor(code, await viewerReadsPreview());
   if (!result.ok) return { title: t("notFoundTitle") };
   const course = result.data;
   const format = await getFormatter({ locale });
@@ -33,15 +35,16 @@ export default async function CoursePage(props: PageProps<"/[locale]/c/[code]">)
   setRequestLocale(locale);
 
   const { code } = await props.params;
-  const [result, account] = await Promise.all([getCourse(code), getAccount()]);
+  /* الحدود قبل المقرر: الحساب غير المحدود (مشرف) يقرأ معاينة المسوّدات، وغيره الكتالوج العام المخزَّن. */
+  const account = await getAccount();
+  const [enrollments, allowance] = account ? await Promise.all([getEnrollments(), getAllowance()]) : [null, null];
+  const { source, result } = await getCourseFor(code, readsPreview(allowance?.ok ? allowance.data : null));
   if (!result.ok) notFound();
   const course = result.data;
-  const enrollments = account ? await getEnrollments() : null;
   const enrollmentError = enrollments !== null && !enrollments.ok;
   const archived = course.status === "archived";
   const baseState: ViewState = !account ? "guest" : enrollments?.ok && enrollments.data.some((e) => e.course.id === course.id) ? "enrolled" : "new";
 
-  const allowance = baseState === "new" ? await getAllowance() : null;
   /* الحساب غير المحدود يبدأ فصلًا منشورًا دون تسجيل. المقرر المؤرشف لا يقبل تسجيلًا جديدًا:
      غير المسجَّل فيه ("closed") لا يرى تسجيلًا ولا بدءًا، بل شرحًا. */
   const state: ViewState = baseState === "enrolled" ? baseState
@@ -66,6 +69,7 @@ export default async function CoursePage(props: PageProps<"/[locale]/c/[code]">)
           enrollmentError={enrollmentError}
           state={state}
           slotQuota={slotQuota}
+          preview={source === "preview"}
         />
       </Section>
     </PageShell>

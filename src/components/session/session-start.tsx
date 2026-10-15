@@ -52,3 +52,33 @@ export function SessionUsedUp({ courseName, courseSlug, chapterNo, chapterTitle,
     </SessionShell>
   );
 }
+
+/* حالة خطأ واضحة لرابط معاينة المشرف: نسخة غير معروفة، أو فصل بلا محتوى. لا حصة ولا رمز. */
+export function SessionPreviewError({ courseName, courseSlug, chapterNo, title, body }: {
+  courseName: string;
+  courseSlug: string;
+  chapterNo: number;
+  title: string;
+  body: string;
+}) {
+  const t = useTranslations("Session");
+  const router = useRouter();
+  const reduce = useReducedMotion();
+  const onExit = () => router.push(`/c/${courseSlug}`);
+
+  return (
+    <SessionShell reduce={reduce}>
+      <TopBar phase="idle" courseName={courseName} chapterNo={chapterNo} onExit={onExit} />
+      <main className="mx-auto flex min-h-0 w-full max-w-measure flex-1 flex-col justify-center overflow-y-auto px-5 py-10">
+        <h1 className="text-3xl font-bold text-ink">{title}</h1>
+        <p className="mt-4 leading-base text-ink-2">{body}</p>
+        <div className="mt-8">
+          <button type="button" onClick={onExit}
+            className="inline-flex h-12 items-center justify-center rounded-pill bg-pressable px-6 font-semibold text-on-pressable">
+            {t("backCourse")}
+          </button>
+        </div>
+      </main>
+    </SessionShell>
+  );
+}

@@ -2,7 +2,8 @@
 
 Status: agreed 2026-10-12. Target repo: `Becan-Learning/bcn-backend-main@dev`.
 **Superseded in part on 2026-10-15 by B1** (`Becan-Learning/bcn-backend-main#42`, issue #38; web side: #54, [ADR 0005](adr/0005-chapter-ids-in-urls-and-content-paths-from-the-backend.md))
-and **B5** (`Becan-Learning/bcn-backend-main#45`, issue #44; web side: #57): Archived Courses and the Chapter lookup by id.
+and **B5** (`Becan-Learning/bcn-backend-main#45`, issue #44; web side: #57): Archived Courses and the Chapter lookup by id, and
+**B4** (`Becan-Learning/bcn-backend-main#47`; web side: #55): the Admin preview reads and version pinning.
 The current contract is §0 below. The numbered sections that follow are the original design and are kept as history; each section the
 migration changed is marked **Superseded**. Where they disagree with §0, §0 wins.
 Builds on the Account work ([backend-auth-handoff.md](backend-auth-handoff.md), merged in web
@@ -97,6 +98,58 @@ went live since. Participant attributes: `course_id` and `chapter_id` are UUIDs;
   Allowance) can only be requested then. So before Start the page reads `lessons_list.json` on the server, and shows `slides.pdf`,
   from the Catalog's `contentPath`. When the token arrives, the client switches to the **pinned** `contentPath` and, if it differs,
   re-reads the lessons and the slides from it. Both go through `/api/fetch-bunny/{contentPath}{file}`.
+
+### Admin preview (B4, `bcn-backend-main#47`; web: W2, #55)
+
+Admin-only, uncached reads, for a viewer whose `GET /me/allowance` says `unlimited: true` (an Admin with two-factor). They use the public
+Catalog's shapes, widened. All answer `Cache-Control: private, no-store`, 401 `UNAUTHENTICATED` / 403 `ADMIN_PERMISSION_REQUIRED` / 403
+`ADMIN_TWO_FACTOR_REQUIRED` for anyone else, and are limited to 120 per minute per Admin.
+
+| Route | Answers |
+|---|---|
+| `GET /api/v1/admin/preview/courses` | Draft and Published Courses (not Archived): `CourseSummary[]`, `status` widened |
+| `GET /api/v1/admin/preview/courses/:slug` | A Course detail of any status (an Archived one marked `archived`), 404 `COURSE_NOT_FOUND` |
+| `GET /api/v1/admin/preview/chapters/:chapterId` | `{ chapter, course }` like `GET /chapters/:chapterId`; Archived, unknown and malformed ids 404 `CHAPTER_NOT_FOUND` |
+
+```ts
+CourseSummary = { …public fields, status: "draft" | "published" | "archived" }
+CourseDetail  = CourseSummary & { chapters: Chapter[]; versions: Version[] }   // Course content versions
+Chapter       = { …public fields, state: "draft" | "coming_soon" | "published",
+                  contentPath: string | null,   // the LIVE prefix in any state; null if none is live
+                  versions: Version[] }          // valid versions only, newest first
+Version       = { id: uuid, version: number, live: boolean, previewed: boolean, contentPath: string } // prefix ends in "/"
+```
+
+Token request: `POST /api/v1/livekit/token` also takes optional `contentVersionId` and `courseContentVersionId` (uuids, a version `id` above). For a
+non-Admin either field is 403 `VERSION_PIN_FORBIDDEN`. Otherwise: 404 `CONTENT_VERSION_NOT_FOUND` (unknown id, another owner's, a Chapter version in the
+Course slot), 409 `VERSION_INVALID`, 409 `CONTENT_NOT_AVAILABLE` (a side with neither a chosen nor a live version). A chosen version replaces the live one
+for its side, whatever the Chapter state or Course status. The response's `contentPath` and `courseContentPath` are the pinned prefixes.
+
+| status | code | web behaviour |
+|---|---|---|
+| 403 | `VERSION_PIN_FORBIDDEN` | localized stop screen (`Session.unavailable.version-forbidden`); the web never sends a pin for a non-Admin |
+| 404 | `CONTENT_VERSION_NOT_FOUND` | localized stop screen (`version-not-found`) |
+| 409 | `VERSION_INVALID` | localized stop screen (`version-invalid`) |
+| 401/403 on a preview **read** | | fall back to the public Catalog read |
+
+How the web uses it (ADR 0005, "Implementation notes (#55)"):
+
+- **Which read.** `readsPreview(allowance)` is true only for `unlimited`. Then `/courses`, `/c/{slug}` and `/session/{slug}/{chapterId}` read the preview
+  routes with `cache: "no-store"` and the forwarded cookie (`src/lib/auth/courses.ts`); everyone else reads the public cached routes, which carry no cookie
+  and keep `revalidate: 300`. The two are separate functions and never share a request. Public schemas reject `draft`; the preview schemas accept it.
+- **Draft label.** A Draft Course or Chapter is marked «مسوّدة» / Draft (`Preview.draft`). An Admin starts any Chapter that has a live path or a valid
+  version, without an Enrollment. If the Chapter has no live version, the start link carries `?version=` of its newest version, and `?courseVersion=` of the
+  Course's newest content version when none is live, so the token never answers `CONTENT_NOT_AVAILABLE` for a Chapter the Admin can see.
+- **Version preview link** (the admin app links here):
+
+  ```
+  /session/{courseSlug}/{chapterId}?version={contentVersionId}&courseVersion={courseContentVersionId}
+  ```
+
+  Arabic is unprefixed; English is under `/en`. `version` is a Chapter `Version.id`, `courseVersion` a Course `Version.id` (the ids the Admin Catalog read
+  returns). Both are optional. The page shows the lessons and slides of `version`'s `contentPath` before Start, sends the ids in the token request, and
+  shows "Preview: version N" and "Course content: version M", each marked live or not live. An unknown id gives an error screen, not a token request.
+  A non-Admin (or an Admin whose preview read fell back to the public one) has the params **ignored**: live content, no marker, no pin.
 
 ## 1. What changes, in one paragraph
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Chapter, ChapterLookup, Course } from "@/lib/courses/schema";
-import { chapterIsPublished, resolveSessionTarget, sessionHref } from "./resolve";
+import { chapterIsPublished, chapterStartable, resolveSessionTarget, sessionHref } from "./resolve";
 
 const chapter = (id: string, number: number, state: Chapter["state"] = "published"): Chapter => ({
   id, number, title: { ar: "فصل", en: "Chapter" }, minutes: 20, lessonCount: 2, state,
@@ -22,7 +22,7 @@ const courseB = course("beta", "22222222-2222-4222-8222-222222222222", [chapter(
 describe("resolveSessionTarget", () => {
   it("finds the chapter in the course named by the URL", () => {
     expect(resolveSessionTarget({ slug: "alpha", chapterId: A1, lookup: lookup(courseA, A1) }))
-      .toEqual({ kind: "found", course: courseA, chapter: courseA.chapters[0] });
+      .toEqual({ kind: "found", course: courseA, chapter: courseA.chapters[0], source: "public" });
   });
   it("uses the chapter the backend returned, so renumbering never lands on another chapter", () => {
     const renumbered = course("alpha", courseA.id, [chapter(A1, 5), chapter(A2, 1, "coming_soon")]);
@@ -57,6 +57,30 @@ describe("resolveSessionTarget", () => {
   });
 });
 
+describe("resolveSessionTarget source", () => {
+  it("records that the answer came from the Admin preview read", () => {
+    const target = resolveSessionTarget({ slug: "alpha", chapterId: A1, lookup: lookup(courseA, A1), source: "preview" });
+    expect(target).toEqual({ kind: "found", course: courseA, chapter: courseA.chapters[0], source: "preview" });
+  });
+  it("keeps the redirect for a stale slug on the preview read too", () => {
+    expect(resolveSessionTarget({ slug: "old", chapterId: A1, lookup: lookup(courseA, A1), source: "preview" })).toEqual({ kind: "redirect", slug: "alpha" });
+  });
+});
+
+describe("chapterStartable", () => {
+  const draft: Chapter = { ...chapter(A1, 1, "draft"), versions: [] };
+  it("needs a published chapter with a live path for everyone on the public read", () => {
+    expect(chapterStartable(chapter(A1, 1), "public")).toBe(true);
+    expect(chapterStartable(chapter(A1, 1, "coming_soon"), "public")).toBe(false);
+    expect(chapterStartable(draft, "public")).toBe(false);
+  });
+  it("lets the preview read start anything with a live path or a valid version", () => {
+    expect(chapterStartable(draft, "preview")).toBe(false);
+    expect(chapterStartable({ ...draft, contentPath: "courses/x/ch_1/" }, "preview")).toBe(true);
+    expect(chapterStartable({ ...draft, versions: [{ id: A2, version: 1, live: false, previewed: false, contentPath: "courses/x/ch_1/v1/" }] }, "preview")).toBe(true);
+  });
+});
+
 describe("chapterIsPublished", () => {
   it("needs the published state and a live content path", () => {
     expect(chapterIsPublished(chapter(A1, 1))).toBe(true);
@@ -69,6 +93,11 @@ describe("sessionHref", () => {
   it("builds /session/{slug}/{chapterId} and its done page", () => {
     expect(sessionHref("alpha", A1)).toBe(`/session/alpha/${A1}`);
     expect(sessionHref("alpha", A1, true)).toBe(`/session/alpha/${A1}/done`);
+  });
+  it("adds the version pins of a preview link, in a fixed order, and nothing when there are none", () => {
+    expect(sessionHref("alpha", A1, false, { courseVersion: B1, version: A2 })).toBe(`/session/alpha/${A1}?version=${A2}&courseVersion=${B1}`);
+    expect(sessionHref("alpha", A1, false, { version: A2 })).toBe(`/session/alpha/${A1}?version=${A2}`);
+    expect(sessionHref("alpha", A1, false, {})).toBe(`/session/alpha/${A1}`);
   });
   it("encodes its segments", () => {
     expect(sessionHref("a/b", "x y")).toBe("/session/a%2Fb/x%20y");

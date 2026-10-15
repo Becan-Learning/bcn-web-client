@@ -7,14 +7,16 @@ import { notFound } from "next/navigation";
 import { SessionView } from "@/components/session/session-view";
 import { findSessionTarget, getEnrollments } from "@/lib/auth/courses";
 import { chapterIsPublished, sessionHref } from "@/lib/session/resolve";
+import { readsPreview, resolveSessionContent, versionParams } from "@/lib/preview/rules";
 import { redirect } from "@/i18n/navigation";
 import { getLessons } from "@/lib/session/lessons";
 import { requireAccount } from "@/lib/auth/session";
 import { accountReturnPath } from "@/lib/auth/next-path";
 import { getAllowance } from "@/lib/allowance/server";
+import { viewerReadsPreview } from "@/lib/preview/viewer";
 import { minutesLeft, nearlyOut, startDecision } from "@/lib/allowance/rules";
 import { usedUpQuota } from "@/lib/allowance/presentation";
-import { SessionUsedUp } from "@/components/session/session-start";
+import { SessionPreviewError, SessionUsedUp } from "@/components/session/session-start";
 
 export async function generateMetadata(
   props: PageProps<"/[locale]/session/[courseSlug]/[chapterId]">,
@@ -22,7 +24,7 @@ export async function generateMetadata(
   const { courseSlug, chapterId, locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   const t = await getTranslations({ locale, namespace: "Session" });
-  const target = await findSessionTarget(courseSlug, chapterId);
+  const target = await findSessionTarget(courseSlug, chapterId, { preview: await viewerReadsPreview() });
   if (target.kind !== "found") return { title: t("metadataFallback")};
   const { course, chapter } = target;
   return { title: t("metadata", { chapter: localize(chapter.title, locale), course: localize(course.name, locale) }) };
@@ -39,17 +41,20 @@ export default async function SessionPage(
   const search = await props.searchParams;
   await requireAccount(locale, accountReturnPath(sessionHref(courseSlug, chapterId), search));
 
-  const [target, enrollments, allowanceResult] = await Promise.all([findSessionTarget(courseSlug, chapterId), getEnrollments(), getAllowance()]);
+  /* الحدود أولًا: الحساب غير المحدود (مشرف) يقرأ معاينة المسوّدات والنسخ بدل الكتالوج العام. */
+  const [enrollments, allowanceResult] = await Promise.all([getEnrollments(), getAllowance()]);
+  const allowance = allowanceResult.ok ? allowanceResult.data : null;
+  const target = await findSessionTarget(courseSlug, chapterId, { preview: readsPreview(allowance) });
   if (target.kind === "not-found") notFound();
   /* رابط قديم: المقرر غيّر الـ slug؛ نحوّل إلى الحالي ونُبقي معاملات الرابط. */
   if (target.kind === "redirect") return redirect({ locale, href: accountReturnPath(sessionHref(target.slug, chapterId), search) });
-  const { course, chapter } = target;
+  const { course, chapter, source } = target;
 
-  const allowance = allowanceResult.ok ? allowanceResult.data : null;
   const decision = startDecision({
     allowance,
     enrolled: enrollments.ok && enrollments.data.some((e) => e.course.id === course.id),
-    published: chapterIsPublished(chapter),
+    /* المشرف يرى كل فصل تجيبه قراءة المعاينة (مسوّدة أو قريبًا)؛ إن لم يكن فيه ما يُقرأ ظهرت حالة الخطأ أدناه لا 404. */
+    published: source === "preview" || chapterIsPublished(chapter),
     courseStatus: course.status,
   });
   if (!decision.ok) {
@@ -68,11 +73,22 @@ export default async function SessionPage(
     }
   }
 
-  /* قبل أن يضغط الطالب «ابدأ» لا رمز بعد (الرمز يفتح حصةً ويحسب منها)، فتُعرض الدروس والشرائح من مسار الكتالوج.
+  /* قبل أن يضغط الطالب «ابدأ» لا رمز بعد (الرمز يفتح حصةً ويحسب منها)، فتُعرض الدروس والشرائح من مسار الكتالوج،
+     أو من مسار النسخة المختارة في رابط المعاينة (للمشرف وحده؛ لغيره يُتجاهل المعاملان ولا يُرسل تثبيت أبدًا).
      عند وصول الرمز يتبنّى العميل المسار المثبَّت فيه، فيعيد جلبهما إن اختلف. */
-  const contentPath = chapter.contentPath;
-  if (contentPath === null) notFound();
-  const lessons = await getLessons(contentPath);
+  const content = resolveSessionContent({ source, course, chapter, ...versionParams(search) });
+  if (content.kind === "error") {
+    if (source === "public") notFound();
+    const t = await getTranslations({ locale, namespace: "Preview" });
+    return <SessionPreviewError
+      courseName={localize(course.name, locale)}
+      courseSlug={course.slug}
+      chapterNo={chapter.number}
+      title={t(`error.${content.reason}.title`)}
+      body={t(`error.${content.reason}.body`)}
+    />;
+  }
+  const lessons = await getLessons(content.contentPath);
 
   return (
     <SessionView
@@ -82,9 +98,11 @@ export default async function SessionPage(
       chapterTitle={localize(chapter.title, locale)}
       minutes={chapter.minutes}
       chapterId={chapter.id}
-      contentPath={contentPath}
+      contentPath={content.contentPath}
       lessons={lessons}
       minutesRemaining={allowance && nearlyOut(allowance) ? minutesLeft(allowance) : null}
+      pins={content.pins}
+      notice={content.notice}
     />
   );
 }

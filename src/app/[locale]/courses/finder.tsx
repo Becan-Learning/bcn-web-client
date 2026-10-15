@@ -20,6 +20,7 @@ import { Link } from "@/i18n/navigation";
 import { SubjectIcon } from "./subject-icon";
 import { ArrowForward, Chevron, SearchIcon } from "@/components/becan/icons";
 import { BecanFace, type LookPoint } from "@/components/becan/becan-face";
+import { DraftBadge } from "@/components/becan/preview-badges";
 import { TypedHeadline } from "@/components/becan/typed-headline";
 import { TONES } from "@/lib/courses/presentation";
 import type { CourseSummary } from "@/lib/courses/schema";
@@ -187,11 +188,14 @@ function CourseCard({
       </motion.span>
 
       <div className="relative flex items-start justify-between gap-2">
-        <span
-          dir="ltr"
-          className={`rounded-pill border px-2 py-0.5 text-[11px] font-semibold ${tone.chip}`}
-        >
-          {course.code}
+        <span className="flex min-w-0 flex-wrap items-center gap-1.5">
+          <span
+            dir="ltr"
+            className={`rounded-pill border px-2 py-0.5 text-[11px] font-semibold ${tone.chip}`}
+          >
+            {course.code}
+          </span>
+          {course.status === "draft" ? <DraftBadge colors={tone.chip} /> : null}
         </span>
         <span
           className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-pill border transition-colors group-hover:bg-pressable group-hover:text-on-pressable ${tone.arrow}`}

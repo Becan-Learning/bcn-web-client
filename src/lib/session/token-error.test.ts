@@ -34,4 +34,17 @@ describe("Token error outcomes", () => {
   ])("keeps unknown or malformed errors on the existing path: %j", (body) => {
     expect(tokenErrorOutcome(403, body)).toBe("connection-failed");
   });
+
+  it("maps the version pin refusals to their own outcomes", () => {
+    expect(tokenErrorOutcome(403, envelope("VERSION_PIN_FORBIDDEN"))).toBe("version-forbidden");
+    expect(tokenErrorOutcome(404, envelope("CONTENT_VERSION_NOT_FOUND"))).toBe("version-not-found");
+    expect(tokenErrorOutcome(409, envelope("VERSION_INVALID"))).toBe("version-invalid");
+  });
+  it.each([
+    [404, "VERSION_PIN_FORBIDDEN"], [409, "VERSION_PIN_FORBIDDEN"],
+    [403, "CONTENT_VERSION_NOT_FOUND"], [409, "CONTENT_VERSION_NOT_FOUND"],
+    [403, "VERSION_INVALID"], [404, "VERSION_INVALID"], [500, "VERSION_INVALID"],
+  ])("only maps a version code on its own status, not %i %s", (status, code) => {
+    expect(tokenErrorOutcome(status, envelope(code))).toBe("connection-failed");
+  });
 });

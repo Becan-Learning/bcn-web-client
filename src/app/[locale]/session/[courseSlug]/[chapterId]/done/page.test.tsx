@@ -47,7 +47,7 @@ const allowance: Allowance = {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  backend.target.mockResolvedValue({ kind: "found", course, chapter: course.chapters[0] });
+  backend.target.mockResolvedValue({ kind: "found", course, chapter: course.chapters[0], source: "public" });
   backend.enrollments.mockResolvedValue({ ok: true, data: [{ course }] });
   backend.allowance.mockResolvedValue({ ok: true, data: allowance });
 });
@@ -155,13 +155,13 @@ describe("done page enrollment gate", () => {
   });
   it("still returns 404 for a coming-soon chapter", async () => {
     const soon = { ...course.chapters[0], state: "coming_soon" as const, contentPath: null };
-    backend.target.mockResolvedValue({ kind: "found", course: { ...course, chapters: [soon] }, chapter: soon });
+    backend.target.mockResolvedValue({ kind: "found", course: { ...course, chapters: [soon] }, chapter: soon, source: "public" });
     backend.allowance.mockResolvedValue({ ok: true, data: unlimited });
     await expect(call()).rejects.toThrow();
   });
   describe("for an archived course", () => {
     const archived: Course = { ...course, status: "archived" };
-    beforeEach(() => backend.target.mockResolvedValue({ kind: "found", course: archived, chapter: archived.chapters[0] }));
+    beforeEach(() => backend.target.mockResolvedValue({ kind: "found", course: archived, chapter: archived.chapters[0], source: "public" }));
     it("shows the summary to a student with an active enrollment", async () => {
       backend.enrollments.mockResolvedValue({ ok: true, data: [{ course: archived }] });
       const html = await render();
@@ -176,3 +176,46 @@ describe("done page enrollment gate", () => {
     });
   });
 });
+
+describe("done page Admin preview", () => {
+  const unlimited = { ...allowance, unlimited: true };
+  const draftChapter = { ...course.chapters[0], state: "draft" as const, contentPath: null, versions: [{ id: "dddddddd-0000-4000-8000-000000000001", version: 1, live: false, previewed: true, contentPath: "courses/math-101/ch_1/v1/" }] };
+  const nextDraft = { ...course.chapters[1], state: "draft" as const, contentPath: null, versions: [{ id: "dddddddd-0000-4000-8000-000000000002", version: 1, live: false, previewed: false, contentPath: "courses/math-101/ch_2/v1/" }] };
+  const draftCourse: Course = { ...course, status: "draft", chapters: [draftChapter, nextDraft], versions: [] };
+  const params = { room: "real-room" };
+  const nothing = { kind: "not-found" as const };
+  const call = () => SummaryPage({ params: Promise.resolve({ locale: "ar", courseSlug: course.slug, chapterId: "aaaaaaaa-0000-4000-8000-000000000001" }), searchParams: Promise.resolve(params) });
+
+  beforeEach(() => {
+    backend.enrollments.mockResolvedValue({ ok: true, data: [] });
+    backend.allowance.mockResolvedValue({ ok: true, data: unlimited });
+    backend.target.mockImplementation(async (_slug: string, _id: string, options?: { preview?: boolean }) =>
+      options?.preview ? { kind: "found", course: draftCourse, chapter: draftChapter, source: "preview" } : nothing);
+  });
+
+  it("shows the summary of a Draft chapter to an unlimited account, with a next link on the newest version", async () => {
+    const html = await render();
+    expect(redirect).not.toHaveBeenCalled();
+    expect(html).toContain("<form");
+    expect(html).toContain('href="/session/math-101/aaaaaaaa-0000-4000-8000-000000000002?version=dddddddd-0000-4000-8000-000000000002"');
+    expect(backend.target).toHaveBeenCalledWith("math-101", "aaaaaaaa-0000-4000-8000-000000000001", { preview: true });
+  });
+  it("returns 404 when the account is not unlimited, with no preview read", async () => {
+    backend.allowance.mockResolvedValue({ ok: true, data: allowance });
+    await expect(call()).rejects.toThrow();
+    expect(backend.target).toHaveBeenCalledTimes(1);
+    expect(backend.target).not.toHaveBeenCalledWith(expect.anything(), expect.anything(), { preview: true });
+  });
+  it("returns 404 after an allowance failure", async () => {
+    backend.allowance.mockResolvedValue({ ok: false, kind: "network" });
+    await expect(call()).rejects.toThrow();
+    expect(backend.target).toHaveBeenCalledTimes(1);
+  });
+  it("does not ask for the preview when the public read finds the chapter", async () => {
+    backend.target.mockResolvedValue({ kind: "found", course, chapter: course.chapters[0], source: "public" });
+    backend.enrollments.mockResolvedValue({ ok: true, data: [{ course }] });
+    await render();
+    expect(backend.target).toHaveBeenCalledTimes(1);
+  });
+});
+

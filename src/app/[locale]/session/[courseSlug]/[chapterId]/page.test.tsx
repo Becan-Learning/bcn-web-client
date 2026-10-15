@@ -1,5 +1,5 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { NextIntlClientProvider } from "next-intl";
+import { createTranslator, NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import ar from "../../../../../../messages/ar.json";
 import en from "../../../../../../messages/en.json";
@@ -9,13 +9,19 @@ import { SessionView } from "@/components/session/session-view";
 import { RemainingMinutes } from "@/components/session/remaining-minutes";
 import { redirect } from "@/i18n/navigation";
 import SessionPage from "./page";
+import { findSessionTarget } from "@/lib/auth/courses";
 
 const backend = vi.hoisted(() => ({ target: vi.fn(), enrollments: vi.fn(), allowance: vi.fn(), lessons: vi.fn(), account: vi.fn(), push: vi.fn() }));
-vi.mock("@/lib/auth/courses", () => ({ findSessionTarget: backend.target, getEnrollments: backend.enrollments }));
+vi.mock("@/lib/auth/courses", () => ({ findSessionTarget: vi.fn((...args: unknown[]) => backend.target(...args)), getEnrollments: backend.enrollments }));
 vi.mock("@/lib/auth/session", () => ({ requireAccount: backend.account }));
 vi.mock("@/lib/allowance/server", () => ({ getAllowance: backend.allowance }));
 vi.mock("@/lib/session/lessons", () => ({ getLessons: backend.lessons }));
-vi.mock("next-intl/server", () => ({ setRequestLocale: vi.fn() }));
+vi.mock("@/lib/preview/viewer", () => ({ viewerReadsPreview: vi.fn() }));
+vi.mock("next-intl/server", () => ({
+  setRequestLocale: vi.fn(),
+  getTranslations: async ({ locale, namespace }: { locale: "ar" | "en"; namespace: "Preview" }) =>
+    createTranslator({ locale, messages: locale === "ar" ? ar : en, namespace }),
+}));
 vi.mock("@/i18n/navigation", () => ({ useRouter: () => ({ push: backend.push }), redirect: vi.fn() }));
 vi.mock("@/components/session/session-view", () => ({
   SessionView: vi.fn(({ minutesRemaining }: { minutesRemaining: number | null }) => (
@@ -39,7 +45,7 @@ const allowance: Allowance = {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  backend.target.mockResolvedValue({ kind: "found", course, chapter: course.chapters[0] });
+  backend.target.mockResolvedValue({ kind: "found", course, chapter: course.chapters[0], source: "public" });
   backend.enrollments.mockResolvedValue({ ok: true, data: [{ course }] });
   backend.allowance.mockResolvedValue({ ok: true, data: allowance });
   backend.lessons.mockResolvedValue([]);
@@ -134,7 +140,7 @@ describe("Session page start gates", () => {
   });
   describe("for an archived course", () => {
     const archived: Course = { ...course, status: "archived" };
-    beforeEach(() => backend.target.mockResolvedValue({ kind: "found", course: archived, chapter: archived.chapters[0] }));
+    beforeEach(() => backend.target.mockResolvedValue({ kind: "found", course: archived, chapter: archived.chapters[0], source: "public" }));
     it("opens the session for a student with an active enrollment", async () => {
       backend.enrollments.mockResolvedValue({ ok: true, data: [{ course: archived }] });
       expect(await render()).toContain("data-session-view");
@@ -186,7 +192,7 @@ describe("Session page start gates", () => {
   });
   it.each([false, true])("still returns 404 for a coming-soon chapter (unlimited: %s)", async (isUnlimited) => {
     const soon = { ...course.chapters[0], state: "coming_soon" as const, contentPath: null };
-    backend.target.mockResolvedValue({ kind: "found", course: { ...course, chapters: [soon] }, chapter: soon });
+    backend.target.mockResolvedValue({ kind: "found", course: { ...course, chapters: [soon] }, chapter: soon, source: "public" });
     backend.allowance.mockResolvedValue({ ok: true, data: { ...allowance, unlimited: isUnlimited } });
     await expect(call()).rejects.toThrow();
     expect(SessionView).not.toHaveBeenCalled();
@@ -216,6 +222,122 @@ describe("Session page routing and content", () => {
     });
     expect(vi.mocked(SessionView).mock.calls[0][0]).not.toHaveProperty("content");
     expect(vi.mocked(SessionView).mock.calls[0][0]).not.toHaveProperty("pdfUrl");
+  });
+});
+
+describe("Session page Admin preview", () => {
+  const CH = "aaaaaaaa-0000-4000-8000-000000000001";
+  const V1 = "dddddddd-0000-4000-8000-000000000001";
+  const V2 = "dddddddd-0000-4000-8000-000000000002";
+  const CV = "cccccccc-0000-4000-8000-000000000001";
+  const unlimited: Allowance = { ...allowance, unlimited: true };
+  const versions = [
+    { id: V2, version: 2, live: false, previewed: false, contentPath: "courses/math-101/ch_1/v2/" },
+    { id: V1, version: 1, live: true, previewed: true, contentPath: "courses/math-101/ch_1/" },
+  ];
+  const courseVersions = [{ id: CV, version: 4, live: false, previewed: false, contentPath: "courses/math-101/v4/" }];
+  const previewCourse: Course = {
+    ...course, versions: courseVersions,
+    chapters: [{ ...course.chapters[0], versions }],
+  };
+  const draftCourse: Course = { ...previewCourse, status: "draft", chapters: [{ ...previewCourse.chapters[0], state: "draft" }] };
+  const open = (search: Record<string, string | string[] | undefined> = {}, locale: "ar" | "en" = "ar") =>
+    SessionPage({ params: Promise.resolve({ locale, courseSlug: "math-101", chapterId: CH }), searchParams: Promise.resolve(search) });
+  const text = async (search: Record<string, string | string[] | undefined> = {}, locale: "ar" | "en" = "ar") => {
+    const page = await open(search, locale);
+    return renderToStaticMarkup(<NextIntlClientProvider locale={locale} messages={locale === "ar" ? ar : en} timeZone="UTC">{page}</NextIntlClientProvider>);
+  };
+  const viewProps = () => vi.mocked(SessionView).mock.calls.at(-1)![0] as unknown as Record<string, unknown>;
+
+  beforeEach(() => {
+    backend.allowance.mockResolvedValue({ ok: true, data: unlimited });
+    backend.enrollments.mockResolvedValue({ ok: true, data: [] });
+    backend.target.mockResolvedValue({ kind: "found", course: previewCourse, chapter: previewCourse.chapters[0], source: "preview" });
+  });
+
+  it("asks for the preview read only for an unlimited account", async () => {
+    await text();
+    expect(findSessionTarget).toHaveBeenLastCalledWith("math-101", CH, { preview: true });
+    backend.allowance.mockResolvedValue({ ok: true, data: allowance });
+    backend.target.mockResolvedValue({ kind: "found", course, chapter: course.chapters[0], source: "public" });
+    backend.enrollments.mockResolvedValue({ ok: true, data: [{ course }] });
+    await text();
+    expect(findSessionTarget).toHaveBeenLastCalledWith("math-101", CH, { preview: false });
+  });
+  it("takes the public read after an allowance failure", async () => {
+    backend.allowance.mockResolvedValue({ ok: false, kind: "network" });
+    await open().catch(() => undefined);
+    expect(findSessionTarget).toHaveBeenLastCalledWith("math-101", CH, { preview: false });
+  });
+  it("pins the chosen versions and reads the lessons from the chosen version's path", async () => {
+    await text({ version: V2, courseVersion: CV });
+    expect(backend.lessons).toHaveBeenCalledWith("courses/math-101/ch_1/v2/");
+    expect(viewProps()).toMatchObject({
+      contentPath: "courses/math-101/ch_1/v2/",
+      pins: { contentVersionId: V2, courseContentVersionId: CV },
+      notice: { draft: false, chapterVersion: { number: 2, live: false }, courseVersion: { number: 4, live: false } },
+    });
+  });
+  it("pins nothing without the params, and shows no marker for a published chapter", async () => {
+    await text();
+    expect(viewProps()).toMatchObject({ contentPath: "courses/math-101/ch_1/", pins: {}, notice: null });
+  });
+  it("starts a Draft chapter without enrolling and marks it Draft", async () => {
+    backend.target.mockResolvedValue({ kind: "found", course: draftCourse, chapter: draftCourse.chapters[0], source: "preview" });
+    await text();
+    expect(redirect).not.toHaveBeenCalled();
+    expect(viewProps()).toMatchObject({ notice: { draft: true, chapterVersion: null, courseVersion: null } });
+  });
+  it("starts a chapter with no live version when the link names one", async () => {
+    const noLive = { ...draftCourse.chapters[0], contentPath: null };
+    backend.target.mockResolvedValue({ kind: "found", course: { ...draftCourse, chapters: [noLive] }, chapter: noLive, source: "preview" });
+    await text({ version: V2 });
+    expect(backend.lessons).toHaveBeenCalledWith("courses/math-101/ch_1/v2/");
+    expect(viewProps()).toMatchObject({ pins: { contentVersionId: V2 } });
+  });
+  it.each(["ar", "en"] as const)("shows a clear error state, not a crash, for an unknown version id in %s", async (locale) => {
+    const messages = locale === "ar" ? ar : en;
+    for (const version of ["dddddddd-0000-4000-8000-0000000000ff", "not-a-uuid"]) {
+      const html = await text({ version }, locale);
+      expect(html).toContain(messages.Preview.error["unknown-version"].title);
+      expect(html).toContain(messages.Preview.error["unknown-version"].body);
+    }
+    expect(SessionView).not.toHaveBeenCalled();
+    expect(backend.lessons).not.toHaveBeenCalled();
+  });
+  it("shows the error state for an unknown course version, and for a chapter version id in the course slot", async () => {
+    for (const courseVersion of ["cccccccc-0000-4000-8000-0000000000ff", V1]) {
+      expect(await text({ version: V2, courseVersion })).toContain(ar.Preview.error["unknown-course-version"].title);
+    }
+    expect(SessionView).not.toHaveBeenCalled();
+  });
+  it("shows the no-content state for a chapter with neither a live path nor a chosen version", async () => {
+    const empty = { ...previewCourse.chapters[0], contentPath: null, versions: [] };
+    backend.target.mockResolvedValue({ kind: "found", course: { ...previewCourse, chapters: [empty] }, chapter: empty, source: "preview" });
+    expect(await text()).toContain(ar.Preview.error["no-content"].title);
+    expect(SessionView).not.toHaveBeenCalled();
+  });
+  it("ignores the version params of a non-Admin: public content, no pins, no marker, no error", async () => {
+    backend.allowance.mockResolvedValue({ ok: true, data: allowance });
+    backend.enrollments.mockResolvedValue({ ok: true, data: [{ course }] });
+    backend.target.mockResolvedValue({ kind: "found", course, chapter: course.chapters[0], source: "public" });
+    for (const search of [{ version: V2, courseVersion: CV }, { version: "garbage" }]) {
+      expect(await text(search)).toContain("data-session-view");
+      expect(viewProps()).toMatchObject({ contentPath: "courses/math-101/ch_1/", pins: {}, notice: null });
+    }
+    expect(backend.lessons).toHaveBeenCalledWith("courses/math-101/ch_1/");
+    expect(backend.lessons).not.toHaveBeenCalledWith("courses/math-101/ch_1/v2/");
+  });
+  it("ignores the version params when the preview read fell back to the public one", async () => {
+    backend.target.mockResolvedValue({ kind: "found", course, chapter: course.chapters[0], source: "public" });
+    backend.enrollments.mockResolvedValue({ ok: true, data: [{ course }] });
+    await text({ version: V2 });
+    expect(viewProps()).toMatchObject({ pins: {}, notice: null });
+  });
+  it("keeps the preview query when a stale slug redirects", async () => {
+    backend.target.mockResolvedValue({ kind: "redirect", slug: "math-102" });
+    await open({ version: V2, courseVersion: CV });
+    expect(redirect).toHaveBeenCalledWith({ locale: "ar", href: `/session/math-102/${CH}?version=${V2}&courseVersion=${CV}` });
   });
 });
 

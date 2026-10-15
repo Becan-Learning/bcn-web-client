@@ -38,6 +38,8 @@ import { getExperience } from "@/lib/experience";
 import { tokenSchema } from "@/lib/courses/schema";
 import { AllowanceUsedUpError, ChapterUnavailableError, tokenErrorOutcome } from "@/lib/session/token-error";
 import { sessionHref } from "@/lib/session/resolve";
+import type { PreviewNotice, VersionPins } from "@/lib/preview/rules";
+import { PreviewBadges } from "@/components/becan/preview-badges";
 import { usePinnedContent } from "./use-pinned-content";
 import { readSessionAllowance } from "@/lib/allowance/client";
 import type { Allowance } from "@/lib/allowance/schema";
@@ -102,13 +104,19 @@ type SessionViewProps = {
   contentPath: string;
   lessons: Lesson[];
   minutesRemaining: number | null;
+  /* معاينة المشرف: النسخ المثبَّتة التي يرسلها طلب الرمز (لا تصل أبدًا لغير المشرف، فالصفحة تحجبها). */
+  pins?: VersionPins;
+  /* علامة «مسوّدة» و«معاينة: النسخة N»؛ فارغة خارج المعاينة. */
+  notice?: PreviewNotice | null;
 };
 
-type ScreenProps = Omit<SessionViewProps, "contentPath"> & { pdfUrl: string };
+type ScreenProps = Omit<SessionViewProps, "contentPath" | "pins"> & { pdfUrl: string };
 
 export function SessionView(props: SessionViewProps) {
-  const { contentPath, lessons: catalogLessons, ...rest } = props;
+  const { contentPath, lessons: catalogLessons, pins, ...rest } = props;
   const { chapterId } = rest;
+  const contentVersionId = pins?.contentVersionId;
+  const courseContentVersionId = pins?.courseContentVersionId;
   const { onPinned, pdfUrl, lessons } = usePinnedContent(contentPath, catalogLessons);
   const locale = useLocale();
   const stored = useSyncExternalStore(
@@ -132,14 +140,18 @@ export function SessionView(props: SessionViewProps) {
         const res = await fetch("/api/v1/livekit/token", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ chapterId, language, experience: getExperience() }),
+          body: JSON.stringify({
+            chapterId, language, experience: getExperience(),
+            ...(contentVersionId ? { contentVersionId } : {}),
+            ...(courseContentVersionId ? { courseContentVersionId } : {}),
+          }),
           cache: "no-store",
         });
         if (!res.ok) {
           const body: unknown = await res.json().catch(() => null);
           const outcome = tokenErrorOutcome(res.status, body);
           if (outcome === "used-up") throw new AllowanceUsedUpError();
-          if (outcome === "content-unavailable" || outcome === "not-published") throw new ChapterUnavailableError(outcome);
+          if (outcome !== "connection-failed") throw new ChapterUnavailableError(outcome);
           throw new Error(`Token request failed (${res.status})`);
         }
         const { serverUrl, token, contentPath: pinnedPath } = tokenSchema.parse(await res.json());
@@ -147,7 +159,7 @@ export function SessionView(props: SessionViewProps) {
         onPinned(pinnedPath);
         return { serverUrl, participantToken: token };
       }),
-    [chapterId, language, onPinned],
+    [chapterId, language, onPinned, contentVersionId, courseContentVersionId],
   );
 
   const session = useSession(tokenSource);
@@ -181,6 +193,7 @@ function SessionScreen({
   pdfUrl,
   lessons,
   minutesRemaining,
+  notice = null,
 }: ScreenProps & {
   session: ReturnType<typeof useSession>;
   language: ExplanationLanguage;
@@ -630,6 +643,8 @@ function SessionScreen({
         detail={detail}
         onExit={onExit}
       />
+
+      {notice ? <PreviewBadges notice={notice} className="shrink-0 px-3 pb-1 md:px-4" /> : null}
 
       {/* مسار الدروس على الجوال — بديل العمود الجانبي */}
       <TopicsTrack

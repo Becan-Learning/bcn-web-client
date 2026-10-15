@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { backendErrorSchema, chapterLookupSchema, chapterSchema, courseSchema, coursesSchema, enrollmentsSchema, tokenSchema } from "./schema";
+import {
+  backendErrorSchema, chapterLookupSchema, chapterSchema, contentVersionSchema, courseSchema, coursesSchema, enrollmentsSchema,
+  previewChapterLookupSchema, previewChapterSchema, previewCourseSchema, previewCoursesSchema, tokenSchema,
+} from "./schema";
 
 const summary = {
   id: "11111111-1111-4111-8111-111111111111", slug: "course-101", code: "COURSE 101", name: { ar: "مقرر", en: "Course" },
@@ -74,3 +77,53 @@ describe("courses backend contract", () => {
     expect(backendErrorSchema.safeParse({ message: "Enrollment required" }).success).toBe(false);
   });
 });
+
+describe("Admin preview contract (backend B4)", () => {
+  const version = { id: "dddddddd-0000-4000-8000-000000000001", version: 3, live: true, previewed: false, contentPath: "courses/course-101/ch_1/v3/" };
+  const draftChapter = { ...chapter, state: "draft", contentPath: null, versions: [version] };
+  const draftCourse = { ...summary, status: "draft", chapters: [draftChapter], versions: [{ ...version, contentPath: "courses/course-101/v3/" }] };
+
+  it("parses a Draft course in the list, with no chapters or versions", () => {
+    expect(previewCoursesSchema.parse([{ ...summary, status: "draft" }])[0].status).toBe("draft");
+    expect(previewCoursesSchema.parse([{ ...summary, status: "archived" }])[0].status).toBe("archived");
+  });
+  it("parses a Draft course detail with a Draft chapter, its live content path and the versions of both", () => {
+    const parsed = previewCourseSchema.parse(draftCourse);
+    expect(parsed.status).toBe("draft");
+    expect(parsed.versions[0]).toMatchObject({ version: 3, live: true, previewed: false });
+    expect(parsed.chapters[0]).toMatchObject({ state: "draft", contentPath: null });
+  });
+  it("parses a Draft chapter that has a live path (the live prefix is returned in any state)", () => {
+    const parsed = previewChapterSchema.parse({ ...draftChapter, contentPath: "courses/course-101/ch_1/v3/" });
+    expect(parsed.contentPath).toBe("courses/course-101/ch_1/v3/");
+  });
+  it("parses the chapter lookup and keeps the versions", () => {
+    const body = { chapter: draftChapter, course: draftCourse };
+    expect(previewChapterLookupSchema.parse(body).chapter.versions).toHaveLength(1);
+  });
+  it.each(["draft", "coming_soon", "published"])("accepts the chapter state %s", (state) => {
+    expect(previewChapterSchema.safeParse({ ...draftChapter, state }).success).toBe(true);
+  });
+  it.each(["Draft", "archived", "", null])("rejects the chapter state %j", (state) => {
+    expect(previewChapterSchema.safeParse({ ...draftChapter, state }).success).toBe(false);
+  });
+  it.each(["Draft", "", null, 1])("rejects the course status %j", (status) => {
+    expect(previewCoursesSchema.safeParse([{ ...summary, status }]).success).toBe(false);
+  });
+  it("requires the versions on the preview shapes", () => {
+    expect(previewChapterSchema.safeParse({ ...draftChapter, versions: undefined }).success).toBe(false);
+    expect(previewCourseSchema.safeParse({ ...draftCourse, versions: undefined }).success).toBe(false);
+  });
+  it.each([
+    { id: "v1" }, { version: 0 }, { version: 1.5 }, { live: "yes" }, { previewed: null },
+    { contentPath: "/courses/x/" }, { contentPath: "courses/../x/" }, { contentPath: "courses/x" }, { contentPath: null },
+  ])("rejects a malformed version %j", (fields) => {
+    expect(contentVersionSchema.safeParse({ ...version, ...fields }).success).toBe(false);
+  });
+  it("never lets the public shapes accept a Draft or the preview-only fields as new meaning", () => {
+    expect(courseSchema.safeParse({ ...summary, status: "draft", chapters: [chapter] }).success).toBe(false);
+    expect(chapterSchema.safeParse({ ...chapter, state: "draft" }).success).toBe(false);
+    expect(chapterLookupSchema.safeParse({ chapter: draftChapter, course: draftCourse }).success).toBe(false);
+  });
+});
+

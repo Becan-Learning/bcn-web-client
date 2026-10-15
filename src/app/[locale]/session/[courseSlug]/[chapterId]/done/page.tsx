@@ -5,7 +5,8 @@ import type { Metadata } from "next";
 import { Link, redirect } from "@/i18n/navigation";
 import { notFound } from "next/navigation";
 import { findSessionTarget, getEnrollments } from "@/lib/auth/courses";
-import { chapterIsPublished, sessionHref } from "@/lib/session/resolve";
+import { chapterIsPublished, chapterStartable, sessionHref } from "@/lib/session/resolve";
+import { previewStartPins, readsPreview } from "@/lib/preview/rules";
 import {
   PageShell,
   PrimaryButton,
@@ -45,13 +46,21 @@ export default async function SummaryPage(
   /* اسم الغرفة يصل من الحصة الحقيقية، لا من معاينة الملخّص. */
   const roomRaw = Array.isArray(sp.room) ? sp.room[0] : sp.room;
   const room = typeof roomRaw === "string" && roomRaw ? roomRaw : null;
-  const [t, format, target, enrollments, allowance] = await Promise.all([
+  const [t, format, publicTarget, enrollments, allowance] = await Promise.all([
     getTranslations("SessionSummary"),
     getFormatter(),
     findSessionTarget(courseSlug, chapterId),
     getEnrollments(),
     room ? getAllowance() : null,
   ]);
+  /* مسوّدة المشرف لا تعرفها القراءة العامة: إن لم يوجد الفصل علنًا سألنا الحدود، فإن كان الحساب غير محدود قرأنا المعاينة.
+     الطالب يبقى على قراءته العامة وحدها بلا أي قراءة إضافية. */
+  let allowanceResult = allowance;
+  let target = publicTarget;
+  if (publicTarget.kind === "not-found") {
+    allowanceResult ??= await getAllowance();
+    if (allowanceResult.ok && readsPreview(allowanceResult.data)) target = await findSessionTarget(courseSlug, chapterId, { preview: true });
+  }
   const number = (value: number) => format.number(value, { numberingSystem: "latn" });
 
   /* تصل من الجلسة الحقيقية: اسم غرفة LiveKit للتقييم، وبلوغ الحدّ الزمني */
@@ -59,12 +68,12 @@ export default async function SummaryPage(
   if (target.kind === "not-found") notFound();
   /* الملخّص يخصّ الفصل بمعرّفه: لو غُيّر رقمه أو رابط مقرره أثناء الحصة بقي هو نفسه. */
   if (target.kind === "redirect") return redirect({ locale, href: accountReturnPath(sessionHref(target.slug, chapterId, true), sp) });
-  const { course, chapter } = target;
+  const { course, chapter, source } = target;
   const enrolled = enrollments.ok && enrollments.data.some((e) => e.course.id === course.id);
   /* غير المسجَّل يحتاج الحدود ليُعرف أهو حساب غير محدود (مشرف) أم يعود إلى المقرر. */
-  const allowanceResult = allowance ?? (enrolled ? null : await getAllowance());
+  allowanceResult ??= enrolled ? null : await getAllowance();
   const allowanceData = allowanceResult?.ok ? allowanceResult.data : null;
-  const decision = startDecision({ allowance: allowanceData, enrolled, published: chapterIsPublished(chapter), courseStatus: course.status });
+  const decision = startDecision({ allowance: allowanceData, enrolled, published: source === "preview" || chapterIsPublished(chapter), courseStatus: course.status });
   if (!decision.ok && decision.reason === "unpublished") notFound();
   if (!decision.ok && (decision.reason === "not-enrolled" || decision.reason === "archived")) return redirect({ locale, href: `/c/${course.slug}` });
   const quota = usedUpQuota(allowanceData);
@@ -92,9 +101,9 @@ export default async function SummaryPage(
               {t("backToCourse")}
             </PrimaryButton>
 
-            {nextChapter && chapterIsPublished(nextChapter) ? (
+            {nextChapter && chapterStartable(nextChapter, source) ? (
               <Link
-                href={sessionHref(course.slug, nextChapter.id)}
+                href={sessionHref(course.slug, nextChapter.id, false, source === "preview" ? previewStartPins(course, nextChapter) : {})}
                 className="group inline-flex min-h-11 items-center gap-2 px-2 font-semibold text-ink"
               >
                 {t("nextChapter")}

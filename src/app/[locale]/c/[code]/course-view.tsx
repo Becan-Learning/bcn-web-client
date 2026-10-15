@@ -13,7 +13,9 @@ import { ArrowForward } from "@/components/becan/icons";
 import { SubjectIcon } from "@/app/[locale]/courses/subject-icon";
 import type { Chapter, Course } from "@/lib/courses/schema";
 import { TONES } from "@/lib/courses/presentation";
-import { chapterIsPublished, sessionHref } from "@/lib/session/resolve";
+import { chapterStartable, sessionHref } from "@/lib/session/resolve";
+import { previewStartPins } from "@/lib/preview/rules";
+import { DraftBadge } from "@/components/becan/preview-badges";
 
 /* صفحة المقرر قابلة للتصفّح، وفتح الفصل يتطلّب تسجيلًا نشطًا في المقرر. */
 
@@ -55,6 +57,7 @@ function ChapterCard({
   disabled,
   onEnroll,
   quotaReached,
+  preview,
 }: {
   chapter: Chapter;
   course: Course;
@@ -64,6 +67,8 @@ function ChapterCard({
   disabled: boolean;
   onEnroll: () => void;
   quotaReached: boolean;
+  /* قراءة معاينة المشرف: الفصل المسوّدة موسوم ويبدأ بنسخته، وكل فصل فيه ما يُقرأ يُفتح. */
+  preview: boolean;
 }) {
   const t = useTranslations("Course");
   const locale = useLocale();
@@ -71,7 +76,7 @@ function ChapterCard({
   const number = (value: number) => format.number(value, { numberingSystem: "latn" });
   const skin = skinOf(course.tone);
   const fill = skin.fills[(chapter.number - 1) % skin.fills.length];
-  const published = chapterIsPublished(chapter);
+  const published = chapterStartable(chapter, preview ? "preview" : "public");
 
   return (
     <li
@@ -97,6 +102,7 @@ function ChapterCard({
           <h3 className="font-display text-lg font-semibold text-on-dominant">
             {localize(chapter.title, locale)}
           </h3>
+          {chapter.state === "draft" ? <DraftBadge colors={skin.arrow} /> : null}
         </div>
 
         <p className={`mt-1 text-sm ${skin.meta}`}>
@@ -110,7 +116,7 @@ function ChapterCard({
         {!published ? (
           <span className={`rounded-pill border px-4 py-2 text-xs font-semibold ${skin.arrow}`}>{t("soon")}</span>
         ) : state === "enrolled" || state === "open" ? (
-          <Link href={sessionHref(course.slug, chapter.id)}
+          <Link href={sessionHref(course.slug, chapter.id, false, preview ? previewStartPins(course, chapter) : {})}
             className={`inline-flex min-h-11 items-center gap-2 rounded-pill border px-5 font-semibold transition-colors hover:bg-pressable hover:text-on-pressable ${skin.arrow}`}>
             {t("start")}<ArrowForward />
           </Link>
@@ -137,12 +143,15 @@ export function CourseView({
   enrollmentError,
   state,
   slotQuota,
+  preview = false,
 }: {
   course: Course;
   chapters: Chapter[];
   enrollmentError: boolean;
   state: ViewState;
   slotQuota: CourseSlotQuota | null;
+  /* المصدر معاينة المشرف (فيه المسوّدات والنسخ)، لا الكتالوج العام. */
+  preview?: boolean;
 }) {
   const t = useTranslations("Course");
   const locale = useLocale();
@@ -192,6 +201,8 @@ export function CourseView({
           </h1>
           {archived ? (
             <span className="mt-3 inline-flex rounded-pill border border-line px-3 py-0.5 text-sm font-semibold text-ink-2">{t("archived")}</span>
+          ) : course.status === "draft" ? (
+            <DraftBadge className="mt-3" />
           ) : null}
           <p className="mt-2 text-ink-2">
             {t("courseSummary", { university: localize(course.institution.name, locale), count: course.publishedChapterCount, countLabel: format.number(course.publishedChapterCount, { numberingSystem: "latn" }) })}
@@ -292,6 +303,7 @@ export function CourseView({
               pending={pending}
               disabled={enrollmentError}
               quotaReached={slotQuota !== null}
+              preview={preview}
               onEnroll={() => mutate("PUT")}
             />
           ))}

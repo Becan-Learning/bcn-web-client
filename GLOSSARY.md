@@ -62,6 +62,16 @@ A retired Course. It is out of the Catalog and closed to new Enrollments, but a 
 Enrollment and can open its published Chapters. The student sees it marked «مؤرشف» / Archived.
 _Avoid_: deleted, disabled course, closed course
 
+**Draft** (مسوّدة):
+A Course or Chapter that is not published yet. Only an unlimited Account (an Admin with two-factor) sees it, read from the
+backend's uncached Admin preview, and the interface marks it «مسوّدة» / Draft. A Student never sees a Draft.
+_Avoid_: unpublished (that also covers coming soon), hidden
+
+**Version preview** (معاينة النسخة):
+An Admin opening a Chapter on a chosen content version, through `/session/{courseSlug}/{chapterId}?version=…&courseVersion=…`.
+The Session is pinned to that version and the screen says "Preview: version N", live or not. Only Admins can pin.
+_Avoid_: test session, staging
+
 ## Session
 
 **Session** (الحصة):

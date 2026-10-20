@@ -192,7 +192,7 @@ Depends on Ticket A. Independent of Ticket B (different files).
 ## Google (added 2026-10-20)
 
 Google is a second sign-in method for the same Account, built against
-[backend-auth-handoff.md](../backend-auth-handoff.md) §3.2. Better Auth's implicit sign-up is
+[backend-auth-handoff.md](../backend-auth-handoff.md) §9. Better Auth's implicit sign-up is
 **disabled**: Google can only create an Account when the call says `requestSignUp: true`. The
 redirect URI is `<web origin>/api/auth/callback/google` through the existing `/api/auth/*` proxy.
 
@@ -209,11 +209,17 @@ redirect URI is `<web origin>/api/auth/callback/google` through the existing `/a
   under the notice «ما عندك حساب بعد». After step 2 it starts Google again with `requestSignUp`.
 - **Existing email:** if the Google email already has an Account, Google is linked to it and the
   student is signed in (Better Auth account linking, handled by the backend).
-- **Errors on `?error=`** (all mapped in `src/lib/auth/errors.ts`): `signup_disabled`,
-  `access_denied`, `BANNED_USER` (existing banned message + support link), `ADMIN_GOOGLE_FORBIDDEN`
-  (Admins sign in with email, password and two-factor), `INVALID_PHONE_NUMBER`, `PHONE_NUMBER_TAKEN`,
-  `INVALID_INSTITUTION`, `INVALID_MAJOR`, and any other lowercase OAuth code
-  (`account_not_linked`, `state_mismatch`, …) as one generic "couldn't continue with Google" message.
+- **Errors on `?error=`** (all mapped in `src/lib/auth/errors.ts`; the backend table is
+  [backend-auth-handoff.md](../backend-auth-handoff.md) §9): `signup_disabled`, `access_denied`,
+  `BANNED_USER` (existing banned message + support link), `ADMIN_GOOGLE_FORBIDDEN` (Admins sign in
+  with email, password and two-factor), `INVALID_PHONE_NUMBER`, `PHONE_NUMBER_TAKEN`,
+  `INVALID_INSTITUTION`, `INVALID_MAJOR`, plus two with their own copy:
+  `account_not_linked` (an Account has this email but it, or Google's address, is unverified:
+  "sign in with your password or verify your email first") and `email_not_verified` (the new
+  Account was created, a verification email was sent, no session). Any other lowercase OAuth code
+  is one generic "couldn't continue with Google" message. State errors (`state_mismatch`,
+  `state_not_found`, `invalid_callback_request`) never reach us: Better Auth shows its own
+  `/api/auth/error` page.
 - **Return path:** `safeNext` / `becan:next` work as for email. The destination goes in
   `callbackURL` and, as `next`, in `errorCallbackURL`.
 - **Settings for an Account without a password** (`authClient.listAccounts()` has no

@@ -57,7 +57,15 @@ describe("Google error codes", () => {
     expect(oauthErrorKey("access_denied")).toBe("googleCancelled");
   });
 
-  it.each(["account_not_linked", "state_mismatch", "unable_to_get_user_info", "email_not_verified"])(
+  it("gives an unverified existing Account its own message", () => {
+    expect(oauthErrorKey("account_not_linked")).toBe("googleAccountNotLinked");
+  });
+
+  it("gives an unverified Google address its own message", () => {
+    expect(oauthErrorKey("email_not_verified")).toBe("googleEmailNotVerified");
+  });
+
+  it.each(["state_mismatch", "unable_to_get_user_info", "unable_to_create_session", "invalid_code"])(
     "sends the generic OAuth failure %s to the Google failure message",
     (code) => {
       expect(oauthErrorKey(code)).toBe("googleFailed");
@@ -79,6 +87,7 @@ describe("Google error codes", () => {
     const errors = createTranslator({ locale, messages, namespace: "Auth.Errors" });
     for (const key of [
       "adminGoogleForbidden", "googleFailed", "googleCancelled", "noAccountYet", "sessionNotFresh",
+      "googleAccountNotLinked", "googleEmailNotVerified",
     ] as const) {
       const text = errors(key);
       expect(text.length).toBeGreaterThan(0);

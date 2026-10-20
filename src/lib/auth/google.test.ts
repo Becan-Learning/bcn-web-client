@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  clearGoogleJoinDraft,
   googleReauthRequest,
   googleSignInRequest,
   googleSignUpRequest,
@@ -92,9 +93,18 @@ describe("sign-in error routing", () => {
       .toEqual({ kind: "message", key: "adminGoogleForbidden" });
   });
 
-  it("shows one generic Google message for OAuth failures", () => {
-    expect(signInErrorRoute("account_not_linked", "/home")).toEqual({ kind: "message", key: "googleFailed" });
-    expect(signInErrorRoute("state_mismatch", "/home")).toEqual({ kind: "message", key: "googleFailed" });
+  it("explains an existing Account whose email is not verified", () => {
+    expect(signInErrorRoute("account_not_linked", "/home"))
+      .toEqual({ kind: "message", key: "googleAccountNotLinked" });
+  });
+
+  it("tells a new sign-up with an unverified Google address to check their inbox", () => {
+    expect(signInErrorRoute("email_not_verified", "/home"))
+      .toEqual({ kind: "message", key: "googleEmailNotVerified" });
+  });
+
+  it("shows one generic Google message for other OAuth failures", () => {
+    expect(signInErrorRoute("unable_to_create_session", "/home")).toEqual({ kind: "message", key: "googleFailed" });
   });
 
   it("does nothing when there is no error", () => {
@@ -128,6 +138,21 @@ describe("Google join draft", () => {
     saveGoogleJoinDraft(fields);
     expect(takeGoogleJoinDraft()).toEqual(fields);
     expect(takeGoogleJoinDraft()).toBeNull();
+  });
+
+  it("is cleared when the round trip succeeds", () => {
+    stubStorage();
+    saveGoogleJoinDraft(fields);
+    clearGoogleJoinDraft();
+    expect(takeGoogleJoinDraft()).toBeNull();
+  });
+
+  it("expires after the OAuth state would have", () => {
+    stubStorage();
+    saveGoogleJoinDraft(fields, 1_000);
+    expect(takeGoogleJoinDraft(1_000 + 11 * 60 * 1000)).toBeNull();
+    saveGoogleJoinDraft(fields, 1_000);
+    expect(takeGoogleJoinDraft(1_000 + 5 * 60 * 1000)).toEqual(fields);
   });
 
   it("ignores a corrupted draft", () => {

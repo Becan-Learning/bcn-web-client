@@ -95,25 +95,37 @@ export function hasPasswordAccount(accounts: readonly { providerId: string }[]) 
   return accounts.some((account) => account.providerId === "credential");
 }
 
-/* مسودة خطوة الجامعة تنجو من رحلة Google كي لا يعيد الطالب اختيارها بعد خطأ. */
+/* مسودة خطوة الجامعة تنجو من رحلة Google كي لا يعيد الطالب اختيارها بعد خطأ.
+   النجاح لا يعود إلى صفحة الانضمام (حساب جديد أو قائم يُربط، كلاهما يهبط على الوجهة)،
+   فتُمسح المسودة حين يظهر حساب مسجَّل في أي شاشة (`useAccount`)، ولها عمر قصير احتياطًا. */
 const DRAFT_KEY = "becan:join-google";
+const DRAFT_TTL_MS = 10 * 60 * 1000;
 
-export function saveGoogleJoinDraft(fields: GoogleSignUpFields) {
+export function saveGoogleJoinDraft(fields: GoogleSignUpFields, now = Date.now()) {
   try {
-    sessionStorage.setItem(DRAFT_KEY, JSON.stringify(fields));
+    sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ ...fields, savedAt: now }));
   } catch {
     /* منع التخزين لا يمنع التسجيل. */
   }
 }
 
-export function takeGoogleJoinDraft(): GoogleSignUpFields | null {
+export function clearGoogleJoinDraft() {
+  try {
+    sessionStorage.removeItem(DRAFT_KEY);
+  } catch {
+    /* منع التخزين لا يمنع الدخول. */
+  }
+}
+
+export function takeGoogleJoinDraft(now = Date.now()): GoogleSignUpFields | null {
   try {
     const raw = sessionStorage.getItem(DRAFT_KEY);
     sessionStorage.removeItem(DRAFT_KEY);
     if (!raw) return null;
     const parsed: unknown = JSON.parse(raw);
     if (!parsed || typeof parsed !== "object") return null;
-    const { phoneNumber, institutionId, majorId } = parsed as Record<string, unknown>;
+    const { phoneNumber, institutionId, majorId, savedAt } = parsed as Record<string, unknown>;
+    if (typeof savedAt !== "number" || now - savedAt > DRAFT_TTL_MS) return null;
     return typeof phoneNumber === "string" && typeof institutionId === "string" &&
       typeof majorId === "string"
       ? { phoneNumber, institutionId, majorId }

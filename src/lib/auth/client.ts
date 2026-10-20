@@ -2,6 +2,8 @@
 
 import { createAuthClient } from "better-auth/react";
 import { inferAdditionalFields } from "better-auth/client/plugins";
+import { useEffect } from "react";
+import { clearGoogleJoinDraft } from "./google";
 import type { Account } from "./types";
 
 export const authClient = createAuthClient({
@@ -23,5 +25,10 @@ export const authClient = createAuthClient({
 
 export function useAccount(): { account: Account | null; isPending: boolean } {
   const { data, isPending } = authClient.useSession();
-  return { account: data?.user ?? null, isPending };
+  const account = data?.user ?? null;
+  /* حساب مسجَّل = انتهت رحلة Google بنجاح؛ المسودة لا حاجة لها بعد الآن. */
+  useEffect(() => {
+    if (account) clearGoogleJoinDraft();
+  }, [account]);
+  return { account, isPending };
 }

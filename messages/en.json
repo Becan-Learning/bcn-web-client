@@ -18,6 +18,8 @@
       "adminGoogleForbidden": "Admin accounts sign in with email, password and two-factor verification. Use your email and password.",
       "googleFailed": "We couldn’t continue with Google. Try again or use your email and password.",
       "googleCancelled": "You didn’t finish signing in with Google. Try again whenever you’re ready.",
+      "googleAccountNotLinked": "There’s already a Becan account with this email, but its email isn’t verified yet. Sign in with your password, or verify your email first, then come back to Google.",
+      "googleEmailNotVerified": "We created your account, but Google didn’t verify your email. We sent you a verification link; open it from your inbox, then sign in.",
       "noAccountYet": "You don’t have an account yet. Create one first.",
       "sessionNotFresh": "To protect your account, sign in again and then try once more.",
       "generic": "We couldn’t complete your request. Please try again."

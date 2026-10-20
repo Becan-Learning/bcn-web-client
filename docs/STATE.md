@@ -27,7 +27,7 @@
 ## الدخول والتسجيل بـGoogle · 2026-10-20
 
 Google طريقة دخول ثانية للحساب نفسه، لا حسابًا منفصلًا. **يعتمد على طلب الخادم** الذي يفعّل
-Google في Better Auth (التسجيل الضمني معطّل): العقد في [backend-auth-handoff.md](backend-auth-handoff.md) §3.2
+Google في Better Auth (التسجيل الضمني معطّل): العقد في [backend-auth-handoff.md](backend-auth-handoff.md) §9
 والمواصفة في [specs/auth-account.md](specs/auth-account.md) («Google»). عنوان الرجوع من Google:
 `<أصل الموقع>/api/auth/callback/google` عبر وسيط `/api/auth/*` نفسه.
 
@@ -43,8 +43,8 @@ Google في Better Auth (التسجيل الضمني معطّل): العقد ف�
 - **أخطاء `?error=`** (كلها في `src/lib/auth/errors.ts`): `signup_disabled` · `access_denied` ·
   `BANNED_USER` (نصّ الإيقاف + رابط التواصل) · `ADMIN_GOOGLE_FORBIDDEN` (المشرف يدخل بالبريد وكلمة المرور) ·
   `INVALID_PHONE_NUMBER` · `PHONE_NUMBER_TAKEN` (بجوار حقل الجوال) · `INVALID_INSTITUTION` · `INVALID_MAJOR` ·
-  وأي رمز OAuth صغير الحروف غيرها (`account_not_linked` · `state_mismatch` …) رسالة «تعذّر Google» واحدة.
-  مسودّة الجوال والجامعة والتخصص تنجو من رحلة Google في `sessionStorage` (`becan:join-google`) فلا يعيد الطالب اختيارها.
+  و`account_not_linked` (بريد الحساب القائم غير مؤكَّد: سجّل بكلمة المرور أو أكّد بريدك) و`email_not_verified` (أُنشئ الحساب وأُرسل رابط التأكيد بلا جلسة) برسالتين خاصتين، وأي رمز OAuth صغير الحروف غيرها رسالة «تعذّر Google» واحدة. أخطاء الحالة (`state_mismatch`…) لا تعود إلينا: تعرض Better Auth صفحتها `/api/auth/error`.
+  مسودّة الجوال والجامعة والتخصص تنجو من رحلة Google في `sessionStorage` (`becan:join-google`) فلا يعيد الطالب اختيارها؛ تُمسح عند ظهور حساب مسجَّل (`useAccount`) أو بعد 10 دقائق. بريد قائم يُربط ويهبط على `callbackURL` لا `newUserCallbackURL`.
 - **`next`**: يسافر في `errorCallbackURL` وتُسلَّم الوجهة في `callbackURL`، فيعمل `safeNext` و`becan:next` كما مع البريد.
 - **الإعدادات لحساب بلا كلمة مرور** (`authClient.listAccounts()` بلا `providerId === "credential"`):
   بطاقة كلمة المرور تصير «أضف كلمة مرور» وترسل رابط إعادة التعيين نفسه إلى بريد الحساب (مسار إعادة التعيين

@@ -24,6 +24,10 @@ const ERROR_KEYS = {
      `signup_disabled` يعني أن بريد Google بلا حساب عندنا. */
   signup_disabled: "noAccountYet",
   access_denied: "googleCancelled",
+  /* الخادم لا يثق بـGoogle وحده للربط: يلزم أن يكون بريد الحساب القائم مؤكَّدًا أيضًا. */
+  account_not_linked: "googleAccountNotLinked",
+  /* بريد Google غير مؤكَّد في تسجيل جديد: أُنشئ الحساب وأُرسل رابط التأكيد بلا جلسة. */
+  email_not_verified: "googleEmailNotVerified",
 } as const;
 
 export type AuthErrorKey =

@@ -20,7 +20,8 @@ vi.mock("@/lib/allowance/server", () => ({ getAllowance: backend.allowance }));
 vi.mock("next-intl/server", () => ({ setRequestLocale: vi.fn() }));
 vi.mock("@/i18n/navigation", () => ({
   Link: (props: ComponentProps<"a">) => <a {...props} />,
-  useRouter: () => ({ refresh: backend.refresh }),
+  useRouter: () => ({ refresh: backend.refresh, replace: vi.fn() }),
+  usePathname: () => "/c/math-101",
 }));
 vi.mock("@/components/becan/kit", () => ({
   PageShell: ({ children }: { children: ReactNode }) => <main>{children}</main>,
@@ -55,8 +56,8 @@ beforeEach(() => {
   backend.enrollments.mockResolvedValue({ ok: true, data: [held] });
   backend.allowance.mockResolvedValue({ ok: true, data: allowance });
 });
-async function render(locale: "ar" | "en" = "ar") {
-  const page = await CoursePage({ params: Promise.resolve({ locale, code: course.slug }), searchParams: Promise.resolve({}) });
+async function render(locale: "ar" | "en" = "ar", searchParams: Record<string, string | string[] | undefined> = {}) {
+  const page = await CoursePage({ params: Promise.resolve({ locale, code: course.slug }), searchParams: Promise.resolve(searchParams) });
   return renderToStaticMarkup(<NextIntlClientProvider locale={locale} messages={locale === "ar" ? ar : en} timeZone="Asia/Riyadh">{page}</NextIntlClientProvider>);
 }
 function expectEnrollButtons(html: string, locale: "ar" | "en" = "ar") {
@@ -287,5 +288,81 @@ describe("Course page reads", () => {
   it("shows no Draft label for a student, whose public read has none", async () => {
     const html = await render();
     expect(html).not.toContain(ar.Preview.draft);
+  });
+});
+
+describe("Course page after a session", () => {
+  const enrolled = () => backend.enrollments.mockResolvedValue({ ok: true, data: [{ ...held, course }] });
+  const usedUp = { ...allowance, usage: { ...allowance.usage, seconds: 3600 } };
+  const ratingTitle = (html: string) => html.match(new RegExp(`<p id="[^"]*"[^>]*>${ar.SessionRating.title}</p>`));
+
+  beforeEach(enrolled);
+
+  it("mounts the rating card for a signed-in student carrying the rate param", async () => {
+    const html = await render("ar", { rate: "ss_room" });
+    expect(ratingTitle(html)).not.toBeNull();
+    expect(html.match(/aria-label="(?:سيئة|ضعيفة|مقبولة|جيدة|ممتازة)"/g)).toHaveLength(5);
+  });
+  it.each([["ar"], ["en"]] as const)("shows no rating card without the param in %s", async (locale) => {
+    const html = await render(locale, {});
+    expect(html).not.toContain((locale === "ar" ? ar : en).SessionRating.title);
+  });
+  it.each([{ rate: "" }, { rate: [] }])("shows no rating card for an empty rate param %#", async (search) => {
+    expect(await render("ar", search)).not.toContain(ar.SessionRating.title);
+  });
+  it("shows no rating card to a guest", async () => {
+    backend.account.mockResolvedValue(null);
+    expect(await render("ar", { rate: "ss_room" })).not.toContain(ar.SessionRating.title);
+  });
+  it("shows the card on a student's own course page even on an archived course", async () => {
+    const archived: Course = { ...course, status: "archived" };
+    backend.course.mockResolvedValue({ ok: true, data: archived });
+    backend.enrollments.mockResolvedValue({ ok: true, data: [{ ...held, course: archived }] });
+    expect(ratingTitle(await render("ar", { rate: "ss_room" }))).not.toBeNull();
+  });
+
+  it.each(["ar", "en"] as const)("keeps the used-up usage block for an enrolled student who has used everything, with or without params, in %s", async (locale) => {
+    backend.allowance.mockResolvedValue({ ok: true, data: usedUp });
+    const label = (locale === "ar" ? ar : en).Quota.usedUp.limit;
+    for (const search of [{}, { rate: "ss_room" }, { rate: "ss_room", limit: "1" }]) {
+      const html = (await render(locale, search)).replace(/&#x27;/g, "'");
+      expect(html).toContain(label);
+      expect(html).toContain("60");
+      expect(html).not.toContain((locale === "ar" ? ar : en).Course.sessionLimit);
+    }
+  });
+  it("shows the session-time notice for limit=1 when the allowance is not used up", async () => {
+    const html = await render("ar", { rate: "ss_room", limit: "1" });
+    expect(html).toContain(ar.Course.sessionLimit);
+    expect(html).not.toContain(ar.Quota.usedUp.limit);
+    expect(await render("ar", { rate: "ss_room" })).not.toContain(ar.Course.sessionLimit);
+    expect(await render("ar", { limit: "1" })).toContain(ar.Course.sessionLimit);
+  });
+  it.each(["network", "http", "invalid"])("adds nothing after a %s allowance read failure", async (kind) => {
+    backend.allowance.mockResolvedValue({ ok: false, kind });
+    const html = await render("ar", { rate: "ss_room", limit: "1" });
+    expect(html).not.toContain(ar.Quota.usedUp.limit);
+    expect(html).toContain(ar.Course.sessionLimit);
+    expect(ratingTitle(html)).not.toBeNull();
+  });
+  it("shows no used-up block or session-time notice to a student who is not enrolled", async () => {
+    backend.enrollments.mockResolvedValue({ ok: true, data: [] });
+    backend.allowance.mockResolvedValue({ ok: true, data: { ...usedUp, usage: { ...usedUp.usage, enrollments: 0 } } });
+    const html = await render("ar", { limit: "1" });
+    expect(html).not.toContain(ar.Quota.usedUp.limit);
+    expect(html).not.toContain(ar.Course.sessionLimit);
+  });
+  it("shows no used-up block for an unlimited account", async () => {
+    backend.enrollments.mockResolvedValue({ ok: true, data: [] });
+    backend.allowance.mockResolvedValue({ ok: true, data: { ...usedUp, unlimited: true } });
+    const html = await render("ar", { rate: "ss_room" });
+    expect(html).not.toContain(ar.Quota.usedUp.limit);
+    expect(ratingTitle(html)).not.toBeNull();
+  });
+  it("renders no Arabic-Indic digits and no dark theme outside the chapter cards", async () => {
+    backend.allowance.mockResolvedValue({ ok: true, data: usedUp });
+    const html = await render("ar", { rate: "ss_room", limit: "1" });
+    expect(html).not.toMatch(/[٠-٩]/);
+    expect(html.match(/data-theme="dark"/g)).toHaveLength(2);
   });
 });

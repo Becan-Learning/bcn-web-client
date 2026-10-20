@@ -600,6 +600,7 @@
     "archived": "Archived",
     "archivedEnrolled": "This course is archived and no longer open for new enrollment. Your enrollment stays active, and you can keep studying its published chapters.",
     "archivedClosed": "This course is archived and no longer open for new enrollment. Its chapters are available only to students who enrolled before it was archived.",
+    "sessionLimit": "Your session time is up. You can start a new one.",
     "unenrollBodyArchived": "If you un-enroll from “{course}”, you can’t open its sessions, and you can’t enroll again because it’s archived."
   },
   "Preview": {
@@ -804,19 +805,15 @@
       }
     }
   },
-  "SessionSummary": {
-    "metadata": "Session summary — Becan",
-    "limit": "Your session time is up. Rate your session below, then you can start a new one.",
-    "nextChapter": "Next chapter",
-    "sessionEnded": "Your session in chapter {number} ended",
-    "backToCourse": "Back to the course"
-  },
-  "SessionFeedback": {
+  "SessionRating": {
     "sent": "Your feedback has arrived. We read every note.",
     "title": "How was the session?",
+    "ratingLabel": "Session rating",
+    "close": "Close",
+    "cancel": "Cancel",
     "notes": "What can we improve?",
     "error": "Your feedback didn’t arrive. Check your connection and try again.",
-      "sending": "Sending…",
+    "sending": "Sending…",
     "submit": "Send feedback",
     "rating": {
       "bad": "Bad",

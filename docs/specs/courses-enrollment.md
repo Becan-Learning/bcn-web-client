@@ -91,16 +91,22 @@ Enrollment, Topic** in [GLOSSARY.md](../../GLOSSARY.md).
   response. 409 `CONTENT_NOT_AVAILABLE` / `CHAPTER_NOT_PUBLISHED` show a localized message; any other non-OK response goes down
   the existing connection-error path.
 
-### `/session/[courseSlug]/[chapterId]/done`
+### `/session/[courseSlug]/[chapterId]/done` (removed page, now a redirect)
 
-It becomes a plain end screen:
+**Updated 2026-10-20 ([ADR 0006](../adr/0006-students-rate-a-session-from-a-one-time-popup-on-the-course-page.md)):** there is no summary page.
 
-- The heading is "Session ended: chapter N", and the time-limit notice is shown when `?limit=1`.
-- The feedback form is shown when `?room=`.
-- The secondary link **Next chapter** appears only if the Chapter numbered N+1 exists and is published.
-- The primary button goes **back to the course** (`/c/{id}`).
-- The `?s=` preview states, days-to-exam, progress bar, struggles and penalty are removed.
-- The same gating as the session page applies: unknown → 404, not enrolled → redirect.
+- Both endings (the student presses End, or the tutor signals `session_ending`) go straight to `/c/{slug}?rate={room}`, plus `&limit=1`
+  when the Session ended at its time limit. A disconnect still shows the "cut" screen and asks for no rating.
+- `/done` stays only as a redirect to `/c/{slug}` that carries `room` over as `rate` (and `limit`), so a link that was already in flight still
+  reaches the rating. The slug is the Course's current one for that Chapter id; the link's own slug when the public read does not find it (a Draft).
+- The Course page shows a small non-modal rating card when `rate` is present and the viewer is signed in: «كيف كانت الحصة؟», five stars and a
+  close button. A star opens a Dialog with that star preselected, the five stars, the optional notes and the send button (the single amber primary).
+  Same `POST /api/feedback` `{ sessionId: room, sessionExperience, notes }`. Closing the card or sending removes `rate` and `limit` with
+  `router.replace`, so it is shown once; closing the dialog without sending returns to the card.
+- What the old page showed now lives on the Course page: the used-up Usage block (`QuotaBlock`) for an enrolled or unlimited viewer who has used
+  the Allowance up, always; the "session time is up" sentence for `limit=1` when the Allowance is not used up. "Next chapter" is gone (the Chapter
+  cards are on the page). Unknown Chapter, coming soon, not enrolled, archived and Admin preview are the Course page's own gates.
+- The `?s=` preview states, days-to-exam, progress bar, struggles and penalty stay removed.
 
 ### `/checkout/result`
 

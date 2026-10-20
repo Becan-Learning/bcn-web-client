@@ -37,7 +37,7 @@ import { createStudentQuestion, type StudentQuestionStatus } from "./student-que
 import { getExperience } from "@/lib/experience";
 import { tokenSchema } from "@/lib/courses/schema";
 import { AllowanceUsedUpError, ChapterUnavailableError, tokenErrorOutcome } from "@/lib/session/token-error";
-import { sessionHref } from "@/lib/session/resolve";
+import { courseAfterSessionHref } from "@/lib/session/rating";
 import type { PreviewNotice, VersionPins } from "@/lib/preview/rules";
 import { PreviewBadges } from "@/components/becan/preview-badges";
 import { usePinnedContent } from "./use-pinned-content";
@@ -186,7 +186,6 @@ function SessionScreen({
   onLockLanguage,
   courseName,
   courseSlug,
-  chapterId,
   chapterNo,
   chapterTitle,
   minutes,
@@ -402,7 +401,7 @@ function SessionScreen({
     }
   };
 
-  /* الخروج إلى ملخّص الجلسة — بطلب الطالب أو ببلوغ الحدّ */
+  /* الخروج إلى صفحة المقرر مع اسم الغرفة، فتعرض بطاقة تقييم الحصة — بطلب الطالب أو ببلوغ الحدّ */
   const finish = useCallback(
     async (reason: "user" | "limit") => {
       if (finishing.current) return;
@@ -412,13 +411,9 @@ function SessionScreen({
       await sessionRef.current.end().catch(() => undefined);
       /* القراءة بدأت مع الإشارة؛ لا مؤقّت جديد ولا مسار إنهاء ثانٍ. */
       if (reason === "limit") await allowanceRead.current;
-      const q = new URLSearchParams();
-      if (room) q.set("room", room);
-      if (reason === "limit") q.set("limit", "1");
-      const qs = q.toString();
-      router.push(`${sessionHref(courseSlug, chapterId, true)}${qs ? `?${qs}` : ""}`);
+      router.push(courseAfterSessionHref(courseSlug, { room: room || null, limit: reason === "limit" }));
     },
-    [router, courseSlug, chapterId, studentQuestion],
+    [router, courseSlug, studentQuestion],
   );
 
   useEffect(() => {

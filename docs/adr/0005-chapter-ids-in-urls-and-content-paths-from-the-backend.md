@@ -42,7 +42,7 @@ The Admin preview is implemented on the backend's B4 contract (`bcn-backend-main
   A Draft Course shows a dashed «مسوّدة» / Draft label in the catalog card and on the Course page; a Draft Chapter shows it on its card.
   An Admin starts any Chapter with something to read (a live path or a valid version) without an Enrollment (`startDecision` allows it as before).
   A Chapter with no live version opens on its newest version, and a Course with no live content version on its newest, through the preview link.
-- **The `/done` page** reads the public Catalog first, as before, and asks the allowance only if the Chapter is not found there; an unlimited
+- **The `/done` page** (a redirect to the Course page since [ADR 0006](0006-students-rate-a-session-from-a-one-time-popup-on-the-course-page.md); what follows describes it before then) reads the public Catalog first, as before, and asks the allowance only if the Chapter is not found there; an unlimited
   Account then reads the preview. So a Student's `/done` path is unchanged.
 - **Version preview link.** `/session/{courseSlug}/{chapterId}?version={contentVersionId}&courseVersion={courseContentVersionId}`, both optional.
   With the preview source, `version` must be one of the Chapter's `versions` and `courseVersion` one of the Course's `versions`; the page then reads the

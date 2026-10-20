@@ -10,6 +10,8 @@ import { readsPreview } from "@/lib/preview/rules";
 import { getAllowance } from "@/lib/allowance/server";
 import { viewerReadsPreview } from "@/lib/preview/viewer";
 import { slotsFull, startDecision } from "@/lib/allowance/rules";
+import { usedUpQuota } from "@/lib/allowance/presentation";
+import { RATE_PARAM, LIMIT_PARAM, readLimitReached, readRateRoom } from "@/lib/session/rating";
 import { getAccount } from "@/lib/auth/session";
 import { PageShell, Section, SiteHeader } from "@/components/becan/kit";
 
@@ -35,6 +37,7 @@ export default async function CoursePage(props: PageProps<"/[locale]/c/[code]">)
   setRequestLocale(locale);
 
   const { code } = await props.params;
+  const search = await props.searchParams;
   /* الحدود قبل المقرر: الحساب غير المحدود (مشرف) يقرأ معاينة المسوّدات، وغيره الكتالوج العام المخزَّن. */
   const account = await getAccount();
   const [enrollments, allowance] = account ? await Promise.all([getEnrollments(), getAllowance()]) : [null, null];
@@ -58,6 +61,13 @@ export default async function CoursePage(props: PageProps<"/[locale]/c/[code]">)
     }
     : null;
 
+  /* بعد الحصة: كتلة الحدود المستنفدة لمن يملك حصةً هنا (كانت في ملخّص الحصة)، وجملة بلوغ وقت الحصة إن لم تكن الحدود مستنفدة.
+     بطاقة التقييم للحساب وحده؛ الضيف لا حصة له. */
+  const startsHere = state === "enrolled" || state === "open";
+  const usedUp = startsHere ? usedUpQuota(allowance?.ok ? allowance.data : null) : null;
+  const limitNotice = startsHere && usedUp === null && readLimitReached(search[LIMIT_PARAM]);
+  const rateRoom = account ? readRateRoom(search[RATE_PARAM]) : null;
+
   return (
     <PageShell withFooter>
       <SiteHeader />
@@ -69,6 +79,9 @@ export default async function CoursePage(props: PageProps<"/[locale]/c/[code]">)
           enrollmentError={enrollmentError}
           state={state}
           slotQuota={slotQuota}
+          usedUp={usedUp}
+          limitNotice={limitNotice}
+          rateRoom={rateRoom}
           preview={source === "preview"}
         />
       </Section>

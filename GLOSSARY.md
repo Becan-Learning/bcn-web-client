@@ -96,6 +96,12 @@ A spoken question the student deliberately starts by pressing Ask, cutting the t
 mid-explanation. Outside a student question the tutor does not hear the student's voice.
 _Avoid_: question (alone), interruption, voice message
 
+**Rating** (تقييم الحصة):
+What the student says about a Session once it has ended: one to five stars and an optional note. It is asked once, in a
+small card on the Course page the student lands on after the Session, and is stored against the Session's room so it is read
+beside what the tutor recorded about it. An unrated Session is not asked again.
+_Avoid_: feedback, review, survey, summary (the removed page)
+
 ## Plans
 
 **Plan** (الباقة):

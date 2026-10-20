@@ -82,14 +82,14 @@ went live since. Participant attributes: `course_id` and `chapter_id` are UUIDs;
 
 ### How the web uses it
 
-- URLs: `/c/{slug}`, `/session/{slug}/{chapterId}`, `/session/{slug}/{chapterId}/done`. The session page and `done` resolve by `chapterId`
+- URLs: `/c/{slug}`, `/session/{slug}/{chapterId}`, and `/session/{slug}/{chapterId}/done` (only a redirect to the Course page since web ADR 0006). The session page (and `done`, to find the current slug) resolve by `chapterId`
   with **one** read of `GET /chapters/:chapterId` (`findSessionTarget`; the pure decision is `resolveSessionTarget` in
   `src/lib/session/resolve.ts`). The Course in the answer holds the Chapter, so: the URL's slug equals `course.slug` = found; a different slug
   (a renamed Course) = redirect to `course.slug`, keeping the query; 404 `CHAPTER_NOT_FOUND`, a malformed id (no request is made), or any
   failed read = not found. The Catalog scan of B1 is gone. The read is cached for 5 minutes, like the Catalog.
 - Archived Courses: `/c/{slug}` renders them (`GET /courses/:slug` answers), marked archived. Enrolling is hidden. A student with an active
   Enrollment starts the `published` Chapters as usual; a student without one gets an explanation and no start (`startDecision` returns
-  `reason: "archived"` for a not-enrolled student of an archived Course, so the session and `done` pages send them back to the Course page).
+  `reason: "archived"` for a not-enrolled student of an archived Course, so the session page sends them back to the Course page).
   An unlimited account (Admin) is the same as before: it starts any `published` Chapter without enrolling. Un-enrolling stays possible
   (it frees a Course slot), with a note that the Course can't be joined again. "My courses" marks each Enrollment whose `course.status` is
   `archived`. A slug shared by an Archived and a non-Archived Course resolves `/c/{slug}` to the non-Archived one, so the "back to the Course"

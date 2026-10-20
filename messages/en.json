@@ -711,6 +711,8 @@
   },
   "Session": {
     "loadingSlides": "Preparing slides…",
+    "supportLabel": "Contact support on WhatsApp",
+    "supportContext": "Hello, I have a question during my session: {course}, chapter {number}",
     "exit": "Exit session",
     "lessons": "Lessons",
     "lessonsShort": "Lessons",

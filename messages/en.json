@@ -769,6 +769,7 @@
       "loadError": "We couldn’t open the slides. Try refreshing the page.",
       "slide": "Slide {number}",
       "enlargeSlide": "Enlarge slide {number}",
+      "now": "Now",
       "enlarge": "Enlarge",
       "startHereSoon": "Start explanation here — Coming soon",
       "slideOf": "Slide {number} of {total}",

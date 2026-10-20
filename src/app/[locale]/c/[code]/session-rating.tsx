@@ -16,6 +16,9 @@ import { LIMIT_PARAM, RATE_PARAM } from "@/lib/session/rating";
    - إغلاق البطاقة أو إرسال التقييم يحذف معاملَي الرابط (`rate` و`limit`) بـ`router.replace`،
      فلا يُعيدها تحديثٌ ولا رجوع. إغلاق النافذة دون إرسال يعيد الطالب إلى البطاقة،
      وتبقى نجمته وملاحظته إن فتحها ثانية: لا يضيع نصٌّ كتبه بضغطة خاطئة.
+   - البطاقة مرفوعة فوق زرّ واتساب الطافي (`SupportButton`: قرص 56px عند 16px/24px من الحافة)
+     بمقداره وفجوة 16px (`bottom-22` ثم `md:bottom-24`)، فلا يغطي القرصُ زاويتَها. تبقى على
+     محاذاة القرص عند النهاية (`end-6`).
    - بلا حركة دخول، فلا شيء يخالف `prefers-reduced-motion`. */
 
 const subscribeNever = () => () => {};
@@ -100,7 +103,7 @@ export function SessionRating({ room }: { room: string | null }) {
         <section
           aria-labelledby={titleId}
           onKeyDown={(event) => { if (event.key === "Escape") dismiss(); }}
-          className="fixed inset-x-4 bottom-4 z-30 rounded-xl border border-line bg-surface p-4 shadow-lift md:inset-x-auto md:end-6 md:bottom-6 md:w-80"
+          className="fixed inset-x-4 bottom-22 z-30 rounded-xl border border-line bg-surface p-4 shadow-lift md:inset-x-auto md:end-6 md:bottom-24 md:w-80"
         >
           <div className="flex items-start justify-between gap-3">
             <p id={titleId} className="pt-2.5 font-semibold text-ink">{t("title")}</p>

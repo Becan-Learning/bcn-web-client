@@ -711,6 +711,8 @@
   },
   "Session": {
     "loadingSlides": "تجهيز الشرائح…",
+    "supportLabel": "تواصل مع الدعم على واتساب",
+    "supportContext": "السلام عليكم، عندي سؤال أثناء حصة {course} — الفصل {number}",
     "exit": "خروج من الحصة",
     "lessons": "الدروس",
     "lessonsShort": "دروس",

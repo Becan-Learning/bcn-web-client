@@ -665,8 +665,9 @@ function SessionScreen({
           />
         ) : null}
 
-        {/* السبورة — الثلثان، والشريط يسبح فوقها */}
-        <main className="relative flex min-w-0 flex-[2] flex-col">
+        {/* السبورة — 60%، والشريط يسبح فوقها. جوال: 3 أجزاء من 5 ارتفاعًا؛
+            ديسكتوب: 3 من 5 من عرض الصفّ بعد العمود الضيّق، ولا تنزل عن 20rem */}
+        <main className="relative flex min-w-0 flex-[3] flex-col md:min-w-[20rem]">
           {endingQuota ? (
             <div role="status" className="flex min-h-0 flex-1 flex-col justify-center overflow-y-auto p-5 md:p-8">
               <QuotaBlock {...endingQuota} surface="session" />
@@ -710,9 +711,11 @@ function SessionScreen({
           /> : null}
         </main>
 
-        {/* الثلث — الشرائح تملأ العمود كاملًا */}
+        {/* 40% — جزءان من 5 بعد السبورة (ارتفاعًا على الجوال، وعرضًا على
+            الديسكتوب)، والشرائح تملأ العمود كاملًا. ولا ينزل عن 19rem حتى
+            تبقى البطاقة مقروءة عند 768px */}
         {showSlides ? (
-          <aside className="flex min-h-0 w-full flex-1 flex-col md:w-[19rem] md:flex-none md:shrink-0">
+          <aside className="flex min-h-0 w-full flex-[2] flex-col md:min-w-[19rem] md:basis-0">
             <SlidesPane url={pdfUrl} agentPage={state.page} />
           </aside>
         ) : null}

@@ -769,6 +769,7 @@
       "loadError": "ما قدرنا نفتح الشرائح. جرّب تحدّث الصفحة.",
       "slide": "الشريحة {number}",
       "enlargeSlide": "كبّر الشريحة {number}",
+      "now": "الآن",
       "enlarge": "تكبير",
       "startHereSoon": "ابدأ الشرح من هنا — قريبًا",
       "slideOf": "الشريحة {number} من {total}",

@@ -1459,7 +1459,7 @@ CSS لا Motion (المزلق 12)، و`prefers-reduced-motion` يثبّته عل
 
 محتوى الجلسة في `app/session/[code]/[n]/script.ts` — **موضوعان من 12 لهما محتوى سبورة**، والعشرة الباقية معطّلة بوسم «قريبًا». كل الفصول تعرض نفس النص حتى يجهز خطّ المحتوى.
 
-الشرائح: `public/slides/slides.pdf` — 52 صفحة حقيقية، تُعرض في `<iframe>`.
+الشرائح: `public/slides/slides.pdf` — 52 صفحة حقيقية. لاندينج: صورة WebP ثابتة للصفحة المعروضة (`public/slides/hero-slide-<N>.webp`، تُولَّد بـ`scripts/render-hero-slide.py`).
 
 ---
 

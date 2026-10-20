@@ -1,13 +1,17 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import { useEffect, useRef, useState } from "react";
 import { Link, useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth/client";
-import { authErrorKey } from "@/lib/auth/errors";
-import { ErrorText, FieldLabel, TextField } from "@/components/becan/kit";
+import { authErrorKey, oauthErrorKey } from "@/lib/auth/errors";
+import { googleReauthRequest } from "@/lib/auth/google";
+import { ErrorText, FieldLabel, GhostButton, TextField } from "@/components/becan/kit";
+import { useHasPassword } from "@/components/auth/use-has-password";
+import { useGoogleRedirect } from "@/components/auth/use-google-redirect";
 import { runSettingsAuthMutation } from "../_auth-mutations";
+import { deleteFailure, planDelete } from "./delete-flow";
 
 /* S4 — تأكيد حذف الحساب.
 
@@ -15,16 +19,26 @@ import { runSettingsAuthMutation } from "../_auth-mutations";
    عابرة. ومع كلمة المرور لا نحتاج نوافذ متتالية ولا عروض إبقاء.
 
    **الزرّ ليس أحمر**: `--error` للخطأ وحده في هذي الهوية، والحذف قرار
-   الطالب لا خطؤه. الحارس هو الجملة المكتوبة لا لون الزرّ. */
+   الطالب لا خطؤه. الحارس هو الجملة المكتوبة لا لون الزرّ.
 
-export function DeleteForm() {
+   **حساب بلا كلمة مرور** (دخل بـGoogle): لا نسأل عنها، ويطلب الخادم جلسة طازجة؛
+   إن كانت الجلسة قديمة دعوناه إلى الدخول بـGoogle من جديد ثم يعود إلى هذه الصفحة. */
+
+export function DeleteForm({ googleError = "" }: { googleError?: string }) {
   const t = useTranslations("Settings.Delete");
   const authErrors = useTranslations("Auth.Errors");
+  const locale = useLocale();
   const router = useRouter();
+  const hasPassword = useHasPassword();
+  const { redirecting, start: startGoogle } = useGoogleRedirect();
+  const [needsFresh, setNeedsFresh] = useState(false);
   const phrase = t("phrase");
   const [value, setValue] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<{ field: "phrase" | "password"; text: string } | null>(null);
+  const [error, setError] = useState<{ field: "phrase" | "password" | "form"; text: string } | null>(() => {
+    const key = oauthErrorKey(googleError);
+    return key ? { field: "form", text: authErrors(key) } : null;
+  });
   const [pending, setPending] = useState(false);
   const busy = useRef(false);
   const [done, setDone] = useState(false);
@@ -48,7 +62,9 @@ export function DeleteForm() {
       document.getElementById("del-confirm")?.focus();
       return;
     }
-    if (!password) {
+    const plan = planDelete(hasPassword, password);
+    if (plan.kind === "wait") return;
+    if (plan.kind === "needPassword") {
       setError({ field: "password", text: t("passwordRequired") });
       document.getElementById("del-password")?.focus();
       return;
@@ -56,16 +72,22 @@ export function DeleteForm() {
     busy.current = true;
     setPending(true);
     setError(null);
+    setNeedsFresh(false);
     try {
-      const result = await runSettingsAuthMutation(() => authClient.deleteUser({ password }));
+      const result = await runSettingsAuthMutation(() => plan.password === null
+        ? authClient.deleteUser()
+        : authClient.deleteUser({ password: plan.password }));
       if (result.error) {
-        setError({ field: "password", text: authErrors(authErrorKey(result.error)) });
+        const key = authErrorKey(result.error);
+        const failure = deleteFailure(!!hasPassword, key);
+        if (failure.kind === "reauthenticate") setNeedsFresh(true);
+        else setError({ field: failure.field, text: authErrors(key) });
       } else {
         setPassword("");
         setDone(true);
       }
     } catch {
-      setError({ field: "password", text: authErrors("generic") });
+      setError({ field: hasPassword ? "password" : "form", text: authErrors("generic") });
     } finally {
       busy.current = false;
       setPending(false);
@@ -104,7 +126,7 @@ export function DeleteForm() {
       onSubmit={submit}
       noValidate
     >
-      <fieldset disabled={pending} aria-busy={pending} className="min-w-0">
+      <fieldset disabled={pending || redirecting} aria-busy={pending} className="min-w-0">
       <FieldLabel htmlFor="del-confirm" hint={t("phraseHint", { phrase })}>
         {t("confirmLabel")}
       </FieldLabel>
@@ -123,6 +145,7 @@ export function DeleteForm() {
       />
       {error?.field === "phrase" ? <div role="alert"><ErrorText id="del-err">{error.text}</ErrorText></div> : null}
 
+      {hasPassword ? (
       <div className="mt-4">
         <FieldLabel htmlFor="del-password">{t("currentPassword")}</FieldLabel>
         <TextField id="del-password" name="password" type="password" dir="ltr" autoComplete="current-password"
@@ -131,11 +154,29 @@ export function DeleteForm() {
           onChange={(e) => { setPassword(e.target.value); setError(null); }} />
         {error?.field === "password" ? <div role="alert"><ErrorText id="del-password-err">{error.text}</ErrorText></div> : null}
       </div>
+      ) : null}
+
+      {error?.field === "form" ? <div role="alert"><ErrorText id="del-form-err">{error.text}</ErrorText></div> : null}
+      {needsFresh ? (
+        <div role="alert" className="mt-4">
+          <ErrorText id="del-fresh-err">{authErrors("sessionNotFresh")}</ErrorText>
+          <GhostButton
+            className="mt-3 w-full gap-3 sm:w-auto"
+            disabled={redirecting}
+            onClick={() => void startGoogle(googleReauthRequest(locale)).then((failure) => {
+              if (failure) setError({ field: "form", text: authErrors(authErrorKey(failure)) });
+            })}
+          >
+            {t(redirecting ? "reauthRedirecting" : "reauth")}
+          </GhostButton>
+        </div>
+      ) : null}
 
       <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
         <button
           type="submit"
-          className="inline-flex h-14 items-center justify-center rounded-pill border border-ink px-8 text-lg font-semibold text-ink"
+          disabled={hasPassword === null}
+          className="inline-flex h-14 items-center justify-center rounded-pill border border-ink px-8 text-lg font-semibold text-ink disabled:opacity-60"
         >
           {t(pending ? "deleting" : "delete")}
         </button>

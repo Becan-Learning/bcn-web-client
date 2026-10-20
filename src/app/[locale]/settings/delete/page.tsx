@@ -34,7 +34,9 @@ export default async function DeletePage(props: PageProps<"/[locale]/settings/de
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  await requireAccount(locale, accountReturnPath("/settings/delete", await props.searchParams));
+  const sp = await props.searchParams;
+  await requireAccount(locale, accountReturnPath("/settings/delete", sp));
+  const googleError = (Array.isArray(sp.error) ? sp.error[0] : sp.error) || "";
   const t = await getTranslations("Settings.Delete");
 
   return (
@@ -66,7 +68,7 @@ export default async function DeletePage(props: PageProps<"/[locale]/settings/de
           </p>
         </SettingsCard>
 
-        <DeleteForm />
+        <DeleteForm googleError={googleError} />
       </div>
     </SettingsShell>
   );

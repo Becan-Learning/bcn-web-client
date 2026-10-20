@@ -90,14 +90,13 @@ describe("chapterIsPublished", () => {
 });
 
 describe("sessionHref", () => {
-  it("builds /session/{slug}/{chapterId} and its done page", () => {
+  it("builds /session/{slug}/{chapterId}", () => {
     expect(sessionHref("alpha", A1)).toBe(`/session/alpha/${A1}`);
-    expect(sessionHref("alpha", A1, true)).toBe(`/session/alpha/${A1}/done`);
   });
   it("adds the version pins of a preview link, in a fixed order, and nothing when there are none", () => {
-    expect(sessionHref("alpha", A1, false, { courseVersion: B1, version: A2 })).toBe(`/session/alpha/${A1}?version=${A2}&courseVersion=${B1}`);
-    expect(sessionHref("alpha", A1, false, { version: A2 })).toBe(`/session/alpha/${A1}?version=${A2}`);
-    expect(sessionHref("alpha", A1, false, {})).toBe(`/session/alpha/${A1}`);
+    expect(sessionHref("alpha", A1, { courseVersion: B1, version: A2 })).toBe(`/session/alpha/${A1}?version=${A2}&courseVersion=${B1}`);
+    expect(sessionHref("alpha", A1, { version: A2 })).toBe(`/session/alpha/${A1}?version=${A2}`);
+    expect(sessionHref("alpha", A1, {})).toBe(`/session/alpha/${A1}`);
   });
   it("encodes its segments", () => {
     expect(sessionHref("a/b", "x y")).toBe("/session/a%2Fb/x%20y");

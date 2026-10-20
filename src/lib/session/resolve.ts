@@ -34,12 +34,12 @@ export function chapterStartable(chapter: Chapter, source: CatalogSource): boole
   return source === "preview" ? previewStartable(chapter) : chapterIsPublished(chapter);
 }
 
-/* رابط الحصة وملخّصها — المنشئ الوحيد لهما. `pins` لرابط معاينة النسخة وحده:
+/* رابط الحصة — المنشئ الوحيد له. `pins` لرابط معاينة النسخة وحده:
    `?version={contentVersionId}&courseVersion={courseContentVersionId}`، وكلاهما اختياري. */
-export function sessionHref(courseSlug: string, chapterId: string, done = false, pins: { version?: string; courseVersion?: string } = {}): string {
+export function sessionHref(courseSlug: string, chapterId: string, pins: { version?: string; courseVersion?: string } = {}): string {
   const query = new URLSearchParams();
   if (pins.version) query.set("version", pins.version);
   if (pins.courseVersion) query.set("courseVersion", pins.courseVersion);
   const qs = query.toString();
-  return `/session/${encodeURIComponent(courseSlug)}/${encodeURIComponent(chapterId)}${done ? "/done" : ""}${qs ? `?${qs}` : ""}`;
+  return `/session/${encodeURIComponent(courseSlug)}/${encodeURIComponent(chapterId)}${qs ? `?${qs}` : ""}`;
 }

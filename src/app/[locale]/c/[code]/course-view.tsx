@@ -7,6 +7,8 @@ import { useRef, useState, useTransition } from "react";
 import { Dialog } from "radix-ui";
 import { PrimaryButton } from "@/components/becan/kit";
 import { QuotaBlock, type CourseSlotQuota } from "@/components/becan/quota";
+import type { UsedUpQuota } from "@/lib/allowance/presentation";
+import { SessionRating } from "./session-rating";
 import { mutateEnrollment } from "./enrollment-mutation";
 import { Link, useRouter } from "@/i18n/navigation";
 import { ArrowForward } from "@/components/becan/icons";
@@ -116,7 +118,7 @@ function ChapterCard({
         {!published ? (
           <span className={`rounded-pill border px-4 py-2 text-xs font-semibold ${skin.arrow}`}>{t("soon")}</span>
         ) : state === "enrolled" || state === "open" ? (
-          <Link href={sessionHref(course.slug, chapter.id, false, preview ? previewStartPins(course, chapter) : {})}
+          <Link href={sessionHref(course.slug, chapter.id, preview ? previewStartPins(course, chapter) : {})}
             className={`inline-flex min-h-11 items-center gap-2 rounded-pill border px-5 font-semibold transition-colors hover:bg-pressable hover:text-on-pressable ${skin.arrow}`}>
             {t("start")}<ArrowForward />
           </Link>
@@ -143,6 +145,9 @@ export function CourseView({
   enrollmentError,
   state,
   slotQuota,
+  usedUp = null,
+  limitNotice = false,
+  rateRoom = null,
   preview = false,
 }: {
   course: Course;
@@ -150,6 +155,12 @@ export function CourseView({
   enrollmentError: boolean;
   state: ViewState;
   slotQuota: CourseSlotQuota | null;
+  /* المسجَّل (أو غير المحدود) وقد استنفد حدود استخدامه: كتلة هادئة بما ذاكره وموعد التجدّد. */
+  usedUp?: UsedUpQuota | null;
+  /* وصل الطالب من حصة انتهت ببلوغ وقتها ولم تستنفد حدوده: جملة واحدة تقول له ذلك. */
+  limitNotice?: boolean;
+  /* غرفة الحصة التي انتهت للتوّ (`?rate=`): تظهر بطاقة التقييم مرة واحدة. */
+  rateRoom?: string | null;
   /* المصدر معاينة المشرف (فيه المسوّدات والنسخ)، لا الكتالوج العام. */
   preview?: boolean;
 }) {
@@ -214,6 +225,12 @@ export function CourseView({
         <p id="archived-note" className="mt-6 max-w-measure rounded-lg bg-tint-aubergine px-4 py-3 leading-base text-ink">
           {t(state === "enrolled" ? "archivedEnrolled" : "archivedClosed")}
         </p>
+      ) : null}
+
+      {usedUp ? (
+        <div className="mt-6"><QuotaBlock {...usedUp} /></div>
+      ) : limitNotice ? (
+        <p className="mt-6 max-w-measure rounded-lg bg-tint-amber px-4 py-3 leading-base text-ink">{t("sessionLimit")}</p>
       ) : null}
 
       <div className="mt-6">
@@ -309,6 +326,8 @@ export function CourseView({
           ))}
         </ul>
       </div>
+
+      <SessionRating room={rateRoom} />
     </>
   );
 }

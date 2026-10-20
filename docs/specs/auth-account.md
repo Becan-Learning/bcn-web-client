@@ -15,8 +15,9 @@ lint, types, unit tests and build; end-to-end runs come when the backend lands.
   (`better-auth/react`). No DB, no `BETTER_AUTH_SECRET`, no `betterAuth()` in this repo.
 - **Same-origin proxy:** `next.config.ts` rewrites `/api/auth/:path*` →
   `${BACKEND_URL}/api/auth/:path*`. Server code talks to `BACKEND_URL` directly.
-- **Sign-in method:** email + password with required email verification. Google and phone
-  sign-in are **commented out** in the UI (code kept in comments, not shown, no "coming soon").
+- **Sign-in method:** email + password with required email verification, and **Google** (see
+  "Google" below). Phone sign-in is **commented out** in the UI (code kept in comments, not shown,
+  no "coming soon").
 - **Account fields at sign-up, all required:** name, email, password, phone, university, major.
   No level. No password confirmation field — a show/hide toggle instead.
 - **Phone:** Saudi mobile only. The student types `05XXXXXXXX` (spaces/dashes allowed); it is
@@ -133,8 +134,8 @@ Routes (all under `src/app/[locale]/`, each with `generateMetadata` + `setReques
      where `callbackURL` = locale-prefixed `safeNext(next)`. On success → `/verify-email?email=…&next=…`.
      Errors via `errors.ts`, focused on the offending field (step switches back if needed).
    - Institutions come from `getInstitutions()` in the server page, passed as props.
-   - **Comment out** the Google button and the "or" divider (keep the code in a comment block
-     with a one-line Arabic reason). Keep the `next` + `sessionStorage` survival logic.
+   - The outlined "Continue with Google" button and the "or" divider sit above step 1 (see
+     "Google" below). Keep the `next` + `sessionStorage` survival logic.
    - Footer link: "Already have an account? Sign in" → `/sign-in?next=…`.
 2. **`/sign-in`** — email + password, "Forgot password?" link, "Create an account" link (both
    carry `next`). `authClient.signIn.email({ email, password, callbackURL })`. On
@@ -185,3 +186,39 @@ Depends on Ticket A. Independent of Ticket B (different files).
 5. **`/settings/data`** stays a mock (backend export endpoint is "later" in the handoff doc).
 
 **Done when:** gates green; no demo name/contact left in account settings.
+
+---
+
+## Google (added 2026-10-20)
+
+Google is a second sign-in method for the same Account, built against
+[backend-auth-handoff.md](../backend-auth-handoff.md) §3.2. Better Auth's implicit sign-up is
+**disabled**: Google can only create an Account when the call says `requestSignUp: true`. The
+redirect URI is `<web origin>/api/auth/callback/google` through the existing `/api/auth/*` proxy.
+
+- **Join page:** "Continue with Google" (outlined; pattern 8 allows one amber primary per screen)
+  on step 1. It does not start Google yet. It switches the form to Google mode on step 2 (phone,
+  university, major; name, email and password come from Google), with the same client validation
+  as email sign-up. Submitting calls
+  `authClient.signIn.social({ provider: "google", requestSignUp: true, additionalData: { phoneNumber, institutionId, majorId }, callbackURL, newUserCallbackURL, errorCallbackURL })`
+  with `phoneNumber` as E.164. "Sign up with email instead" returns to step 1. Errors that come back
+  land on step 2 next to the field they name (a taken phone number under the phone field).
+- **Sign-in page:** the same button without `requestSignUp`. If the Google email has no Account,
+  Better Auth redirects to `errorCallbackURL` with `?error=signup_disabled`; the sign-in page
+  redirects to `/join?method=google&notice=no-account&next=…`, which opens Google mode on step 2
+  under the notice «ما عندك حساب بعد». After step 2 it starts Google again with `requestSignUp`.
+- **Existing email:** if the Google email already has an Account, Google is linked to it and the
+  student is signed in (Better Auth account linking, handled by the backend).
+- **Errors on `?error=`** (all mapped in `src/lib/auth/errors.ts`): `signup_disabled`,
+  `access_denied`, `BANNED_USER` (existing banned message + support link), `ADMIN_GOOGLE_FORBIDDEN`
+  (Admins sign in with email, password and two-factor), `INVALID_PHONE_NUMBER`, `PHONE_NUMBER_TAKEN`,
+  `INVALID_INSTITUTION`, `INVALID_MAJOR`, and any other lowercase OAuth code
+  (`account_not_linked`, `state_mismatch`, …) as one generic "couldn't continue with Google" message.
+- **Return path:** `safeNext` / `becan:next` work as for email. The destination goes in
+  `callbackURL` and, as `next`, in `errorCallbackURL`.
+- **Settings for an Account without a password** (`authClient.listAccounts()` has no
+  `providerId: "credential"`): "Change password" becomes "Add a password", which sends the existing
+  password-reset email to the Account's email (the reset flow creates a credential account) and
+  shows a sent confirmation. "Delete account" does not ask for a password and calls `deleteUser()`
+  without one; Better Auth then requires a fresh session. On `SESSION_EXPIRED` the student is
+  told to sign in again with Google (`/settings/delete` is the return page).

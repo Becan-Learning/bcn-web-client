@@ -12,7 +12,7 @@ backend yet beyond the Better Auth mount and its four core tables (migration
 | Domain | Better Auth table | Note |
 |---|---|---|
 | **Account** (the student's one record) | `user` | Everything below adds columns here. |
-| a sign-in method (password, later Google) | `account` | Better Auth's name; *not* our Account. |
+| a sign-in method (password, Google) | `account` | Better Auth's name; *not* our Account. |
 | a signed-in device | `session` | |
 | a pending email link | `verification` | |
 
@@ -130,7 +130,7 @@ betterAuth({
   user: {
     additionalFields: { /* §2.2 */ },
     changeEmail: { enabled: true },         // verification goes to the NEW address
-    deleteUser: { enabled: true },          // web always sends the password; no email step
+    deleteUser: { enabled: true },          // web sends the password, or none for a Google-only Account (fresh session); no email step
   },
   session: {
     expiresIn: 60 * 60 * 24 * 30,           // 30 days
@@ -144,7 +144,7 @@ betterAuth({
 });
 ```
 
-Google sign-in and phone sign-in are **not** enabled; the web has them commented out.
+Phone sign-in is **not** enabled; the web has it commented out. Google sign-in is enabled (§3.2).
 
 ### 3.1 Email (Resend)
 
@@ -157,6 +157,46 @@ Google sign-in and phone sign-in are **not** enabled; the web has them commented
 - Do not `await` the send inside the handler (timing attack on sign-up / reset); fire it with
   `void` and log failures with the Pino logger.
 - The `url` Better Auth passes already contains the web's `callbackURL` / `redirectTo`. Send it as is.
+
+### 3.2 Google sign-in
+
+Google is a Better Auth social provider with **implicit sign-up disabled**
+(`socialProviders.google.disableImplicitSignUp: true`, with `GOOGLE_CLIENT_ID` and
+`GOOGLE_CLIENT_SECRET`). The OAuth redirect URI is `<web origin>/api/auth/callback/google`, which
+reaches the backend through the same `/api/auth/*` proxy (`BETTER_AUTH_URL` is the web origin).
+If the Google email already has an Account, Better Auth links Google to it and signs the student in.
+
+Calls (the web uses `authClient.signIn.social`, verified in better-auth 1.7.7: `requestSignUp`,
+`additionalData`, `newUserCallbackURL`, `errorCallbackURL` exist on `POST /sign-in/social`):
+
+```ts
+// Sign-up (join page only)
+signIn.social({
+  provider: "google",
+  requestSignUp: true,
+  additionalData: { phoneNumber /* E.164 */, institutionId, majorId },
+  callbackURL, newUserCallbackURL, errorCallbackURL,   // errorCallbackURL = /join?method=google&next=…
+});
+// Sign-in (sign-in page)
+signIn.social({ provider: "google", callbackURL, errorCallbackURL });  // errorCallbackURL = /sign-in?next=…
+```
+
+The backend validates `additionalData` with the same rules and codes as email sign-up (§2.3).
+Failures redirect the browser to `errorCallbackURL` with `?error=<code>`; the web maps these:
+
+| `?error=` | Meaning | Web behaviour |
+|---|---|---|
+| `signup_disabled` | Google email has no Account and `requestSignUp` was not set (Better Auth, from the message "signup disabled") | Sign-in redirects to `/join` in Google mode with the notice «ما عندك حساب بعد» |
+| `INVALID_PHONE_NUMBER`, `PHONE_NUMBER_TAKEN`, `INVALID_INSTITUTION`, `INVALID_MAJOR` | §2.3 codes | Join page, step 2, next to the field |
+| `BANNED_USER` | Banned Account | The existing banned message and support link |
+| `ADMIN_GOOGLE_FORBIDDEN` | The email belongs to an Admin | "Use email and password" (Admins sign in with password and two-factor) |
+| `access_denied` | The student cancelled on Google | Gentle retry message |
+| other lowercase codes (`account_not_linked`, `state_mismatch`, `unable_to_link_account`, `email_not_verified`, …) | OAuth failure | One generic "couldn't continue with Google" message |
+
+Custom codes must reach the redirect as `?error=<CODE>` (Better Auth does this for an `APIError`
+with `body.code` thrown from a user hook during the callback). Account deletion for a password-less
+Account calls `deleteUser()` with no password: Better Auth requires a fresh session
+(`SESSION_EXPIRED`), and the web sends the student through Google again.
 
 ## 4. Express wiring
 
@@ -234,6 +274,7 @@ anonymous browser id. Same attribute names; only the values change.
 - [ ] create/update hooks with the four error codes
 - [ ] Better Auth config per §3 (baseURL = web origin, trustedOrigins, verification, reset, change email, delete, session)
 - [ ] Resend sender with `x-becan-locale`
+- [ ] Google provider (§3.2): `disableImplicitSignUp`, `additionalData` validation, `ADMIN_GOOGLE_FORBIDDEN`, `BANNED_USER` on the callback
 - [ ] `trust proxy`, auth rate limiting, `requireSession` middleware
 - [ ] `GET /api/v1/institutions`
 - [ ] `.env.example` + `AGENTS.md` refreshed

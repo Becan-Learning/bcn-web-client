@@ -13,34 +13,44 @@ import {
   TextField,
 } from "@/components/becan/kit";
 import { PasswordField } from "@/components/auth/password-field";
+import { AuthDivider, GoogleButton } from "@/components/auth/google-button";
+import { useGoogleRedirect } from "@/components/auth/use-google-redirect";
+import { BannedSupportLink } from "@/components/auth/banned-support-link";
 import {
   useAuthReturn,
   useSignedInRedirect,
 } from "@/components/auth/use-auth-return";
 import { authClient } from "@/lib/auth/client";
 import type { Institution } from "@/lib/auth/catalog";
-import { authErrorKey, type AuthErrorKey } from "@/lib/auth/errors";
+import { authErrorKey, oauthErrorKey } from "@/lib/auth/errors";
 import { toE164Saudi } from "@/lib/auth/phone";
 import {
-  validateJoinStepOne,
-  validateJoinStepTwo,
-} from "@/lib/auth/join-validation";
-
-type Field =
-  | "name"
-  | "email"
-  | "password"
-  | "phoneNumber"
-  | "institutionId"
-  | "majorId";
-type Issue = { field: Field | "form"; key: AuthErrorKey | "nameRequired" };
+  googleSignUpRequest,
+  saveGoogleJoinDraft,
+  takeGoogleJoinDraft,
+} from "@/lib/auth/google";
+import {
+  joinIssueTarget,
+  joinStart,
+  planJoinSubmit,
+  type JoinField as Field,
+  type JoinIssue as Issue,
+  type JoinState,
+} from "@/lib/auth/join-mode";
 
 export function JoinForm({
   next,
   institutions,
+  initialGoogle = false,
+  noAccountNotice = false,
+  oauthError = "",
 }: {
   next: string;
   institutions: Institution[];
+  /* وضع Google من الرابط: يصل إليه من دخول بريدٍ بلا حساب أو من خطأ عاد من Google. */
+  initialGoogle?: boolean;
+  noAccountNotice?: boolean;
+  oauthError?: string;
 }) {
   const t = useTranslations("Join.Form");
   const errors = useTranslations("Auth.Errors");
@@ -48,7 +58,10 @@ export function JoinForm({
   const router = useRouter();
   const { destination, verifyCallbackURL, clearReturn } = useAuthReturn(next);
   useSignedInRedirect(destination, clearReturn);
-  const [step, setStep] = useState<1 | 2>(1);
+  const [state, setState] = useState<JoinState>(() => joinStart(initialGoogle));
+  const { step, method } = state;
+  const google = method === "google";
+  const { redirecting, start: startGoogle } = useGoogleRedirect();
   const [values, setValues] = useState({
     name: "",
     email: "",
@@ -57,8 +70,12 @@ export function JoinForm({
     institutionId: "",
     majorId: "",
   });
-  const [issue, setIssue] = useState<Issue | null>(null);
-  const [pending, setPending] = useState(false);
+  const [issue, setIssue] = useState<Issue | null>(() => {
+    const key = initialGoogle ? oauthErrorKey(oauthError) : null;
+    return key ? { ...joinIssueTarget(key, "google"), key } : null;
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const pending = submitting || redirecting;
   const [retrying, startRetry] = useTransition();
   const majors = institutions.find(
     (item) => item.id === values.institutionId,
@@ -67,6 +84,14 @@ export function JoinForm({
   useEffect(() => {
     if (issue) document.getElementById(`join-${issue.field}`)?.focus();
   }, [issue, step]);
+
+  /* عاد الطالب من Google بخطأ: نعيد له جامعته وتخصصه وجواله بدل أن يختارها من جديد.
+     التخزين غير متاح وقت الرسم على الخادم، فالقراءة بعد التركيب لا في قيمة البداية. */
+  useEffect(() => {
+    if (!initialGoogle || !oauthError) return;
+    const draft = takeGoogleJoinDraft();
+    if (draft) queueMicrotask(() => setValues((current) => ({ ...current, ...draft })));
+  }, [initialGoogle, oauthError]);
 
   const message = (field: Field | "form") => issue?.field === field
     ? issue.key === "nameRequired" ? t(issue.key) : errors(issue.key)
@@ -80,30 +105,30 @@ export function JoinForm({
     setIssue(null);
   };
 
-  const submit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (pending) return;
-    const firstIssue = validateJoinStepOne(values);
-    if (firstIssue) {
-      setStep(1);
-      setIssue(firstIssue);
-      return;
-    }
-    if (step === 1) {
-      setIssue(null);
-      setStep(2);
-      requestAnimationFrame(
-        () => document.getElementById("join-phoneNumber")?.focus(),
-      );
-      return;
-    }
-    const secondIssue = validateJoinStepTwo(values, institutions);
-    if (secondIssue) {
-      setIssue(secondIssue);
-      return;
-    }
+  const goToStepTwo = () => {
+    requestAnimationFrame(
+      () => document.getElementById("join-phoneNumber")?.focus(),
+    );
+  };
+
+  const showError = (key: ReturnType<typeof authErrorKey>) => {
+    const target = joinIssueTarget(key, method);
+    setState((current) => ({ ...current, step: target.step }));
+    setIssue({ field: target.field, key });
+  };
+
+  const submitGoogle = async () => {
     setIssue(null);
-    setPending(true);
+    saveGoogleJoinDraft(values);
+    /* الوجهة تعود في رابط الخطأ (`next`)؛ نسخة التخزين لا حاجة لها بعد الآن. */
+    clearReturn();
+    const error = await startGoogle(googleSignUpRequest(locale, destination, values));
+    if (error) showError(authErrorKey(error));
+  };
+
+  const submitEmail = async () => {
+    setIssue(null);
+    setSubmitting(true);
     try {
       const { error } = await authClient.signUp.email({
         name: values.name.trim(),
@@ -115,13 +140,7 @@ export function JoinForm({
         callbackURL: verifyCallbackURL,
       });
       if (error) {
-        const key = authErrorKey(error);
-        const field: Field | "form" = key === "emailTaken" || key === "invalidEmail" ? "email"
-          : key === "passwordTooShort" || key === "passwordTooLong" || key === "invalidPassword" ? "password"
-          : key === "invalidPhoneNumber" || key === "phoneNumberTaken" ? "phoneNumber"
-          : key === "invalidInstitution" ? "institutionId" : key === "invalidMajor" ? "majorId" : "form";
-        setStep(field === "email" || field === "password" ? 1 : 2);
-        setIssue({ field, key });
+        showError(authErrorKey(error));
         return;
       }
       /* رابط البريد ومعامل next يحملان الوجهة؛ لا نترك نسخة قديمة لدخول لاحق. */
@@ -132,22 +151,54 @@ export function JoinForm({
     } catch {
       setIssue({ field: "form", key: "generic" });
     } finally {
-      setPending(false);
+      setSubmitting(false);
+    }
+  };
+
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (pending) return;
+    const plan = planJoinSubmit(state, values, institutions);
+    if (plan.kind === "issue") {
+      setState((current) => ({ ...current, step: plan.step }));
+      setIssue(plan.issue);
+    } else if (plan.kind === "advance") {
+      setIssue(null);
+      setState({ method: "email", step: 2 });
+      goToStepTwo();
+    } else if (plan.kind === "google") {
+      await submitGoogle();
+    } else {
+      await submitEmail();
     }
   };
 
   return (
     <div className="mt-6 w-full">
-      {/* الدخول بحساب Google غير مفعّل في الخادم.
-      <PrimaryButton onClick={() => authClient.signIn.social({ provider: "google", callbackURL: verifyCallbackURL })} className="w-full">
-        {t("google")}
-      </PrimaryButton>
-      <div className="my-6 flex items-center gap-4" aria-hidden="true">
-        <span className="h-px flex-1 bg-line" />
-        <span className="text-sm font-semibold text-ink-2">{t("or")}</span>
-        <span className="h-px flex-1 bg-line" />
-      </div>
-      */}
+      {noAccountNotice && google ? (
+        <div
+          role="status"
+          className="mb-5 rounded-xl border border-line bg-tint-aubergine px-4 py-3"
+        >
+          <p className="font-semibold text-ink">{t("noAccountTitle")}</p>
+          <p className="mt-1 text-sm leading-base text-ink-2">{t("noAccountBody")}</p>
+        </div>
+      ) : null}
+      {!google && step === 1 ? (
+        <>
+          <GoogleButton
+            disabled={pending}
+            onClick={() => {
+              setIssue(null);
+              setState({ method: "google", step: 2 });
+              goToStepTwo();
+            }}
+          >
+            {t("google")}
+          </GoogleButton>
+          <AuthDivider label={t("or")} />
+        </>
+      ) : null}
       {/* الدخول برقم الجوال غير مفعّل؛ الرقم هنا من بيانات الحساب فقط.
       <GhostButton onClick={() => setStep(2)}>{t("phoneSignIn")}</GhostButton>
       */}
@@ -156,7 +207,7 @@ export function JoinForm({
         className="mb-5 text-sm leading-base font-semibold text-ink-2"
         aria-live="polite"
       >
-        {t(step === 1 ? "stepOne" : "stepTwo")}
+        {t(google ? "stepGoogle" : step === 1 ? "stepOne" : "stepTwo")}
       </p>
       <form onSubmit={submit} noValidate aria-busy={pending}>
         <fieldset disabled={pending} className="space-y-4">
@@ -293,7 +344,10 @@ export function JoinForm({
           </div>
           <div id="join-form" tabIndex={-1} aria-live="polite">
             {message("form") ? (
-              <ErrorText id="join-form-error">{message("form")!}</ErrorText>
+              <>
+                <ErrorText id="join-form-error">{message("form")!}</ErrorText>
+                {issue?.key === "accountBanned" ? <BannedSupportLink /> : null}
+              </>
             ) : null}
           </div>
           <PrimaryButton
@@ -301,20 +355,22 @@ export function JoinForm({
             disabled={pending || (step === 2 && !institutions.length)}
             className="w-full"
           >
-            {t(pending ? "submitting" : step === 1 ? "next" : "submit")}
+            {google
+              ? t(pending ? "submittingGoogle" : "submitGoogle")
+              : t(pending ? "submitting" : step === 1 ? "next" : "submit")}
           </PrimaryButton>
           {step === 2 ? (
             <GhostButton
               className="w-full"
               onClick={() => {
-                setStep(1);
+                setState(joinStart(false));
                 setIssue(null);
                 requestAnimationFrame(
                   () => document.getElementById("join-name")?.focus(),
                 );
               }}
             >
-              {t("back")}
+              {t(google ? "useEmail" : "back")}
             </GhostButton>
           ) : null}
         </fieldset>

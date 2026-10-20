@@ -32,6 +32,7 @@ export default async function JoinPage(props: PageProps<"/[locale]/join">) {
   const course = one(sp.course);
   const chapter = one(sp.chapter);
   const next = one(sp.next);
+  const google = one(sp.method) === "google";
   const institutions = await getInstitutions();
 
   /* سطر السياق إلزامي في البريف — يبقى ظاهرًا حتى بلا معاملات،
@@ -73,7 +74,13 @@ export default async function JoinPage(props: PageProps<"/[locale]/join">) {
             )}
           </p>
 
-          <JoinForm next={next} institutions={institutions} />
+          <JoinForm
+            next={next}
+            institutions={institutions}
+            initialGoogle={google}
+            noAccountNotice={google && one(sp.notice) === "no-account"}
+            oauthError={one(sp.error)}
+          />
         </div>
       </main>
     </PageShell>

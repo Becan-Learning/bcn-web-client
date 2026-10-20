@@ -12,7 +12,7 @@ backend yet beyond the Better Auth mount and its four core tables (migration
 | Domain | Better Auth table | Note |
 |---|---|---|
 | **Account** (the student's one record) | `user` | Everything below adds columns here. |
-| a sign-in method (password, later Google) | `account` | Better Auth's name; *not* our Account. |
+| a sign-in method (password, Google) | `account` | Better Auth's name; *not* our Account. |
 | a signed-in device | `session` | |
 | a pending email link | `verification` | |
 
@@ -130,7 +130,7 @@ betterAuth({
   user: {
     additionalFields: { /* §2.2 */ },
     changeEmail: { enabled: true },         // verification goes to the NEW address
-    deleteUser: { enabled: true },          // web always sends the password; no email step
+    deleteUser: { enabled: true },          // web sends the password, or none for a Google-only Account (fresh session); no email step
   },
   session: {
     expiresIn: 60 * 60 * 24 * 30,           // 30 days
@@ -144,7 +144,7 @@ betterAuth({
 });
 ```
 
-Google sign-in and phone sign-in are **not** enabled; the web has them commented out.
+Phone sign-in is **not** enabled. Google sign-in is, when the backend has `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`: see §9.
 
 ### 3.1 Email (Resend)
 
@@ -226,6 +226,71 @@ billing records.
 Unchanged contract. The web's `/api/get-lk-token` now fills the participant attributes `user_id`
 (the Better Auth user id) and `user_name` (`user.name`) from the verified session instead of the
 anonymous browser id. Same attribute names; only the values change.
+
+## 9. Google sign-in and sign-up
+
+Status: implemented 2026-10-20 ([ADR 0006](adr/0006-google-sign-up-collects-fields-first-and-admins-never-use-google.md)).
+
+**Configured only when the backend has both `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`.** Without them
+`POST /api/auth/sign-in/social` answers 404. Google Cloud Console redirect URI:
+`{BETTER_AUTH_URL}/api/auth/callback/google` (the web origin; it proxies `/api/auth/*`).
+
+### Client call
+
+```ts
+// Join page: the form's phone, institution and major are already filled in and valid.
+await authClient.signIn.social({
+  provider: "google",
+  requestSignUp: true,
+  additionalData: { phoneNumber, institutionId, majorId },
+  callbackURL,        // existing Account: signed in, lands here
+  newUserCallbackURL, // Account just created: lands here instead
+  errorCallbackURL    // any failure: ?error=<code>&error_description=<text>
+});
+
+// Sign-in page: never creates an Account.
+await authClient.signIn.social({ provider: "google", callbackURL, errorCallbackURL });
+```
+
+All three URLs must be on the web origin (or a relative path). The call answers `{ url, redirect: true }`
+and the client sets `window.location` to `url` (Google's consent screen); Google returns to
+`/api/auth/callback/google`, which sets the session cookie and redirects. `additionalData` is read as
+exactly those three keys, strings only; the same validation as email sign-up runs.
+
+### What happens
+
+| Situation | Result |
+|---|---|
+| Join page, no Account has this Google email | Account created (name and verified email from Google, Free Plan), signed in, redirect to `newUserCallbackURL` |
+| Join page or sign-in page, an Account has this email | Google linked, signed in, redirect to `callbackURL` (the join fields are ignored) |
+| Returning Google sign-in | signed in, redirect to `callbackURL` |
+| Sign-in page, no Account | `?error=signup_disabled` |
+
+Linking needs Google to report the address as verified **and** the Account's own address to be verified.
+
+### Error codes on `errorCallbackURL`
+
+`?error=<code>` is the whole contract; `error_description` is an English sentence for logs, not for
+display. Codes from our hooks (uppercase, same as email sign-up): `INVALID_PHONE_NUMBER`,
+`INVALID_INSTITUTION`, `INVALID_MAJOR`, `PHONE_NUMBER_TAKEN`, `BANNED_USER`, `ADMIN_GOOGLE_FORBIDDEN`
+(Admins sign in with email, password and two-factor). Better Auth's own (lowercase):
+
+| Code | Meaning |
+|---|---|
+| `signup_disabled` | sign-in page, no Account with this email |
+| `account_not_linked` | an Account has this email but Google or the Account's own address is unverified |
+| `email_not_verified` | the new Account's Google address is unverified; no session, a verification email was sent |
+| `access_denied` | the student cancelled on Google's screen (Google's own code, passed through) |
+| `unable_to_link_account`, `unable_to_create_user`, `unable_to_create_session` | rare server-side failures |
+| `invalid_code`, `unable_to_get_user_info`, `email_not_found`, `no_code`, `no_callback_url`, `oauth_provider_not_found` | the exchange with Google failed |
+
+Treat any other value as a generic failure. Failures before the redirect (a callback URL that is not
+trusted, rate limit) come back as the JSON error of the `signIn.social` call itself. If the OAuth state
+is lost (cookies cleared, expired after 10 minutes), Better Auth cannot know the `errorCallbackURL` and
+redirects to its own `/api/auth/error?error=state_mismatch` (also `state_not_found`,
+`invalid_callback_request`).
+
+The sign-in endpoint is rate limited to 10 per minute per IP in production.
 
 ## Checklist
 

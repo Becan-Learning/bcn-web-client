@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
 import { Link, useRouter } from "@/i18n/navigation";
 import {
@@ -11,37 +11,64 @@ import {
   TextField,
 } from "@/components/becan/kit";
 import { PasswordField } from "@/components/auth/password-field";
+import { AuthDivider, GoogleButton } from "@/components/auth/google-button";
+import { useGoogleRedirect } from "@/components/auth/use-google-redirect";
 import {
   useAuthReturn,
   useSignedInRedirect,
 } from "@/components/auth/use-auth-return";
 import { BannedSupportLink } from "@/components/auth/banned-support-link";
 import { authClient } from "@/lib/auth/client";
-import { authErrorKey } from "@/lib/auth/errors";
+import { authErrorKey, type AuthErrorKey } from "@/lib/auth/errors";
+import { googleSignInRequest } from "@/lib/auth/google";
 
 export function SignInForm({
   next,
   resetSuccess,
+  oauthErrorKey = null,
 }: {
   next: string;
   resetSuccess: boolean;
+  /* خطأ عاد من Google في `?error=`؛ الصفحة تحوّل «بلا حساب» إلى التسجيل قبل بلوغه. */
+  oauthErrorKey?: AuthErrorKey | null;
 }) {
   const t = useTranslations("SignIn");
   const errors = useTranslations("Auth.Errors");
   const router = useRouter();
+  const locale = useLocale();
+  const { redirecting, start: startGoogle } = useGoogleRedirect();
   const { destination, verifyCallbackURL, clearReturn } = useAuthReturn(next);
   useSignedInRedirect(destination, clearReturn);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [pending, setPending] = useState(false);
+  const [signingIn, setPending] = useState(false);
+  const pending = signingIn || redirecting;
   const [issue, setIssue] = useState<{
     field: "email" | "password" | "form";
     message: string;
     banned?: boolean;
-  } | null>(null);
+  } | null>(() => oauthErrorKey
+    ? {
+        field: "form",
+        message: errors(oauthErrorKey),
+        banned: oauthErrorKey === "accountBanned",
+      }
+    : null);
   useEffect(() => {
     if (issue) document.getElementById(`sign-in-${issue.field}`)?.focus();
   }, [issue]);
+
+  const submitGoogle = async () => {
+    if (pending) return;
+    setIssue(null);
+    /* الوجهة تعود في رابط الخطأ (`next`)؛ نسخة التخزين لا حاجة لها بعد الآن. */
+    clearReturn();
+    const error = await startGoogle(googleSignInRequest(locale, destination));
+    if (error) {
+      const key = authErrorKey(error);
+      setIssue({ field: "form", message: errors(key), banned: key === "accountBanned" });
+    }
+  };
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -104,6 +131,10 @@ export function SignInForm({
           {t("resetSuccess")}
         </p>
       ) : null}
+      <GoogleButton disabled={pending} onClick={() => void submitGoogle()}>
+        {t(redirecting ? "googleRedirecting" : "google")}
+      </GoogleButton>
+      <AuthDivider label={t("or")} />
       <form onSubmit={submit} noValidate aria-busy={pending}>
         <fieldset disabled={pending} className="space-y-4">
           <div>

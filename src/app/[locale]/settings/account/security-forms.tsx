@@ -147,3 +147,54 @@ export function PasswordForm({ onDone, onCancel, onPendingChange, disabled }: Fo
     </form>
   );
 }
+
+/* حساب بلا كلمة مرور (دخل بـGoogle): نرسل رابط إعادة التعيين نفسه إلى بريده، فينشئ له
+   مسار إعادة التعيين كلمة مرور. */
+export function AddPasswordForm({ email, disabled, onPendingChange }: {
+  email: string;
+  disabled: boolean;
+  onPendingChange: (pending: boolean) => void;
+}) {
+  const t = useTranslations("Settings.Account");
+  const errors = useTranslations("Auth.Errors");
+  const locale = useLocale();
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+  const { pending, run } = useSecurityRequest(onPendingChange);
+  const focusNotice = useCallback((node: HTMLParagraphElement | null) => node?.focus(), []);
+
+  const send = async () => {
+    if (pending || disabled) return;
+    setError("");
+    try {
+      await run(async () => {
+        const path = `/reset-password?${new URLSearchParams({ next: "/settings/account" })}`;
+        const result = await runSettingsAuthMutation(() => authClient.requestPasswordReset({
+          email, redirectTo: locale === "en" ? `/en${path}` : path,
+        }));
+        if (result.error) setError(errors(authErrorKey(result.error)));
+        else setSent(true);
+      });
+    } catch {
+      setError(errors("generic"));
+    }
+  };
+
+  const address = (chunks: React.ReactNode) => <span dir="ltr">{chunks}</span>;
+  return (
+    <>
+      <p className="mt-2 max-w-measure text-sm leading-base text-ink-2">{t("addPasswordEffect")}</p>
+      {sent ? (
+        <p ref={focusNotice} tabIndex={-1} role="status" className="mt-4 max-w-measure leading-base text-ink-2">
+          {t.rich("addPasswordSent", { email, address })}
+        </p>
+      ) : (
+        <button type="button" disabled={pending || disabled} aria-busy={pending} onClick={() => void send()}
+          className="mt-4 inline-flex min-h-11 items-center px-2 font-semibold text-ink underline underline-offset-4 disabled:opacity-60">
+          {t(pending ? "addingPassword" : "addPassword")}
+        </button>
+      )}
+      {error ? <div role="alert"><ErrorText id="acc-add-password-err">{error}</ErrorText></div> : null}
+    </>
+  );
+}

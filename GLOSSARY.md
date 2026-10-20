@@ -30,6 +30,12 @@ study facts that shape what they see (university, major). Nothing about the stud
 it. A student has exactly one Account.
 _Avoid_: user, profile, student account, member
 
+**Sign-in method** (طريقة الدخول):
+How a student proves they own their Account: email and password, or Google. One Account can have
+both. Google does not make a second Account, and an Account created with Google has no password
+until the student adds one. Better Auth stores each method as an `account` row; that table is not our Account.
+_Avoid_: login type, provider account
+
 ## Catalog
 
 **Catalog** (الكتالوج):

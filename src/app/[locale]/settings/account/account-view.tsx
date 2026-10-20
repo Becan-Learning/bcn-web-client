@@ -14,9 +14,10 @@ import { LanguageSwitcher } from "@/components/becan/language-switcher";
 import { SaveNotice, useSaveNotice } from "../_controls";
 import { SettingsCard } from "../_shell";
 import { planAccountChange, type AccountChange, type SavedAccount } from "./account-changes";
-import { EmailForm, PasswordForm } from "./security-forms";
+import { AddPasswordForm, EmailForm, PasswordForm } from "./security-forms";
 import { runSettingsAuthMutation } from "../_auth-mutations";
 import { retryAccountInstitutions } from "./retry-catalog";
+import { useHasPassword } from "@/components/auth/use-has-password";
 
 /* الحفظ التلقائي للبيانات العادية فقط؛ البريد وكلمة المرور يحتاجان قرارًا صريحًا. */
 export function AccountView({ account, institutions }: { account: Account; institutions: Institution[] }) {
@@ -25,6 +26,7 @@ export function AccountView({ account, institutions }: { account: Account; insti
   const locale = useLocale();
   const router = useRouter();
   const { saved, ping } = useSaveNotice();
+  const hasPassword = useHasPassword();
   const lastSaved = useRef<SavedAccount>({
     name: account.name, phoneNumber: account.phoneNumber,
     institutionId: account.institutionId, majorId: account.majorId,
@@ -216,7 +218,9 @@ export function AccountView({ account, institutions }: { account: Account; insti
       </SettingsCard>
 
       <SettingsCard title={t("password")}>
-        {changing === "password" ? (
+        {hasPassword === null ? null : !hasPassword ? (
+          <AddPasswordForm email={account.email} disabled={pending} onPendingChange={setSecurityPending} />
+        ) : changing === "password" ? (
           <PasswordForm disabled={pending} onPendingChange={setSecurityPending}
             onDone={() => { returnFocus.current = "password"; setChanging(null); ping(); router.refresh(); }}
             onCancel={() => { returnFocus.current = "password"; setChanging(null); }} />

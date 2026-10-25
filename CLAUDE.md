@@ -21,28 +21,28 @@ Next.js 16 · TypeScript · Tailwind 4 · Motion (الحزمة `motion`، الا
 
 | المسار | المحتوى |
 |---|---|
-| `src/app/[locale]/` | كل الشاشات (بيانات عرض) |
-| `src/app/api/` | رمز LiveKit · وسيط Bunny · تقييم Langfuse — خارج `[locale]` |
+| `src/app/[locale]/` | كل الشاشات |
+| `src/app/api/` | وسيط Bunny · تقييم Langfuse — خارج `[locale]`؛ رمز LiveKit يصدره الخادم |
 | `src/i18n/` | `routing` · `navigation` · `request` |
 | `messages/` | `ar.json` · `en.json` — شجرة مفاتيح واحدة |
 | `src/components/becan/` | عُدّة التصميم: `kit` · `icons` · `logo` · `becan-face` … |
 | `src/components/session/` | الجلسة الحقيقية: `session-view` · `parts` · `slides-pdf` |
-| `src/lib/data/` | بيانات العرض: الكتالوج · الخطط · الفوترة · الأسئلة · الدعم |
-| `src/lib/session/` | عقد الوكيل (`ui-control` · `teaching-board`) · `session-reducer` · `content` |
+| `src/lib/data/` | بيانات العرض: الخطط · الفوترة · الأسئلة · الدعم |
+| `src/lib/session/` | عقد الوكيل (`ui-control` · `teaching-board`) · `session-reducer` · `lessons` · `types` |
 | `src/styles/` | `tokens.css` + `globals.css` |
 
 - نصوص الصفحات في `messages/` — **ممنوع نصّ ظاهر للطالب ثابت في المكوّنات** (عربي أو إنجليزي).
   التنقّل بـ`Link` و`useRouter` من `@/i18n/navigation`؛ **ممنوع `next/link`**.
 - **عقد الوكيل لا يُغيَّر من طرف واحد:** الوكيل ينشر على موضوع `ui-control`
-  (`scroll` · `set_lesson` · `set_topic` · `topic_done` · `session_ending` · `board_*`)،
-  والطالب يكتب على `lk.chat` ويستدعي `start_turn` · `end_turn` · `cancel_turn` بـRPC. سمات المشارك في `api/get-lk-token`.
+  (`scroll` · `set_lesson` · `set_topic` · `topic_done` · `allowance_reached` · `session_ending` · `board_*`) — [عقد حدود الاستخدام ونهاية الحصة](docs/agent-contract-allowance.md)،
+  والطالب يكتب على `lk.chat` ويستدعي `start_turn` · `end_turn` · `cancel_turn` بـRPC. سمات المشارك يصدرها الخادم في `/api/v1/livekit/token` — [العقد](docs/backend-courses-handoff.md).
 - **Radix للآليات فقط** (حبس التركيز · Escape · البوابات) ويُلوَّن بالتوكنات. لا مظهر shadcn.
   نوافذ الجلسة داخل البوابة تعيد `data-theme="dark" data-surface="session"`.
 - **أدوات الجلسة التي لا يدعمها الوكيل لا تظهر في شريط الجلسة** — لا أزرار «قريبًا» ولا تزييف.
 - **صوت الطالب لا يبلغ الوكيل إلا عبر «سؤال الطالب»** (زر «اسأل»): المايك مكتوم طوال الجلسة،
   ولا وضع مايك مفتوح — [ADR 0003](docs/adr/0003-student-voice-only-through-student-questions.md)
   و[العقد](docs/agent-contract-student-question.md).
-- Clerk وSupabase **غير مركّبين بعد**؛ المعرّف مجهول (`becan:uid`) والكتالوج عرض.
+- **الحساب من Better Auth في الخادم** والويب عميل فقط ([ADR 0004](docs/adr/0004-auth-lives-in-backend-behind-same-origin-proxy.md))؛ الكتالوج والتسجيل في المقررات من الخادم ([المواصفة](docs/specs/courses-enrollment.md))، والويب يحتفظ بقواعد العرض فقط.
 - التحقق: `pnpm lint` ثم `pnpm type-check` ثم `pnpm build`.
 
 ## الهوية — مقفلة، لا تُقترح بدائل

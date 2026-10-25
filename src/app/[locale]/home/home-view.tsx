@@ -1,29 +1,23 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { CourseCardBody } from "@/app/[locale]/courses/course-card";
-import { TONES, slugOf } from "@/lib/data/catalog";
+import { TONES } from "@/lib/courses/presentation";
 import { GearIcon } from "@/components/becan/icons";
-import { GhostButton, PageShell } from "@/components/becan/kit";
-import { enrolledCourses, type EnrolledCourse } from "@/lib/data/home";
+import { Copy, GhostButton, PageShell, PrimaryButton } from "@/components/becan/kit";
+import type { Enrollment } from "@/lib/courses/schema";
+import { QuotaBlock } from "@/components/becan/quota";
+import type { UsedUpQuota } from "@/lib/allowance/presentation";
 
-/* الشاشة ٨ — الداشبورد `/home`.
+/* الشاشة ٨ — الداشبورد `/home`، مقصور على المقررات المسجَّلة. */
 
-   مقصورة الآن على المقررات المسجَّلة والتقدّم فيها بطلب صريح.
-
-   ما بُني من البريف ثم رُفع — كتلة الإلحاح بالأيام حتى أقرب اختبار،
-   والحالات الست، واقتراح تاريخ الاختبار من المجتمع، وطبقة الأحداث،
-   والطبقة الثانية (المهام والترم) — محفوظ كاملًا في الحفظة `1c34c65`
-   ويُسترجَع منها متى عادت الحاجة. */
-
-export async function HomeView() {
+export async function HomeView({ name, enrollments, quota }: { name: string; enrollments: Enrollment[] | null; quota: UsedUpQuota | null }) {
   const t = await getTranslations("Home");
-  const courses = enrolledCourses();
 
   return (
     <PageShell>
-      {/* تحية بالاسم الأول والإعدادات فقط — لا إشعارات ولا بحث */}
+      {/* التحية من الحساب والإعدادات فقط — لا إشعارات ولا بحث */}
       <header className="mx-auto flex w-full max-w-page items-center justify-between gap-3 px-4 pt-5 pb-2 md:px-8 xl:px-10">
-        <p className="text-ink">{t("greeting")}</p>
+        <p className="min-w-0 break-words text-ink"><Copy>{t("greeting", { name })}</Copy></p>
         <Link
           href="/settings"
           aria-label={t("settings")}
@@ -34,59 +28,47 @@ export async function HomeView() {
       </header>
 
       <main className="mx-auto w-full max-w-page px-4 pt-4 pb-16 md:px-8 xl:px-10">
+        {quota ? <div className="mb-6"><QuotaBlock {...quota} /></div> : null}
+
         <h1 className="font-display text-3xl leading-tight font-bold text-ink md:text-4xl">
           {t("title")}
         </h1>
 
-        <ul className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {courses.map((c) => (
-            <li key={c.code}>
-              <EnrolledCard c={c} />
-            </li>
-          ))}
-        </ul>
-
-        <div className="mt-6">
-          <GhostButton href="/courses">{t("add")}</GhostButton>
-        </div>
+        {enrollments === null ? (
+          <p role="alert" className="mt-6 text-error">{t("loadError")}</p>
+        ) : enrollments.length === 0 ? (
+          <div className="mt-6">
+            <p className="text-ink-2">{t("empty")}</p>
+            <PrimaryButton href="/courses" className="mt-6">{t("browseCourses")}</PrimaryButton>
+          </div>
+        ) : (
+          <>
+            <ul className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {enrollments.map((c) => (
+                <li key={c.course.id}><EnrolledCard c={c} /></li>
+              ))}
+            </ul>
+            <div className="mt-6"><GhostButton href="/courses">{t("add")}</GhostButton></div>
+          </>
+        )}
       </main>
     </PageShell>
   );
 }
 
-/* البطاقة هي بطاقة /courses نفسها — نفس الجسم من `CourseCardBody`
-   لا نسخةً منه — ويزيد عليها شريط التقدّم.
-
-   والمقرر الذي لم تجهز فصوله لا يُخفى: تظهر بوسم «قريبًا» ولا
-   تكون رابطًا، فالضغط لا يعد بما ليس موجودًا. */
-
-async function EnrolledCard({ c }: { c: EnrolledCourse }) {
+/* البطاقة هي بطاقة /courses نفسها، ويبقى المقرر غير المنشور رابطًا لإدارة التسجيل. */
+async function EnrolledCard({ c }: { c: Enrollment }) {
   const t = await getTranslations("Home");
   const tone = TONES[c.course.tone];
-  const shell = `group relative flex min-h-36 flex-col justify-between overflow-hidden rounded-lg border p-3 shadow-soft ${tone.card}`;
-
-  if (c.soon) {
-    return (
-      <div className={`${shell} opacity-60`}>
-        <CourseCardBody course={c.course} />
-        <span
-          className={`relative mt-2 w-fit rounded-pill border px-2 py-0.5 text-[11px] font-semibold ${tone.chip}`}
-        >
-          {t("soon")}
-        </span>
-      </div>
-    );
-  }
-
   return (
     <Link
-      href={`/c/${slugOf(c.code)}`}
-      className={`${shell} transition-transform duration-200 hover:-translate-y-1 hover:shadow-lift`}
+      href={`/c/${c.course.id}`}
+      className={`group relative flex min-h-36 flex-col justify-between overflow-hidden rounded-lg border p-3 shadow-soft transition-transform duration-200 hover:-translate-y-1 hover:shadow-lift ${tone.card}`}
     >
-      <CourseCardBody
-        course={c.course}
-        progress={{ done: c.done, total: c.ready }}
-      />
+      <CourseCardBody course={c.course} />
+      {c.course.publishedChapterCount === 0 ? (
+        <span className={`relative mt-2 w-fit rounded-pill border px-2 py-0.5 text-[11px] font-semibold ${tone.chip}`}>{t("soon")}</span>
+      ) : null}
     </Link>
   );
 }

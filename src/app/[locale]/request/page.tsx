@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getInstitutions } from "@/lib/auth/catalog";
+import { getCourses } from "@/lib/auth/courses";
 import type { Metadata } from "next";
 import { RequestForm } from "./request-form";
 import { BecanFace } from "@/components/becan/becan-face";
@@ -19,7 +21,7 @@ export default async function RequestPage(props: PageProps<"/[locale]/request">)
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  const t = await getTranslations("Request");
+  const [t, institutions, courses] = await Promise.all([getTranslations("Request"), getInstitutions(), getCourses()]);
   const [headlinePrefix, headlineWord, headlineSuffix] = t.markup("title", {
     word: (chunks) => `\0${chunks}\0`,
   }).split("\0");
@@ -39,7 +41,7 @@ export default async function RequestPage(props: PageProps<"/[locale]/request">)
         <p className="mt-5 max-w-measure text-lg text-ink-2">
           {t("intro")}</p>
 
-        <RequestForm />
+        <RequestForm institutions={institutions} courses={courses.ok ? courses.data : []} />
       </Section>
     </PageShell>
   );

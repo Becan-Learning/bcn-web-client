@@ -20,7 +20,6 @@ import {
 } from "./explanation-language";
 import dynamic from "next/dynamic";
 import { useRouter } from "@/i18n/navigation";
-import { motion } from "motion/react";
 import {
   RoomAudioRenderer,
   SessionProvider,
@@ -36,8 +35,16 @@ import {
 } from "livekit-client";
 import { createStudentQuestion, type StudentQuestionStatus } from "./student-question";
 import { getExperience } from "@/lib/experience";
-import { getAnonId } from "@/lib/session/anon-id";
-import type { ChapterContent } from "@/lib/session/content";
+import type { ChapterContent } from "@/lib/session/types";
+import { tokenSchema } from "@/lib/courses/schema";
+import { AllowanceUsedUpError, tokenErrorOutcome } from "@/lib/session/token-error";
+import { courseAfterSessionHref } from "@/lib/session/rating";
+import { readSessionAllowance } from "@/lib/allowance/client";
+import type { Allowance } from "@/lib/allowance/schema";
+import { sessionEndingQuota } from "@/lib/session/ending";
+import { QuotaBlock } from "@/components/becan/quota";
+import { SessionShell as Shell } from "./session-start";
+import { RemainingMinutes } from "./remaining-minutes";
 import {
   INITIAL_SESSION_STATE,
   checkpointShown,
@@ -84,9 +91,6 @@ function LoadingSlides() {
   return <SlidesMessage text={t("loadingSlides")} />;
 }
 
-/* اسم مؤقّت حتى يُركَّب الحساب (Clerk) */
-const USER_NAME = "طالب بيكان";
-
 type SessionViewProps = {
   courseName: string;
   courseSlug: string;
@@ -96,10 +100,12 @@ type SessionViewProps = {
   content: ChapterContent;
   pdfUrl: string;
   lessons: Lesson[];
+  minutesRemaining: number | null;
 };
 
 export function SessionView(props: SessionViewProps) {
-  const { courseId, chapterId } = props.content;
+  const { courseId } = props.content;
+  const chapterNumber = props.chapterNo;
   const locale = useLocale();
   const stored = useSyncExternalStore(
     subscribeExplanationLanguage,
@@ -119,23 +125,21 @@ export function SessionView(props: SessionViewProps) {
   const tokenSource = useMemo(
     () =>
       TokenSource.custom(async () => {
-        const params = new URLSearchParams({
-          course_id: courseId,
-          chapter_id: chapterId,
-          language,
-          user_name: USER_NAME,
-          user_id: getAnonId(),
-          experience: getExperience(),
+        const res = await fetch("/api/v1/livekit/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ courseId, chapterNumber, language, experience: getExperience() }),
+          cache: "no-store",
         });
-        const res = await fetch(`/api/get-lk-token?${params}`, { cache: "no-store" });
-        if (!res.ok) throw new Error(`Token request failed (${res.status})`);
-
-        const serverUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL;
-        if (!serverUrl) throw new Error("NEXT_PUBLIC_LIVEKIT_URL is not set");
-
-        return { serverUrl, participantToken: await res.text() };
+        if (!res.ok) {
+          const body: unknown = await res.json().catch(() => null);
+          if (tokenErrorOutcome(res.status, body) === "used-up") throw new AllowanceUsedUpError();
+          throw new Error(`Token request failed (${res.status})`);
+        }
+        const { serverUrl, token } = tokenSchema.parse(await res.json());
+        return { serverUrl, participantToken: token };
       }),
-    [courseId, chapterId, language],
+    [courseId, chapterNumber, language],
   );
 
   const session = useSession(tokenSource);
@@ -165,6 +169,7 @@ function SessionScreen({
   minutes,
   pdfUrl,
   lessons,
+  minutesRemaining,
 }: SessionViewProps & {
   session: ReturnType<typeof useSession>;
   language: ExplanationLanguage;
@@ -179,6 +184,9 @@ function SessionScreen({
   const isMobile = useIsMobile();
   const agent = useAgent(session);
   const [state, dispatch] = useReducer(sessionReducer, INITIAL_SESSION_STATE);
+  const [endingAllowance, setEndingAllowance] = useState<Allowance | null>(null);
+  const allowanceRead = useRef<Promise<Allowance | null> | null>(null);
+  const allowanceRequest = useRef<AbortController | null>(null);
   const recorder = usePacketRecorder();
   const { record } = recorder;
 
@@ -265,12 +273,23 @@ function SessionScreen({
       }
       record(parsed, room.name);
       const message = parseAgentMessage(parsed);
+      if (message?.action === "allowance_reached" && !allowanceRead.current) {
+        const request = new AbortController();
+        allowanceRequest.current = request;
+        allowanceRead.current = readSessionAllowance(
+          AbortSignal.any([request.signal, AbortSignal.timeout(5_000)]),
+        ).then((allowance) => {
+          if (!request.signal.aborted) setEndingAllowance(allowance);
+          return allowance;
+        });
+      }
       if (message) dispatch(message);
     };
     const onDisconnected = () => dispatch({ action: "board_reset" });
     room.on(RoomEvent.Disconnected, onDisconnected);
     room.on(RoomEvent.DataReceived, onData);
     return () => {
+      allowanceRequest.current?.abort();
       room.off(RoomEvent.Disconnected, onDisconnected);
       room.off(RoomEvent.DataReceived, onData);
     };
@@ -303,6 +322,9 @@ function SessionScreen({
   const start = async (lessonSlug: string | null = null) => {
     if (starting) return;
     onLockLanguage();
+    allowanceRequest.current?.abort();
+    allowanceRead.current = null;
+    setEndingAllowance(null);
     dispatch({ action: "session_reset" });
     pendingLesson.current = lessonSlug;
     setFailed(false);
@@ -339,6 +361,12 @@ function SessionScreen({
         throw error;
       }
     } catch (error) {
+      if (error instanceof AllowanceUsedUpError) {
+        /* رُفض البدء بعد قراءة الصفحة؛ نعيد قراءة الاستخدام وموعد التجدد من الخادم. */
+        setStarted(false);
+        router.refresh();
+        return;
+      }
       console.error("Failed to start session:", error);
       setFailed(true);
     } finally {
@@ -346,7 +374,7 @@ function SessionScreen({
     }
   };
 
-  /* الخروج إلى ملخّص الجلسة — بطلب الطالب أو ببلوغ الحدّ */
+  /* الخروج إلى صفحة المقرر مع اسم الغرفة، فتعرض بطاقة تقييم الحصة — بطلب الطالب أو ببلوغ الحدّ */
   const finish = useCallback(
     async (reason: "user" | "limit") => {
       if (finishing.current) return;
@@ -354,13 +382,11 @@ function SessionScreen({
       const room = sessionRef.current.room.name;
       await studentQuestion.close("cancel_turn");
       await sessionRef.current.end().catch(() => undefined);
-      const q = new URLSearchParams();
-      if (room) q.set("room", room);
-      if (reason === "limit") q.set("limit", "1");
-      const qs = q.toString();
-      router.push(`/session/${courseSlug}/${chapterNo}/done${qs ? `?${qs}` : ""}`);
+      /* القراءة بدأت مع الإشارة؛ لا مؤقّت جديد ولا مسار إنهاء ثانٍ. */
+      if (reason === "limit") await allowanceRead.current;
+      router.push(courseAfterSessionHref(courseSlug, { room: room || null, limit: reason === "limit" }));
     },
-    [router, courseSlug, chapterNo, studentQuestion],
+    [router, courseSlug, studentQuestion],
   );
 
   useEffect(() => {
@@ -379,6 +405,7 @@ function SessionScreen({
   /* ————— المرحلة المعروضة — اشتقاق نقيّ ————— */
   const cs = session.connectionState;
   const ending = state.ending || userEnding;
+  const endingQuota = sessionEndingQuota(state, endingAllowance);
   let phase: Phase;
   if (ending) phase = "ending";
   else if (
@@ -540,6 +567,7 @@ function SessionScreen({
               estimate: (chunks) => <span dir="ltr">{chunks}</span>,
             })}
           </p>
+          {minutesRemaining !== null ? <RemainingMinutes count={minutesRemaining} /> : null}
           <LanguageChoice value={language} onChange={onLanguage} />
           {lessons.length > 0 ? (
             <p className="mt-6 text-sm text-ink-2">{t("chooseLesson")}</p>
@@ -587,24 +615,29 @@ function SessionScreen({
           />
         ) : null}
 
-        {/* السبورة — الثلثان، والشريط يسبح فوقها */}
-        <main className="relative flex min-w-0 flex-[2] flex-col">
-          <Board
+        {/* السبورة — 60%، والشريط يسبح فوقها. جوال: 3 أجزاء من 5 ارتفاعًا؛
+            ديسكتوب: 3 من 5 من عرض الصفّ بعد العمود الضيّق، ولا تنزل عن 20rem */}
+        <main className="relative flex min-w-0 flex-[3] flex-col md:min-w-[20rem]">
+          {endingQuota ? (
+            <div role="status" className="flex min-h-0 flex-1 flex-col justify-center overflow-y-auto p-5 md:p-8">
+              <QuotaBlock {...endingQuota} surface="session" />
+            </div>
+          ) : <Board
             board={state.board}
             speaking={phase === "live"}
             intro={intro}
             reduce={reduce}
             language={language}
-          />
+          />}
 
-          {chat && inRoom ? (
+          {!endingQuota && chat && inRoom ? (
             <ChatPanel
               onSend={sendText}
               onClose={() => setChat(false)}
             />
           ) : null}
 
-          <Toolbar
+          {!endingQuota ? <Toolbar
             phase={phase}
             hint={phase === "idle"}
             canAsk={canAsk}
@@ -625,12 +658,14 @@ function SessionScreen({
             onSlides={() => setShowSlides((v) => !v)}
             onTopics={onTopics}
             onEnd={() => setConfirmEnd(true)}
-          />
+          /> : null}
         </main>
 
-        {/* الثلث — الشرائح تملأ العمود كاملًا */}
+        {/* 40% — جزءان من 5 بعد السبورة (ارتفاعًا على الجوال، وعرضًا على
+            الديسكتوب)، والشرائح تملأ العمود كاملًا. ولا ينزل عن 19rem حتى
+            تبقى البطاقة مقروءة عند 768px */}
         {showSlides ? (
-          <aside className="flex min-h-0 w-full flex-1 flex-col md:w-[19rem] md:flex-none md:shrink-0">
+          <aside className="flex min-h-0 w-full flex-[2] flex-col md:min-w-[19rem] md:basis-0">
             <SlidesPane url={pdfUrl} agentPage={state.page} />
           </aside>
         ) : null}
@@ -676,21 +711,5 @@ function SessionScreen({
       <RoomAudioRenderer />
       <PacketRecorderButtons recorder={recorder} />
     </Shell>
-  );
-}
-
-/* الغلاف — سطح الجلسة الداكن، والدخول تلاشٍ 250ms */
-function Shell({ children, reduce }: { children: React.ReactNode; reduce: boolean }) {
-  return (
-    <motion.div
-      data-theme="dark"
-      data-surface="session"
-      initial={reduce ? false : { opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.25 }}
-      className="relative flex h-dvh flex-col bg-ground text-ink"
-    >
-      {children}
-    </motion.div>
   );
 }

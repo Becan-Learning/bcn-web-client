@@ -5,13 +5,24 @@ import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { Document, Page, pdfjs } from "react-pdf";
 import { Dialog } from "radix-ui";
 import { ArrowBack, ArrowForward, ExpandIcon, ShrinkIcon } from "@/components/becan/icons";
+import {
+  DEFAULT_SLIDE_RATIO,
+  centerDelta,
+  currentSlide,
+  isWithin,
+  slideMark,
+  slideRatio,
+  type PickedSlide,
+  type SlideMark,
+} from "@/lib/session/slides";
 import { SlidesMessage } from "./parts";
 
 /* لوح الشرائح — ملف PDF الحقيقي عبر react-pdf.
 
    كومة بطاقات كتصميم الجلسة: رأسية على الديسكتوب وأفقية على الجوال.
    الشريحة المفتوحة تتبع طلب الوكيل (`scroll`)، واختيار الطالب يغلب
-   التتبّع حتى يطلب الوكيل شريحة أخرى. والعامل يُحزَم محليًا من
+   التتبّع حتى يطلب الوكيل شريحة أخرى. شريحة المعلّم وحدها تحمل وسم
+   «الآن»، وبقية البطاقات خافتة. والعامل يُحزَم محليًا من
    pdfjs-dist بنسخة react-pdf نفسها — لا CDN خارجي. */
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -50,6 +61,13 @@ function useSize() {
   return [ref, size] as const;
 }
 
+const MARK_CLASS: Record<SlideMark, string> = {
+  now: "border-[3px] border-warmth ring-4 ring-warmth/35",
+  start: "border-[3px] border-warmth ring-4 ring-warmth/35",
+  picked: "border-[3px] border-ink-2",
+  other: "border border-line opacity-50 hover:opacity-100 focus-within:opacity-100",
+};
+
 const reducedMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -65,14 +83,17 @@ export function SlidesPane({
   const format = useFormatter();
   const number = (value: number) => format.number(value, { numberingSystem: "latn" });
   const [numPages, setNumPages] = useState(0);
-  const [picked, setPicked] = useState<{ page: number; agentPage: number | null } | null>(null);
+  const [picked, setPicked] = useState<PickedSlide | null>(null);
   const [zoom, setZoom] = useState<number | null>(null);
   /* الشرائح التي اقتربت من المرأى مرة — تُرسم وتبقى مرسومة */
   const [seen, setSeen] = useState<ReadonlySet<number>>(() => new Set());
   const [cardRef, cardWidth] = useWidth();
   const [zoomRef, zoomBox] = useSize();
-  /* نسبة الصفحة من ملف PDF نفسه، و16:9 إلى أن تُحمَّل */
-  const [ratio, setRatio] = useState(16 / 9);
+  /* نسبة البطاقات من أول صفحة في الملف، و4:3 إلى أن تُقرأ — فلا تُقصّ الشريحة */
+  const [docRatio, setDocRatio] = useState(DEFAULT_SLIDE_RATIO);
+  /* نسبة الشريحة المكبَّرة نفسها إن اختلفت عن الأولى */
+  const [zoomRatio, setZoomRatio] = useState<number | null>(null);
+  const ratio = zoomRatio ?? docRatio;
   /* الشريحة المكبَّرة تتّسع كاملةً بلا تمرير: أصغر العرضين، عرض الحاوية
      أو ما يسمح به ارتفاعها — ناقص حدّ الإطار (2px من كل جهة) */
   const zoomWidth = Math.max(
@@ -82,19 +103,32 @@ export function SlidesPane({
   const listRef = useRef<HTMLOListElement>(null);
 
   const clamp = (p: number) => (numPages > 0 ? Math.min(Math.max(p, 1), numPages) : p);
-  /* اختيار الطالب قائم ما دام الوكيل لم يطلب غير ما كان يطلبه لحظته */
-  const page =
-    picked && picked.agentPage === agentPage ? clamp(picked.page) : clamp(agentPage ?? 1);
+  const current = currentSlide({ picked, agentPage, numPages });
+  const { page, pickedActive } = current;
 
+  /* شريحة المعلّم تُوسَّط في العمود (رأسيًا على الديسكتوب وأفقيًا على الجوال)؛
+     وشريحة اختارها الطالب لا تُحرَّك إن كانت ظاهرة كاملة. التمرير داخل القائمة
+     وحدها (`scrollBy`) لا `scrollIntoView` فلا تتحرّك الحاويات فوقها.
+     يُعاد عند تغيّر النسبة لأن أطوال البطاقات تتغيّر. */
   useEffect(() => {
-    listRef.current
-      ?.querySelector(`[data-page="${page}"]`)
-      ?.scrollIntoView({
-        block: "nearest",
-        inline: "center",
-        behavior: reducedMotion() ? "auto" : "smooth",
-      });
-  }, [page, numPages]);
+    const list = listRef.current;
+    const card = list?.querySelector<HTMLElement>(`[data-page="${page}"]`);
+    if (!list || !card) return;
+    const c = list.getBoundingClientRect();
+    const i = card.getBoundingClientRect();
+    if (
+      pickedActive &&
+      isWithin(c.top, c.height, i.top, i.height) &&
+      isWithin(c.left, c.width, i.left, i.width)
+    ) {
+      return;
+    }
+    list.scrollBy({
+      top: centerDelta(c.top, c.height, i.top, i.height),
+      left: centerDelta(c.left, c.width, i.left, i.width),
+      behavior: reducedMotion() ? "auto" : "smooth",
+    });
+  }, [page, pickedActive, numPages, ratio]);
 
   /* رسم كسول بلا سقف: كل بطاقة تُرسم حين تقترب من المرأى (بهامش 600px
      في المحورين — رأسيًا على الديسكتوب وأفقيًا على الجوال)، ولا تُفكّ
@@ -135,7 +169,15 @@ export function SlidesPane({
   return (
     <Document
       file={url}
-      onLoadSuccess={({ numPages: n }) => setNumPages(n)}
+      onLoadSuccess={async (pdf) => {
+        setNumPages(pdf.numPages);
+        try {
+          const viewport = (await pdf.getPage(1)).getViewport({ scale: 1 });
+          setDocRatio(slideRatio(viewport.width, viewport.height));
+        } catch {
+          /* تبقى 4:3 */
+        }
+      }}
       loading={<SlidesMessage text={t("loadingSlides")} />}
       error={<SlidesMessage text={t("Slides.loadError")} />}
       className="flex min-h-0 flex-1 flex-col"
@@ -146,30 +188,30 @@ export function SlidesPane({
         className="no-scrollbar flex min-h-0 flex-1 gap-3 overflow-x-auto px-1.5 py-1 md:flex-col md:overflow-x-hidden md:overflow-y-auto"
       >
         {Array.from({ length: numPages }, (_, i) => i + 1).map((p) => {
-          const open = p === page;
+          const mark = slideMark(p, current);
           const drawn = seen.has(p) || Math.abs(p - page) <= 1;
           return (
-            <li key={p} data-page={p} className="w-[72%] shrink-0 md:w-auto">
-              {/* الإطار الجوزيّ يشير إلى الشريحة المفتوحة — حدّ لا يحمل نصًا */}
+            <li key={p} data-page={p} className="w-[85%] shrink-0 md:w-auto">
+              {/* الإطار الجوزيّ يشير إلى شريحة المعلّم — حدّ لا يحمل نصًا؛
+                  واختيار الطالب إطار محايد، وغيرهما خافتة حتى يُمرَّر عليها */}
               <div
-                className={`relative overflow-hidden rounded-lg bg-panel transition-colors ${
-                  open ? "border-[3px] border-warmth ring-4 ring-warmth/35" : "border border-line"
-                }`}
+                className={`relative overflow-hidden rounded-lg bg-panel transition-[opacity,border-color] motion-reduce:transition-none ${MARK_CLASS[mark]}`}
               >
                 <button
                   type="button"
                   onClick={() => setPicked({ page: p, agentPage })}
-                  aria-current={open ? "true" : undefined}
+                  aria-current={mark === "now" || mark === "start" ? "true" : undefined}
                   aria-label={t("Slides.slide", { number: number(p) })}
                   /* الحاوية تقصّ ما خارجها، فالحلقة ترتسم داخل الزرّ */
                   className="block w-full focus-visible:outline-offset-[-3px]"
                 >
-                  {/* aspect-video على الفارغة أيضًا: للبطاقة حجمها الحقيقي
-                      قبل الرسم فيرصدها المراقب في موضعها */}
+                  {/* نسبة الملف نفسها على الفارغة أيضًا: للبطاقة حجمها الحقيقي
+                      قبل الرسم فيرصدها المراقب في موضعها، ولا تُقصّ الشريحة */}
                   <span
-                    ref={open ? cardRef : undefined}
+                    ref={p === page ? cardRef : undefined}
                     dir="ltr"
-                    className="block aspect-video w-full overflow-hidden"
+                    style={{ aspectRatio: docRatio }}
+                    className="block w-full overflow-hidden"
                   >
                     {drawn && cardWidth > 0 ? (
                       <Page
@@ -182,6 +224,13 @@ export function SlidesPane({
                     ) : null}
                   </span>
                 </button>
+
+                {mark === "now" ? (
+                  <span className="pointer-events-none absolute top-1 start-1 inline-flex items-center gap-1.5 rounded-pill bg-ground/85 px-2 py-0.5 text-xs font-semibold text-ink">
+                    <span aria-hidden className="h-1.5 w-1.5 rounded-pill bg-live" />
+                    {t("Slides.now")}
+                  </span>
+                ) : null}
 
                 <div className="absolute top-1 end-1 flex items-center gap-1">
                   <span className="rounded-pill bg-ground/85 px-1.5 text-[10px] font-semibold text-ink">
@@ -201,7 +250,7 @@ export function SlidesPane({
                 </div>
 
                 {/* «ابدأ الشرح من هنا» — لا ربط بعد بين الشريحة ودرسها عند الوكيل */}
-                {picked?.page === p && picked.agentPage === agentPage ? (
+                {pickedActive && picked?.page === p ? (
                   <div className="absolute inset-x-0 bottom-0 flex justify-center p-2">
                     <button
                       type="button"
@@ -276,7 +325,7 @@ export function SlidesPane({
                       loading={null}
                       onLoadSuccess={(pg) => {
                         if (pg.originalWidth > 0 && pg.originalHeight > 0) {
-                          setRatio(pg.originalWidth / pg.originalHeight);
+                          setZoomRatio(slideRatio(pg.originalWidth, pg.originalHeight));
                         }
                       }}
                     />

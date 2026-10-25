@@ -1,12 +1,12 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { hasLocale } from "next-intl";
-import { localize } from "@/i18n/localized";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import type { Metadata } from "next";
 import { SettingsCard, SettingsShell } from "../_shell";
-import { SUBSCRIPTION } from "@/lib/data/billing";
 import { DeleteForm } from "./delete-form";
+import { requireAccount } from "@/lib/auth/session";
+import { accountReturnPath } from "@/lib/auth/next-path";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/settings/delete">): Promise<Metadata> {
   const { locale } = await params;
@@ -15,19 +15,12 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/settings
   return { title: t("metadataTitle") };
 }
 
-/* S4 — حذف الحساب، صفحة منفصلة كما يطلب البريف.
-
-   تشرح **ماذا يُحذف وماذا يبقى ومدة التنفيذ** قبل أي زرّ، فالقرار
-   مبنيّ على معرفة لا على تحذير عام.
-
-   ⚠️ المدد هنا (30 يومًا للحذف، 7 أيام للتراجع، مدة حفظ الفواتير)
-   تحتاج تثبيتها مع الفريق التقني ومراجعة المستشار القانوني وفق
-   نظام حماية البيانات الشخصية. */
+/* تسبق آثار الحذف التأكيد حتى يبني الطالب قراره على معرفة. */
 
 const DELETED = [
   "deletedAccount",
   "deletedSessions",
-  "deletedProgress",
+  "deletedEnrollments",
   "deletedPreferences",
   "deletedAudio",
 ] as const;
@@ -41,6 +34,9 @@ export default async function DeletePage(props: PageProps<"/[locale]/settings/de
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  const sp = await props.searchParams;
+  await requireAccount(locale, accountReturnPath("/settings/delete", sp));
+  const googleError = (Array.isArray(sp.error) ? sp.error[0] : sp.error) || "";
   const t = await getTranslations("Settings.Delete");
 
   return (
@@ -72,9 +68,7 @@ export default async function DeletePage(props: PageProps<"/[locale]/settings/de
           </p>
         </SettingsCard>
 
-        <DeleteForm
-          activeUntil={SUBSCRIPTION.canceled ? null : localize(SUBSCRIPTION.renewsOn, locale)}
-        />
+        <DeleteForm googleError={googleError} />
       </div>
     </SettingsShell>
   );

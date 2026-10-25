@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getTranslations, getLocale } from "next-intl/server";
 import { localize } from "@/i18n/localized";
 import {
@@ -24,7 +25,9 @@ const HEAD = BOARD.find((b) => b.kind === "head");
 const ITEMS = BOARD.filter((b) => b.kind === "item").slice(0, 2);
 const PENALTY = BOARD.find((b) => b.kind === "penalty");
 
-/** أول شريحة يمرّ بها الفصل — من خريطة المواضيع نفسها. */
+/** أول شريحة يمرّ بها الفصل — من خريطة المواضيع نفسها.
+    الصورة `public/slides/hero-slide-<N>.webp` مولَّدة من هذه الصفحة؛ إن تغيّر
+    الرقم فأعد توليدها: `scripts/render-hero-slide.py`. */
 const SLIDE = SLIDE_OF_TOPIC[0];
 const TOPICS = TOPICS_META.length;
 
@@ -153,28 +156,28 @@ function TopicsRail() {
 }
 
 /** عمود الشرائح — الشريحة المفتوحة يؤطّرها الجوزيّ كما في الجلسة.
-    الإطار مكبَّر عن غلافه ليُقصّ مؤشّرا تمرير عارض الـPDF. */
+    صورة ثابتة بنسبة الصفحة الحقيقية 4:3 (720×540) بلا قصّ — عارض الـPDF
+    المدمج لا يصلح لمربّع بهذا الصغر. الملف مضغوط أصلًا بثلاثة أضعاف العرض
+    المعروض، فيُخدَم كما هو (`unoptimized`) بلا إعادة ترميز. */
 async function SlidesColumn() {
   const t = await getTranslations("Landing.Demo");
   return (
     <div className="hidden w-24 shrink-0 flex-col gap-2 md:flex">
-      <span
-        className="relative block aspect-[16/10] w-full overflow-hidden rounded-md border-2 border-warmth"
-      >
-        <iframe
-          title={t("slideTitle")}
-          loading="lazy"
-          src={`/slides/slides.pdf#page=${SLIDE}&toolbar=0&navpanes=0&statusbar=0&view=FitH`}
-          className="absolute top-0 start-0 h-[calc(100%+22px)] w-[calc(100%+22px)]"
-        />
-      </span>
+      <Image
+        src={`/slides/hero-slide-${SLIDE}.webp`}
+        alt={t("slideTitle")}
+        width={288}
+        height={216}
+        unoptimized
+        className="block aspect-[4/3] w-full rounded-md border-2 border-warmth bg-panel"
+      />
 
       {/* شريحتان تاليتان مطويّتان — تقولان إن الكومة أطول */}
       {[1, 2].map((n) => (
         <span
           key={n}
           aria-hidden="true"
-          className="block aspect-[16/10] w-full rounded-md border border-line bg-panel"
+          className="block aspect-[4/3] w-full rounded-md border border-line bg-panel"
         />
       ))}
     </div>

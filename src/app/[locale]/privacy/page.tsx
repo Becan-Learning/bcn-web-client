@@ -128,7 +128,7 @@ export default async function PrivacyPage(props: PageProps<"/[locale]/privacy">)
       body: (
         <>
           <Points
-            items={(["item1", "item2", "item3", "item4"] as const).map((item) =>
+            items={(["item1", "item2", "item4"] as const).map((item) =>
               t(`sections.why.points1.${item}`),
             )}
           />

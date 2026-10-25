@@ -1,3 +1,4 @@
+/* مسودّة معطّلة وغير قابلة للوصول حتى تتوفّر بوابة دفع. */
 import type { Localized } from "@/i18n/localized";
 
 /* الخطط — مصدر واحد لصفحة الخطط والدفع والاشتراك والفواتير.
@@ -29,7 +30,7 @@ export type Plan = {
 export const PLANS: Plan[] = [
   {
     id: "free",
-    name: { ar: "مجاني", en: "Free" },
+    name: { ar: "مجانية", en: "Free" },
     price: 0,
     minutes: 60,
     hours: { ar: "≈ ساعة مذاكرة موجّهة", en: "≈ 1 hour of guided study" },

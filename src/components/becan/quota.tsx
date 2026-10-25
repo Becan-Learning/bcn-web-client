@@ -1,83 +1,71 @@
 import { useFormatter, useTranslations } from "next-intl";
+import { formatRenewalDate } from "@/lib/allowance/format";
 import { Link } from "@/i18n/navigation";
-import { ArrowForward } from "./icons";
-import { PrimaryButton } from "./kit";
 
-/* P6 — «نفدت دقائقك».
+/* حدود الاستخدام — كتلة لا نافذة، لا تقطع الحصة الجارية.
 
-   شاشة الإيراد الفعلية، وتظهر في أسوأ لحظة: منتصف مذاكرة ليلة
-   اختبار. لهذا:
+   - كهرمانية في الموقع، وسطح هادئ في الحصة؛ الأحمر محجوز للخطأ.
+   - ما أنجزه قبل ما ينقصه: نذكر المذاكرة أو التسجيل قبل الخطوة التالية.
+   - روابط المقررات هادئة: يبقى زر كهرماني أساسي واحد للشاشة (النمط ٨).
 
-   - **كتلة لا نافذة**: لا تحجب الشاشة ولا تقطع الجلسة الجارية.
-     الجلسة الحالية تُكمَل حتى نهايتها ثم يظهر الحدّ.
-   - **كهرمانية لا حمراء**: الإلحاح كهرماني هادئ (النمط ٧)، والأحمر
-     محجوز للخطأ.
-   - **ما أنجزه قبل ما ينقصه**: «ذاكرت 60 دقيقة» تسبق ذكر الحدّ.
-     العكس يقرأ كعقوبة.
-   - **الترقية مربوطة بالاختبار القادم** لا بميزة مجرّدة.
+   ممنوع فيها: «للأسف» · «انتهت صلاحيتك» · عدّاد تنازلي · سعر أو ترقية. */
 
-   ممنوع فيها: «للأسف» · «انتهت صلاحيتك» · عدّاد تنازلي · أي أحمر. */
+export type HeldCourse = { id: string; name: string };
 
-export function QuotaBlock({
-  studied,
-  chaptersLeft,
-  price,
-  minutes,
-  /** الأساسي يكون في مكان آخر من الشاشة أحيانًا — عندها يهدأ زرّها */
-  quiet,
-}: {
-  studied: number;
-  chaptersLeft: number;
-  price: number;
-  minutes: number;
-  quiet?: boolean;
-}) {
+export type CourseSlotQuota = { courses: HeldCourse[]; limit: number };
+
+type QuotaBlockProps = { id?: string; surface?: "site" | "session" } & (
+  | { kind: "used-up"; minutesStudied: number; sessionsUsed: number; renewalDate: Date }
+  | ({ kind: "slots-full" } & CourseSlotQuota)
+);
+
+export function QuotaBlock(props: QuotaBlockProps) {
   const t = useTranslations("Quota");
   const format = useFormatter();
   const number = (value: number) => format.number(value, { numberingSystem: "latn" });
+  const skin = (props.surface ?? "site") === "session" ? "border border-line bg-panel" : "bg-tint-amber";
+
   return (
-    <section className="rounded-xl bg-tint-amber p-5 md:p-6">
-      <h2 className="text-xl font-bold text-ink md:text-2xl">
-        {t("title")}
-      </h2>
-
-      {/* الإنجاز أولًا ثم الحدّ، والحدّ مربوط بما ينتظره لا بميزة */}
-      <p className="mt-3 max-w-measure leading-base text-ink-2">
-        {t.rich("progress", {
-          studied,
-          studiedLabel: number(studied),
-          chaptersLeft,
-          chaptersLabel: number(chaptersLeft),
-          strong: (chunks) => <span className="font-semibold text-ink">{chunks}</span>,
-        })}
-      </p>
-
-      <div className="mt-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-        {quiet ? (
-          <Link
-            href="/plans"
-            className="inline-flex h-12 items-center justify-center rounded-pill border border-aubergine-mid px-6 font-semibold text-aubergine-base"
-          >
-            {t("continue", { price: number(price) })}
-          </Link>
-        ) : (
-          <PrimaryButton href="/plans" className="w-full sm:w-fit">
-            {t("continue", { price: number(price) })}
-          </PrimaryButton>
-        )}
-
-        <Link
-          href="/plans"
-          className="group inline-flex min-h-11 items-center gap-2 px-2 font-semibold text-ink"
-        >
-          {t("plans")}
-          <ArrowForward className="h-4 w-4 transition-transform duration-200 rtl:group-hover:-translate-x-1 ltr:group-hover:translate-x-1" />
-        </Link>
-      </div>
-
-      <p className="mt-3 text-sm text-ink-2">
-        {t("allowance", { minutes, minutesLabel: number(minutes) })}
-      </p>
+    <section id={props.id} className={`max-w-2xl scroll-mt-6 rounded-xl p-5 text-ink md:p-6 ${skin}`}>
+      {props.kind === "used-up" ? (
+        <>
+          <p className="text-lg leading-base font-semibold">
+            {t("usedUp.progress", {
+              minutes: props.minutesStudied,
+              minutesLabel: number(props.minutesStudied),
+              sessions: props.sessionsUsed,
+              sessionsLabel: number(props.sessionsUsed),
+            })}
+          </p>
+          {props.surface === "session" ? (
+            <p className="mt-3 leading-base text-ink-2">{t("usedUp.nextSession", { date: formatRenewalDate(format, props.renewalDate) })}</p>
+          ) : (
+            <>
+              <p className="mt-3 leading-base text-ink-2">{t("usedUp.limit")}</p>
+              <p className="mt-3 leading-base text-ink-2">{t("usedUp.renewal", { date: formatRenewalDate(format, props.renewalDate) })}</p>
+            </>
+          )}
+        </>
+      ) : (
+        <>
+          <p className="text-lg leading-base font-semibold">
+            {t.rich("slotsFull.enrolled", {
+              courses: () => <>{format.list(props.courses.map((course) => (
+                <Link key={course.id} href={`/c/${course.id}`} dir="auto"
+                  className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm px-1 underline underline-offset-4 hover:text-aubergine-base">
+                  {course.name}
+                </Link>
+              )))}</>,
+            })}
+          </p>
+          <p className="mt-3 max-w-measure leading-base text-ink-2">
+            {t("slotsFull.rule", { count: props.limit, countLabel: number(props.limit) })}
+          </p>
+          <p className="mt-3 max-w-measure leading-base text-ink-2">
+            {t("slotsFull.release", { count: props.courses.length })}
+          </p>
+        </>
+      )}
     </section>
   );
 }

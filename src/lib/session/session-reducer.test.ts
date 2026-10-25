@@ -11,6 +11,41 @@ const checkpoint = { id: "t3-q:1", question: "Question?", choices: ["one", "two"
 const open = () => sessionReducer(INITIAL_SESSION_STATE, { action: "set_checkpoint", checkpoint });
 const idle = { busy: false, startedAt: null };
 
+describe("allowance ending", () => {
+  it("records the marker without ending and retains it through session_ending and disconnect", () => {
+    const reached = sessionReducer(INITIAL_SESSION_STATE, { action: "allowance_reached" });
+    expect(reached).toMatchObject({ allowanceReached: true, ending: false, endingMessage: null });
+    const ended = sessionReducer(reached, { action: "session_ending", message: "budget" });
+    expect(ended).toMatchObject({ allowanceReached: true, ending: true, endingMessage: "budget" });
+    expect(sessionReducer(ended, { action: "board_reset" }).allowanceReached).toBe(true);
+    expect(sessionReducer(ended, { action: "session_reset" })).toEqual(INITIAL_SESSION_STATE);
+  });
+
+  it("keeps session_ending alone generic", () => {
+    expect(sessionReducer(INITIAL_SESSION_STATE, { action: "session_ending", message: "cap" }))
+      .toMatchObject({ allowanceReached: false, ending: true, endingMessage: "cap" });
+  });
+});
+
+describe("allowance packet", () => {
+  it("accepts the fieldless action in the AgentMessage union", () => {
+    expect(parseAgentMessage({ action: "allowance_reached" })).toEqual({ action: "allowance_reached" });
+  });
+
+  it("ignores extra fields instead of using packet usage", () => {
+    expect(parseAgentMessage({ action: "allowance_reached", seconds: 999, sessions: 999 }))
+      .toEqual({ action: "allowance_reached" });
+  });
+
+  it.each([null, undefined, "allowance_reached", 1, [], ["allowance_reached"], {},
+    { action: null }, { action: 1 }, { action: ["allowance_reached"] },
+    { action: { action: "allowance_reached" } }, { action: "allowance_reached " },
+  ])("rejects malformed allowance input %#", (packet) => {
+    expect(() => parseAgentMessage(packet)).not.toThrow();
+    expect(parseAgentMessage(packet)).toBeNull();
+  });
+});
+
 describe("checkpoint wire state", () => {
   it.each([{ choices: [] }, { choices: ["one", "two"] }])("maps wire text to question with choices $choices", ({ choices }) => {
     expect(parseAgentMessage({

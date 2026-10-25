@@ -1,3 +1,4 @@
+/* مسودّة معطّلة وغير قابلة للوصول حتى تتوفّر بوابة دفع. */
 import { localize } from "@/i18n/localized";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";

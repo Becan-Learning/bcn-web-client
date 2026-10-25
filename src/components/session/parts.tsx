@@ -18,7 +18,9 @@ import {
   SlidesIcon,
   LeaveIcon,
   Waveform,
+  WhatsappIcon,
 } from "@/components/becan/icons";
+import { whatsappHref } from "@/lib/data/support";
 import { BecanGlyph } from "@/components/becan/becan-face";
 import type { Checkpoint } from "@/lib/session/session-reducer";
 
@@ -131,16 +133,30 @@ export function TopBar({
         })}
       </p>
 
-      {/* هدف اللمس 44px على الجوال، وأصغر على الديسكتوب حيث الإدخال فأرة */}
-      <button
-        type="button"
-        onClick={onExit}
-        aria-label={t("exit")}
-        title={t("exit")}
-        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill text-ink-2 hover:bg-panel pointer-fine:md:h-8 pointer-fine:md:w-8"
-      >
-        <CloseIcon className="h-4 w-4" />
-      </button>
+      {/* هدف اللمس 44px على الجوال، وأصغر على الديسكتوب حيث الإدخال فأرة.
+          الدعم رابط صغير لا قرصٌ طافٍ (النمط ١٠: تحكّم الجلسة في الثلث السفلي)،
+          ويُفتح في تبويب جديد فتستمر الحصة. */}
+      <div className="flex shrink-0 items-center">
+        <a
+          href={whatsappHref(t("supportContext", { course: courseName, number: number(chapterNo) }))}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={t("supportLabel")}
+          title={t("supportLabel")}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill text-ink-2 hover:bg-panel pointer-fine:md:h-8 pointer-fine:md:w-8"
+        >
+          <WhatsappIcon className="h-4 w-4" />
+        </a>
+        <button
+          type="button"
+          onClick={onExit}
+          aria-label={t("exit")}
+          title={t("exit")}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill text-ink-2 hover:bg-panel pointer-fine:md:h-8 pointer-fine:md:w-8"
+        >
+          <CloseIcon className="h-4 w-4" />
+        </button>
+      </div>
     </header>
   );
 }

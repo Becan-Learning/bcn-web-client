@@ -1,3 +1,4 @@
+/* مسودّة معطّلة وغير قابلة للوصول حتى تتوفّر بوابة دفع. */
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { hasLocale } from "next-intl";
 import { localize } from "@/i18n/localized";
@@ -7,6 +8,8 @@ import type { Metadata } from "next";
 import { Link } from "@/i18n/navigation";
 import { SettingsCard, SettingsShell } from "../_shell";
 import { INVOICES, invoiceRow } from "@/lib/data/billing";
+import { requireAccount } from "@/lib/auth/session";
+import { accountReturnPath } from "@/lib/auth/next-path";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/settings/invoices">): Promise<Metadata> {
   const { locale } = await params;
@@ -32,6 +35,7 @@ export default async function InvoicesPage(props: PageProps<"/[locale]/settings/
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  await requireAccount(locale, accountReturnPath("/settings/invoices", await props.searchParams));
   const t = await getTranslations("Settings.Invoices");
 
   const rows = INVOICES.map(invoiceRow);

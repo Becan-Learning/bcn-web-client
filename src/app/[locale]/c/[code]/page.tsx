@@ -1,22 +1,17 @@
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 import { hasLocale } from "next-intl";
 import { localize } from "@/i18n/localized";
 import { routing } from "@/i18n/routing";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CourseView, type ViewState } from "./course-view";
-import {
-  COURSES,
-  chaptersOf,
-  courseBySlug,
-  readyCount,
-  slugOf,
-} from "@/lib/data/catalog";
+import { getCourse, getEnrollments } from "@/lib/auth/courses";
+import { getAllowance } from "@/lib/allowance/server";
+import { slotsFull, startDecision } from "@/lib/allowance/rules";
+import { usedUpQuota } from "@/lib/allowance/presentation";
+import { RATE_PARAM, LIMIT_PARAM, readLimitReached, readRateRoom } from "@/lib/session/rating";
+import { getAccount } from "@/lib/auth/session";
 import { PageShell, Section, SiteHeader } from "@/components/becan/kit";
-
-export function generateStaticParams() {
-  return COURSES.map((c) => ({ code: slugOf(c.code) }));
-}
 
 export async function generateMetadata(
   props: PageProps<"/[locale]/c/[code]">,
@@ -24,11 +19,13 @@ export async function generateMetadata(
   const { code, locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   const t = await getTranslations({ locale, namespace: "Course" });
-  const course = courseBySlug(code);
-  if (!course) return { title: t("notFoundTitle") };
+  const result = await getCourse(code);
+  if (!result.ok) return { title: t("notFoundTitle") };
+  const course = result.data;
+  const format = await getFormatter({ locale });
   return {
     title: t("metadataTitle", { course: localize(course.name, locale) }),
-    description: t("metadataDescription", { university: localize(course.university, locale), count: readyCount(course.code), countLabel: String(readyCount(course.code)) }),
+    description: t("metadataDescription", { university: localize(course.institution.name, locale), count: course.publishedChapterCount, countLabel: format.number(course.publishedChapterCount, { numberingSystem: "latn" }) }),
   };
 }
 
@@ -38,27 +35,33 @@ export default async function CoursePage(props: PageProps<"/[locale]/c/[code]">)
   setRequestLocale(locale);
 
   const { code } = await props.params;
-  const sp = await props.searchParams;
+  const search = await props.searchParams;
+  const [result, account] = await Promise.all([getCourse(code), getAccount()]);
+  if (!result.ok) notFound();
+  const course = result.data;
+  /* الحدود مع التسجيلات: الحساب المسجَّل يحتاجها بعد الحصة (كتلة الحدود المستنفدة)، وغير المسجَّل ليعرف أهو غير محدود. */
+  const [enrollments, allowance] = account ? await Promise.all([getEnrollments(), getAllowance()]) : [null, null];
+  const enrollmentError = enrollments !== null && !enrollments.ok;
+  const baseState: ViewState = !account ? "guest" : enrollments?.ok && enrollments.data.some((e) => e.course.id === course.id) ? "enrolled" : "new";
 
-  const course = courseBySlug(code);
-  if (!course) notFound();
+  /* الحساب غير المحدود يبدأ فصلًا منشورًا دون تسجيل. */
+  const state: ViewState = baseState === "new"
+    && startDecision({ allowance: allowance?.ok ? allowance.data : null, enrolled: false, published: true }).ok
+    ? "open"
+    : baseState;
+  const slotQuota = allowance?.ok && allowance.data.limits.enrollments !== null && enrollments?.ok && slotsFull(allowance.data, enrollments.data, course.id)
+    ? {
+      limit: allowance.data.limits.enrollments,
+      courses: enrollments.data.map(({ course: held }) => ({ id: held.id, name: localize(held.name, locale) })),
+    }
+    : null;
 
-  /* حالات البريف الأربع. الافتراضي «زائر غير مسجّل» — وهو الحال
-     الحقيقي لأي قادم من صفحة البحث. */
-  /* تاريخ الاختبار المتوقّع — يُحسب على الخادم فيصل نصًّا جاهزًا،
-     فلا يختلف بين الخادم والعميل. أرقام لاتينية صراحةً بـ nu-latn
-     لأن لغة ar تعطي أرقامًا هندية في بعض البيئات. */
-  const exam = new Date();
-  exam.setDate(exam.getDate() + 21);
-  const examDate = new Intl.DateTimeFormat(locale === "ar" ? "ar-u-nu-latn-ca-gregory" : "en", {
-    numberingSystem: "latn",
-    calendar: "gregory",
-    day: "numeric",
-    month: "long",
-  }).format(exam);
-
-  const raw = Array.isArray(sp.state) ? sp.state[0] : sp.state;
-  const state: ViewState = raw === "new" || raw === "progress" ? raw : "guest";
+  /* بعد الحصة: كتلة الحدود المستنفدة لمن يملك حصةً هنا (كانت في ملخّص الحصة)، وجملة بلوغ وقت الحصة إن لم تكن الحدود مستنفدة.
+     بطاقة التقييم للحساب وحده؛ الضيف لا حصة له. */
+  const startsHere = state === "enrolled" || state === "open";
+  const usedUp = startsHere ? usedUpQuota(allowance?.ok ? allowance.data : null) : null;
+  const limitNotice = startsHere && usedUp === null && readLimitReached(search[LIMIT_PARAM]);
+  const rateRoom = account ? readRateRoom(search[RATE_PARAM]) : null;
 
   return (
     <PageShell withFooter>
@@ -67,10 +70,13 @@ export default async function CoursePage(props: PageProps<"/[locale]/c/[code]">)
       <Section className="pt-10 pb-16 md:pt-14">
         <CourseView
           course={course}
-          chapters={chaptersOf(course.code)}
-          readyCount={readyCount(course.code)}
+          chapters={course.chapters}
+          enrollmentError={enrollmentError}
           state={state}
-          examDate={examDate}
+          slotQuota={slotQuota}
+          usedUp={usedUp}
+          limitNotice={limitNotice}
+          rateRoom={rateRoom}
         />
       </Section>
     </PageShell>

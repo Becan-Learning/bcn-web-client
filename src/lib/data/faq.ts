@@ -30,7 +30,7 @@ export const FAQ: FaqGroup[] = [
         q: { ar: "وش الفرق بينك وبين ChatGPT؟", en: "How is Becan different from ChatGPT?" },
         a: [
           { ar: "ChatGPT يجاوب على السؤال اللي تكتبه. بيكان يشرح لك مقررك أنت: يبدأ من الفصل اللي عندك، ويمشي على مواضيعه بالترتيب، ويكتب على سبورة قدامك وهو يتكلّم.", en: "With ChatGPT, you type a question and get an answer. With Becan, you study your course: start from your chapter, follow its topics in order, and see notes written on the board as you listen." },
-          { ar: "الفرق العملي في ثلاثة أشياء: المحتوى مبني على مصادر مقررك لا على معرفة عامة، وبيكان يسألك بعد كل موضوع عشان يتأكّد إنك فهمت لا عشان يكمّل الكلام، ويطلع لك في آخر الجلسة وين تعثّرت بالضبط ووش الخطأ اللي يفقدك الدرجة فيه.", en: "There are three practical differences: the content uses your course sources; you answer a question after each topic to check your understanding; and you finish with a summary of where you struggled and which mistakes could cost you marks." },
+          { ar: "الفرق العملي في ثلاثة أشياء: المحتوى مبني على مصادر مقررك لا على معرفة عامة، وبيكان يسألك بعد كل موضوع عشان يتأكّد إنك فهمت لا عشان يكمّل الكلام، ويطلع لك في آخر الحصة وين تعثّرت بالضبط ووش الخطأ اللي يفقدك الدرجة فيه.", en: "There are three practical differences: the content uses your course sources; you answer a question after each topic to check your understanding; and you finish with a summary of where you struggled and which mistakes could cost you marks." },
           { ar: "وأنت ما ترفع شيء ولا تكتب برومبت — تختار مقررك وفصلك وبس.", en: "You don’t need to upload anything or write a prompt. Just choose your course and chapter." },
         ],
       },
@@ -43,7 +43,7 @@ export const FAQ: FaqGroup[] = [
       {
         q: { ar: "أقدر أستخدمه على الجوال؟", en: "Can I use it on my phone?" },
         a: [
-          { ar: "إي. الجلسة تشتغل على الجوال، والأفضل بالوضع الأفقي عشان السبورة تاخذ مساحتها — ونبّهك لها أول ما تبدأ.", en: "Yes. Sessions work on your phone. Landscape gives the board more room — you’ll see a reminder when you start." },
+          { ar: "إي. الحصة تشتغل على الجوال، والأفضل بالوضع الأفقي عشان السبورة تاخذ مساحتها — ونبّهك لها أول ما تبدأ.", en: "Yes. Sessions work on your phone. Landscape gives the board more room — you’ll see a reminder when you start." },
         ],
       },
     ],
@@ -62,7 +62,7 @@ export const FAQ: FaqGroup[] = [
       {
         q: { ar: "ليش بعض الفصول مكتوب عليها «قريبًا»؟", en: "Why do some chapters say “Coming soon”?" },
         a: [
-          { ar: "لأن محتواها ما جهز بعد. ما نفتح فصلًا قبل ما يكتمل شرحه ويُراجَع — نفضّل نقول لك «مو جاهز» على إن ندخّلك جلسة ناقصة.", en: "Their content isn’t ready yet. A chapter opens once its explanation is prepared and reviewed, so you don’t start an unfinished session." },
+          { ar: "لأن محتواها ما جهز بعد. ما نفتح فصلًا قبل ما يكتمل شرحه ويُراجَع — نفضّل نقول لك «مو جاهز» على إن ندخّلك حصة ناقصة.", en: "Their content isn’t ready yet. A chapter opens once its explanation is prepared and reviewed, so you don’t start an unfinished session." },
         ],
       },
     ],
@@ -84,41 +84,43 @@ export const FAQ: FaqGroup[] = [
         a: [
           { ar: "أول شيء: تأكّد إن المتصفّح أخذ الإذن. إذا رفضته أول مرة، افتح إعدادات الموقع في متصفّحك وفعّل الميكروفون ثم حدّث الصفحة.", en: "First, check your browser’s microphone permission. If you denied it earlier, open the site settings, allow the microphone, then refresh the page." },
           { ar: "على الجوال، أقفل التطبيقات اللي تستعمل الميكروفون — المكالمات وتطبيقات التسجيل تمسكه ولا تشاركه.", en: "On your phone, close other apps using the microphone. Calls and recording apps can prevent your browser from using it." },
-          { ar: "وإذا ضل ما يشتغل، تقدر تكمّل الجلسة كتابة: تكتب سؤالك بدل ما تنطقه، وبيكان يجاوب بصوته زي ما هو.", en: "If it still doesn’t work, type your questions and continue the session. You’ll still hear the answers by voice." },
-        ],
-      },
-    ],
-  },
-  {
-    id: "money",
-    title: { ar: "الاشتراك والدفع", en: "Subscriptions and payments" },
-    questions: [
-      {
-        q: { ar: "كيف ألغي الاشتراك؟", en: "How do I cancel my subscription?" },
-        a: [
-          { ar: "من الإعدادات ← الاشتراك ← «ألغِ التجديد»، بخطوة تأكيد واحدة. ما نطلب سبب ولا نحوّلك على أحد.", en: "Go to Settings → Subscription → “Cancel renewal”, then confirm once. You don’t need to give a reason or contact anyone." },
-          { ar: "الإلغاء يوقف التجديد الجاي فقط: خطتك تكمل شغّالة بدقائقها إلى نهاية المدة اللي دفعتها، والتاريخ مكتوب لك في نفس الصفحة.", en: "Cancellation stops the next renewal. You keep your plan and minutes until the end of your paid period; the date is shown on the same page." },
-        ],
-      },
-      {
-        q: { ar: "وش يصير لو خلصت دقائقي؟", en: "What happens if I run out of minutes?" },
-        a: [
-          { ar: "الجلسة اللي أنت فيها تكمل إلى آخرها — ما نقطعها عليك.", en: "You can finish the session you’re in without interruption." },
-          { ar: "بعدها تشوف كم ذاكرت وكم باقي عليك قبل اختبارك، وتختار: ترقّي، أو تنتظر تجديد حصتك في بداية الشهر.", en: "Afterwards, see how much you’ve studied and what’s left before your exam. You can upgrade or wait for your minutes to renew at the start of the month." },
-        ],
-      },
-      {
-        q: { ar: "أقدر أدفع بمدى؟", en: "Can I pay with mada?" },
-        a: [
-          { ar: "إي، ومدى هي الخيار الأول في صفحة الدفع. وفيه Apple Pay والبطاقات الائتمانية.", en: "Yes. mada is the first option at checkout. Apple Pay and credit cards are also available." },
-        ],
-      },
-      {
-        q: { ar: "الأسعار شاملة الضريبة؟", en: "Do prices include VAT?" },
-        a: [
-          { ar: "إي، السعر اللي تشوفه هو اللي ينخصم — ما فيه رسوم تنضاف عند الدفع. والفاتورة تفصل لك الصافي عن ضريبة القيمة المضافة.", en: "Yes. You pay the price shown, with no added charges at checkout. Your invoice lists the net amount and VAT separately." },
+          { ar: "وإذا ضل ما يشتغل، تقدر تكمّل الحصة كتابة: تكتب سؤالك بدل ما تنطقه، وبيكان يجاوب بصوته زي ما هو.", en: "If it still doesn’t work, type your questions and continue the session. You’ll still hear the answers by voice." },
         ],
       },
     ],
   },
 ];
+
+/* أسئلة الاشتراك والدفع مسودّة معطّلة حتى تتوفّر بوابة دفع؛ خارج FAQ المعروضة. */
+export const PARKED_PAYMENT_FAQ: FaqGroup = {
+  id: "money",
+  title: { ar: "الاشتراك والدفع", en: "Subscriptions and payments" },
+  questions: [
+    {
+      q: { ar: "كيف ألغي الاشتراك؟", en: "How do I cancel my subscription?" },
+      a: [
+        { ar: "من الإعدادات ← الاشتراك ← «ألغِ التجديد»، بخطوة تأكيد واحدة. ما نطلب سبب ولا نحوّلك على أحد.", en: "Go to Settings → Subscription → “Cancel renewal”, then confirm once. You don’t need to give a reason or contact anyone." },
+        { ar: "الإلغاء يوقف التجديد الجاي فقط: باقتك تكمل شغّالة بدقائقها إلى نهاية المدة اللي دفعتها، والتاريخ مكتوب لك في نفس الصفحة.", en: "Cancellation stops the next renewal. You keep your plan and minutes until the end of your paid period; the date is shown on the same page." },
+      ],
+    },
+    {
+      q: { ar: "وش يصير لو خلصت دقائقي؟", en: "What happens if I run out of minutes?" },
+      a: [
+        { ar: "الحصة اللي أنت فيها تكمل إلى آخرها — ما نقطعها عليك.", en: "You can finish the session you’re in without interruption." },
+        { ar: "بعدها تشوف كم ذاكرت وكم باقي عليك قبل اختبارك، وتختار: ترقّي، أو تنتظر تجديد دقائقك.", en: "Afterwards, see how much you’ve studied and what’s left before your exam. You can upgrade or wait for your minutes to renew at the start of the month." },
+      ],
+    },
+    {
+      q: { ar: "أقدر أدفع بمدى؟", en: "Can I pay with mada?" },
+      a: [
+        { ar: "إي، ومدى هي الخيار الأول في صفحة الدفع. وفيه Apple Pay والبطاقات الائتمانية.", en: "Yes. mada is the first option at checkout. Apple Pay and credit cards are also available." },
+      ],
+    },
+    {
+      q: { ar: "الأسعار شاملة الضريبة؟", en: "Do prices include VAT?" },
+      a: [
+        { ar: "إي، السعر اللي تشوفه هو اللي ينخصم — ما فيه رسوم تنضاف عند الدفع. والفاتورة تفصل لك الصافي عن ضريبة القيمة المضافة.", en: "Yes. You pay the price shown, with no added charges at checkout. Your invoice lists the net amount and VAT separately." },
+      ],
+    },
+  ],
+};

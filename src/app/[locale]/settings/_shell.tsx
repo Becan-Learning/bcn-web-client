@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ArrowBack } from "@/components/becan/icons";
 import { PageShell, Section, SiteHeader } from "@/components/becan/kit";
+import { SignOut } from "./_sign-out";
 
 /* تخطيط الإعدادات الموحَّد — الاشتراك والفواتير معه في نفس القشرة.
 
@@ -14,10 +15,10 @@ import { PageShell, Section, SiteHeader } from "@/components/becan/kit";
    في عمود جانبي ملازم، وعلى الجوال يعود منها برابط رجوع واحد. */
 
 export type SectionId =
-  "account" | "study" | "notifications" | "subscription" | "invoices" | "data";
+  "account" | "study" | "subscription" | "invoices" | "data";
 
 export const SETTINGS_SECTIONS: {
-  id: SectionId;
+  id: Exclude<SectionId, "invoices">;
   href: string;
 }[] = [
   {
@@ -29,16 +30,8 @@ export const SETTINGS_SECTIONS: {
     href: "/settings/study",
   },
   {
-    id: "notifications",
-    href: "/settings/notifications",
-  },
-  {
     id: "subscription",
     href: "/settings/subscription",
-  },
-  {
-    id: "invoices",
-    href: "/settings/invoices",
   },
   {
     id: "data",
@@ -97,6 +90,7 @@ export async function SettingsShell({
                 );
               })}
             </ul>
+            <SignOut />
           </nav>
 
           <div className="mt-6 md:mt-0">

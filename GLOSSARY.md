@@ -22,7 +22,58 @@ The language a course's own material happens to be in — lesson names, slides, 
 the university writes them. Neither the product nor the tutor translates it.
 _Avoid_: course language, material language
 
+## Account
+
+**Account** (الحساب):
+The student's one record with Becan: who they are (name, email, phone), how they sign in, and the
+study facts that shape what they see (university, major). Nothing about the student lives outside
+it. A student has exactly one Account.
+_Avoid_: user, profile, student account, member
+
+**Sign-in method** (طريقة الدخول):
+How a student proves they own their Account: email and password, or Google. One Account can have
+both. Google does not make a second Account, and an Account created with Google has no password
+until the student adds one. Better Auth stores each method as an `account` row; that table is not our Account.
+_Avoid_: login type, provider account
+
+## Catalog
+
+**Catalog** (الكتالوج):
+Every Course Becan offers. Students choose from it; they never add to it.
+_Avoid_: library, materials
+
+**Course** (المقرر):
+One university course as one Institution teaches it, split into Chapters. The same subject at two
+Institutions is two Courses.
+_Avoid_: subject, material (مادة), class
+
+**Chapter** (الفصل):
+One numbered part of a Course, and the unit a session teaches. A Chapter is either published, so
+an enrolled student can open it, or announced as coming soon.
+_Avoid_: unit, module, section
+
+**Lesson** (الدرس):
+One of the ordered parts a Chapter is taught in; a session moves through a Chapter's Lessons in
+order. It is the smallest unit the student sees outside a session.
+_Avoid_: topic (outside a session), part
+
+**Enrollment** (التسجيل في المقرر):
+A student's hold on one Course that lets them open its Chapters. It is active from the moment
+they enroll until it ends; it ends when the student un-enrolls. An ended Enrollment is kept, never
+erased, and a student holds at most one active Enrollment per Course.
+_Avoid_: subscription, registration (that is creating an Account), membership
+
 ## Session
+
+**Session** (الحصة):
+One sitting in which the tutor teaches one student one Chapter, from the moment it starts until it
+ends. A student has at most one Session open at a time.
+_Avoid_: lesson, call, room, class; and never the sign-in sense of "session" (a Device session)
+
+**Topic** (الموضوع):
+One step inside a Lesson that the tutor marks while teaching it. It exists only inside a
+session; nothing outside a session counts or shows Topics.
+_Avoid_: lesson, section, step
 
 **Checkpoint** (سؤال الفهم):
 A question the tutor puts to the student during a session to confirm they understood a topic.
@@ -35,3 +86,30 @@ _Avoid_: question (alone), quiz, assessment, open question
 A spoken question the student deliberately starts by pressing Ask, cutting the tutor off
 mid-explanation. Outside a student question the tutor does not hear the student's voice.
 _Avoid_: question (alone), interruption, voice message
+
+**Rating** (تقييم الحصة):
+What the student says about a Session once it has ended: one to five stars and an optional note. It is asked once, in a
+small card on the Course page the student lands on after the Session, and is stored against the Session's room so it is read
+beside what the tutor recorded about it. An unrated Session is not asked again.
+_Avoid_: feedback, review, survey, summary (the removed page)
+
+## Plans
+
+**Plan** (الباقة):
+A named set of limits on what a student may use. Every student is on exactly one Plan at a time;
+at launch every student is on the Free Plan.
+_Avoid_: tier, subscription, package, خطة
+
+**Allowance** (حدود الاستخدام):
+What a Plan lets a student use in one Period: how many Sessions they may start, how many minutes
+of Session time, and how many Courses they may hold an Enrollment in at once.
+_Avoid_: quota, credits, balance, الحصة (that is a Session)
+
+**Usage** (الاستخدام):
+How much of the Allowance the student has used in the current Period.
+_Avoid_: consumption, spend
+
+**Period** (دورة الاستخدام):
+The 30-day window an Allowance applies to. When one Period ends the next begins and Usage starts
+again from zero.
+_Avoid_: month, billing cycle, cycle (alone)

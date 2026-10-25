@@ -28,6 +28,8 @@ export type SessionState = {
   handledCheckpointId: string | null;
   /** الوكيل أعلن بلوغ الحدّ الزمني */
   ending: boolean;
+  /** حدود الطالب، لا الحدّ الزمني للحصة، سبّبت النهاية */
+  allowanceReached: boolean;
   /** سببٌ تشخيصيّ من الوكيل، لا يُعرض لأنه لا يتبع لغة الطالب */
   endingMessage: string | null;
 };
@@ -41,6 +43,7 @@ export const INITIAL_SESSION_STATE: SessionState = {
   checkpoint: null,
   handledCheckpointId: null,
   ending: false,
+  allowanceReached: false,
   endingMessage: null,
 };
 
@@ -115,6 +118,9 @@ export function sessionReducer(
 
     case "topic_done":
       return { ...state, topic: null };
+
+    case "allowance_reached":
+      return { ...state, allowanceReached: true };
 
     case "session_ending":
       return { ...state, ending: true, endingMessage: action.message };

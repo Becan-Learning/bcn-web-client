@@ -44,11 +44,13 @@ export default async function CoursePage(props: PageProps<"/[locale]/c/[code]">)
   const enrollmentError = enrollments !== null && !enrollments.ok;
   const baseState: ViewState = !account ? "guest" : enrollments?.ok && enrollments.data.some((e) => e.course.id === course.id) ? "enrolled" : "new";
 
-  /* الحساب غير المحدود يبدأ فصلًا منشورًا دون تسجيل. */
+  /* الحساب غير المحدود يبدأ أي فصل دون تسجيل، والفصل غير المنشور أيضًا ليُختبر قبل نشره. */
+  const viewer = allowance?.ok ? allowance.data : null;
   const state: ViewState = baseState === "new"
-    && startDecision({ allowance: allowance?.ok ? allowance.data : null, enrolled: false, published: true }).ok
+    && startDecision({ allowance: viewer, enrolled: false, published: true }).ok
     ? "open"
     : baseState;
+  const opensUnpublished = startDecision({ allowance: viewer, enrolled: false, published: false }).ok;
   const slotQuota = allowance?.ok && allowance.data.limits.enrollments !== null && enrollments?.ok && slotsFull(allowance.data, enrollments.data, course.id)
     ? {
       limit: allowance.data.limits.enrollments,
@@ -73,6 +75,7 @@ export default async function CoursePage(props: PageProps<"/[locale]/c/[code]">)
           chapters={course.chapters}
           enrollmentError={enrollmentError}
           state={state}
+          opensUnpublished={opensUnpublished}
           slotQuota={slotQuota}
           usedUp={usedUp}
           limitNotice={limitNotice}

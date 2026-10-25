@@ -598,6 +598,7 @@
     "sources": "Other resources",
     "start": "Start the explanation",
     "soon": "Coming soon",
+    "unpublished": "Unpublished",
     "content": "Course content",
     "metadataTitle": "{course} — Becan",
     "metadataDescription": "{university} · {count, plural, one {{countLabel} ready chapter} other {{countLabel} ready chapters}}.",

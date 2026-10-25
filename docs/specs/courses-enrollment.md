@@ -63,9 +63,15 @@ Enrollment, Topic** in [GLOSSARY.md](../../GLOSSARY.md).
   - **Signed in, not enrolled:** the primary button **Enroll** sends `PUT /api/v1/me/enrollments/{id}`,
     then `router.refresh()`. Chapter cards are not links, and their action is the same Enroll.
   - **Enrolled:** no amber primary button. Each published Chapter card links to
-    `/session/{id}/{n}`, and unpublished ones show "coming soon" and are not links. A
+    `/session/{id}/{n}`, and unpublished ones show "coming soon" and are not links (except for an
+    unlimited Account, below). A
     secondary, outlined **Un-enroll** control opens a confirmation dialog (Radix, using the
     tokens). On confirm it sends `DELETE /api/v1/me/enrollments/{id}`, then `router.refresh()`.
+- **Unlimited Account (an Admin with two-factor, `/me/allowance.unlimited`):** starts every Chapter
+  without an Enrollment, unpublished ones too, so a Chapter can be tested before it is published
+  (backend ADR 0007). An unpublished Chapter card links to `/session/{id}/{n}` and carries a dashed
+  «غير منشور» / "Unpublished" label. The decision is `startDecision` (`src/lib/allowance/rules.ts`).
+  A failed allowance read shows the Student view.
 - Removed: `MiniDashboard`, mastery, chapter status, resume, Continue, and the expected exam date.
 - A chapter card shows the number, title, minutes and "N lessons" (`lessonCount`).
 
@@ -83,6 +89,8 @@ Enrollment, Topic** in [GLOSSARY.md](../../GLOSSARY.md).
 - `requireAccount`, then `GET /courses/:id` and `GET /me/enrollments` in parallel.
   - The Course or Chapter is missing, or the Chapter is unpublished → `notFound()`.
   - The student isn't enrolled → `redirect` to `/c/{id}`.
+  - An unlimited Account skips both the published and the Enrollment checks (and the Usage limits);
+    the backend issues an Admin Session token for it.
 - Content ids: `courseId = course.id`, `chapterId = ch_{n}`. Lessons come from Bunny
   (`getLessons`) and slides from `/api/fetch-bunny/courses/{id}/ch_{n}/slides.pdf`.
   `src/lib/session/content.ts` is deleted.

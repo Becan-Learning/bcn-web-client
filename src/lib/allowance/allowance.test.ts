@@ -174,8 +174,14 @@ describe("startDecision", () => {
     expect(startDecision({ allowance: unlimited(spent), enrolled: true, published: true })).toEqual({ ok: true });
     expect(startDecision({ allowance: unlimited(spent), enrolled: false, published: true })).toEqual({ ok: true });
   });
-  it("still refuses an unpublished chapter for an unlimited account", () => {
-    expect(startDecision({ allowance: unlimited(student), enrolled: true, published: false })).toEqual({ ok: false, reason: "unpublished" });
-    expect(startDecision({ allowance: unlimited(student), enrolled: false, published: false })).toEqual({ ok: false, reason: "unpublished" });
+  it("refuses an unpublished chapter before anything else for a student", () => {
+    expect(startDecision({ allowance: student, enrolled: false, published: false })).toEqual({ ok: false, reason: "unpublished" });
+    expect(startDecision({ allowance: spent, enrolled: true, published: false })).toEqual({ ok: false, reason: "unpublished" });
+    expect(startDecision({ allowance: null, enrolled: true, published: false })).toEqual({ ok: false, reason: "unpublished" });
+  });
+  it("lets an unlimited account start an unpublished chapter, enrolled or not", () => {
+    expect(startDecision({ allowance: unlimited(student), enrolled: true, published: false })).toEqual({ ok: true });
+    expect(startDecision({ allowance: unlimited(student), enrolled: false, published: false })).toEqual({ ok: true });
+    expect(startDecision({ allowance: unlimited(spent), enrolled: false, published: false })).toEqual({ ok: true });
   });
 });

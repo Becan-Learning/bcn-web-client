@@ -598,6 +598,7 @@
     "sources": "مصادر أخرى",
     "start": "ابدأ الشرح",
     "soon": "قريبًا",
+    "unpublished": "غير منشور",
     "content": "محتوى المقرر",
     "metadataTitle": "{course} — بيكان",
     "metadataDescription": "{university} · {count, plural, zero {لا فصول جاهزة} one {فصل واحد جاهز} two {فصلان جاهزان} few {{countLabel} فصول جاهزة} many {{countLabel} فصلًا جاهزًا} other {{countLabel} فصل جاهز}}.",

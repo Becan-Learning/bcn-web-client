@@ -15,9 +15,6 @@ import { ArrowForward } from "@/components/becan/icons";
 import { SubjectIcon } from "@/app/[locale]/courses/subject-icon";
 import type { Chapter, Course } from "@/lib/courses/schema";
 import { TONES } from "@/lib/courses/presentation";
-import { chapterStartable, sessionHref } from "@/lib/session/resolve";
-import { previewStartPins } from "@/lib/preview/rules";
-import { DraftBadge } from "@/components/becan/preview-badges";
 
 /* صفحة المقرر قابلة للتصفّح، وفتح الفصل يتطلّب تسجيلًا نشطًا في المقرر. */
 
@@ -27,9 +24,8 @@ const TABS = [
   { id: "sources", label: "sources", ready: false },
 ] as const;
 
-/* "open": حساب غير محدود (مشرف) غير مسجَّل — يبدأ الفصول المنشورة مباشرة.
-   "closed": مقرر مؤرشف وغير مسجَّل فيه — لا تسجيل ولا بدء، وشرح بدلهما. */
-export type ViewState = "guest" | "new" | "enrolled" | "open" | "closed";
+/* "open": حساب غير محدود (مشرف) غير مسجَّل — يبدأ الفصول المنشورة مباشرة. */
+export type ViewState = "guest" | "new" | "enrolled" | "open";
 
 /* بطاقات الفصول داكنة. اللوحة لا تملك كهرمانيًا أو جوزيًا داكنًا
    يصلح تعبئةً تحمل نصًا، فالعائلتان المتاحتان: الباذنجاني والزيتي.
@@ -59,7 +55,6 @@ function ChapterCard({
   disabled,
   onEnroll,
   quotaReached,
-  preview,
 }: {
   chapter: Chapter;
   course: Course;
@@ -69,8 +64,6 @@ function ChapterCard({
   disabled: boolean;
   onEnroll: () => void;
   quotaReached: boolean;
-  /* قراءة معاينة المشرف: الفصل المسوّدة موسوم ويبدأ بنسخته، وكل فصل فيه ما يُقرأ يُفتح. */
-  preview: boolean;
 }) {
   const t = useTranslations("Course");
   const locale = useLocale();
@@ -78,14 +71,13 @@ function ChapterCard({
   const number = (value: number) => format.number(value, { numberingSystem: "latn" });
   const skin = skinOf(course.tone);
   const fill = skin.fills[(chapter.number - 1) % skin.fills.length];
-  const published = chapterStartable(chapter, preview ? "preview" : "public");
 
   return (
     <li
       id={`ch-${chapter.number}`}
       data-theme="dark"
       className={`group relative flex scroll-mt-6 flex-col overflow-hidden rounded-xl p-4 shadow-soft transition-transform duration-200 ${fill} ${
-        published
+        chapter.published
           ? "hover:-translate-y-1.5 hover:shadow-lift"
           : "opacity-45"
       }`}
@@ -104,7 +96,6 @@ function ChapterCard({
           <h3 className="font-display text-lg font-semibold text-on-dominant">
             {localize(chapter.title, locale)}
           </h3>
-          {chapter.state === "draft" ? <DraftBadge colors={skin.arrow} /> : null}
         </div>
 
         <p className={`mt-1 text-sm ${skin.meta}`}>
@@ -115,14 +106,14 @@ function ChapterCard({
       </div>
 
       <div className="relative z-10 mt-auto flex justify-end pt-4">
-        {!published ? (
+        {!chapter.published ? (
           <span className={`rounded-pill border px-4 py-2 text-xs font-semibold ${skin.arrow}`}>{t("soon")}</span>
         ) : state === "enrolled" || state === "open" ? (
-          <Link href={sessionHref(course.slug, chapter.id, preview ? previewStartPins(course, chapter) : {})}
+          <Link href={`/session/${course.id}/${chapter.number}`}
             className={`inline-flex min-h-11 items-center gap-2 rounded-pill border px-5 font-semibold transition-colors hover:bg-pressable hover:text-on-pressable ${skin.arrow}`}>
             {t("start")}<ArrowForward />
           </Link>
-        ) : state === "closed" ? null : state === "guest" ? (
+        ) : state === "guest" ? (
           <Link href={joinHref} className={`inline-flex min-h-11 items-center gap-2 rounded-pill border px-5 font-semibold ${skin.arrow}`}>{t("enroll")}</Link>
         ) : quotaReached ? (
           <Link href="#quota" className={`inline-flex min-h-11 items-center rounded-pill border px-5 font-semibold ${skin.arrow}`}>
@@ -148,7 +139,6 @@ export function CourseView({
   usedUp = null,
   limitNotice = false,
   rateRoom = null,
-  preview = false,
 }: {
   course: Course;
   chapters: Chapter[];
@@ -161,8 +151,6 @@ export function CourseView({
   limitNotice?: boolean;
   /* غرفة الحصة التي انتهت للتوّ (`?rate=`): تظهر بطاقة التقييم مرة واحدة. */
   rateRoom?: string | null;
-  /* المصدر معاينة المشرف (فيه المسوّدات والنسخ)، لا الكتالوج العام. */
-  preview?: boolean;
 }) {
   const t = useTranslations("Course");
   const locale = useLocale();
@@ -174,8 +162,7 @@ export function CourseView({
   const [error, setError] = useState<"enrollError" | "unenrollError" | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const cancelRef = useRef<HTMLButtonElement>(null);
-  const archived = course.status === "archived";
-  const joinHref = `/join?course=${encodeURIComponent(localize(course.name, locale))}&next=${encodeURIComponent(`/c/${course.slug}`)}`;
+  const joinHref = `/join?course=${encodeURIComponent(localize(course.name, locale))}&next=${encodeURIComponent(`/c/${course.id}`)}`;
 
   const mutate = (method: "PUT" | "DELETE") => {
     if (pending || enrollmentError) return;
@@ -210,22 +197,11 @@ export function CourseView({
               {course.code}
             </span>
           </h1>
-          {archived ? (
-            <span className="mt-3 inline-flex rounded-pill border border-line px-3 py-0.5 text-sm font-semibold text-ink-2">{t("archived")}</span>
-          ) : course.status === "draft" ? (
-            <DraftBadge className="mt-3" />
-          ) : null}
           <p className="mt-2 text-ink-2">
             {t("courseSummary", { university: localize(course.institution.name, locale), count: course.publishedChapterCount, countLabel: format.number(course.publishedChapterCount, { numberingSystem: "latn" }) })}
           </p>
         </div>
       </div>
-
-      {archived ? (
-        <p id="archived-note" className="mt-6 max-w-measure rounded-lg bg-tint-aubergine px-4 py-3 leading-base text-ink">
-          {t(state === "enrolled" ? "archivedEnrolled" : "archivedClosed")}
-        </p>
-      ) : null}
 
       {usedUp ? (
         <div className="mt-6"><QuotaBlock {...usedUp} /></div>
@@ -236,7 +212,7 @@ export function CourseView({
       <div className="mt-6">
         {state === "guest" ? (
           <PrimaryButton href={joinHref}>{t("enroll")}</PrimaryButton>
-        ) : state === "open" || state === "closed" ? null : state === "new" ? slotQuota !== null ? (
+        ) : state === "open" ? null : state === "new" ? slotQuota !== null ? (
           <QuotaBlock id="quota" kind="slots-full" {...slotQuota} />
         ) : (
           <PrimaryButton type="button" disabled={pending || enrollmentError} onClick={() => mutate("PUT")}>
@@ -253,7 +229,7 @@ export function CourseView({
                 onOpenAutoFocus={(event) => { event.preventDefault(); cancelRef.current?.focus(); }}
                 className="fixed top-1/2 start-1/2 z-50 w-[calc(100%_-_2rem)] max-w-md -translate-y-1/2 rounded-xl border border-line bg-surface p-6 ltr:-translate-x-1/2 rtl:translate-x-1/2">
                 <Dialog.Title className="font-display text-2xl font-bold text-ink">{t("unenrollTitle")}</Dialog.Title>
-                <Dialog.Description className="mt-3 leading-base text-ink-2">{t(archived ? "unenrollBodyArchived" : "unenrollBody", { course: localize(course.name, locale) })}</Dialog.Description>
+                <Dialog.Description className="mt-3 leading-base text-ink-2">{t("unenrollBody", { course: localize(course.name, locale) })}</Dialog.Description>
                 {error ? <p role="alert" className="mt-4 text-error">{t(error)}</p> : null}
                 <div className="mt-6 flex flex-wrap gap-3">
                   <PrimaryButton type="button" disabled={pending} onClick={() => mutate("DELETE")}>{t(pending ? "unenrolling" : "unenrollConfirm")}</PrimaryButton>
@@ -312,7 +288,7 @@ export function CourseView({
         <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {chapters.map((ch) => (
             <ChapterCard
-              key={ch.id}
+              key={ch.number}
               chapter={ch}
               course={course}
               state={state}
@@ -320,7 +296,6 @@ export function CourseView({
               pending={pending}
               disabled={enrollmentError}
               quotaReached={slotQuota !== null}
-              preview={preview}
               onEnroll={() => mutate("PUT")}
             />
           ))}

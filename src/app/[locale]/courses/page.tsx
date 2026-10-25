@@ -4,9 +4,7 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import type { Metadata } from "next";
 import { getInstitutions } from "@/lib/auth/catalog";
-import { getCoursesFor } from "@/lib/auth/courses";
-import { getAllowance } from "@/lib/allowance/server";
-import { readsPreview } from "@/lib/preview/rules";
+import { getCourses } from "@/lib/auth/courses";
 import { getAccount } from "@/lib/auth/session";
 import { Finder } from "./finder";
 import { PageShell, SiteHeader } from "@/components/becan/kit";
@@ -23,10 +21,7 @@ export default async function CoursesPage(props: PageProps<"/[locale]/courses">)
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
-  /* الحدود قبل الكتالوج: الحساب غير المحدود (مشرف) يقرأ معاينة تضم المسوّدات، وغيره الكتالوج العام المخزَّن. */
-  const [institutions, account] = await Promise.all([getInstitutions(), getAccount()]);
-  const allowance = account ? await getAllowance() : null;
-  const { result: courses } = await getCoursesFor(readsPreview(allowance?.ok ? allowance.data : null));
+  const [institutions, courses, account] = await Promise.all([getInstitutions(), getCourses(), getAccount()]);
 
   return (
     <PageShell withFooter>

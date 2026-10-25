@@ -1,18 +1,12 @@
 import { describe, expect, it } from "vitest";
-import {
-  backendErrorSchema, chapterLookupSchema, chapterSchema, contentVersionSchema, courseSchema, coursesSchema, enrollmentsSchema,
-  previewChapterLookupSchema, previewChapterSchema, previewCourseSchema, previewCoursesSchema, tokenSchema,
-} from "./schema";
+import { backendErrorSchema, chapterSchema, courseSchema, coursesSchema, enrollmentsSchema, tokenSchema } from "./schema";
 
 const summary = {
-  id: "11111111-1111-4111-8111-111111111111", slug: "course-101", code: "COURSE 101", name: { ar: "مقرر", en: "Course" },
+  id: "course-101", code: "COURSE 101", name: { ar: "مقرر", en: "Course" },
   institution: { id: "ksu", name: { ar: "جامعة", en: "University" } },
-  icon: "atom", tone: "deep", chapterCount: 2, publishedChapterCount: 1, status: "published",
+  icon: "atom", tone: "deep", chapterCount: 2, publishedChapterCount: 1,
 };
-const chapter = {
-  id: "aaaaaaaa-0000-4000-8000-000000000001", number: 1, title: { ar: "فصل", en: "Chapter" }, minutes: 20, lessonCount: 2,
-  state: "published", contentPath: "courses/course-101/ch_1/",
-};
+const chapter = { number: 1, title: { ar: "فصل", en: "Chapter" }, minutes: 20, lessonCount: 2, published: true };
 
 describe("courses backend contract", () => {
   it("parses catalog, detail and timestamped active enrollments", () => {
@@ -22,44 +16,19 @@ describe("courses backend contract", () => {
     expect(enrollmentsSchema.parse([enrollment])).toEqual([enrollment]);
     expect(enrollmentsSchema.parse([])).toEqual([]);
   });
-  it("parses an archived course in the detail, the list and the enrollments", () => {
-    const archived = { ...summary, status: "archived" };
-    expect(coursesSchema.parse([archived])[0].status).toBe("archived");
-    expect(courseSchema.parse({ ...archived, chapters: [chapter] }).status).toBe("archived");
-    expect(enrollmentsSchema.parse([{ enrolledAt: "2026-10-12T10:00:00.000Z", course: archived }])[0].course.status).toBe("archived");
-  });
-  it.each(["draft", "Archived", "", null, 1, undefined])("rejects the course status %j", (status) => {
-    expect(coursesSchema.safeParse([{ ...summary, status }]).success).toBe(false);
-  });
-  it("parses the chapter lookup: the chapter beside its whole course", () => {
-    const body = { chapter, course: { ...summary, status: "archived", chapters: [chapter] } };
-    expect(chapterLookupSchema.parse(body)).toEqual(body);
-  });
-  it.each([{ chapter }, { course: { ...summary, chapters: [chapter] } }, { chapter, course: summary }, { chapter: { ...chapter, id: "ch_1" }, course: { ...summary, chapters: [chapter] } }])(
-    "rejects a malformed chapter lookup %j", (body) => {
-      expect(chapterLookupSchema.safeParse(body).success).toBe(false);
-    });
   it("accepts unknown presentation strings with safe defaults", () => {
     const [course] = coursesSchema.parse([{ ...summary, icon: "new-icon", tone: "new-tone" }]);
     expect(course.icon).toBe("blocks");
     expect(course.tone).toBe("lilac");
   });
   it.each([
-    { id: "course-101" }, { slug: "../course" }, { slug: "11111111-1111-4111-8111-111111111111/x" }, { name: { ar: "مقرر" } }, { institution: { id: "ksu" } },
+    { id: "../course" }, { name: { ar: "مقرر" } }, { institution: { id: "ksu" } },
     { chapterCount: -1 }, { publishedChapterCount: 1.5 }, { icon: null }, { tone: 2 },
   ])("rejects malformed catalog fields %j", (fields) => {
     expect(coursesSchema.safeParse([{ ...summary, ...fields }]).success).toBe(false);
   });
-  it.each([{ number: 0 }, { minutes: 0 }, { lessonCount: -1 }, { id: "ch_1" }, { state: "draft" }, { state: undefined },
-    { published: true, state: undefined }, { contentPath: "/courses/x/" }, { contentPath: "courses/../x/" }, { contentPath: "courses/x" }])("rejects malformed chapter fields %j", (fields) => {
+  it.each([{ number: 0 }, { minutes: 0 }, { lessonCount: -1 }, { published: "true" }])("rejects malformed chapter fields %j", (fields) => {
     expect(chapterSchema.safeParse({ ...chapter, ...fields }).success).toBe(false);
-  });
-  it("parses a coming-soon chapter with no content path", () => {
-    const soon = { ...chapter, state: "coming_soon", contentPath: null };
-    expect(chapterSchema.parse(soon)).toEqual(soon);
-  });
-  it("has no published boolean any more", () => {
-    expect(chapterSchema.parse(chapter)).not.toHaveProperty("published");
   });
   it("rejects partial details and invalid enrollment dates", () => {
     expect(courseSchema.safeParse(summary).success).toBe(false);
@@ -67,63 +36,10 @@ describe("courses backend contract", () => {
     expect(enrollmentsSchema.safeParse([{ enrolledAt: "2026-10-12T10:00:00Z" }]).success).toBe(false);
   });
   it("parses tokens and error envelopes without exposing malformed payloads", () => {
-    const token = { token: "jwt", serverUrl: "wss://session.example.com", contentPath: "courses/becan-test/ch_1/", courseContentPath: "courses/becan-test/" };
-    expect(tokenSchema.parse(token)).toEqual(token);
-    expect(tokenSchema.safeParse({ ...token, token: "", serverUrl: "not-a-url" }).success).toBe(false);
+    expect(tokenSchema.parse({ token: "jwt", serverUrl: "wss://session.example.com" }).token).toBe("jwt");
+    expect(tokenSchema.safeParse({ token: "", serverUrl: "not-a-url" }).success).toBe(false);
     expect(tokenSchema.safeParse({ token: "jwt" }).success).toBe(false);
-    expect(tokenSchema.safeParse({ token: "jwt", serverUrl: token.serverUrl }).success).toBe(false);
-    expect(tokenSchema.safeParse({ ...token, contentPath: "courses/../ch_1/" }).success).toBe(false);
     expect(backendErrorSchema.parse({ error: { message: "Enrollment required", code: "NOT_ENROLLED" } }).error.code).toBe("NOT_ENROLLED");
     expect(backendErrorSchema.safeParse({ message: "Enrollment required" }).success).toBe(false);
   });
 });
-
-describe("Admin preview contract (backend B4)", () => {
-  const version = { id: "dddddddd-0000-4000-8000-000000000001", version: 3, live: true, previewed: false, contentPath: "courses/course-101/ch_1/v3/" };
-  const draftChapter = { ...chapter, state: "draft", contentPath: null, versions: [version] };
-  const draftCourse = { ...summary, status: "draft", chapters: [draftChapter], versions: [{ ...version, contentPath: "courses/course-101/v3/" }] };
-
-  it("parses a Draft course in the list, with no chapters or versions", () => {
-    expect(previewCoursesSchema.parse([{ ...summary, status: "draft" }])[0].status).toBe("draft");
-    expect(previewCoursesSchema.parse([{ ...summary, status: "archived" }])[0].status).toBe("archived");
-  });
-  it("parses a Draft course detail with a Draft chapter, its live content path and the versions of both", () => {
-    const parsed = previewCourseSchema.parse(draftCourse);
-    expect(parsed.status).toBe("draft");
-    expect(parsed.versions[0]).toMatchObject({ version: 3, live: true, previewed: false });
-    expect(parsed.chapters[0]).toMatchObject({ state: "draft", contentPath: null });
-  });
-  it("parses a Draft chapter that has a live path (the live prefix is returned in any state)", () => {
-    const parsed = previewChapterSchema.parse({ ...draftChapter, contentPath: "courses/course-101/ch_1/v3/" });
-    expect(parsed.contentPath).toBe("courses/course-101/ch_1/v3/");
-  });
-  it("parses the chapter lookup and keeps the versions", () => {
-    const body = { chapter: draftChapter, course: draftCourse };
-    expect(previewChapterLookupSchema.parse(body).chapter.versions).toHaveLength(1);
-  });
-  it.each(["draft", "coming_soon", "published"])("accepts the chapter state %s", (state) => {
-    expect(previewChapterSchema.safeParse({ ...draftChapter, state }).success).toBe(true);
-  });
-  it.each(["Draft", "archived", "", null])("rejects the chapter state %j", (state) => {
-    expect(previewChapterSchema.safeParse({ ...draftChapter, state }).success).toBe(false);
-  });
-  it.each(["Draft", "", null, 1])("rejects the course status %j", (status) => {
-    expect(previewCoursesSchema.safeParse([{ ...summary, status }]).success).toBe(false);
-  });
-  it("requires the versions on the preview shapes", () => {
-    expect(previewChapterSchema.safeParse({ ...draftChapter, versions: undefined }).success).toBe(false);
-    expect(previewCourseSchema.safeParse({ ...draftCourse, versions: undefined }).success).toBe(false);
-  });
-  it.each([
-    { id: "v1" }, { version: 0 }, { version: 1.5 }, { live: "yes" }, { previewed: null },
-    { contentPath: "/courses/x/" }, { contentPath: "courses/../x/" }, { contentPath: "courses/x" }, { contentPath: null },
-  ])("rejects a malformed version %j", (fields) => {
-    expect(contentVersionSchema.safeParse({ ...version, ...fields }).success).toBe(false);
-  });
-  it("never lets the public shapes accept a Draft or the preview-only fields as new meaning", () => {
-    expect(courseSchema.safeParse({ ...summary, status: "draft", chapters: [chapter] }).success).toBe(false);
-    expect(chapterSchema.safeParse({ ...chapter, state: "draft" }).success).toBe(false);
-    expect(chapterLookupSchema.safeParse({ chapter: draftChapter, course: draftCourse }).success).toBe(false);
-  });
-});
-

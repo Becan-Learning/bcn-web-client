@@ -13,29 +13,29 @@ const allowance: Allowance = {
 const enrollment: Enrollment = {
   enrolledAt: "2026-10-01T00:00:00Z",
   course: {
-    id: "33333333-3333-4333-8333-333333333333", slug: "acct-101", code: "ACCT 101", name: { ar: "المحاسبة", en: "Accounting" },
+    id: "acct-101", code: "ACCT 101", name: { ar: "المحاسبة", en: "Accounting" },
     institution: { id: "university", name: { ar: "الجامعة", en: "University" } },
-    icon: "coins", tone: "lilac", chapterCount: 3, publishedChapterCount: 2, status: "published",
+    icon: "coins", tone: "lilac", chapterCount: 3, publishedChapterCount: 2,
   },
 };
 
 describe("Course slots", () => {
   it("does not block when the allowance read failed", () => {
-    expect(slotsFull(null, [enrollment], "44444444-4444-4444-8444-444444444444")).toBe(false);
+    expect(slotsFull(null, [enrollment], "math-101")).toBe(false);
   });
   it("never blocks a null enrollment limit", () => {
-    expect(slotsFull({ ...allowance, limits: { ...allowance.limits, enrollments: null } }, [enrollment], "44444444-4444-4444-8444-444444444444")).toBe(false);
+    expect(slotsFull({ ...allowance, limits: { ...allowance.limits, enrollments: null } }, [enrollment], "math-101")).toBe(false);
   });
   it.each([[0, false], [1, true], [2, true]])("uses allowance usage of %i to decide fullness", (enrollments, expected) => {
-    expect(slotsFull({ ...allowance, usage: { ...allowance.usage, enrollments } }, [enrollment], "44444444-4444-4444-8444-444444444444")).toBe(expected);
+    expect(slotsFull({ ...allowance, usage: { ...allowance.usage, enrollments } }, [enrollment], "math-101")).toBe(expected);
   });
   it("keeps an already enrolled course available at the limit", () => {
-    expect(slotsFull(allowance, [enrollment], "33333333-3333-4333-8333-333333333333")).toBe(false);
+    expect(slotsFull(allowance, [enrollment], "acct-101")).toBe(false);
   });
   it("handles more than one course slot", () => {
-    expect(slotsFull({ ...allowance, limits: { ...allowance.limits, enrollments: 2 } }, [enrollment], "44444444-4444-4444-8444-444444444444")).toBe(false);
+    expect(slotsFull({ ...allowance, limits: { ...allowance.limits, enrollments: 2 } }, [enrollment], "math-101")).toBe(false);
   });
   it("honors a zero slot limit", () => {
-    expect(slotsFull({ ...allowance, limits: { ...allowance.limits, enrollments: 0 } }, [], "44444444-4444-4444-8444-444444444444")).toBe(true);
+    expect(slotsFull({ ...allowance, limits: { ...allowance.limits, enrollments: 0 } }, [], "math-101")).toBe(true);
   });
 });

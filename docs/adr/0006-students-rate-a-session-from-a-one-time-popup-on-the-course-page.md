@@ -2,7 +2,7 @@
 
 Status: **implemented** (2026-10-20).
 
-A Session used to end on a summary page, `/session/{slug}/{chapterId}/done`. After the removal of the
+A Session used to end on a summary page, `/session/{code}/{n}/done`. After the removal of the
 fake progress figures (stumbles, days to the exam) it was a heading, a time-limit or usage notice, a
 "back to the course" button, a "next chapter" link and the rating form (five stars, optional notes).
 Its one real job was the rating, and every other thing on it already lived on the Course page.
@@ -26,15 +26,14 @@ are unchanged: `{ sessionId: room, sessionExperience, notes }`, scored in Langfu
   still rate; their stars and notes stay if they reopen it, so a stray Escape does not lose what they typed.
   After a send the dialog stays open on the thank-you until the student closes it, but the card is gone.
 - **`/done` stays as a redirect** to `/c/{slug}` that carries `room` over as `rate` (and `limit`), so a link
-  that was already in flight when this shipped still reaches the rating. It resolves the Course's current
-  slug from the Chapter id, as the page did (ADR 0005), and keeps the link's own slug for a Draft the
-  public read does not know. Sign-in, Enrollment and archived-Course rules belong to the Course page.
+  that was already in flight when this shipped still reaches the rating. It uses the Course code in the link
+  as the slug. Sign-in and Enrollment rules belong to the Course page.
 - **What the summary showed, and where it went.** The used-up Usage block (`QuotaBlock`) now shows on the
   Course page for any signed-in student who is enrolled in the Course (or is an unlimited account) and has
   used the Allowance up, with or without the rating params, so it does not vanish when the card is
   closed. The generic "your session time is up" sentence shows when `limit=1` and the Allowance is not used
   up. "Back to the course" is the page itself. "Next chapter" is gone: the Chapter cards are on the page.
-  The gates (unknown Chapter, coming soon, not enrolled, archived, Admin preview) are the Course page's own.
+  The gates (unknown Chapter, coming soon, not enrolled) are the Course page's own.
 - **The card is for a signed-in account only.** A guest has no Session to rate.
 
 ## Considered Options
@@ -51,9 +50,8 @@ are unchanged: `{ sessionId: room, sessionExperience, notes }`, scored in Langfu
 ## Consequences
 
 - `SessionSummary` messages, the summary page and `feedback-form.tsx` are gone; the strings that remain
-  moved to `SessionRating` and `Course.sessionLimit`. `sessionHref` no longer builds a `/done` link.
+  moved to `SessionRating` and `Course.sessionLimit`.
 - The Course page now reads `searchParams`. It already read the account and Allowance on every request,
   so it was already dynamic.
-- A Course whose slug is renamed during a live Session gives a 404 on the way out, because the Session
-  screen links to the slug it loaded with. Only the `/done` redirect resolves a renamed slug.
-- This supersedes the `/done` description in ADR 0005.
+- Milestone 2 (Chapter-id URLs, ADR 0005) was reverted on 2026-10-25. This ADR was written against it and now
+  describes the same behavior on the `/session/{code}/{n}` routes.

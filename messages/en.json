@@ -616,33 +616,7 @@
     "unenrollError": "We couldn’t un-enroll you. Try again.",
     "enrollmentLoadError": "We couldn’t check your enrollment. Reload the page to try again.",
     "lessons": "{count, plural, one {{countLabel} lesson} other {{countLabel} lessons}}",
-    "archived": "Archived",
-    "archivedEnrolled": "This course is archived and no longer open for new enrollment. Your enrollment stays active, and you can keep studying its published chapters.",
-    "archivedClosed": "This course is archived and no longer open for new enrollment. Its chapters are available only to students who enrolled before it was archived.",
-    "sessionLimit": "Your session time is up. You can start a new one.",
-    "unenrollBodyArchived": "If you un-enroll from “{course}”, you can’t open its sessions, and you can’t enroll again because it’s archived."
-  },
-  "Preview": {
-    "label": "Admin preview",
-    "draft": "Draft",
-    "version": "Preview: version {number}",
-    "courseVersion": "Course content: version {number}",
-    "live": "the live version",
-    "notLive": "not the live version",
-    "error": {
-      "unknown-version": {
-        "title": "We couldn’t find this version",
-        "body": "The preview link points to a version that doesn’t exist for this chapter. It may have been deleted or is no longer valid. Open the chapter from the admin dashboard again, or go back to the course."
-      },
-      "unknown-course-version": {
-        "title": "We couldn’t find the course content version",
-        "body": "The preview link points to a content version that doesn’t exist for this course. It may have been deleted or is no longer valid. Open the chapter from the admin dashboard again, or go back to the course."
-      },
-      "no-content": {
-        "title": "There’s no content to preview",
-        "body": "This chapter has no live version, and the link names no version to preview. Open it from the admin dashboard on a specific version, or go back to the course."
-      }
-    }
+    "sessionLimit": "Your session time is up. You can start a new one."
   },
   "Home": {
     "metadataTitle": "Your courses — Becan",
@@ -653,8 +627,7 @@
     "soon": "Coming soon",
     "empty": "You haven’t enrolled in any courses yet.",
     "browseCourses": "Browse courses",
-    "loadError": "We couldn’t load your courses. Reload the page to try again.",
-    "archived": "Archived"
+    "loadError": "We couldn’t load your courses. Reload the page to try again."
   },
   "Checkout": {
     "metadataTitle": "Checkout — Becan",
@@ -803,29 +776,7 @@
     "studentQuestionCancel": "Cancel",
     "studentQuestionNoSpeech": "We didn't hear anything",
     "studentQuestionMicUnavailable": "The microphone is unavailable or permission was denied — you can type in chat.",
-    "studentQuestionShortcut": "Ask: Space · Send: Space again · Cancel: Escape",
-    "unavailable": {
-      "content-unavailable": {
-        "title": "The content isn’t ready yet",
-        "body": "This chapter has no content ready right now, so we can’t open its session. Go back to the course and try another chapter, or come back later."
-      },
-      "not-published": {
-        "title": "This chapter isn’t available right now",
-        "body": "This chapter isn’t published at the moment, so we can’t open a session for it. Go back to the course and pick an available chapter."
-      },
-      "version-forbidden": {
-        "title": "Preview is for admins only",
-        "body": "Opening a specific version needs an admin account with two-factor authentication on. Go back to the course and open the chapter from there."
-      },
-      "version-not-found": {
-        "title": "We couldn’t find this version",
-        "body": "The requested version doesn’t belong to this chapter or its course, or it was deleted. Open the chapter from the admin dashboard again."
-      },
-      "version-invalid": {
-        "title": "This version can’t be previewed",
-        "body": "The version is incomplete or has an error, so we can’t open a session for it. Pick a valid version from the admin dashboard."
-      }
-    }
+    "studentQuestionShortcut": "Ask: Space · Send: Space again · Cancel: Escape"
   },
   "SessionRating": {
     "sent": "Your feedback has arrived. We read every note.",

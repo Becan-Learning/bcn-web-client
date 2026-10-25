@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 
 /* وسيط تخزين Bunny — يُبقي مفتاح التخزين على الخادم، ويخدم الشرائح
-   وقوائم الدروس من الأصل نفسه فلا تحتاج CORS.
-   المسار مسار المحتوى الذي يعيده الخادم (`courses/{slug}/ch_1/…`) وهو معتم عندنا: نقبل أي مقاطع
-   سليمة تحت جذر التخزين، ونرفض الخروج منه. */
+   وقوائم الدروس من الأصل نفسه فلا تحتاج CORS. */
 
 export async function GET(
   _request: Request,
@@ -14,7 +12,7 @@ export async function GET(
   /* لا خروج من جذر التخزين */
   if (
     !filepath?.length ||
-    filepath.some((seg) => !seg || seg === "." || seg === ".." || seg.includes("\\") || seg.includes("/"))
+    filepath.some((seg) => !seg || seg === "." || seg === ".." || seg.includes("\\"))
   ) {
     return NextResponse.json({ error: "Invalid file path" }, { status: 400 });
   }

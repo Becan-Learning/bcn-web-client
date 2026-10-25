@@ -79,7 +79,7 @@ lint, types, unit tests and build; end-to-end runs come when the backend lands.
      (any non-200 or network error → `null`, logged).
    - `requireAccount(locale, path)`: `getAccount()`, or `redirect` to `/sign-in?next=<path>` via
      `@/i18n/navigation`.
-   - Use `requireAccount` in the server entry of every gated route: `session/[courseSlug]/[chapterId]` page,
+   - Use `requireAccount` in the server entry of every gated route: `session/[code]/[n]` page,
      `session/.../done` (a redirect), `home`, the settings shell/pages, `checkout` (+ `checkout/result`).
 4. **`src/lib/auth/catalog.ts`** (`server-only`) — `getInstitutions(): Promise<Institution[]>` from
    `${BACKEND_URL}/api/v1/institutions` (`next: { revalidate: 300 }`). Types:

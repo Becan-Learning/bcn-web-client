@@ -28,14 +28,15 @@ export type StartDecision =
   | { ok: false; reason: "unpublished" | "not-enrolled" | "used-up" };
 
 /* هل يبدأ هذا الحساب حصةً في هذا الفصل؟ القرار الوحيد للمنع بسبب النشر أو التسجيل أو الحدود.
-   الحساب غير المحدود (مشرف بتحقق بخطوتين) لا يحتاج تسجيلًا ولا تحدّه الحدود، أما الفصل غير المنشور فيُرفض للجميع. */
+   الحساب غير المحدود (مشرف بتحقق بخطوتين، `tutor:unlimited` في الخادم) يبدأ أي فصل، منشورًا أو لا، دون تسجيل ولا حدود:
+   هكذا يُختبر الفصل قبل نشره (ADR 0007 في الخادم). الفصل غير المنشور يُرفض لكل حساب آخر. */
 export function startDecision({ allowance, enrolled, published }: {
   allowance: Allowance | null;
   enrolled: boolean;
   published: boolean;
 }): StartDecision {
-  if (!published) return { ok: false, reason: "unpublished" };
   if (allowance?.unlimited) return { ok: true };
+  if (!published) return { ok: false, reason: "unpublished" };
   if (!enrolled) return { ok: false, reason: "not-enrolled" };
   if (allowance && usedUp(allowance)) return { ok: false, reason: "used-up" };
   return { ok: true };

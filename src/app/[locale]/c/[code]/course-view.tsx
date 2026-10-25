@@ -50,6 +50,7 @@ function ChapterCard({
   chapter,
   course,
   state,
+  opensUnpublished,
   joinHref,
   pending,
   disabled,
@@ -59,6 +60,7 @@ function ChapterCard({
   chapter: Chapter;
   course: Course;
   state: ViewState;
+  opensUnpublished: boolean;
   joinHref: string;
   pending: boolean;
   disabled: boolean;
@@ -71,13 +73,15 @@ function ChapterCard({
   const number = (value: number) => format.number(value, { numberingSystem: "latn" });
   const skin = skinOf(course.tone);
   const fill = skin.fills[(chapter.number - 1) % skin.fills.length];
+  /* الفصل غير المنشور «قريبًا» بلا فعل، إلا للحساب غير المحدود: يفتحه بوسم «غير منشور». */
+  const opens = chapter.published || opensUnpublished;
 
   return (
     <li
       id={`ch-${chapter.number}`}
       data-theme="dark"
       className={`group relative flex scroll-mt-6 flex-col overflow-hidden rounded-xl p-4 shadow-soft transition-transform duration-200 ${fill} ${
-        chapter.published
+        opens
           ? "hover:-translate-y-1.5 hover:shadow-lift"
           : "opacity-45"
       }`}
@@ -96,6 +100,9 @@ function ChapterCard({
           <h3 className="font-display text-lg font-semibold text-on-dominant">
             {localize(chapter.title, locale)}
           </h3>
+          {chapter.published ? null : opensUnpublished ? (
+            <span className={`rounded-pill border border-dashed px-2 py-0.5 text-[11px] font-semibold ${skin.arrow}`}>{t("unpublished")}</span>
+          ) : null}
         </div>
 
         <p className={`mt-1 text-sm ${skin.meta}`}>
@@ -106,7 +113,7 @@ function ChapterCard({
       </div>
 
       <div className="relative z-10 mt-auto flex justify-end pt-4">
-        {!chapter.published ? (
+        {!opens ? (
           <span className={`rounded-pill border px-4 py-2 text-xs font-semibold ${skin.arrow}`}>{t("soon")}</span>
         ) : state === "enrolled" || state === "open" ? (
           <Link href={`/session/${course.id}/${chapter.number}`}
@@ -135,6 +142,7 @@ export function CourseView({
   chapters,
   enrollmentError,
   state,
+  opensUnpublished,
   slotQuota,
   usedUp = null,
   limitNotice = false,
@@ -144,6 +152,8 @@ export function CourseView({
   chapters: Chapter[];
   enrollmentError: boolean;
   state: ViewState;
+  /* الحساب غير المحدود يفتح الفصول غير المنشورة ليختبرها قبل نشرها. */
+  opensUnpublished: boolean;
   slotQuota: CourseSlotQuota | null;
   /* المسجَّل (أو غير المحدود) وقد استنفد حدود استخدامه: كتلة هادئة بما ذاكره وموعد التجدّد. */
   usedUp?: UsedUpQuota | null;
@@ -292,6 +302,7 @@ export function CourseView({
               chapter={ch}
               course={course}
               state={state}
+              opensUnpublished={opensUnpublished}
               joinHref={joinHref}
               pending={pending}
               disabled={enrollmentError}

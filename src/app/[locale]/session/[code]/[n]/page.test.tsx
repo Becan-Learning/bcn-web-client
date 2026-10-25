@@ -156,12 +156,28 @@ describe("Session page start gates", () => {
     expect(html).toContain("data-session-view");
     expect(html).not.toContain(ar.Quota.usedUp.limit);
   });
-  it.each([false, true])("still returns 404 for an unpublished chapter (unlimited: %s)", async (isUnlimited) => {
+  it.each([true, false])("returns 404 for an unpublished chapter to a student (enrolled: %s)", async (enrolled) => {
     const draft = { ...course, chapters: [{ ...course.chapters[0], published: false }] };
     backend.course.mockResolvedValue({ ok: true, data: draft });
-    backend.allowance.mockResolvedValue({ ok: true, data: { ...allowance, unlimited: isUnlimited } });
+    backend.enrollments.mockResolvedValue({ ok: true, data: enrolled ? [{ course: draft }] : [] });
     await expect(call()).rejects.toThrow();
     expect(SessionView).not.toHaveBeenCalled();
+    expect(redirect).not.toHaveBeenCalled();
+  });
+  it("returns 404 for an unpublished chapter when the allowance cannot be read", async () => {
+    backend.course.mockResolvedValue({ ok: true, data: { ...course, chapters: [{ ...course.chapters[0], published: false }] } });
+    backend.allowance.mockResolvedValue({ ok: false, kind: "network" });
+    await expect(call()).rejects.toThrow();
+    expect(SessionView).not.toHaveBeenCalled();
+  });
+  it.each([true, false])("opens an unpublished chapter for an unlimited account (enrolled: %s)", async (enrolled) => {
+    const draft = { ...course, chapters: [{ ...course.chapters[0], published: false }] };
+    backend.course.mockResolvedValue({ ok: true, data: draft });
+    backend.enrollments.mockResolvedValue({ ok: true, data: enrolled ? [{ course: draft }] : [] });
+    backend.allowance.mockResolvedValue({ ok: true, data: unlimited });
+    expect(await render()).toContain("data-session-view");
+    expect(redirect).not.toHaveBeenCalled();
+    expect(vi.mocked(SessionView).mock.calls[0][0]).toMatchObject({ content: { courseId: "math-101", chapterId: "ch_1" } });
   });
 });
 

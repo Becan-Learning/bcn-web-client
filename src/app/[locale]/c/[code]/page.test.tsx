@@ -90,6 +90,7 @@ describe("Course page slot limit", () => {
     const html = await render();
     const unpublished = html.match(/<li id="ch-2"[\s\S]*?<\/li>/)![0];
     expect(unpublished).toContain(ar.Course.soon);
+    expect(unpublished).not.toContain(ar.Course.unpublished);
     expect(unpublished).not.toMatch(/<a |<button/);
   });
 
@@ -152,7 +153,23 @@ describe("Course page for an unlimited account", () => {
     expect(html).toContain('href="/session/math-101/1"');
     expect(html).not.toContain('id="quota"');
   });
-  it("keeps the unpublished chapter inert", async () => {
+  it.each(["ar", "en"] as const)("links the unpublished chapter to its session with an unpublished label in %s", async (locale) => {
+    const messages = locale === "ar" ? ar : en;
+    const unpublished = (await render(locale)).match(/<li id="ch-2"[\s\S]*?<\/li>/)![0];
+    expect(unpublished).toContain('href="/session/math-101/2"');
+    expect(unpublished).toContain(messages.Course.unpublished);
+    expect(unpublished).not.toContain(messages.Course.soon);
+    expect(unpublished).not.toContain("opacity-45");
+  });
+  it("links the unpublished chapter for an unlimited account that is also enrolled", async () => {
+    backend.enrollments.mockResolvedValue({ ok: true, data: [{ ...held, course }] });
+    const html = await render();
+    expect(html).toContain(ar.Course.unenroll);
+    expect(html).toContain('href="/session/math-101/2"');
+    expect(html).toContain(ar.Course.unpublished);
+  });
+  it("keeps the unpublished chapter inert when the allowance read fails", async () => {
+    backend.allowance.mockResolvedValue({ ok: false, kind: "network" });
     const unpublished = (await render()).match(/<li id="ch-2"[\s\S]*?<\/li>/)![0];
     expect(unpublished).toContain(ar.Course.soon);
     expect(unpublished).not.toMatch(/<a |<button/);

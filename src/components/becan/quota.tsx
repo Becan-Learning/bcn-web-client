@@ -10,7 +10,7 @@ import { Link } from "@/i18n/navigation";
 
    ممنوع فيها: «للأسف» · «انتهت صلاحيتك» · عدّاد تنازلي · سعر أو ترقية. */
 
-export type HeldCourse = { slug: string; name: string };
+export type HeldCourse = { id: string; name: string };
 
 export type CourseSlotQuota = { courses: HeldCourse[]; limit: number };
 
@@ -51,7 +51,7 @@ export function QuotaBlock(props: QuotaBlockProps) {
           <p className="text-lg leading-base font-semibold">
             {t.rich("slotsFull.enrolled", {
               courses: () => <>{format.list(props.courses.map((course) => (
-                <Link key={course.slug} href={`/c/${course.slug}`} dir="auto"
+                <Link key={course.id} href={`/c/${course.id}`} dir="auto"
                   className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm px-1 underline underline-offset-4 hover:text-aubergine-base">
                   {course.name}
                 </Link>

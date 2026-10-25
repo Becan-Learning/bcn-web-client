@@ -35,12 +35,10 @@ import {
 } from "livekit-client";
 import { createStudentQuestion, type StudentQuestionStatus } from "./student-question";
 import { getExperience } from "@/lib/experience";
+import type { ChapterContent } from "@/lib/session/types";
 import { tokenSchema } from "@/lib/courses/schema";
-import { AllowanceUsedUpError, ChapterUnavailableError, tokenErrorOutcome } from "@/lib/session/token-error";
+import { AllowanceUsedUpError, tokenErrorOutcome } from "@/lib/session/token-error";
 import { courseAfterSessionHref } from "@/lib/session/rating";
-import type { PreviewNotice, VersionPins } from "@/lib/preview/rules";
-import { PreviewBadges } from "@/components/becan/preview-badges";
-import { usePinnedContent } from "./use-pinned-content";
 import { readSessionAllowance } from "@/lib/allowance/client";
 import type { Allowance } from "@/lib/allowance/schema";
 import { sessionEndingQuota } from "@/lib/session/ending";
@@ -99,25 +97,15 @@ type SessionViewProps = {
   chapterNo: number;
   chapterTitle: string;
   minutes: number;
-  chapterId: string;
-  /* مسار محتوى الفصل في الكتالوج — يُعرض قبل البدء؛ بعد وصول الرمز يُستبدل بالمسار المثبَّت فيه. */
-  contentPath: string;
+  content: ChapterContent;
+  pdfUrl: string;
   lessons: Lesson[];
   minutesRemaining: number | null;
-  /* معاينة المشرف: النسخ المثبَّتة التي يرسلها طلب الرمز (لا تصل أبدًا لغير المشرف، فالصفحة تحجبها). */
-  pins?: VersionPins;
-  /* علامة «مسوّدة» و«معاينة: النسخة N»؛ فارغة خارج المعاينة. */
-  notice?: PreviewNotice | null;
 };
 
-type ScreenProps = Omit<SessionViewProps, "contentPath" | "pins"> & { pdfUrl: string };
-
 export function SessionView(props: SessionViewProps) {
-  const { contentPath, lessons: catalogLessons, pins, ...rest } = props;
-  const { chapterId } = rest;
-  const contentVersionId = pins?.contentVersionId;
-  const courseContentVersionId = pins?.courseContentVersionId;
-  const { onPinned, pdfUrl, lessons } = usePinnedContent(contentPath, catalogLessons);
+  const { courseId } = props.content;
+  const chapterNumber = props.chapterNo;
   const locale = useLocale();
   const stored = useSyncExternalStore(
     subscribeExplanationLanguage,
@@ -140,26 +128,18 @@ export function SessionView(props: SessionViewProps) {
         const res = await fetch("/api/v1/livekit/token", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            chapterId, language, experience: getExperience(),
-            ...(contentVersionId ? { contentVersionId } : {}),
-            ...(courseContentVersionId ? { courseContentVersionId } : {}),
-          }),
+          body: JSON.stringify({ courseId, chapterNumber, language, experience: getExperience() }),
           cache: "no-store",
         });
         if (!res.ok) {
           const body: unknown = await res.json().catch(() => null);
-          const outcome = tokenErrorOutcome(res.status, body);
-          if (outcome === "used-up") throw new AllowanceUsedUpError();
-          if (outcome !== "connection-failed") throw new ChapterUnavailableError(outcome);
+          if (tokenErrorOutcome(res.status, body) === "used-up") throw new AllowanceUsedUpError();
           throw new Error(`Token request failed (${res.status})`);
         }
-        const { serverUrl, token, contentPath: pinnedPath } = tokenSchema.parse(await res.json());
-        /* الحصة مثبَّتة على هذه النسخة من المحتوى؛ منها نقرأ الدروس والشرائح من الآن. */
-        onPinned(pinnedPath);
+        const { serverUrl, token } = tokenSchema.parse(await res.json());
         return { serverUrl, participantToken: token };
       }),
-    [chapterId, language, onPinned, contentVersionId, courseContentVersionId],
+    [courseId, chapterNumber, language],
   );
 
   const session = useSession(tokenSource);
@@ -167,9 +147,7 @@ export function SessionView(props: SessionViewProps) {
   return (
     <SessionProvider session={session}>
       <SessionScreen
-        {...rest}
-        lessons={lessons}
-        pdfUrl={pdfUrl}
+        {...props}
         session={session}
         language={language}
         onLanguage={chooseLanguage}
@@ -192,8 +170,7 @@ function SessionScreen({
   pdfUrl,
   lessons,
   minutesRemaining,
-  notice = null,
-}: ScreenProps & {
+}: SessionViewProps & {
   session: ReturnType<typeof useSession>;
   language: ExplanationLanguage;
   onLanguage: (l: ExplanationLanguage) => void;
@@ -216,8 +193,6 @@ function SessionScreen({
   const [started, setStarted] = useState(false);
   const [starting, setStarting] = useState(false);
   const [failed, setFailed] = useState(false);
-  /* رفض الخادم فتح الحصة لسبب في الفصل نفسه — لا تفيد إعادة المحاولة. */
-  const [unavailable, setUnavailable] = useState<ChapterUnavailableError["reason"] | null>(null);
   const [userEnding, setUserEnding] = useState(false);
   const [micUnavailable, setMicUnavailable] = useState(false);
   /* useSession().local.microphoneTrack يكون null ما دام المايك مكتومًا، فلا يصلح
@@ -353,7 +328,6 @@ function SessionScreen({
     dispatch({ action: "session_reset" });
     pendingLesson.current = lessonSlug;
     setFailed(false);
-    setUnavailable(null);
     setStarted(true);
     setStarting(true);
     try {
@@ -393,8 +367,7 @@ function SessionScreen({
         router.refresh();
         return;
       }
-      if (error instanceof ChapterUnavailableError) setUnavailable(error.reason);
-      else console.error("Failed to start session:", error);
+      console.error("Failed to start session:", error);
       setFailed(true);
     } finally {
       setStarting(false);
@@ -539,27 +512,6 @@ function SessionScreen({
       : undefined;
 
   /* ————— انقطاع ————— */
-  if (phase === "cut" && unavailable) {
-    return (
-      <Shell reduce={reduce}>
-        <TopBar phase="idle" courseName={courseName} chapterNo={chapterNo} onExit={onExit} />
-        <div className="mx-auto flex w-full max-w-measure flex-1 flex-col justify-center px-5 py-10">
-          <h1 className="text-3xl font-bold text-ink">{t(`unavailable.${unavailable}.title`)}</h1>
-          <p className="mt-4 leading-base text-ink-2">{t(`unavailable.${unavailable}.body`)}</p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <button
-              type="button"
-              onClick={onExit}
-              className="inline-flex h-12 items-center justify-center rounded-pill bg-pressable px-6 font-semibold text-on-pressable"
-            >
-              {t("backCourse")}
-            </button>
-          </div>
-        </div>
-      </Shell>
-    );
-  }
-
   if (phase === "cut") {
     const lastLesson = lessons.find((l) => l.slug === state.lesson?.slug);
     return (
@@ -638,8 +590,6 @@ function SessionScreen({
         detail={detail}
         onExit={onExit}
       />
-
-      {notice ? <PreviewBadges notice={notice} className="shrink-0 px-3 pb-1 md:px-4" /> : null}
 
       {/* مسار الدروس على الجوال — بديل العمود الجانبي */}
       <TopicsTrack

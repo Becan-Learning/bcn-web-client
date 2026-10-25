@@ -9,12 +9,7 @@ import type { Allowance } from "@/lib/allowance/schema";
 import CoursePage from "./page";
 
 const backend = vi.hoisted(() => ({ course: vi.fn(), account: vi.fn(), enrollments: vi.fn(), allowance: vi.fn(), refresh: vi.fn() }));
-/* القراءة الفعلية مزيَّفة: `backend.course(slug, preview)` يجيب، والمصدر من علم المعاينة كما في `getCourseFor`. */
-vi.mock("@/lib/auth/courses", () => ({
-  getCourseFor: async (slug: string, preview: boolean) => ({ source: preview ? "preview" : "public", result: await backend.course(slug, preview) }),
-  getEnrollments: backend.enrollments,
-}));
-vi.mock("@/lib/preview/viewer", () => ({ viewerReadsPreview: vi.fn() }));
+vi.mock("@/lib/auth/courses", () => ({ getCourse: backend.course, getEnrollments: backend.enrollments }));
 vi.mock("@/lib/auth/session", () => ({ getAccount: backend.account }));
 vi.mock("@/lib/allowance/server", () => ({ getAllowance: backend.allowance }));
 vi.mock("next-intl/server", () => ({ setRequestLocale: vi.fn() }));
@@ -32,15 +27,15 @@ vi.mock("@/components/becan/kit", () => ({
 }));
 
 const course: Course = {
-  id: "11111111-1111-4111-8111-111111111111", slug: "math-101", code: "MATH 101", name: { ar: "الرياضيات", en: "Mathematics" },
+  id: "math-101", code: "MATH 101", name: { ar: "الرياضيات", en: "Mathematics" },
   institution: { id: "university", name: { ar: "الجامعة", en: "University" } },
-  icon: "blocks", tone: "lilac", chapterCount: 2, publishedChapterCount: 1, status: "published",
+  icon: "blocks", tone: "lilac", chapterCount: 2, publishedChapterCount: 1,
   chapters: [
-    { id: "aaaaaaaa-0000-4000-8000-000000000001", number: 1, title: { ar: "الأول", en: "First" }, minutes: 30, lessonCount: 3, state: "published", contentPath: "courses/math-101/ch_1/" },
-    { id: "aaaaaaaa-0000-4000-8000-000000000002", number: 2, title: { ar: "الثاني", en: "Second" }, minutes: 30, lessonCount: 3, state: "coming_soon", contentPath: null },
+    { number: 1, title: { ar: "الأول", en: "First" }, minutes: 30, lessonCount: 3, published: true },
+    { number: 2, title: { ar: "الثاني", en: "Second" }, minutes: 30, lessonCount: 3, published: false },
   ],
 };
-const held = { enrolledAt: "2026-10-01T00:00:00Z", course: { ...course, id: "33333333-3333-4333-8333-333333333333", slug: "acct-101", name: { ar: "المحاسبة", en: "Accounting" } } };
+const held = { enrolledAt: "2026-10-01T00:00:00Z", course: { ...course, id: "acct-101", name: { ar: "المحاسبة", en: "Accounting" } } };
 const allowance: Allowance = {
   unlimited: false,
   plan: { id: "free", name: { ar: "مجانية", en: "Free" } },
@@ -57,7 +52,7 @@ beforeEach(() => {
   backend.allowance.mockResolvedValue({ ok: true, data: allowance });
 });
 async function render(locale: "ar" | "en" = "ar", searchParams: Record<string, string | string[] | undefined> = {}) {
-  const page = await CoursePage({ params: Promise.resolve({ locale, code: course.slug }), searchParams: Promise.resolve(searchParams) });
+  const page = await CoursePage({ params: Promise.resolve({ locale, code: course.id }), searchParams: Promise.resolve(searchParams) });
   return renderToStaticMarkup(<NextIntlClientProvider locale={locale} messages={locale === "ar" ? ar : en} timeZone="Asia/Riyadh">{page}</NextIntlClientProvider>);
 }
 function expectEnrollButtons(html: string, locale: "ar" | "en" = "ar") {
@@ -98,13 +93,12 @@ describe("Course page slot limit", () => {
     expect(unpublished).not.toMatch(/<a |<button/);
   });
 
-  it("keeps the held course's own page enrolled, with no quota block", async () => {
+  it("keeps the held course's own page enrolled", async () => {
     backend.enrollments.mockResolvedValue({ ok: true, data: [{ ...held, course }] });
     const html = await render();
     expect(html).toContain(ar.Course.unenroll);
-    expect(html).toContain('href="/session/math-101/aaaaaaaa-0000-4000-8000-000000000001"');
+    expect(html).toContain('href="/session/math-101/1"');
     expect(html).not.toContain(ar.Quota.slotsFull.release);
-    expect(html).not.toContain('id="quota"');
   });
   it("does not read student data for a guest", async () => {
     backend.account.mockResolvedValue(null);
@@ -146,7 +140,7 @@ describe("Course page for an unlimited account", () => {
   it.each(["ar", "en"] as const)("lets a published chapter start without enrolling and shows no enroll or quota UI in %s", async (locale) => {
     const html = await render(locale);
     const messages = locale === "ar" ? ar : en;
-    expect(html).toContain('href="/session/math-101/aaaaaaaa-0000-4000-8000-000000000001"');
+    expect(html).toContain('href="/session/math-101/1"');
     expect(html).not.toContain(`>${messages.Course.enroll}<`);
     expect(html).not.toContain('id="quota"');
     expect(html).not.toContain(messages.Course.slotsFullHint);
@@ -155,7 +149,7 @@ describe("Course page for an unlimited account", () => {
   it("starts a chapter even when the held courses fill every slot", async () => {
     backend.enrollments.mockResolvedValue({ ok: true, data: [held] });
     const html = await render();
-    expect(html).toContain('href="/session/math-101/aaaaaaaa-0000-4000-8000-000000000001"');
+    expect(html).toContain('href="/session/math-101/1"');
     expect(html).not.toContain('id="quota"');
   });
   it("keeps the unpublished chapter inert", async () => {
@@ -167,127 +161,8 @@ describe("Course page for an unlimited account", () => {
     backend.enrollments.mockResolvedValue({ ok: true, data: [] });
     backend.allowance.mockResolvedValue({ ok: true, data: { ...allowance, usage: { ...allowance.usage, enrollments: 0 } } });
     const html = await render();
-    expect(html).not.toContain('href="/session/math-101/aaaaaaaa-0000-4000-8000-000000000001"');
+    expect(html).not.toContain('href="/session/math-101/1"');
     expect(html.match(new RegExp(`>${ar.Course.enroll}</button>`, "g"))).toHaveLength(2);
-  });
-});
-
-describe("Course page for an archived course", () => {
-  const archived: Course = { ...course, status: "archived" };
-  const startHref = 'href="/session/math-101/aaaaaaaa-0000-4000-8000-000000000001"';
-  beforeEach(() => {
-    backend.course.mockResolvedValue({ ok: true, data: archived });
-    backend.enrollments.mockResolvedValue({ ok: true, data: [{ ...held, course: archived }] });
-  });
-  it.each(["ar", "en"] as const)("marks it archived and lets an enrolled student start a published chapter in %s", async (locale) => {
-    const messages = locale === "ar" ? ar : en;
-    const html = await render(locale);
-    expect(html).toContain(`>${messages.Course.archived}</span>`);
-    expect(html).toContain(messages.Course.archivedEnrolled);
-    expect(html).not.toContain(messages.Course.archivedClosed);
-    expect(html).toContain(startHref);
-    expect(html).not.toContain(`>${messages.Course.enroll}<`);
-    expect(html).toContain(messages.Course.unenroll);
-    expect(html).not.toContain('id="quota"');
-    const unpublished = html.match(/<li id="ch-2"[\s\S]*?<\/li>/)![0];
-    expect(unpublished).not.toMatch(/<a |<button/);
-  });
-  it.each(["ar", "en"] as const)("gives a student who is not enrolled an explanation and no enroll or start action in %s", async (locale) => {
-    const messages = locale === "ar" ? ar : en;
-    backend.enrollments.mockResolvedValue({ ok: true, data: [] });
-    backend.allowance.mockResolvedValue({ ok: true, data: { ...allowance, usage: { ...allowance.usage, enrollments: 0 } } });
-    const html = await render(locale);
-    expect(html).toContain(`>${messages.Course.archived}</span>`);
-    expect(html).toContain(messages.Course.archivedClosed);
-    expect(html).not.toContain(startHref);
-    expect(html).not.toContain(messages.Course.enroll);
-    expect(html).not.toContain(messages.Course.unenroll);
-    expect(html.match(/<ul[\s\S]*<\/ul>/)![0]).not.toMatch(/<a |<button/);
-    expect(html).not.toContain("aria-haspopup");
-    expect(html).not.toContain('id="quota"');
-  });
-  it("does not offer a slot-limited student a quota block for a course they cannot join anyway", async () => {
-    backend.enrollments.mockResolvedValue({ ok: true, data: [held] });
-    const html = await render();
-    expect(html).toContain(ar.Course.archivedClosed);
-    expect(html).not.toContain('id="quota"');
-    expect(html).not.toContain(ar.Course.slotsFullHint);
-  });
-  it("shows a guest the same explanation instead of a sign-up prompt", async () => {
-    backend.account.mockResolvedValue(null);
-    const html = await render();
-    expect(html).toContain(ar.Course.archivedClosed);
-    expect(html).not.toContain("/join?course=");
-    expect(html).not.toContain(startHref);
-    expect(backend.enrollments).not.toHaveBeenCalled();
-  });
-  it("lets an unlimited account start without enrolling", async () => {
-    backend.enrollments.mockResolvedValue({ ok: true, data: [] });
-    backend.allowance.mockResolvedValue({ ok: true, data: { ...allowance, unlimited: true } });
-    const html = await render();
-    expect(html).toContain(startHref);
-    expect(html).not.toContain(`>${ar.Course.enroll}<`);
-  });
-  it("says nothing about archiving for a published course", async () => {
-    backend.course.mockResolvedValue({ ok: true, data: course });
-    const html = await render();
-    expect(html).not.toContain(ar.Course.archived);
-    expect(html).not.toContain(ar.Course.archivedClosed);
-    expect(html).not.toContain(ar.Course.archivedEnrolled);
-  });
-});
-
-describe("Course page reads", () => {
-  const draftChapter = {
-    id: "aaaaaaaa-0000-4000-8000-000000000003", number: 3, title: { ar: "الثالث", en: "Third" }, minutes: 30, lessonCount: 3,
-    state: "draft" as const, contentPath: null,
-    versions: [{ id: "dddddddd-0000-4000-8000-000000000002", version: 2, live: false, previewed: false, contentPath: "courses/math-101/ch_3/v2/" }],
-  };
-  const courseVersions = [{ id: "cccccccc-0000-4000-8000-000000000001", version: 1, live: false, previewed: false, contentPath: "courses/math-101/v1/" }];
-  const unlimited = { ...allowance, unlimited: true };
-  beforeEach(() => backend.enrollments.mockResolvedValue({ ok: true, data: [] }));
-
-  it("takes the public read for a student who is not unlimited", async () => {
-    await render();
-    expect(backend.course).toHaveBeenCalledWith("math-101", false);
-  });
-  it("takes the public read for a guest without reading an allowance", async () => {
-    backend.account.mockResolvedValue(null);
-    await render();
-    expect(backend.course).toHaveBeenCalledWith("math-101", false);
-    expect(backend.allowance).not.toHaveBeenCalled();
-  });
-  it("takes the public read after an allowance failure", async () => {
-    backend.allowance.mockResolvedValue({ ok: false, kind: "network" });
-    await render();
-    expect(backend.course).toHaveBeenCalledWith("math-101", false);
-  });
-  it.each(["ar", "en"] as const)("takes the preview read for an unlimited account and marks a Draft course and a Draft chapter in %s", async (locale) => {
-    const messages = locale === "ar" ? ar : en;
-    backend.allowance.mockResolvedValue({ ok: true, data: unlimited });
-    backend.course.mockResolvedValue({ ok: true, data: { ...course, status: "draft", versions: courseVersions, chapters: [...course.chapters, draftChapter] } });
-    const html = await render(locale);
-    expect(backend.course).toHaveBeenCalledWith("math-101", true);
-    expect(messages.Preview.draft).toBe(locale === "ar" ? "مسوّدة" : "Draft");
-    /* وسم المقرر في الترويسة ووسم الفصل في بطاقته */
-    expect(html.match(new RegExp(`>${messages.Preview.draft}</span>`, "g"))).toHaveLength(2);
-    const card = html.match(/<li id="ch-3"[\s\S]*?<\/li>/)![0];
-    expect(card).toContain(messages.Preview.draft);
-    /* الفصل المسوّدة بلا نسخة حيّة يبدأ على أحدث نسخة، والمقرر بلا محتوى حيّ على أحدث نسخة له */
-    expect(card).toContain('href="/session/math-101/aaaaaaaa-0000-4000-8000-000000000003?version=dddddddd-0000-4000-8000-000000000002&amp;courseVersion=cccccccc-0000-4000-8000-000000000001"');
-    expect(card).not.toContain(messages.Course.soon);
-  });
-  it("starts a published chapter of a Draft course with no pins when the live versions exist", async () => {
-    backend.allowance.mockResolvedValue({ ok: true, data: unlimited });
-    const live = [{ ...courseVersions[0], live: true }];
-    backend.course.mockResolvedValue({ ok: true, data: { ...course, versions: live, chapters: [{ ...course.chapters[0], versions: [] }, course.chapters[1]] } });
-    const html = await render();
-    expect(html).toContain('href="/session/math-101/aaaaaaaa-0000-4000-8000-000000000001"');
-    expect(html).not.toContain(ar.Preview.draft);
-  });
-  it("shows no Draft label for a student, whose public read has none", async () => {
-    const html = await render();
-    expect(html).not.toContain(ar.Preview.draft);
   });
 });
 
@@ -313,12 +188,6 @@ describe("Course page after a session", () => {
   it("shows no rating card to a guest", async () => {
     backend.account.mockResolvedValue(null);
     expect(await render("ar", { rate: "ss_room" })).not.toContain(ar.SessionRating.title);
-  });
-  it("shows the card on a student's own course page even on an archived course", async () => {
-    const archived: Course = { ...course, status: "archived" };
-    backend.course.mockResolvedValue({ ok: true, data: archived });
-    backend.enrollments.mockResolvedValue({ ok: true, data: [{ ...held, course: archived }] });
-    expect(ratingTitle(await render("ar", { rate: "ss_room" }))).not.toBeNull();
   });
 
   it.each(["ar", "en"] as const)("keeps the used-up usage block for an enrolled student who has used everything, with or without params, in %s", async (locale) => {

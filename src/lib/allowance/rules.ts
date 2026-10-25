@@ -1,4 +1,4 @@
-import type { CourseStatus, Enrollment } from "@/lib/courses/schema";
+import type { Enrollment } from "@/lib/courses/schema";
 import type { Allowance } from "./schema";
 
 export function minutesLeft({ limits, usage, unlimited }: Allowance): number | null {
@@ -25,21 +25,18 @@ export function slotsFull(allowance: Allowance | null, enrollments: Enrollment[]
 
 export type StartDecision =
   | { ok: true }
-  | { ok: false; reason: "unpublished" | "archived" | "not-enrolled" | "used-up" };
+  | { ok: false; reason: "unpublished" | "not-enrolled" | "used-up" };
 
 /* هل يبدأ هذا الحساب حصةً في هذا الفصل؟ القرار الوحيد للمنع بسبب النشر أو التسجيل أو الحدود.
-   الحساب غير المحدود (مشرف بتحقق بخطوتين) لا يحتاج تسجيلًا ولا تحدّه الحدود، أما الفصل غير المنشور فيُرفض للجميع.
-   المقرر المؤرشف يخدم تسجيلاته النشطة فقط: غير المسجَّل فيه يُمنع بسبب «archived» لا «not-enrolled»،
-   فلا يُعرض له تسجيل (لا يستطيعه) بل شرح أن المقرر مؤرشف. */
-export function startDecision({ allowance, enrolled, published, courseStatus }: {
+   الحساب غير المحدود (مشرف بتحقق بخطوتين) لا يحتاج تسجيلًا ولا تحدّه الحدود، أما الفصل غير المنشور فيُرفض للجميع. */
+export function startDecision({ allowance, enrolled, published }: {
   allowance: Allowance | null;
   enrolled: boolean;
   published: boolean;
-  courseStatus: CourseStatus;
 }): StartDecision {
   if (!published) return { ok: false, reason: "unpublished" };
   if (allowance?.unlimited) return { ok: true };
-  if (!enrolled) return { ok: false, reason: courseStatus === "archived" ? "archived" : "not-enrolled" };
+  if (!enrolled) return { ok: false, reason: "not-enrolled" };
   if (allowance && usedUp(allowance)) return { ok: false, reason: "used-up" };
   return { ok: true };
 }

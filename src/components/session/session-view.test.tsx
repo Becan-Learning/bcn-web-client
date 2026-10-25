@@ -1,9 +1,8 @@
-import type { ComponentProps, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { NextIntlClientProvider } from "next-intl";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import ar from "../../../messages/ar.json";
-import en from "../../../messages/en.json";
 import { SessionView } from "./session-view";
 
 const controls = vi.hoisted(() => ({
@@ -48,16 +47,10 @@ beforeEach(() => {
 });
 afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
 
-const CHAPTER_ID = "aaaaaaaa-0000-4000-8000-000000000001";
-const tokenResponse = {
-  token: "jwt", serverUrl: "wss://session.example.com",
-  contentPath: "courses/math-101/ch_1/", courseContentPath: "courses/math-101/",
-};
-
-function render(minutesRemaining: number | null = null, preview: Pick<ComponentProps<typeof SessionView>, "pins" | "notice"> = {}, locale: "ar" | "en" = "ar") {
-  return renderToStaticMarkup(<NextIntlClientProvider locale={locale} messages={locale === "ar" ? ar : en} timeZone="UTC">
+function render(minutesRemaining: number | null = null) {
+  return renderToStaticMarkup(<NextIntlClientProvider locale="ar" messages={ar} timeZone="UTC">
     <SessionView courseName="الرياضيات" courseSlug="math-101" chapterNo={1} chapterTitle="الأول"
-      minutes={30} chapterId={CHAPTER_ID} contentPath="courses/math-101/ch_1/" lessons={[]} minutesRemaining={minutesRemaining} {...preview} />
+      minutes={30} content={{ courseId: "math-101", chapterId: "ch_1" }} pdfUrl="/slides.pdf" lessons={[]} minutesRemaining={minutesRemaining} />
   </NextIntlClientProvider>);
 }
 
@@ -89,7 +82,6 @@ describe("Token refusal at session start", () => {
   it.each([
     [403, JSON.stringify({ error: { code: "NOT_ENROLLED", message: "Refused" } })],
     [409, JSON.stringify({ error: { code: "MINUTES_USED_UP", message: "Refused" } })],
-    [404, JSON.stringify({ error: { code: "CHAPTER_NOT_FOUND", message: "Refused" } })],
     [500, "Not JSON"],
   ])("keeps other failures on today's connection failure path (%i)", async (status, body) => {
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
@@ -100,97 +92,4 @@ describe("Token refusal at session start", () => {
     expect(controls.refresh).not.toHaveBeenCalled();
     expect(controls.stop).toHaveBeenCalledOnce();
   });
-
-  it("requests the token with the chapter id only, never a course id or chapter number", async () => {
-    controls.fetch.mockResolvedValue(Response.json(tokenResponse));
-    render();
-    controls.primary();
-    await vi.waitFor(() => expect(controls.fetch).toHaveBeenCalledOnce());
-    const [url, init] = controls.fetch.mock.calls[0];
-    expect(url).toBe("/api/v1/livekit/token");
-    const body = JSON.parse(init.body);
-    expect(body).toEqual({ chapterId: CHAPTER_ID, language: expect.any(String), experience: expect.any(String) });
-    expect(body).not.toHaveProperty("courseId");
-    expect(body).not.toHaveProperty("chapterNumber");
-  });
-
-  it.each(["CONTENT_NOT_AVAILABLE", "CHAPTER_NOT_PUBLISHED"])("stops quietly, without a connection error, for 409 %s", async (code) => {
-    const error = vi.spyOn(console, "error").mockImplementation(() => {});
-    controls.fetch.mockResolvedValue(new Response(JSON.stringify({ error: { code, message: "Refused" } }), { status: 409 }));
-    render();
-    controls.primary();
-    await vi.waitFor(() => expect(controls.stop).toHaveBeenCalledOnce());
-    expect(error).not.toHaveBeenCalled();
-    expect(controls.refresh).not.toHaveBeenCalled();
-  });
-
-  it("treats a token response without pinned content paths as a connection failure", async () => {
-    const error = vi.spyOn(console, "error").mockImplementation(() => {});
-    controls.fetch.mockResolvedValue(Response.json({ token: "jwt", serverUrl: "wss://session.example.com" }));
-    render();
-    controls.primary();
-    await vi.waitFor(() => expect(error).toHaveBeenCalledWith("Failed to start session:", expect.anything()));
-  });
 });
-
-describe("Admin preview", () => {
-  const VERSION_ID = "dddddddd-0000-4000-8000-000000000002";
-  const COURSE_VERSION_ID = "cccccccc-0000-4000-8000-000000000001";
-  const bodyOf = () => JSON.parse(controls.fetch.mock.calls[0][1].body);
-
-  it("sends the pinned version ids in the token request", async () => {
-    controls.fetch.mockResolvedValue(Response.json(tokenResponse));
-    render(null, { pins: { contentVersionId: VERSION_ID, courseContentVersionId: COURSE_VERSION_ID } });
-    controls.primary();
-    await vi.waitFor(() => expect(controls.fetch).toHaveBeenCalledOnce());
-    expect(bodyOf()).toEqual({
-      chapterId: CHAPTER_ID, language: expect.any(String), experience: expect.any(String),
-      contentVersionId: VERSION_ID, courseContentVersionId: COURSE_VERSION_ID,
-    });
-  });
-  it("sends only the side that was pinned", async () => {
-    controls.fetch.mockResolvedValue(Response.json(tokenResponse));
-    render(null, { pins: { courseContentVersionId: COURSE_VERSION_ID } });
-    controls.primary();
-    await vi.waitFor(() => expect(controls.fetch).toHaveBeenCalledOnce());
-    expect(bodyOf()).not.toHaveProperty("contentVersionId");
-    expect(bodyOf().courseContentVersionId).toBe(COURSE_VERSION_ID);
-  });
-  it("never sends version fields without pins", async () => {
-    controls.fetch.mockResolvedValue(Response.json(tokenResponse));
-    render(null, { pins: {}, notice: null });
-    controls.primary();
-    await vi.waitFor(() => expect(controls.fetch).toHaveBeenCalledOnce());
-    expect(Object.keys(bodyOf()).sort()).toEqual(["chapterId", "experience", "language"]);
-  });
-  it.each([
-    [403, "VERSION_PIN_FORBIDDEN"], [404, "CONTENT_VERSION_NOT_FOUND"], [409, "VERSION_INVALID"],
-  ])("stops quietly, without a connection error, for %i %s", async (status, code) => {
-    const error = vi.spyOn(console, "error").mockImplementation(() => {});
-    controls.fetch.mockResolvedValue(new Response(JSON.stringify({ error: { code, message: "Refused" } }), { status }));
-    render(null, { pins: { contentVersionId: VERSION_ID } });
-    controls.primary();
-    await vi.waitFor(() => expect(controls.stop).toHaveBeenCalledOnce());
-    expect(error).not.toHaveBeenCalled();
-    expect(controls.refresh).not.toHaveBeenCalled();
-  });
-  it.each(["ar", "en"] as const)("shows the version marker, saying whether it is live, in %s", (locale) => {
-    const messages = locale === "ar" ? ar : en;
-    const html = render(null, { notice: { draft: false, chapterVersion: { number: 3, live: false }, courseVersion: { number: 2, live: true } } }, locale);
-    expect(html).toContain(`${messages.Preview.version.replace("{number}", "3")} · ${messages.Preview.notLive}`);
-    expect(html).toContain(`${messages.Preview.courseVersion.replace("{number}", "2")} · ${messages.Preview.live}`);
-    expect(html).not.toContain(`>${messages.Preview.draft}<`);
-  });
-  it("shows a Draft label beside the marker", () => {
-    const html = render(null, { notice: { draft: true, chapterVersion: { number: 1, live: true }, courseVersion: null } });
-    expect(html).toContain(`>${ar.Preview.draft}</span>`);
-    expect(html).toContain("معاينة: النسخة 1 · هي النسخة الحيّة");
-    expect(html).not.toContain("محتوى المقرر");
-  });
-  it("shows no marker outside the preview", () => {
-    const html = render();
-    expect(html).not.toContain("data-preview-version");
-    expect(html).not.toContain(ar.Preview.draft);
-  });
-});
-

@@ -1,7 +1,11 @@
 # Session URLs use Chapter ids, and content paths come from the backend
 
-Status: **implemented** in web issue #54 (2026-10-15) and, for the Admin preview below, in web issue #55 (W2, 2026-10-15). See
-[Implementation notes (#55)](#implementation-notes-55).
+Status: **Superseded** (2026-10-25) by backend ADR 0007, "Catalog is managed by hand with SQL; one content
+folder per Chapter". Milestone 2 was reverted in all four repos: Course and Chapter ids are back to the Course
+slug and `ch_{n}`, session URLs are `/session/{code}/{n}` again, content paths are built by the web as
+`courses/{course_id}/{chapter_id}/`, and there are no Archived Courses for enrolled Students and no Admin
+Draft or version preview. This file is kept as the record of what was built and why it was dropped; nothing
+below is current.
 
 Chapters now have stable UUID ids, and their number is an editable position (backend ADR-0005). So
 session URLs become `/session/{courseSlug}/{chapterId}`. An id-based URL can't silently land on a

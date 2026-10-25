@@ -28,7 +28,7 @@ Next.js 16 · TypeScript · Tailwind 4 · Motion (الحزمة `motion`، الا
 | `src/components/becan/` | عُدّة التصميم: `kit` · `icons` · `logo` · `becan-face` … |
 | `src/components/session/` | الجلسة الحقيقية: `session-view` · `parts` · `slides-pdf` |
 | `src/lib/data/` | بيانات العرض: الخطط · الفوترة · الأسئلة · الدعم |
-| `src/lib/session/` | عقد الوكيل (`ui-control` · `teaching-board`) · `session-reducer` · `lessons` · `content` · `resolve` |
+| `src/lib/session/` | عقد الوكيل (`ui-control` · `teaching-board`) · `session-reducer` · `lessons` · `types` |
 | `src/styles/` | `tokens.css` + `globals.css` |
 
 - نصوص الصفحات في `messages/` — **ممنوع نصّ ظاهر للطالب ثابت في المكوّنات** (عربي أو إنجليزي).

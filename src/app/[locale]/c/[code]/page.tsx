@@ -5,10 +5,8 @@ import { routing } from "@/i18n/routing";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CourseView, type ViewState } from "./course-view";
-import { getCourseFor, getEnrollments } from "@/lib/auth/courses";
-import { readsPreview } from "@/lib/preview/rules";
+import { getCourse, getEnrollments } from "@/lib/auth/courses";
 import { getAllowance } from "@/lib/allowance/server";
-import { viewerReadsPreview } from "@/lib/preview/viewer";
 import { slotsFull, startDecision } from "@/lib/allowance/rules";
 import { usedUpQuota } from "@/lib/allowance/presentation";
 import { RATE_PARAM, LIMIT_PARAM, readLimitReached, readRateRoom } from "@/lib/session/rating";
@@ -21,7 +19,7 @@ export async function generateMetadata(
   const { code, locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   const t = await getTranslations({ locale, namespace: "Course" });
-  const { result } = await getCourseFor(code, await viewerReadsPreview());
+  const result = await getCourse(code);
   if (!result.ok) return { title: t("notFoundTitle") };
   const course = result.data;
   const format = await getFormatter({ locale });
@@ -38,26 +36,23 @@ export default async function CoursePage(props: PageProps<"/[locale]/c/[code]">)
 
   const { code } = await props.params;
   const search = await props.searchParams;
-  /* الحدود قبل المقرر: الحساب غير المحدود (مشرف) يقرأ معاينة المسوّدات، وغيره الكتالوج العام المخزَّن. */
-  const account = await getAccount();
-  const [enrollments, allowance] = account ? await Promise.all([getEnrollments(), getAllowance()]) : [null, null];
-  const { source, result } = await getCourseFor(code, readsPreview(allowance?.ok ? allowance.data : null));
+  const [result, account] = await Promise.all([getCourse(code), getAccount()]);
   if (!result.ok) notFound();
   const course = result.data;
+  /* الحدود مع التسجيلات: الحساب المسجَّل يحتاجها بعد الحصة (كتلة الحدود المستنفدة)، وغير المسجَّل ليعرف أهو غير محدود. */
+  const [enrollments, allowance] = account ? await Promise.all([getEnrollments(), getAllowance()]) : [null, null];
   const enrollmentError = enrollments !== null && !enrollments.ok;
-  const archived = course.status === "archived";
   const baseState: ViewState = !account ? "guest" : enrollments?.ok && enrollments.data.some((e) => e.course.id === course.id) ? "enrolled" : "new";
 
-  /* الحساب غير المحدود يبدأ فصلًا منشورًا دون تسجيل. المقرر المؤرشف لا يقبل تسجيلًا جديدًا:
-     غير المسجَّل فيه ("closed") لا يرى تسجيلًا ولا بدءًا، بل شرحًا. */
-  const state: ViewState = baseState === "enrolled" ? baseState
-    : startDecision({ allowance: allowance?.ok ? allowance.data : null, enrolled: false, published: true, courseStatus: course.status }).ok && baseState === "new"
-      ? "open"
-      : archived ? "closed" : baseState;
-  const slotQuota = !archived && allowance?.ok && allowance.data.limits.enrollments !== null && enrollments?.ok && slotsFull(allowance.data, enrollments.data, course.id)
+  /* الحساب غير المحدود يبدأ فصلًا منشورًا دون تسجيل. */
+  const state: ViewState = baseState === "new"
+    && startDecision({ allowance: allowance?.ok ? allowance.data : null, enrolled: false, published: true }).ok
+    ? "open"
+    : baseState;
+  const slotQuota = allowance?.ok && allowance.data.limits.enrollments !== null && enrollments?.ok && slotsFull(allowance.data, enrollments.data, course.id)
     ? {
       limit: allowance.data.limits.enrollments,
-      courses: enrollments.data.map(({ course: held }) => ({ slug: held.slug, name: localize(held.name, locale) })),
+      courses: enrollments.data.map(({ course: held }) => ({ id: held.id, name: localize(held.name, locale) })),
     }
     : null;
 
@@ -82,7 +77,6 @@ export default async function CoursePage(props: PageProps<"/[locale]/c/[code]">)
           usedUp={usedUp}
           limitNotice={limitNotice}
           rateRoom={rateRoom}
-          preview={source === "preview"}
         />
       </Section>
     </PageShell>

@@ -29,9 +29,9 @@ vi.mock("@/components/becan/kit", () => ({
 const enrollment: Enrollment = {
   enrolledAt: "2026-10-01T00:00:00Z",
   course: {
-    id: "11111111-1111-4111-8111-111111111111", slug: "math-101", code: "MATH 101", name: { ar: "الرياضيات", en: "Mathematics" },
+    id: "math-101", code: "MATH 101", name: { ar: "الرياضيات", en: "Mathematics" },
     institution: { id: "university", name: { ar: "الجامعة", en: "University" } },
-    icon: "blocks", tone: "lilac", chapterCount: 1, publishedChapterCount: 1, status: "published",
+    icon: "blocks", tone: "lilac", chapterCount: 1, publishedChapterCount: 1,
   },
 };
 const allowance: Allowance = {
@@ -107,23 +107,5 @@ describe("Home allowance notice", () => {
     expect(await render()).toContain(ar.Quota.usedUp.limit);
     expect(await render()).not.toContain(ar.Quota.usedUp.limit);
     expect(backend.allowance).toHaveBeenCalledTimes(2);
-  });
-});
-
-describe("Home archived courses", () => {
-  const archived: Enrollment = { ...enrollment, course: { ...enrollment.course, status: "archived" } };
-  it.each(["ar", "en"] as const)("marks an archived course, and only that one, in %s", async (locale) => {
-    const other: Enrollment = { ...enrollment, course: { ...enrollment.course, id: "22222222-2222-4222-8222-222222222222", slug: "acct-101", name: { ar: "المحاسبة", en: "Accounting" } } };
-    backend.enrollments.mockResolvedValue({ ok: true, data: [archived, other] });
-    const html = await render(locale);
-    const label = (locale === "ar" ? ar : en).Home.archived;
-    expect(html.match(new RegExp(`>${label}</span>`, "g"))).toHaveLength(1);
-    const card = html.match(/<a[^>]*href="\/c\/math-101"[\s\S]*?<\/a>/)![0];
-    expect(card).toContain(label);
-    expect(html.match(/<a[^>]*href="\/c\/acct-101"[\s\S]*?<\/a>/)![0]).not.toContain(label);
-    expect(card).toContain('href="/c/math-101"');
-  });
-  it("does not mark a published course", async () => {
-    expect(await render()).not.toContain(`>${ar.Home.archived}</span>`);
   });
 });

@@ -3,11 +3,13 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getPlans } from "@/lib/plans/server";
 import { RotatingWords } from "./_home/rotating-words";
 import { SessionScene } from "./_home/session-scene";
 import {
   HowItWorks,
   LandingFaq,
+  Pricing,
   Proof,
   ThreePoints,
   TwoWayVoice,
@@ -39,13 +41,15 @@ export default async function Home(props: PageProps<"/[locale]">) {
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  const t = await getTranslations("Landing");
+  const [t, plans] = await Promise.all([getTranslations("Landing"), getPlans()]);
   /** نصّ الفعل — مصدر واحد فلا يفترق بين موضعين. */
   const CTA = t("cta");
 
+  /* مدخل الأسعار يغيب مع القسم نفسه حين تتعذّر قراءة الباقات. */
   const NAV = [
+    ...(plans.ok ? [{ href: "#pricing", label: t("pricingNav") }] : []),
     { href: "#how", label: t("howNav") },
-  ] as const;
+  ];
 
   /* أربع طرق يذاكر بها الطالب اليوم ولا تنفعه — تتعاقب بعد
      «كفاية مذاكرة».
@@ -115,6 +119,7 @@ export default async function Home(props: PageProps<"/[locale]">) {
         <TwoWayVoice />
         <HowItWorks cta={CTA} />
         <Proof />
+        <Pricing />
         <LandingFaq />
 
         <CaptureBand

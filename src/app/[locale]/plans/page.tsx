@@ -1,4 +1,3 @@
-/* مسودّة معطّلة وغير قابلة للوصول حتى تتوفّر بوابة دفع. */
 import { localize } from "@/i18n/localized";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
@@ -7,8 +6,11 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import { PageShell, QuietLink, Section, SiteHeader } from "@/components/becan/kit";
 import { CheckIcon } from "@/components/becan/icons";
-import { breakdown, PLANS, VAT, type Plan } from "@/lib/data/plans";
+import { getPlans, getViewer } from "@/lib/plans/server";
+import { coursesLabel, hoursLabel, minutesLabel, sessionsLabel } from "@/lib/plans/labels";
+import { breakdown, formatPrice, VAT, type PlanView } from "@/lib/plans/view";
 import { PlanCard } from "./plan-card";
+import { RetryPlans } from "./retry-plans";
 
 /* P1 — الخطط.
 
@@ -25,7 +27,11 @@ import { PlanCard } from "./plan-card";
    كلّها، على الخطة المميّزة. والخطة الحالية موسومة ومعطّلة الزرّ.
 
    والتفصيل الضريبيّ مشتقّ من `breakdown` لا مكتوب: الطالب يرى 149
-   ويدفع 149، والصافي يُشتقّ منه لا يُضاف إليه. */
+   ويدفع 149، والصافي يُشتقّ منه لا يُضاف إليه.
+
+   **الباقات من الخادم** (`getPlans`)، وباقة الطالب الحالية من
+   `/me/allowance`. لا تقدير لعدد الفصول: الدقائق لا تُترجَم إلى فصول.
+   الدفع تجريبي حتى تتوفّر بوابة: لا يُحصَّل شيء ولا تتغيّر باقة أحد. */
 
 /* صفوف المقارنة — كلّها كمّيّة، فالجدول يقول الحجم لا الوظيفة. */
 
@@ -40,12 +46,37 @@ export default async function PlansPage(props: PageProps<"/[locale]/plans">) {
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  const t = await getTranslations("Plans");
-  const ROWS: { label: string; of: (p: Plan) => string }[] = [
-    { label: t("chapters"), of: (p) => localize(p.chapters, locale) },
-    { label: t("minutes"), of: (p) => t("minuteCount", { count: p.minutes, countLabel: String(p.minutes) }) },
-    { label: t("hours"), of: (p) => localize(p.hours, locale) },
-    { label: t("courses"), of: (p) => localize(p.courses, locale) },
+  const [t, facts, result, viewer] = await Promise.all([
+    getTranslations("Plans"),
+    getTranslations("PlanFacts"),
+    getPlans(),
+    getViewer(),
+  ]);
+
+  if (!result.ok) {
+    return (
+      <PageShell withFooter>
+        <SiteHeader />
+
+        <Section className="pt-12 pb-16 md:pt-16">
+          <h1 className="font-display text-4xl leading-tight font-bold text-ink md:text-5xl">
+            {t("title")}</h1>
+          <div className="mt-8 max-w-measure rounded-xl bg-tint-amber p-5 md:p-6">
+            <h2 className="text-lg font-bold text-ink">{t("errorTitle")}</h2>
+            <p className="mt-2 leading-base text-ink-2">{t("errorBody")}</p>
+            <RetryPlans label={t("retry")} />
+          </div>
+        </Section>
+      </PageShell>
+    );
+  }
+
+  const plans = result.plans;
+  const ROWS: { label: string; of: (p: PlanView) => string }[] = [
+    { label: t("minutes"), of: (p) => minutesLabel(facts, p) },
+    { label: t("hours"), of: (p) => hoursLabel(facts, p) ?? "—" },
+    { label: t("sessions"), of: (p) => sessionsLabel(facts, p) },
+    { label: t("courses"), of: (p) => coursesLabel(facts, p) },
   ];
 
   return (
@@ -62,9 +93,14 @@ export default async function PlansPage(props: PageProps<"/[locale]/plans">) {
         </p>
 
         <ul className="mt-10 grid items-start gap-4 md:grid-cols-3">
-          {PLANS.map((plan) => (
+          {plans.map((plan) => (
             <li key={plan.id}>
-              <PlanCard plan={plan} href={`/checkout?plan=${plan.id}`} />
+              <PlanCard
+                plan={plan}
+                href={plan.price === 0 ? (viewer.signedIn ? "/home" : "/join") : `/checkout?plan=${plan.id}`}
+                current={viewer.planId === plan.id}
+                freeAction={viewer.signedIn ? "home" : "start"}
+              />
             </li>
           ))}
         </ul>
@@ -78,7 +114,7 @@ export default async function PlansPage(props: PageProps<"/[locale]/plans">) {
                 <th scope="col" className="px-5 py-4 text-start text-ink-2">
                   <span className="text-sm font-semibold">{t("comparison")}</span>
                 </th>
-                {PLANS.map((p) => (
+                {plans.map((p) => (
                   <th
                     key={p.id}
                     scope="col"
@@ -99,7 +135,7 @@ export default async function PlansPage(props: PageProps<"/[locale]/plans">) {
                   >
                     {row.label}
                   </th>
-                  {PLANS.map((p) => (
+                  {plans.map((p) => (
                     <td key={p.id} className="px-5 py-4 text-ink">
                       {row.of(p)}
                     </td>
@@ -114,7 +150,7 @@ export default async function PlansPage(props: PageProps<"/[locale]/plans">) {
                   className="px-5 py-4 text-start text-sm font-semibold text-ink-2"
                 >
                   {t("sharedFeatures")}</th>
-                {PLANS.map((p) => (
+                {plans.map((p) => (
                   <td key={p.id} className="px-5 py-4">
                     <span className="flex items-center gap-2 text-ink">
                       <CheckIcon className="h-4 w-4 text-success" />
@@ -147,7 +183,7 @@ export default async function PlansPage(props: PageProps<"/[locale]/plans">) {
               {t("vatBody")}</p>
 
             <dl className="mt-4 flex flex-col gap-2 text-sm">
-              {PLANS.filter((p) => p.price > 0).map((p) => {
+              {plans.filter((p) => p.price > 0).map((p) => {
                 const b = breakdown(p.price);
                 return (
                   <div
@@ -156,7 +192,7 @@ export default async function PlansPage(props: PageProps<"/[locale]/plans">) {
                   >
                     <dt className="text-ink-2">{localize(p.name, locale)}</dt>
                     <dd className="text-end text-ink">
-                      {t.rich("taxBreakdown", { net: b.net.toFixed(2), vat: b.vat.toFixed(2), gross: String(b.gross), strong: (chunks) => <span className="font-semibold">{chunks}</span> })}
+                      {t.rich("taxBreakdown", { net: b.net.toFixed(2), vat: b.vat.toFixed(2), gross: formatPrice(b.gross), strong: (chunks) => <span className="font-semibold">{chunks}</span> })}
                     </dd>
                   </div>
                 );

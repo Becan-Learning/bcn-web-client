@@ -40,6 +40,22 @@ export default async function TermsPage(props: PageProps<"/[locale]/terms">) {
     timeZone: "UTC",
   });
   const richValues = {
+    plans: (chunks: ReactNode) => (
+      <Link
+        href="/plans"
+        className="font-semibold text-pressable underline underline-offset-4"
+      >
+        {chunks}
+      </Link>
+    ),
+    refunds: (chunks: ReactNode) => (
+      <Link
+        href="/refunds"
+        className="font-semibold text-pressable underline underline-offset-4"
+      >
+        {chunks}
+      </Link>
+    ),
     status: (chunks: ReactNode) => (
       <Link
         href="/status"

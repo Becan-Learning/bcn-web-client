@@ -18,7 +18,7 @@ export type SectionId =
   "account" | "study" | "subscription" | "invoices" | "data";
 
 export const SETTINGS_SECTIONS: {
-  id: Exclude<SectionId, "invoices">;
+  id: SectionId;
   href: string;
 }[] = [
   {
@@ -32,6 +32,10 @@ export const SETTINGS_SECTIONS: {
   {
     id: "subscription",
     href: "/settings/subscription",
+  },
+  {
+    id: "invoices",
+    href: "/settings/invoices",
   },
   {
     id: "data",

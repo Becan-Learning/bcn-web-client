@@ -1,4 +1,3 @@
-/* مسودّة معطّلة وغير قابلة للوصول حتى تتوفّر بوابة دفع. */
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { hasLocale } from "next-intl";
 import { localize } from "@/i18n/localized";
@@ -14,9 +13,8 @@ import {
   Section,
   SiteHeader,
 } from "@/components/becan/kit";
-import { planById } from "@/lib/data/plans";
-import { requireAccount } from "@/lib/auth/session";
-import { accountReturnPath } from "@/lib/auth/next-path";
+import { getPlans } from "@/lib/plans/server";
+import { planById } from "@/lib/plans/view";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/checkout/result">): Promise<Metadata> {
   const { locale } = await params;
@@ -34,7 +32,12 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/checkout
    الفشل يذكر **سببًا محدّدًا** لا «حدث خطأ»: الطالب لا يستطيع تصحيح
    ما لا يعرفه. والسبب يأتي من البوابة في الإنتاج، ويُعايَن هنا بـ`?r=`.
 
-   النجاح والدفع المعلّق يعيدان الطالب إلى مقرراته. */
+   **الدفع تجريبي حتى تتوفّر بوابة**، فالنجاح هنا شكر لا ترقية: استلمنا
+   الطلب، والدفع الإلكتروني يُفتح قريبًا، ولم يُخصم شيء، وباقته كما هي.
+   والفشل والمعلّق لا يبلغهما إلا من يكتب `?s=` بنفسه.
+
+   الصفحة مفتوحة للزائر. والباقة تُقرأ من الخادم؛ إن غابت أو تعذّرت
+   قراءتها يبقى الشكر بلا اسم باقة. */
 
 const STATES = ["success", "failed", "pending"] as const;
 type ResultState = (typeof STATES)[number];
@@ -69,7 +72,6 @@ export default async function ResultPage(props: PageProps<"/[locale]/checkout/re
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  await requireAccount(locale, accountReturnPath("/checkout/result", await props.searchParams));
 
   const sp = await props.searchParams;
   const rawState = Array.isArray(sp.s) ? sp.s[0] : sp.s;
@@ -77,7 +79,10 @@ export default async function ResultPage(props: PageProps<"/[locale]/checkout/re
   const rawReason = Array.isArray(sp.r) ? sp.r[0] : sp.r;
 
   const state: ResultState = isState(rawState) ? rawState : "success";
-  const plan = planById(rawPlan ?? "") ?? planById("pro")!;
+  const plans = await getPlans();
+  const found = plans.ok ? planById(plans.plans, rawPlan ?? "") : undefined;
+  /* الباقة المجانية لا تُدفع: لا تُسمّى هنا. */
+  const plan = found && found.price > 0 ? found : undefined;
   const reason = Object.hasOwn(REASONS, rawReason ?? "") ? REASONS[rawReason as keyof typeof REASONS] : FALLBACK;
 
   return (
@@ -87,9 +92,9 @@ export default async function ResultPage(props: PageProps<"/[locale]/checkout/re
       <Section className="pt-12 pb-16 md:pt-16">
         <div className="mx-auto w-full max-w-[34rem]">
           {state === "success" ? (
-            <Success plan={localize(plan.name, locale)} minutes={plan.minutes} />
+            <Success plan={plan ? localize(plan.name, locale) : null} />
           ) : state === "failed" ? (
-            <Failed planId={plan.id} reason={reason} />
+            <Failed planId={plan?.id ?? null} reason={reason} />
           ) : (
             <Pending />
           )}
@@ -101,32 +106,26 @@ export default async function ResultPage(props: PageProps<"/[locale]/checkout/re
 
 /* ————— نجاح ————— */
 
-async function Success({
-  plan,
-  minutes,
-}: {
-  plan: string;
-  minutes: number;
-}) {
+async function Success({ plan }: { plan: string | null }) {
   const t = await getTranslations("Checkout.Result");
   return (
     <div>
-      {/* رقم واحد بارز: الحصّة الجديدة — لا لوحة إحصائيات */}
       <h1 className="font-display text-4xl leading-tight font-bold text-ink md:text-5xl">
         {t("successTitle")}
       </h1>
 
       <p className="mt-4 leading-base text-ink-2">
-        {t("successBody", { plan, minutes, minutesLabel: String(minutes) })}
+        {plan ? t("successBodyPlan", { plan }) : t("successBody")}
       </p>
+      <p className="mt-3 leading-base text-ink-2">{t("successSoon")}</p>
+      <p className="mt-3 leading-base font-semibold text-ink">{t("successNothing")}</p>
 
-      <PrimaryButton href="/home" className="mt-8 w-full sm:w-fit">
-        {t("home")}
+      <PrimaryButton href="/courses" className="mt-8 w-full sm:w-fit">
+        {t("browse")}
       </PrimaryButton>
 
-      <div className="mt-6 flex flex-wrap items-center gap-x-6">
-        <QuietLink href="/settings/invoices">{t("invoice")}</QuietLink>
-        <QuietLink href="/settings/subscription">{t("subscription")}</QuietLink>
+      <div className="mt-6">
+        <QuietLink href="/plans">{t("backToPlans")}</QuietLink>
       </div>
     </div>
   );
@@ -138,10 +137,12 @@ async function Failed({
   planId,
   reason,
 }: {
-  planId: string;
+  planId: string | null;
   reason: (typeof REASONS)[keyof typeof REASONS];
 }) {
   const t = await getTranslations("Checkout.Result");
+  /* بلا باقة معروفة لا رابط دفع لها: يرجع إلى الباقات يختار. */
+  const retryHref = planId ? `/checkout?plan=${encodeURIComponent(planId)}` : "/plans";
   return (
     <div>
       {/* ماذا حدث */}
@@ -161,13 +162,13 @@ async function Failed({
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
         <PrimaryButton
-          href={`/checkout?plan=${planId}`}
+          href={retryHref}
           className="w-full sm:w-fit"
         >
           {t("retry")}
         </PrimaryButton>
 
-        <GhostButton href={`/checkout?plan=${planId}`}>
+        <GhostButton href={retryHref}>
           {t("anotherMethod")}
         </GhostButton>
       </div>

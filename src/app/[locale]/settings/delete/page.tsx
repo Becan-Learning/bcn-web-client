@@ -1,4 +1,4 @@
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 import { hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
@@ -7,6 +7,10 @@ import { SettingsCard, SettingsShell } from "../_shell";
 import { DeleteForm } from "./delete-form";
 import { requireAccount } from "@/lib/auth/session";
 import { accountReturnPath } from "@/lib/auth/next-path";
+import { getAllowance } from "@/lib/allowance/server";
+import { formatRenewalDate } from "@/lib/allowance/format";
+import { getPlans } from "@/lib/plans/server";
+import { currentPaidPlan } from "@/lib/plans/view";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/settings/delete">): Promise<Metadata> {
   const { locale } = await params;
@@ -37,7 +41,15 @@ export default async function DeletePage(props: PageProps<"/[locale]/settings/de
   const sp = await props.searchParams;
   await requireAccount(locale, accountReturnPath("/settings/delete", sp));
   const googleError = (Array.isArray(sp.error) ? sp.error[0] : sp.error) || "";
-  const t = await getTranslations("Settings.Delete");
+  const [t, format, allowance, plans] = await Promise.all([
+    getTranslations("Settings.Delete"),
+    getFormatter({ locale }),
+    getAllowance(),
+    getPlans(),
+  ]);
+  /* تحذير الاشتراك المدفوع لمن باقته الحالية بسعر أكبر من صفر وحدهم. */
+  const paid = allowance.ok ? currentPaidPlan(allowance.data.plan.id, plans.ok ? plans.plans : null) : null;
+  const activeUntil = paid && allowance.ok ? formatRenewalDate(format, new Date(allowance.data.period.end)) : null;
 
   return (
     <SettingsShell
@@ -68,7 +80,7 @@ export default async function DeletePage(props: PageProps<"/[locale]/settings/de
           </p>
         </SettingsCard>
 
-        <DeleteForm googleError={googleError} />
+        <DeleteForm googleError={googleError} activeUntil={activeUntil} />
       </div>
     </SettingsShell>
   );

@@ -45,12 +45,14 @@
   },
   "SiteFooter": {
     "how": "How it works",
+    "pricing": "Pricing",
     "faq": "FAQs",
     "contact": "Contact us",
     "status": "System status",
     "login": "Sign in",
     "terms": "Terms and conditions",
     "privacy": "Privacy policy",
+    "refunds": "Refunds and cancellations",
     "cookies": "Cookies",
     "contactInfo": "Contact information",
     "emailLabel": "Email: ",
@@ -128,6 +130,8 @@
     "studyHint": "Explanation speed and test format",
     "subscription": "Plan",
     "subscriptionHint": "Your limits and usage",
+    "invoices": "Invoices",
+    "invoicesHint": "Your payment history with VAT shown separately",
     "data": "Your data",
     "dataHint": "Download your data or delete your account",
     "saved": "Saved",
@@ -195,42 +199,15 @@
       "reauthRedirecting": "You’re heading to Google…",
       "cancel": "Cancel",
       "phraseInvalid": "Type “{phrase}” exactly to confirm this is intentional",
-      "phraseHint": "Type this exactly: {phrase}"
+      "phraseHint": "Type this exactly: {phrase}",
+      "activeSubscription": "You have a paid subscription active until <strong>{date}</strong>. Deleting your account stops it now, and we don’t refund the remaining period. <cancel>Canceling without deleting</cancel> lets you use it until the end."
     },
     "Invoices": {
       "metadataTitle": "Invoices — Becan",
       "title": "Invoices",
-      "lede": "Every payment you’ve made, with VAT separate from the net amount.",
+      "lede": "Your payment invoices, with VAT separate from the net amount.",
       "emptyTitle": "No invoices yet",
-      "emptyBody": "Your first invoice appears here after your first paid subscription.",
-      "net": "Net amount",
-      "vat": "VAT",
-      "caption": "Your invoice history",
-      "date": "Date",
-      "plan": "Plan",
-      "total": "Total",
-      "invoice": "Invoice",
-      "open": "Open invoice",
-      "amount": "SAR {amount}",
-      "planName": "{plan} plan",
-      "note": "All amounts are in Saudi riyals and include VAT. Need an invoice in an organization’s name? <contact>Contact us</contact>."
-    },
-    "Invoice": {
-      "invoices": "Invoices",
-      "brand": "Becan",
-      "subscriptionInvoice": "Subscription invoice",
-      "number": "Invoice number",
-      "date": "Date",
-      "description": "Description",
-      "method": "Payment method",
-      "net": "Net amount",
-      "totalPaid": "Total paid",
-      "paid": "Paid · Amounts in Saudi riyals.",
-      "print": "Save invoice",
-      "planMonth": "{plan} plan — one month",
-      "vatRate": "VAT {rate}%",
-      "amount": "SAR {amount}",
-      "metadataTitle": "Invoice {id} — Becan"
+      "emptyBody": "Your first invoice appears here after your first paid subscription."
     },
     "Subscription": {
       "metadataTitle": "Plan — Becan",
@@ -246,7 +223,25 @@
       "errorBody": "We couldn’t get your limits and usage right now. Try again.",
       "lede": "Your usage limits for this period and what you've used of them",
       "usedUp": "You've reached your usage limits for this period. You can't start a new session before {date}",
-      "retry": "Try again"
+      "retry": "Try again",
+      "upgrade": "Upgrade your plan",
+      "compare": "Compare plans",
+      "paidTitle": "Your paid subscription",
+      "paidPrice": "SAR {price} every 30 days",
+      "vatNote": "The price includes VAT.",
+      "renewsOn": "Next renewal",
+      "endsOn": "Ends on",
+      "method": "Payment method",
+      "canceledTitle": "Renewal canceled",
+      "canceledBody": "Your {plan} stays active until <strong>{date}</strong>, then you return to the free plan. You won’t be charged.",
+      "resume": "Resume subscription",
+      "cancelTitle": "Cancel subscription",
+      "cancelBody": "You can cancel renewal anytime. Your plan stays active until the end of your paid period.",
+      "cancel": "Cancel renewal",
+      "confirmTitle": "Canceling returns you to the free plan",
+      "activeUntil": "Your {plan} stays active until {date}.",
+      "confirm": "Confirm cancellation",
+      "keep": "Keep my plan"
     }
   },
   "Quota": {
@@ -482,12 +477,10 @@
   },
   "Plans": {
     "metadataTitle": "Plans — Becan",
-    "metadataDescription": "Compare monthly study plans. Prices include VAT.",
-    "chapters": "Chapters per month",
+    "metadataDescription": "Compare study plans. Prices cover each 30-day period and include VAT.",
     "minutes": "Minutes",
     "hours": "In hours",
     "courses": "Courses",
-    "minuteCount": "{count, plural, one {{countLabel} minute} other {{countLabel} minutes}}",
     "title": "Plans",
     "comparisonCaption": "Compare plan allowances",
     "comparison": "Comparison",
@@ -500,10 +493,14 @@
     "pricingFaq": "Pricing questions",
     "vatTitle": "VAT is included",
     "vatBody": "You pay the price shown. No fees are added at checkout, and your invoice separates the net amount from VAT.",
-    "intro": "You get the same explanations, board, questions and summaries on each plan. Plans differ in <strong>study time</strong> and <strong>number of courses</strong>.",
+    "intro": "You get the same explanations, board, questions and summaries on each plan. Plans differ in <strong>study time</strong>, <strong>number of sessions</strong> and <strong>number of courses</strong>.",
     "paymentMethods": "mada, <latin>Apple Pay</latin> and credit cards.",
     "taxBreakdown": "SAR {net} + SAR {vat} VAT = <strong>SAR {gross}</strong>",
-    "vatRate": "VAT: {rate}%."
+    "vatRate": "VAT: {rate}%.",
+    "sessions": "Sessions",
+    "errorTitle": "We couldn’t load the plans",
+    "errorBody": "We couldn’t get the plans and their prices right now. Try again.",
+    "retry": "Try again"
   },
   "PlanCard": {
     "current": "Your current plan",
@@ -511,13 +508,26 @@
     "vatIncluded": "VAT included",
     "startFree": "Start free",
     "choose": "Choose {plan}",
-    "price": "<unit>SAR</unit> <price>{priceLabel}</price> <unit>/ month</unit>",
-    "minutes": "{count, plural, one {<amount>{countLabel}</amount> <unit>minute per month</unit>} other {<amount>{countLabel}</amount> <unit>minutes per month</unit>}}"
+    "price": "<unit>SAR</unit> <price>{priceLabel}</price> <unit>every 30 days</unit>",
+    "minutes": "{count, plural, one {<amount>{countLabel}</amount> <unit>minute every 30 days</unit>} other {<amount>{countLabel}</amount> <unit>minutes every 30 days</unit>}}",
+    "minutesUnlimited": "<amount>Unlimited minutes</amount> <unit>every 30 days</unit>",
+    "sessionsPerPeriod": "{sessions} every 30 days",
+    "goHome": "Open your courses"
+  },
+  "PlanFacts": {
+    "minutes": "{count, plural, one {{countLabel} minute} other {{countLabel} minutes}}",
+    "minutesUnlimited": "Unlimited minutes",
+    "hours": "{count, plural, one {≈ 1 hour of guided study} other {≈ {countLabel} hours of guided study}}",
+    "courses": "{count, plural, one {One course} other {{countLabel} courses}}",
+    "coursesAll": "All your courses",
+    "sessions": "{count, plural, one {Up to 1 session} other {Up to {countLabel} sessions}}",
+    "sessionsUnlimited": "Unlimited sessions"
   },
   "Landing": {
     "metadataTitle": "Becan — Your personal course tutor",
     "metadataDescription": "Study your course by voice, check your understanding with questions, and see which mistakes could cost you marks.",
     "cta": "Choose your course for free",
+    "pricingNav": "Pricing",
     "howNav": "How it works",
     "heroTitle": "Stop studying in ways that",
     "wrong": "don’t work",
@@ -561,7 +571,7 @@
       "ratingLabel": "{rating} out of 5",
       "rating": "<strong>{rating}</strong> out of 5 · Session rating",
       "pricingBody": "Get the value of a private tutor — <strong>for the price of a single lesson with one</strong>.",
-      "pricingNote": "Monthly prices include VAT · <refunds>Cancel anytime</refunds>",
+      "pricingNote": "Prices are per 30 days and include VAT · <refunds>Cancel anytime</refunds>",
       "voice": "<hears>You can ask by voice</hears> <speaks>and hear the answer</speaks>"
     },
     "Demo": {
@@ -647,7 +657,7 @@
     "summary": "Order summary",
     "net": "Net amount",
     "total": "Total",
-    "security": "Payment goes through an approved payment gateway. Becan doesn’t store your card number. Your subscription renews monthly, and you can cancel anytime.",
+    "security": "Payment goes through an approved payment gateway. Becan doesn’t store your card number. Your subscription renews every 30 days, and you can cancel anytime.",
     "Result": {
       "metadataTitle": "Payment result — Becan",
       "declinedWhy": "Your bank declined the payment.",
@@ -658,10 +668,8 @@
       "expiredFix": "Use a valid card, or pay from your phone without entering numbers.",
       "onlineWhy": "Online purchases aren’t enabled on your card.",
       "onlineFix": "Enable them in your bank’s app — usually under “Card settings” — then try again.",
-      "successTitle": "You’ve upgraded",
+      "successTitle": "Thank you",
       "home": "Back to your courses",
-      "invoice": "View your invoice",
-      "subscription": "Manage subscription",
       "failedTitle": "Payment didn’t go through",
       "unchanged": "You haven’t been charged, and your plan hasn’t changed.",
       "retry": "Try again",
@@ -671,17 +679,25 @@
       "continueTitle": "You can keep studying now",
       "pendingDefault": "Your current plan’s minutes are still available. You can study with them while payment is being processed.",
       "status": "Check subscription status",
-      "successBody": "You’re on the {plan} plan — {minutes, plural, one {{minutesLabel} minute} other {{minutesLabel} minutes}} a month, with all your courses unlocked. Your invoice has been emailed to you.",
-      "help": "Happening again? <contact>Message us on WhatsApp</contact> and we’ll help you follow it up."
+      "successBody": "We received your request.",
+      "help": "Happening again? <contact>Message us on WhatsApp</contact> and we’ll help you follow it up.",
+      "successBodyPlan": "We received your request for the {plan}.",
+      "successSoon": "Online payment opens soon.",
+      "successNothing": "Nothing was charged, and your current plan hasn’t changed.",
+      "browse": "Browse courses",
+      "backToPlans": "Back to plans"
     },
-    "planSummary": "{plan} plan — {minutes, plural, one {{minutesLabel} minute} other {{minutesLabel} minutes}} a month, {courses}.",
-    "planMonth": "{plan} plan — one month",
+    "planSummary": "{plan} — {minutes} every 30 days, {courses}.",
     "vatRate": "VAT {rate}%",
     "amount": "SAR {amount}",
     "pay": "Pay SAR {amount}",
     "numberPlaceholder": "0000 0000 0000 0000",
     "expiryPlaceholder": "MM/YY",
-    "cvcPlaceholder": "123"
+    "cvcPlaceholder": "123",
+    "planPeriod": "{plan} — 30 days",
+    "errorTitle": "We couldn’t load the plan",
+    "errorBody": "We couldn’t get the plans and their prices right now. Try again.",
+    "retry": "Try again"
   },
   "Session": {
     "loadingSlides": "Preparing slides…",
@@ -922,8 +938,8 @@
         },
         "money": {
           "title": "Subscriptions and payment",
-          "paragraph1": "Becan offers one free Plan during the soft launch.",
-          "paragraph2": "There is currently no payment gateway, and no charges are collected for the Plan.",
+          "paragraph1": "Prices shown on the <plans>Plans page</plans> include VAT. Your subscription renews automatically every 30 days until you cancel it.",
+          "paragraph2": "Full details of cancellation and refunds are in the <refunds>Refunds and cancellation policy</refunds>.",
           "paragraph3": "We may change prices. If we do, we will give you at least 30 days’ notice. The new price applies from the renewal after that notice — not partway through your current paid period."
         },
         "availability": {
@@ -972,7 +988,7 @@
           "title": "When a refund is not available",
           "points1": {
             "item1": "After 7 days from payment, or after you have used more than 20% of your plan’s minutes — whichever comes first. You can cancel renewal and keep using the period you paid for.",
-            "item2": "Renewals after the first month — cancellation prevents the next renewal; it does not refund one that has already happened.",
+            "item2": "Renewals after the first 30 days — cancellation prevents the next renewal; it does not refund one that has already happened.",
             "item3": "Account suspension for breaking the terms, such as sharing your account or republishing content."
           }
         },
@@ -1053,7 +1069,7 @@
     "email": "Email address",
     "emailPlaceholder": "name@example.com",
     "resend": "Resend the link",
-      "sending": "You’re requesting a new link…",
+    "sending": "You’re requesting a new link…",
     "sent": "You requested a new link. Check your inbox.",
     "cooldown": "You can request a new link in {seconds} seconds.",
     "signIn": "Back to sign in"
@@ -1066,7 +1082,7 @@
     "email": "Email address",
     "emailPlaceholder": "name@example.com",
     "submit": "Send the change link",
-      "sending": "You’re requesting the change link…",
+    "sending": "You’re requesting the change link…",
     "confirmation": "If you have an account with this email, you’ll receive a message with a password change link. Check your inbox and spam folder.",
     "signIn": "Back to sign in"
   },

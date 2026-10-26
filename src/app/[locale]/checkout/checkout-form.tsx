@@ -1,4 +1,3 @@
-/* مسودّة معطّلة وغير قابلة للوصول حتى تتوفّر بوابة دفع. */
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
@@ -8,7 +7,7 @@ import { localize } from "@/i18n/localized";
 import { useId, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { ErrorText, FieldLabel, PrimaryButton, TextField } from "@/components/becan/kit";
-import { breakdown, planById, VAT } from "@/lib/data/plans";
+import { breakdown, formatPrice, VAT, type PlanView } from "@/lib/plans/view";
 import { METHODS, type MethodId } from "@/lib/data/billing";
 
 /* P2 — نموذج الدفع.
@@ -19,7 +18,11 @@ import { METHODS, type MethodId } from "@/lib/data/billing";
    حقول البطاقة إنجليزية الأرقام بـ`dir="ltr"` و`inputmode="numeric"`
    و`autocomplete` صحيح، كي يملأها مدير كلمات المرور بلا كتابة.
 
-   `noValidate` مقصود: رسائل المتصفّح بلغة النظام لا بالعربية. */
+   `noValidate` مقصود: رسائل المتصفّح بلغة النظام لا بالعربية.
+
+   **الدفع تجريبي حتى تتوفّر بوابة**: بيانات البطاقة لا تغادر المتصفّح
+   (لا `fetch` ولا إجراء خادم)، ولا يُحصَّل شيء ولا تتغيّر باقة أحد.
+   الإرسال الصحيح ينتقل إلى صفحة النتيجة فقط. */
 
 type Errors = Partial<Record<"number" | "expiry" | "cvc" | "name", string>>;
 
@@ -37,7 +40,7 @@ const groupExpiry = (v: string) => {
   return d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
 };
 
-export function CheckoutForm({ planId }: { planId: string }) {
+export function CheckoutForm({ plan }: { plan: PlanView }) {
   const t = useTranslations("Checkout");
   const locale = useLocale();
   const router = useRouter();
@@ -49,8 +52,7 @@ export function CheckoutForm({ planId }: { planId: string }) {
   const [name, setName] = useState("");
   const [errors, setErrors] = useState<Errors>({});
 
-  const plan = planById(planId);
-  const sums = breakdown(plan?.price ?? 0);
+  const sums = breakdown(plan.price);
   const needsCard = method !== "applepay";
 
   const clear = (key: keyof Errors) =>
@@ -91,10 +93,8 @@ export function CheckoutForm({ planId }: { planId: string }) {
       return;
     }
 
-    router.push(`/checkout/result?s=success&plan=${planId}`);
+    router.push(`/checkout/result?s=success&plan=${encodeURIComponent(plan.id)}`);
   };
-
-  if (!plan) return null;
 
   return (
     <form className="mt-9" onSubmit={submit} noValidate>
@@ -254,8 +254,8 @@ export function CheckoutForm({ planId }: { planId: string }) {
 
         <dl className="mt-3 flex flex-col gap-2 text-sm">
           <SumRow
-            term={t("planMonth", { plan: localize(plan.name, locale) })}
-            value={t("amount", { amount: String(sums.gross) })}
+            term={t("planPeriod", { plan: localize(plan.name, locale) })}
+            value={t("amount", { amount: formatPrice(sums.gross) })}
           />
           <SumRow term={t("net")} value={t("amount", { amount: String(sums.net.toFixed(2)) })} />
           <SumRow
@@ -266,13 +266,13 @@ export function CheckoutForm({ planId }: { planId: string }) {
 
         <div className="mt-3 flex items-baseline justify-between gap-3 border-t border-line pt-3">
           <span className="font-semibold text-ink">{t("total")}</span>
-          <span className="text-xl font-bold text-ink">{t("amount", { amount: String(sums.gross) })}</span>
+          <span className="text-xl font-bold text-ink">{t("amount", { amount: formatPrice(sums.gross) })}</span>
         </div>
       </section>
 
       {/* المبلغ في الزر لا «تأكيد» — يعرف كم يدفع قبل أن يضغط */}
       <PrimaryButton type="submit" className="mt-6 w-full">
-        {t("pay", { amount: String(plan.price) })}
+        {t("pay", { amount: formatPrice(plan.price) })}
       </PrimaryButton>
 
       {/* شارة أمان نصّية — لا أقفال ذهبية */}

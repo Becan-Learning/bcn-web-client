@@ -247,6 +247,43 @@ Env (`src/config/env.ts` + `.env.example`): `LIVEKIT_URL` (the `wss://` URL that
 `serverUrl`), `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`. All three are required in every
 environment. `vitest.config.ts` `test.env` sets dummy values so tests can mint and decode tokens.
 
+### 5.7 `GET /plans` (public)
+
+Added 2026-10-26 for the pricing pages and the mock checkout (web PR "mock checkout"). The web
+reads it server-side in `src/lib/plans/` and caches it for 5 minutes, like the Catalog.
+
+- Returns the **Listed** Plans in display order. Headers: `Cache-Control: public, max-age=300`.
+- `priceHalalas` is what one Period costs, **VAT (15%) included**, in halalas; Free is `0`. A
+  Period is 30 days. The web shows `priceHalalas / 100` riyals, minutes as `seconds / 60`, and
+  derives the net and VAT from the gross price.
+- Every `limits` value may be `null`, meaning **unlimited**. The web never shows "null".
+- `badge` is `null` when the Plan has none. `featured` marks the one Plan drawn as the main card.
+- The web validates the response with Zod. An empty list, a missing field or a wrong type counts
+  as a failed read: the landing hides its Pricing section, and `/plans` and `/checkout` show an
+  error with a retry.
+- No payment is taken yet. The web checkout is a mock and sends nothing to the backend, so no
+  student's Plan changes (see [STATE.md](STATE.md)).
+
+```json
+{
+  "plans": [
+    {
+      "id": "lite",
+      "name": { "ar": "باقة لايت", "en": "Lite plan" },
+      "priceHalalas": 9000,
+      "featured": true,
+      "badge": { "ar": "الأنسب للبداية", "en": "Best for getting started" },
+      "limits": { "sessions": 25, "seconds": 15000, "enrollments": null, "sessionSeconds": 1800, "minStartSeconds": 180 }
+    }
+  ]
+}
+```
+
+Seed values: `free` (0, 6 sessions, 3600 s, 1 Course), `lite` (9000, 25 sessions, 15000 s,
+unlimited Courses, featured), `pro` (14900, 50 sessions, 30000 s, unlimited Courses, badge
+"الأنسب قبل الاختبارات" / "Best before exams"). The Plan `id` is the same one `GET /me/allowance`
+returns in `plan.id`, which is how the web marks a student's current Plan and looks up its price.
+
 ## 6. Rate limits and scale
 
 - The global `apiRateLimiter` is 100 requests per 15 minutes **per IP**. At that level, a

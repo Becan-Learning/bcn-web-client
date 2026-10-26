@@ -100,6 +100,16 @@ A named set of limits on what a student may use. Every student is on exactly one
 at launch every student is on the Free Plan.
 _Avoid_: tier, subscription, package, خطة
 
+**Price** (السعر):
+What one Period of a Plan costs, VAT included; the Free Plan's is 0. No payment is taken yet: checkout is a mock and
+charges nothing, so a Price is shown, never collected.
+_Avoid_: fee, subscription cost, monthly price (a Period is 30 days, not a month)
+
+**Listed** (معروضة):
+A Plan shown on the pricing pages (the landing Pricing section, `/plans` and `/checkout`). The backend decides which Plans are
+Listed; an unlisted Plan has no card and no checkout.
+_Avoid_: public, visible, active
+
 **Allowance** (حدود الاستخدام):
 What a Plan lets a student use in one Period: how many Sessions they may start, how many minutes
 of Session time, and how many Courses they may hold an Enrollment in at once.

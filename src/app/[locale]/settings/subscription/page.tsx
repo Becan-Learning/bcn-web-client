@@ -3,6 +3,7 @@ import { hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import type { Metadata } from "next";
+import { QuietLink, PrimaryButton } from "@/components/becan/kit";
 import { SettingsCard, SettingsShell } from "../_shell";
 import { localize } from "@/i18n/localized";
 import { getAllowance } from "@/lib/allowance/server";
@@ -10,6 +11,9 @@ import { formatRenewalDate } from "@/lib/allowance/format";
 import { minutesLeft, usedUp } from "@/lib/allowance/rules";
 import { requireAccount } from "@/lib/auth/session";
 import { accountReturnPath } from "@/lib/auth/next-path";
+import { getPlans } from "@/lib/plans/server";
+import { currentPaidPlan, formatPrice } from "@/lib/plans/view";
+import { PaidPlanPanel } from "./paid-plan-panel";
 import { RetryAllowance } from "./retry-allowance";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/settings/subscription">): Promise<Metadata> {
@@ -26,10 +30,11 @@ export default async function SubscriptionPage(
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
   await requireAccount(locale, accountReturnPath("/settings/subscription", await props.searchParams));
-  const [t, format, result] = await Promise.all([
+  const [t, format, result, plans] = await Promise.all([
     getTranslations("Settings.Subscription"),
     getFormatter({ locale }),
     getAllowance(),
+    getPlans(),
   ]);
 
   if (!result.ok) {
@@ -57,6 +62,9 @@ export default async function SubscriptionPage(
     { label: t("courses"), value: usage(allowance.usage.enrollments, allowance.limits.enrollments) },
   ];
   const renewal = formatRenewalDate(format, new Date(allowance.period.end));
+  /* الدفع والتجديد والإلغاء لمن باقته الحالية بسعر أكبر من صفر وحدهم؛ السعر من
+     `GET /plans` بمعرّف الباقة، وتعذّر القراءة يعني أن لا شيء من ذلك يظهر. */
+  const paid = currentPaidPlan(allowance.plan.id, plans.ok ? plans.plans : null);
 
   return (
     <SettingsShell active="subscription" title={t("title")} lede={t("lede")}>
@@ -83,6 +91,15 @@ export default async function SubscriptionPage(
           <p className="mt-1 text-sm leading-base text-ink-2">{t("renewal", { date: renewal })}</p>
         </div>
       </SettingsCard>
+
+      {paid ? (
+        <PaidPlanPanel plan={{ name: paid.name, priceLabel: formatPrice(paid.price) }} renewsOn={renewal} />
+      ) : null}
+
+      <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+        {paid ? null : <PrimaryButton href="/plans">{t("upgrade")}</PrimaryButton>}
+        <QuietLink href="/plans">{t("compare")}</QuietLink>
+      </div>
     </SettingsShell>
   );
 }

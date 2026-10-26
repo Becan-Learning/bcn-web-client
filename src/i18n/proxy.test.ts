@@ -105,7 +105,7 @@ describe("Account route gating", () => {
     expect(destination.searchParams.get("next")).toBe("/session/acct101/1?room=test&n=2");
     expect(response.headers.get("set-cookie")).toBeNull();
   });
-  it.each(["/home", "/settings", "/settings/account", "/settings/invoices/inv-1", "/checkout?plan=pro", "/checkout/result?s=pending", "/session/acct101/1/done?room=test"])(
+  it.each(["/home", "/settings", "/settings/account", "/settings/invoices/inv-1", "/session/acct101/1/done?room=test"])(
     "gates Arabic and English visits to %s",
     (path) => {
       for (const prefix of ["", "/en"]) {
@@ -126,7 +126,7 @@ describe("Account route gating", () => {
     expect(destination.pathname).toBe("/sign-in");
     expect(destination.searchParams.get("next")).toBe("/settings/account");
   });
-  it.each(["/", "/join", "/en/sign-in", "/courses", "/homework", "/settings-guide", "/checkout-info", "/session-info"])(
+  it.each(["/", "/join", "/en/sign-in", "/courses", "/plans", "/checkout?plan=lite", "/checkout/result?s=success", "/refunds", "/homework", "/settings-guide", "/session-info"])(
     "does not gate public path %s",
     (path) => expect(proxy(request(path)).headers.get("location")).toBeNull(),
   );

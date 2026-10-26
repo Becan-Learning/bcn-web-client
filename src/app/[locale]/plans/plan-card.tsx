@@ -1,9 +1,9 @@
-/* مسودّة معطّلة وغير قابلة للوصول حتى تتوفّر بوابة دفع. */
 import { useLocale, useTranslations } from "next-intl";
 import { localize } from "@/i18n/localized";
 import { Link } from "@/i18n/navigation";
 import { PrimaryButton } from "@/components/becan/kit";
-import { CURRENT_PLAN, type Plan } from "@/lib/data/plans";
+import { coursesLabel, hoursLabel, sessionsLabel } from "@/lib/plans/labels";
+import { formatPrice, type PlanView } from "@/lib/plans/view";
 
 /* بطاقة الخطة — مشتركة بين قسم الأسعار في اللاندينج وصفحة `/plans`،
    فلا يفترق شكل التسعير بين موضعين.
@@ -21,8 +21,10 @@ import { CURRENT_PLAN, type Plan } from "@/lib/data/plans";
    `body` لا لون السطح — مزلق مسجَّل في docs/STATE.md.
 
    **الرقم البارز عدد الدقائق**، وتحته ترجمتها إلى ساعات — الطالب لا
-   يقيس مذاكرته بالدقيقة، والبريف يشترط الترجمة. وحُذف عدد الفصول
-   بطلب صريح، وهو باقٍ في جدول المقارنة في `/plans`. */
+   يقيس مذاكرته بالدقيقة، والبريف يشترط الترجمة. ولا تقدير لعدد الفصول
+   في أي موضع: الدقائق لا تُترجَم إلى فصول.
+
+   **السعر لدورة الاستخدام (30 يومًا) لا «شهر»**، والأرقام من الخادم. */
 
 export function PlanCard({
   plan,
@@ -30,17 +32,25 @@ export function PlanCard({
   href,
   /** الوسم يظهر على المميّزة وحدها في اللاندينج، وعلى الكلّ في `/plans` */
   showBadge = true,
+  /** باقة الطالب الحالية — لا تُوسم إلا حين يُعرف أنها باقته */
+  current = false,
+  /** زرّ الباقة المجانية: الزائر يبدأ، والطالب يرجع إلى مقرراته */
+  freeAction = "start",
 }: {
-  plan: Plan;
+  plan: PlanView;
   href: string;
   showBadge?: boolean;
+  current?: boolean;
+  freeAction?: "start" | "home";
 }) {
   const t = useTranslations("PlanCard");
+  const facts = useTranslations("PlanFacts");
   const locale = useLocale();
   const name = localize(plan.name, locale);
-  const featured = !!plan.featured;
-  const current = plan.id === CURRENT_PLAN;
+  const featured = plan.featured;
   const free = plan.price === 0;
+  const hours = hoursLabel(facts, plan);
+  const action = free ? t(freeAction === "home" ? "goHome" : "startFree") : t("choose", { plan: name });
 
   return (
     <div
@@ -71,8 +81,8 @@ export function PlanCard({
 
       {/* السعر */}
       <p className="mt-5 flex items-baseline gap-2">
-        {free ? <span className="font-display text-6xl leading-none font-bold text-ink">{plan.price}</span> : t.rich("price", {
-          priceLabel: String(plan.price),
+        {free ? <span className="font-display text-6xl leading-none font-bold text-ink">{formatPrice(plan.price)}</span> : t.rich("price", {
+          priceLabel: formatPrice(plan.price),
           price: (chunks) => <span className="font-display text-6xl leading-none font-bold text-ink">{chunks}</span>,
           unit: (chunks) => <span className="text-ink-2">{chunks}</span>,
         })}
@@ -81,21 +91,27 @@ export function PlanCard({
         {free ? t("freeNote") : t("vatIncluded")}
       </p>
 
-      {/* الدقائق وترجمتها والمقررات — لا عدد فصول */}
+      {/* الدقائق وترجمتها والمقررات والحصص — لا عدد فصول */}
       <div
         className={`mt-7 border-t pt-6 ${featured ? "border-aubergine-mid" : "border-line"
           }`}
       >
         <p className="font-display text-3xl leading-none font-bold text-ink">
-          {t.rich("minutes", {
-            count: plan.minutes, countLabel: String(plan.minutes),
-            amount: (chunks) => <>{chunks}</>,
-            unit: (chunks) => <span className="ms-2 text-base font-normal text-ink-2">{chunks}</span>,
-          })}
+          {plan.minutes === null
+            ? t.rich("minutesUnlimited", {
+              amount: (chunks) => <>{chunks}</>,
+              unit: (chunks) => <span className="ms-2 text-base font-normal text-ink-2">{chunks}</span>,
+            })
+            : t.rich("minutes", {
+              count: plan.minutes, countLabel: String(plan.minutes),
+              amount: (chunks) => <>{chunks}</>,
+              unit: (chunks) => <span className="ms-2 text-base font-normal text-ink-2">{chunks}</span>,
+            })}
         </p>
         {/* ترجمة الدقيقة إلى ساعات — الطالب لا يقيس مذاكرته بالدقيقة */}
-        <p className="mt-2 text-sm text-ink-2">{localize(plan.hours, locale)}</p>
-        <p className="mt-4 font-semibold text-ink">{localize(plan.courses, locale)}</p>
+        {hours ? <p className="mt-2 text-sm text-ink-2">{hours}</p> : null}
+        <p className="mt-4 font-semibold text-ink">{coursesLabel(facts, plan)}</p>
+        <p className="mt-1 text-sm text-ink-2">{t("sessionsPerPeriod", { sessions: sessionsLabel(facts, plan) })}</p>
       </div>
 
       {/* الفعل — كهرماني على المميّزة وحدها */}
@@ -105,14 +121,14 @@ export function PlanCard({
             {t("current")}</span>
         ) : featured ? (
           <PrimaryButton href={href} className="w-full">
-            {t("choose", { plan: name })}
+            {action}
           </PrimaryButton>
         ) : (
           <Link
             href={href}
             className="inline-flex h-14 w-full items-center justify-center rounded-pill border border-aubergine-mid px-6 font-semibold text-aubergine-base"
           >
-            {free ? t("startFree") : t("choose", { plan: name })}
+            {action}
           </Link>
         )}
       </div>

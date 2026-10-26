@@ -6,11 +6,19 @@ import ar from "../../../../../messages/ar.json";
 import en from "../../../../../messages/en.json";
 import type { Allowance } from "@/lib/allowance/schema";
 import type { BackendResult } from "@/lib/auth/read-backend";
+import type { PlanView } from "@/lib/plans/view";
 import SubscriptionPage, { generateMetadata } from "./page";
 import { RetryAllowance } from "./retry-allowance";
 
-const backend = vi.hoisted(() => ({ allowance: vi.fn(), account: vi.fn(), refresh: vi.fn(), locale: "ar" as "ar" | "en" }));
-vi.mock("@/i18n/navigation", () => ({ useRouter: () => ({ refresh: backend.refresh }) }));
+const backend = vi.hoisted(() => ({ allowance: vi.fn(), plans: vi.fn(), account: vi.fn(), refresh: vi.fn(), locale: "ar" as "ar" | "en" }));
+vi.mock("@/i18n/navigation", () => ({
+  useRouter: () => ({ refresh: backend.refresh }),
+  Link: ({ href, children, className }: { href: string; children: ReactNode; className?: string }) => <a href={href} className={className}>{children}</a>,
+}));
+vi.mock("@/lib/plans/server", () => ({ getPlans: backend.plans }));
+vi.mock("./paid-plan-panel", () => ({
+  PaidPlanPanel: (props: unknown) => <div data-paid-panel={JSON.stringify(props)} />,
+}));
 vi.mock("@/lib/allowance/server", () => ({ getAllowance: backend.allowance }));
 vi.mock("@/lib/auth/session", () => ({ requireAccount: backend.account }));
 vi.mock("next-intl/server", () => ({
@@ -25,6 +33,11 @@ vi.mock("../_shell", () => ({
   SettingsShell: ({ title, lede, children }: { title: string; lede?: string; children: ReactNode }) => <main><h1>{title}</h1>{lede ? <p>{lede}</p> : null}{children}</main>,
   SettingsCard: ({ title, children }: { title?: string; children: ReactNode }) => <section>{title ? <h2>{title}</h2> : null}{children}</section>,
 }));
+
+const plansList: PlanView[] = [
+  { id: "free", name: { ar: "باقة مجانية", en: "Free plan" }, price: 0, minutes: 60, hours: 1, courses: 1, sessions: 6, badge: null, featured: false },
+  { id: "lite", name: { ar: "باقة لايت", en: "Lite plan" }, price: 90, minutes: 250, hours: 4, courses: null, sessions: 25, badge: null, featured: true },
+];
 
 const allowance: Allowance = {
   unlimited: false,
@@ -43,9 +56,42 @@ async function render(locale: "ar" | "en", result: BackendResult<Allowance>, sea
 }
 const textOf = (html: string) => html.replace(/<[^>]*>/g, " ").replace(/&#x27;/g, "'");
 
-beforeEach(() => { vi.clearAllMocks(); backend.locale = "ar"; });
+beforeEach(() => {
+  vi.clearAllMocks();
+  backend.locale = "ar";
+  backend.plans.mockResolvedValue({ ok: true, plans: plansList });
+});
 
 describe("Plan page", () => {
+  it.each(["ar", "en"] as const)("links a Free student to upgrade and compare plans in %s", async (locale) => {
+    const messages = (locale === "ar" ? ar : en).Settings.Subscription;
+    const html = await render(locale, { ok: true, data: allowance });
+    const text = textOf(html);
+    expect(text).toContain(messages.upgrade);
+    expect(text).toContain(messages.compare);
+    expect(html.match(/href="\/plans"/g)).toHaveLength(2);
+    expect(html).not.toContain("data-paid-panel");
+  });
+
+  it.each(["ar", "en"] as const)("shows the paid blocks only when the current Plan has a price in %s", async (locale) => {
+    const paid = { ...allowance, plan: { id: "lite", name: { ar: "باقة لايت", en: "Lite plan" } } };
+    const html = await render(locale, { ok: true, data: paid });
+    const panel = JSON.parse(html.match(/data-paid-panel="([^"]*)"/)![1].replaceAll("&quot;", '"'));
+    expect(panel).toEqual({ plan: { name: plansList[1].name, priceLabel: "90" }, renewsOn: expect.stringContaining("2026") });
+    const messages = (locale === "ar" ? ar : en).Settings.Subscription;
+    expect(textOf(html)).toContain(messages.compare);
+    expect(textOf(html)).not.toContain(messages.upgrade);
+  });
+
+  it.each([
+    ["the plans request fails", { ok: false }],
+    ["the Plan is not listed", { ok: true, plans: [plansList[0]] }],
+  ])("hides the paid blocks when %s", async (_name, plans) => {
+    backend.plans.mockResolvedValue(plans);
+    const paid = { ...allowance, plan: { id: "lite", name: { ar: "باقة لايت", en: "Lite plan" } } };
+    expect(await render("ar", { ok: true, data: paid })).not.toContain("data-paid-panel");
+  });
+
   it.each(["ar", "en"] as const)("shows real usage, the localized plan and renewal in %s with Latin digits", async (locale) => {
     const messages = (locale === "ar" ? ar : en).Settings.Subscription;
     const html = await render(locale, { ok: true, data: allowance });
@@ -68,7 +114,7 @@ describe("Plan page", () => {
     const ordered = [messages.minutesLeft, messages.sessions, messages.minutesUsed, messages.courses, allowance.plan.name[locale]];
     const positions = ordered.map((label) => text.indexOf(label));
     expect(positions.every((position, index) => position >= 0 && (index === 0 || position > positions[index - 1]))).toBe(true);
-    expect(html).not.toMatch(/<button|amber|pressable|ريال|SAR|وسيلة الدفع|Payment method|Cancel|إلغاء|upgrade|ترقية/);
+    expect(html).not.toMatch(/<button|ريال|SAR|وسيلة الدفع|Payment method|Cancel|إلغاء|data-paid-panel/);
     expect(backend.account).toHaveBeenCalledWith(locale, "/settings/subscription");
     expect(backend.allowance).toHaveBeenCalledOnce();
     expect((await generateMetadata(props(locale))).title).toBe(messages.metadataTitle);

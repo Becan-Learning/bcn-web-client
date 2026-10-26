@@ -13,7 +13,7 @@ export default function proxy(request: NextRequest) {
   const prefixed = prefix !== undefined;
   const path = prefix ? pathname.slice(prefix.length + 1) || "/" : pathname;
   const locale = prefix ?? (request.cookies.get("NEXT_LOCALE")?.value === "en" ? "en" : "ar");
-  const gated = path === "/home" || ["/session", "/settings", "/checkout"].some(
+  const gated = path === "/home" || ["/session", "/settings"].some(
     (route) => path === route || path.startsWith(`${route}/`),
   );
 

@@ -14,7 +14,7 @@ import {
 } from "@/components/becan/icons";
 import { PrimaryButton, QuietLink, Section } from "@/components/becan/kit";
 import { BecanMorph } from "@/components/becan/becan-morph";
-import { PLANS } from "@/lib/data/plans";
+import { getPlans } from "@/lib/plans/server";
 import { PlanCard } from "@/app/[locale]/plans/plan-card";
 import { FAQ } from "@/lib/data/faq";
 import { FaqItem } from "@/app/[locale]/faq/faq-item";
@@ -484,12 +484,13 @@ export async function Proof() {
    شكل التسعير بين موضعين. واللاندينج يقود إلى `/plans` لا إلى الدفع
    مباشرةً: يعرض ولا يبيع.
 
-   **عدد الفصول محذوف من البطاقة** بطلب صريح، وباقٍ في جدول `/plans`.
-   والدقائق وترجمتها إلى ساعات باقيتان — البريف يشترط الترجمة. */
+   **لا عدد فصول في البطاقة**، والدقائق وترجمتها إلى ساعات باقيتان —
+   البريف يشترط الترجمة. والباقات من الخادم (`getPlans`): إن تعذّرت
+   قراءتها يختفي القسم كلّه ولا تتأثر بقية الصفحة. */
 
-/* قسم الأسعار مسودّة معطّلة ولا يُعرض حتى تتوفّر بوابة دفع. */
 export async function Pricing() {
-  const t = await getTranslations("Landing.Sections");
+  const [t, result] = await Promise.all([getTranslations("Landing.Sections"), getPlans()]);
+  if (!result.ok) return null;
   return (
     <Section id="pricing" className="py-16 md:py-20">
       <SectionTitle>{t("pricingTitle")}</SectionTitle>
@@ -500,9 +501,9 @@ export async function Pricing() {
 
       {/* `pt` يترك مجالًا لارتفاع البطاقة المميّزة فلا تُقصّ */}
       <ul className="mt-10 grid items-stretch gap-4 md:grid-cols-3 md:pt-3">
-        {PLANS.map((plan) => (
+        {result.plans.map((plan) => (
           <li key={plan.id}>
-            <PlanCard plan={plan} href="/plans" showBadge={!!plan.featured} />
+            <PlanCard plan={plan} href="/plans" showBadge={plan.featured} />
           </li>
         ))}
       </ul>
@@ -516,7 +517,7 @@ export async function Pricing() {
 
 /* ————— الأسئلة الشائعة على اللاندينج —————
 
-   ثلاثة أسئلة من `src/lib/data/faq.ts` نفسه — **لا نسخة ثانية من
+   خمسة أسئلة من `src/lib/data/faq.ts` نفسه — **لا نسخة ثانية من
    النصّ**: تُنتقى بسؤالها فإن غُيّر في المصدر ظهر الخطأ في البناء لا
    في الصفحة.
 
@@ -528,7 +529,7 @@ export async function Pricing() {
    وموضعه **قبل شريط الالتقاط مباشرة**: الاعتراض يُرفع من الطريق في
    اللحظة التي تسبق الطلب، لا بعده. */
 
-const LANDING_FAQ = [FAQ[0].questions[0], FAQ[1].questions[0], FAQ[0].questions[1]];
+const LANDING_FAQ = [FAQ[0].questions[0], FAQ[1].questions[0], FAQ[0].questions[1], FAQ[3].questions[1], FAQ[3].questions[0]];
 
 export async function LandingFaq() {
   const t = await getTranslations("Landing.Sections");

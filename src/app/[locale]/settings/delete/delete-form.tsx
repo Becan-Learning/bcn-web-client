@@ -22,9 +22,12 @@ import { deleteFailure, planDelete } from "./delete-flow";
    الطالب لا خطؤه. الحارس هو الجملة المكتوبة لا لون الزرّ.
 
    **حساب بلا كلمة مرور** (دخل بـGoogle): لا نسأل عنها، ويطلب الخادم جلسة طازجة؛
-   إن كانت الجلسة قديمة دعوناه إلى الدخول بـGoogle من جديد ثم يعود إلى هذه الصفحة. */
+   إن كانت الجلسة قديمة دعوناه إلى الدخول بـGoogle من جديد ثم يعود إلى هذه الصفحة.
 
-export function DeleteForm({ googleError = "" }: { googleError?: string }) {
+   **تحذير الاشتراك المدفوع** يظهر حين تكون باقة الطالب الحالية بسعر أكبر من صفر
+   وحدها (`activeUntil` تاريخ نهاية دورته)؛ اليوم لا أحد على باقة مدفوعة فلا يظهر. */
+
+export function DeleteForm({ googleError = "", activeUntil = null }: { googleError?: string; activeUntil?: string | null }) {
   const t = useTranslations("Settings.Delete");
   const authErrors = useTranslations("Auth.Errors");
   const locale = useLocale();
@@ -126,6 +129,12 @@ export function DeleteForm({ googleError = "" }: { googleError?: string }) {
       onSubmit={submit}
       noValidate
     >
+      {activeUntil ? (
+        <p className="mb-5 max-w-measure leading-base text-ink-2">
+          {t.rich("activeSubscription", { date: activeUntil, strong: (chunks) => <span className="font-semibold text-ink">{chunks}</span>, cancel: (chunks) => <Link href="/settings/subscription" className="font-semibold text-pressable underline underline-offset-4">{chunks}</Link> })}
+        </p>
+      ) : null}
+
       <fieldset disabled={pending || redirecting} aria-busy={pending} className="min-w-0">
       <FieldLabel htmlFor="del-confirm" hint={t("phraseHint", { phrase })}>
         {t("confirmLabel")}

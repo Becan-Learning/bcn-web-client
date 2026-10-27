@@ -21,6 +21,8 @@ const accountSessionSchema = z.object({
     phoneNumberVerified: z.boolean(),
     institutionId: z.string(),
     majorId: z.string(),
+    /* حقل ملحقة التحقق بخطوتين في نوع المستخدم؛ الخادم قد يغفله للحساب العادي. */
+    twoFactorEnabled: z.boolean().nullable().default(null),
   }),
   session: z.object({
     id: z.string().min(1),

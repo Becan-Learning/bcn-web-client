@@ -21,6 +21,7 @@ import { BannedSupportLink } from "@/components/auth/banned-support-link";
 import { authClient } from "@/lib/auth/client";
 import { authErrorKey, type AuthErrorKey } from "@/lib/auth/errors";
 import { googleSignInRequest } from "@/lib/auth/google";
+import { signInOutcome } from "@/lib/auth/two-factor";
 
 export function SignInForm({
   next,
@@ -84,7 +85,7 @@ export function SignInForm({
     setIssue(null);
     setPending(true);
     try {
-      const { error } = await authClient.signIn.email(
+      const { data, error } = await authClient.signIn.email(
         { email: email.trim(), password, callbackURL: verifyCallbackURL },
         {
           /* موجّه اللغة يستبدل الصفحة؛ نمنع انتقال المكتبة الكامل الذي يسبقه. */
@@ -110,8 +111,16 @@ export function SignInForm({
           banned: key === "accountBanned",
         });
       } else {
-        clearReturn();
-        router.replace(destination);
+        const outcome = signInOutcome(data);
+        if (outcome === "twoFactor") {
+          /* الدخول لم يكتمل: الوجهة تبقى مخزّنة وصفحة التحقق هي التي تنهيها. */
+          router.replace(`/two-factor?${new URLSearchParams({ next: destination })}`);
+        } else if (outcome === "signedIn") {
+          clearReturn();
+          router.replace(destination);
+        } else {
+          setIssue({ field: "form", message: errors("generic") });
+        }
       }
     } catch {
       setIssue({ field: "form", message: errors("generic") });

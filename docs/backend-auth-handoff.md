@@ -175,7 +175,7 @@ Phone sign-in is **not** enabled. Google sign-in is, when the backend has `GOOGL
 
 | Method | Path | Auth | Purpose |
 |---|---|---|---|
-| `ALL` | `/api/auth/*` | — | Better Auth (exists). The web uses: `sign-up/email`, `sign-in/email`, `sign-out`, `get-session`, `send-verification-email`, `verify-email`, `request-password-reset`, `reset-password`, `update-user`, `change-email`, `change-password`, `delete-user`. |
+| `ALL` | `/api/auth/*` | — | Better Auth (exists). The web uses: `sign-up/email`, `sign-in/email`, `two-factor/verify-totp`, `two-factor/verify-backup-code`, `sign-out`, `get-session`, `send-verification-email`, `verify-email`, `request-password-reset`, `reset-password`, `update-user`, `change-email`, `change-password`, `delete-user`. |
 | `GET` | `/api/v1/institutions` | public | Catalog for sign-up and settings. Cache: `public, max-age=300`. |
 | `GET` | `/api/v1/me/export` | session | **Later.** The student's data as JSON (Account fields, sessions list). The web's `/settings/data` stays a mock until this exists. |
 
@@ -291,6 +291,16 @@ redirects to its own `/api/auth/error?error=state_mismatch` (also `state_not_fou
 `invalid_callback_request`).
 
 The sign-in endpoint is rate limited to 10 per minute per IP in production.
+
+## Two-factor sign-in (Admin Accounts)
+
+An Account with two-factor on (every Admin) does not get a session from `POST /api/auth/sign-in/email`.
+The answer is 200 `{ "twoFactorRedirect": true, "twoFactorMethods": ["totp"] }` plus the HTTP-only
+`two_factor` cookie (10 minutes). The web (`twoFactorClient()`, no options) then navigates to
+`/two-factor?next=…`, which finishes sign-in with `POST /api/auth/two-factor/verify-totp` or
+`/two-factor/verify-backup-code` (no `trustDevice`). Error codes the web maps: `INVALID_CODE`,
+`INVALID_BACKUP_CODE`, `INVALID_TWO_FACTOR_COOKIE`, `ACCOUNT_TEMPORARILY_LOCKED`. The session user now
+carries `twoFactorEnabled` (`boolean | null`).
 
 ## Checklist
 

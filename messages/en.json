@@ -22,6 +22,9 @@
       "googleEmailNotVerified": "We created your account, but Google didn’t verify your email. We sent you a verification link; open it from your inbox, then sign in.",
       "noAccountYet": "You don’t have an account yet. Create one first.",
       "sessionNotFresh": "To protect your account, sign in again and then try once more.",
+      "invalidTwoFactorCode": "The code is incorrect. Check it and try again.",
+      "twoFactorExpired": "This verification step has expired or never started. Sign in again.",
+      "twoFactorLocked": "You entered the wrong code too many times, so we paused attempts for now. Try again later.",
       "generic": "We couldn’t complete your request. Please try again."
     },
     "Banned": {
@@ -1060,6 +1063,23 @@
     "forgotPassword": "Forgot your password?",
     "createAccount": "Don’t have an account? Create one",
     "resetSuccess": "You changed your password. Sign in with the new password."
+  },
+  "TwoFactor": {
+    "metadataTitle": "Two-factor verification — Becan",
+    "metadataDescription": "Finish signing in with the code from your authenticator app.",
+    "title": "Finish <word>signing in</word>",
+    "body": "Open your authenticator app and enter the 6-digit code.",
+    "codeLabel": "Verification code",
+    "codeRequired": "Enter the 6-digit code.",
+    "backupBody": "Enter one of your backup codes. Each code works only once.",
+    "backupLabel": "Backup code",
+    "backupRequired": "Enter the backup code.",
+    "submit": "Verify",
+    "verifying": "You’re verifying the code…",
+    "useBackupCode": "Use a backup code",
+    "useAuthenticator": "Use your authenticator app",
+    "signIn": "Back to sign in",
+    "expiredAction": "Sign in again"
   },
   "VerifyEmail": {
     "metadataTitle": "Verify your email — Becan",

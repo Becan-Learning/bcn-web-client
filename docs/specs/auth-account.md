@@ -140,7 +140,10 @@ Routes (all under `src/app/[locale]/`, each with `generateMetadata` + `setReques
 2. **`/sign-in`** — email + password, "Forgot password?" link, "Create an account" link (both
    carry `next`). `authClient.signIn.email({ email, password, callbackURL })`. On
    `EMAIL_NOT_VERIFIED` (403) → `/verify-email?email=…&next=…` (backend has already resent). On
-   success → `router.replace(safeNext(next))`.
+   success → `router.replace(safeNext(next))`. An Account with two-factor on (every Admin) gets 200
+   `{ twoFactorRedirect: true }` and no session: the form then goes to `/two-factor?next=…`, which
+   finishes sign-in (see "Two-factor" below). A 200 with neither a user/token nor `twoFactorRedirect`
+   shows the generic error.
 3. **`/verify-email`** — "Check your inbox" with the email shown (`dir="ltr"`), a resend button
    (`authClient.sendVerificationEmail({ email, callbackURL })`) with a 60-second cooldown, and a
    link back to sign-in. Also handles `?error=` from an expired/invalid link (Better Auth appends
@@ -228,3 +231,22 @@ redirect URI is `<web origin>/api/auth/callback/google` through the existing `/a
   shows a sent confirmation. "Delete account" does not ask for a password and calls `deleteUser()`
   without one; Better Auth then requires a fresh session. On `SESSION_EXPIRED` the student is
   told to sign in again with Google (`/settings/delete` is the return page).
+
+## Two-factor sign-in
+
+Added 2026-10-27. Admin Accounts must have two-factor (TOTP) on, so the web must finish that step:
+the backend answers `POST /api/auth/sign-in/email` with `{ "twoFactorRedirect": true, "twoFactorMethods": ["totp"] }`,
+a 10-minute HTTP-only `two_factor` cookie and no session.
+
+- `authClient` has `twoFactorClient()` with no options; the sign-in form navigates itself
+  (`router.replace("/two-factor?next=<destination>")`), keeping the stored return path. The decision
+  is `signInOutcome` in `src/lib/auth/two-factor.ts`.
+- **`/two-factor`** is not gated by the proxy. It takes a 6-digit authenticator code
+  (`authClient.twoFactor.verifyTotp`, auto-submits at 6 digits, Arabic-Indic digits are converted to
+  ASCII) or, after a switch, a backup code (`verifyBackupCode`). No "trust this device".
+  Success → `clearReturn()` + `router.replace(destination)`. A visitor who already has a session is
+  sent on like on `/sign-in`.
+- **Errors:** `INVALID_CODE` / `INVALID_BACKUP_CODE` → wrong code; `INVALID_TWO_FACTOR_COOKIE` →
+  "this sign-in step expired" with a button back to `/sign-in?next=…` (opening the page with no
+  pending sign-in lands here); `ACCOUNT_TEMPORARILY_LOCKED` → too many failed attempts; 429 →
+  `tooManyRequests`.

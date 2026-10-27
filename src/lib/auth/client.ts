@@ -1,13 +1,14 @@
 "use client";
 
 import { createAuthClient } from "better-auth/react";
-import { inferAdditionalFields } from "better-auth/client/plugins";
+import { inferAdditionalFields, twoFactorClient } from "better-auth/client/plugins";
 import { useEffect } from "react";
 import { clearGoogleJoinDraft } from "./google";
 import type { Account } from "./types";
 
 export const authClient = createAuthClient({
-  plugins: [inferAdditionalFields({
+  /* بلا خيارات: ننتقل إلى `/two-factor` بأنفسنا كي يبقى المسار بلغة الواجهة. */
+  plugins: [twoFactorClient(), inferAdditionalFields({
     user: {
       phoneNumber: { type: "string", required: true },
       phoneNumberVerified: { type: "boolean", required: false, input: false, defaultValue: false },

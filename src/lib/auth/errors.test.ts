@@ -39,6 +39,34 @@ describe("authErrorKey for a banned Account", () => {
   });
 });
 
+describe("two-factor error codes", () => {
+  it("maps both wrong-code errors to one invalid-code key", () => {
+    expect(authErrorKey({ code: "INVALID_CODE", status: 401 })).toBe("invalidTwoFactorCode");
+    expect(authErrorKey({ code: "INVALID_BACKUP_CODE", status: 401 })).toBe("invalidTwoFactorCode");
+  });
+
+  it("maps a missing or expired two-factor cookie to the expired-step key", () => {
+    expect(authErrorKey({ code: "INVALID_TWO_FACTOR_COOKIE", status: 401 })).toBe("twoFactorExpired");
+  });
+
+  it("maps the temporary lock, and keeps 429 as too many requests", () => {
+    expect(authErrorKey({ code: "ACCOUNT_TEMPORARILY_LOCKED", status: 403 })).toBe("twoFactorLocked");
+    expect(authErrorKey({ status: 429 })).toBe("tooManyRequests");
+  });
+
+  it.each(["ar", "en"] as const)("has copy for every two-factor key in %s", (locale) => {
+    const messages = locale === "ar" ? ar : en;
+    const errors = createTranslator({ locale, messages, namespace: "Auth.Errors" });
+    for (const key of ["invalidTwoFactorCode", "twoFactorExpired", "twoFactorLocked"] as const) {
+      const text = errors(key);
+      expect(text.length).toBeGreaterThan(0);
+      expect(text).not.toBe(errors("generic"));
+      expect(text).not.toMatch(/[٠-٩]/);
+      if (locale === "ar") expect(text).not.toContain("جلسة");
+    }
+  });
+});
+
 describe("Google error codes", () => {
   it("maps the sign-up-disabled redirect to the no-account key", () => {
     expect(oauthErrorKey("signup_disabled")).toBe("noAccountYet");

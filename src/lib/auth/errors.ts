@@ -18,6 +18,12 @@ const ERROR_KEYS = {
   INVALID_MAJOR: "invalidMajor",
   /* المشرف يدخل بكلمة المرور والتحقق بخطوتين فقط؛ الخادم يرفض Google له. */
   ADMIN_GOOGLE_FORBIDDEN: "adminGoogleForbidden",
+  /* رمز التحقق بخطوتين الخاطئ (التطبيق أو الاحتياطي) رسالة واحدة. */
+  INVALID_CODE: "invalidTwoFactorCode",
+  INVALID_BACKUP_CODE: "invalidTwoFactorCode",
+  /* كوكي الخطوة الثانية مؤقت (10 دقائق)؛ غيابه يعني أن الدخول لم يبدأ أو انتهى. */
+  INVALID_TWO_FACTOR_COOKIE: "twoFactorExpired",
+  ACCOUNT_TEMPORARILY_LOCKED: "twoFactorLocked",
   /* حذف الحساب بلا كلمة مرور يشترط جلسة طازجة (`SESSION_EXPIRED` في Better Auth). */
   SESSION_EXPIRED: "sessionNotFresh",
   /* رموز الرجوع من Google تصل في `?error=` بحروف صغيرة (oauth/errors في Better Auth).

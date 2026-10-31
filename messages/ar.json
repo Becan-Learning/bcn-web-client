@@ -707,6 +707,7 @@
     "supportLabel": "تواصل مع الدعم على واتساب",
     "supportContext": "السلام عليكم، عندي سؤال أثناء حصة {course} — الفصل {number}",
     "supportCard": "عندك مشكلة؟ كلّمنا على واتساب",
+    "supportShort": "الدعم",
     "supportHint": "لو صار أي خلل، كلّمنا من هنا",
     "exit": "خروج من الحصة",
     "lessons": "الدروس",

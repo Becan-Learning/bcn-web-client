@@ -83,19 +83,22 @@ function SessionDialog({
 }
 
 /* ————— الدعم عبر واتساب —————
-   أيقونة الشريط العلوي تبقى دائمًا (لوحة الدروس قد تكون مغلقة). وتحت لوحة
-   الدروس بطاقة مستقلة بالسطح نفسه، فيراها من فتح القائمة وهو عالق. */
+   أيقونة الشريط العلوي تبقى دائمًا (العمود قد يكون مخفيًا). وتحت عمود
+   الدروس صندوق مستقل بالسطح نفسه، وفي ورقة الجوال بطاقة بالحدّ نفسه. */
 
 /* فقاعة تشير إلى مدخل الدعم الظاهر — بنمط StartHint نفسه دون النبض. زخرفية
    (aria-hidden) تختفي بعد 3 ثوانٍ، والمدخل نفسه له اسم دائم لقارئ الشاشة.
    below: أسفل الأيقونة العلوية ونهايتها على نهاية الأيقونة كي لا تخرج من
-   الشاشة، والسهم وحده يتوسّط الأيقونة. وإلا فوق البطاقة وسطها.
+   الشاشة، والسهم وحده يتوسّط الأيقونة.
+   above: فوق بطاقة ورقة الجوال وسطها.
+   side: إلى نهاية صندوق العمود — العمود على حافة البداية وعرضه 64px، فالفقاعة
+   الموسّطة فوقه تنزلق خارج الشاشة، والسهم على جهة البداية يشير إليه.
    التوسيط بـ inset-x-0 لا بـ start-1/2 مع إزاحة (تنقلب في RTL). */
-function SupportHint({ below }: { below?: boolean }) {
+function SupportHint({ placement }: { placement: "below" | "above" | "side" }) {
   const t = useTranslations("Session");
   const bubble =
     "whitespace-nowrap rounded-pill bg-ink px-3 py-1.5 text-xs font-bold text-ground shadow-lift";
-  if (below) {
+  if (placement === "below") {
     return (
       <>
         <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-full z-30 flex justify-center">
@@ -105,6 +108,14 @@ function SupportHint({ below }: { below?: boolean }) {
           {t("supportHint")}
         </span>
       </>
+    );
+  }
+  if (placement === "side") {
+    return (
+      <span aria-hidden="true" className="pointer-events-none absolute start-full top-1/2 z-40 ms-2 flex -translate-y-1/2 items-center">
+        <span className="-me-1 h-2.5 w-2.5 rotate-45 rounded-[2px] bg-ink" />
+        <span className={bubble}>{t("supportHint")}</span>
+      </span>
     );
   }
   return (
@@ -117,19 +128,36 @@ function SupportHint({ below }: { below?: boolean }) {
   );
 }
 
-/** بطاقة الدعم تحت لوحة الدروس — حاوية مستقلة بسطح اللوحة وحدّها وزواياها. */
-function SupportCard({
-  href,
-  hint,
-  className = "",
-}: {
-  href: string;
-  hint?: boolean;
-  className?: string;
-}) {
+/** صندوق الدعم تحت عمود الدروس — حاوية مستقلة بسطح العمود وحدّه وزواياه،
+    ظاهرة ما دام العمود ظاهرًا. أيقونة بحجم زرّ التبديل وتحتها كلمة صغيرة
+    بنمط «دروس». */
+function SupportRailBox({ href, hint }: { href: string; hint?: boolean }) {
   const t = useTranslations("Session");
   return (
-    <div className={`relative shrink-0 rounded-xl border border-line bg-panel p-1.5 ${className}`}>
+    <div className="relative flex w-16 shrink-0 flex-col items-center rounded-xl border border-line bg-panel py-2">
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={t("supportLabel")}
+        title={t("supportLabel")}
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill text-ink-2 transition-colors hover:bg-surface hover:text-ink pointer-fine:h-8 pointer-fine:w-8"
+      >
+        <WhatsappIcon className="h-4 w-4" />
+      </a>
+      <p aria-hidden="true" className="mt-1 shrink-0 text-[10px] font-semibold text-ink-2">
+        {t("supportShort")}
+      </p>
+      {hint ? <SupportHint placement="side" /> : null}
+    </div>
+  );
+}
+
+/** بطاقة الدعم أسفل ورقة الدروس على الجوال — بسطح الورقة وحدّ يفصلها. */
+function SupportCard({ href, hint }: { href: string; hint?: boolean }) {
+  const t = useTranslations("Session");
+  return (
+    <div className="relative shrink-0 rounded-xl border border-line bg-panel p-1.5">
       <a
         href={href}
         target="_blank"
@@ -139,7 +167,7 @@ function SupportCard({
         <WhatsappIcon className="h-4 w-4 shrink-0" />
         <span className="min-w-0 flex-1">{t("supportCard")}</span>
       </a>
-      {hint ? <SupportHint /> : null}
+      {hint ? <SupportHint placement="above" /> : null}
     </div>
   );
 }
@@ -213,7 +241,7 @@ export function TopBar({
           >
             <WhatsappIcon className="h-4 w-4" />
           </a>
-          {supportHint ? <SupportHint below /> : null}
+          {supportHint ? <SupportHint placement="below" /> : null}
         </span>
         <button
           type="button"
@@ -404,8 +432,8 @@ export function TopicsRail({
   const done = topics.filter((_, i) => stateOf(i) === "done").length;
 
   return (
-    <div className="relative hidden shrink-0 md:block">
-      <section className="flex h-full w-16 flex-col items-center overflow-hidden rounded-xl border border-line bg-panel py-2">
+    <div className="relative hidden shrink-0 flex-col gap-2 md:flex">
+      <section className="flex min-h-0 w-16 flex-1 flex-col items-center overflow-hidden rounded-xl border border-line bg-panel py-2">
         <button
           type="button"
           onClick={onToggle}
@@ -455,14 +483,12 @@ export function TopicsRail({
         </ol>
       </section>
 
-      {/* القائمة المنسدلة — تطفو فوق السبورة ولا توسّع العمود. تحتها بطاقة
-          الدعم حاوية مستقلة، فتبقى القائمة وحدها هي المُمرَّرة */}
+      <SupportRailBox href={supportHref} hint={supportHint} />
+
+      {/* القائمة المنسدلة — تطفو فوق السبورة ولا توسّع العمود */}
       {open ? (
-        <div className="absolute inset-y-0 start-[calc(100%+0.5rem)] z-30 flex w-64 flex-col gap-2">
-          <div className="min-h-0 flex-1 overflow-hidden rounded-xl border border-line bg-panel shadow-lift">
-            <TopicsList topics={topics} stateOf={stateOf} current={current} onPick={onPick} />
-          </div>
-          <SupportCard href={supportHref} hint={supportHint} className="shadow-lift" />
+        <div className="absolute inset-y-0 start-[calc(100%+0.5rem)] z-30 w-64 overflow-hidden rounded-xl border border-line bg-panel shadow-lift">
+          <TopicsList topics={topics} stateOf={stateOf} current={current} onPick={onPick} />
         </div>
       ) : null}
     </div>
@@ -515,12 +541,12 @@ export function TopicsSheet({
 
 /* ————— تنبيه قلب الشاشة —————
    نافذة تظهر مرة واحدة قبل البدء وفي الوضع الرأسي وحده — `portrait:`
-   تُخفيها فور القلب بلا جافاسكربت ولا مستمع أحداث. */
+   تُخفيها فور القلب بلا جافاسكربت ولا مستمع أحداث. الإغلاق حالة في الشاشة
+   (لا هنا) كي تبدأ فقاعة الدعم عدّها بعد زوال ما يغطّيها. */
 
-export function RotateNotice() {
+export function RotateNotice({ open, onDismiss }: { open: boolean; onDismiss: () => void }) {
   const t = useTranslations("Session");
-  const [shown, setShown] = useState(true);
-  if (!shown) return null;
+  if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-40 hidden items-center justify-center p-6 portrait:flex md:portrait:hidden">
@@ -529,7 +555,7 @@ export function RotateNotice() {
         type="button"
         tabIndex={-1}
         aria-label={t("close")}
-        onClick={() => setShown(false)}
+        onClick={onDismiss}
         className="absolute inset-0 bg-ground/85 backdrop-blur-sm"
       />
 
@@ -547,7 +573,7 @@ export function RotateNotice() {
         {/* مقلوب لا كهرماني — الكهرماني الوحيد في الشاشة زرّ البدء */}
         <button
           type="button"
-          onClick={() => setShown(false)}
+          onClick={onDismiss}
           className="mt-6 inline-flex h-11 w-full items-center justify-center rounded-pill bg-ink px-5 text-sm font-bold text-ground"
         >
           {t("okay")}

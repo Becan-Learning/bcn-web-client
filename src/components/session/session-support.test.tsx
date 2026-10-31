@@ -9,7 +9,7 @@ import en from "../../../messages/en.json";
 import { WHATSAPP } from "@/lib/data/support";
 import { SessionView } from "./session-view";
 
-const live = vi.hoisted(() => ({ agentState: "disconnected", mobile: false }));
+const live = vi.hoisted(() => ({ agentState: "disconnected", mobile: false, portrait: false }));
 vi.mock("@/i18n/navigation", () => ({ useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }) }));
 vi.mock("next/dynamic", () => ({ default: () => () => null }));
 vi.mock("livekit-client", async (importOriginal) => ({
@@ -51,8 +51,9 @@ const hint = () => screen.queryByText(ar.Session.supportHint);
 beforeEach(() => {
   live.agentState = "disconnected";
   live.mobile = false;
+  live.portrait = false;
   vi.stubGlobal("matchMedia", (query: string) => ({
-    matches: live.mobile && query.includes("max-width"),
+    matches: query.includes("orientation") ? live.mobile && live.portrait : live.mobile && query.includes("max-width"),
     addEventListener: () => {},
     removeEventListener: () => {},
   }));
@@ -73,51 +74,70 @@ describe("Connection lost screen", () => {
 });
 
 describe("Support entry in the session", () => {
-  it("shows the hint on the top-bar icon on load and hides it after 3 seconds", () => {
+  const topBarLink = (name: string) => screen.getAllByRole("link", { name })[0];
+
+  it("shows the hint on the desktop rail's support box on load and hides it after 3 seconds", () => {
     vi.useFakeTimers();
     mount();
     const bubble = hint()!;
     expect(bubble).not.toBeNull();
-    expect(bubble.getAttribute("aria-hidden")).toBe("true");
-    expect(bubble.className).toContain("pointer-events-none");
-    expect(bubble.className).not.toContain("animate-");
-    // the hint belongs to the top-bar support link while the lessons panel is closed
-    expect(bubble.parentElement).toBe(screen.getByRole("link", { name: ar.Session.supportLabel }).parentElement);
+    const wrapper = bubble.closest('[aria-hidden="true"]')!;
+    expect(wrapper.className).toContain("pointer-events-none");
+    expect(wrapper.innerHTML).not.toContain("animate-");
+    // the rail is visible, so the bubble belongs to its box and not to the top-bar icon
+    const [topBar, rail] = screen.getAllByRole("link", { name: ar.Session.supportLabel });
+    expect(rail.parentElement!.contains(bubble)).toBe(true);
+    expect(topBar.parentElement!.contains(bubble)).toBe(false);
     act(() => { vi.advanceTimersByTime(2_999); });
     expect(hint()).not.toBeNull();
     act(() => { vi.advanceTimersByTime(1); });
     expect(hint()).toBeNull();
   });
 
-  it("puts a separate support card with the same context link under the desktop lessons panel and moves the hint to it", async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
+  it("puts the support box under the rail with the same container classes and the same context link", () => {
     mount("en");
-    const text = en.Session.supportHint;
-    await userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
-      .click(screen.getAllByRole("button", { name: en.Session.openLessonsList })[0]);
-    const card = screen.getByRole("link", { name: en.Session.supportCard });
-    const topBar = screen.getByRole("link", { name: en.Session.supportLabel });
-    expect(card.getAttribute("href")).toBe(topBar.getAttribute("href"));
-    expect(card.getAttribute("href")).toContain(`https://wa.me/${WHATSAPP}?text=`);
-    expect(card.getAttribute("target")).toBe("_blank");
-    expect(card.getAttribute("rel")).toBe("noopener noreferrer");
-    // a sibling box of the lessons list, not inside it
-    expect(card.closest("ol")).toBeNull();
-    expect(card.parentElement!.className).toContain("border-line");
-    // one hint only, pointing at the card
-    expect(screen.getAllByText(text)).toHaveLength(1);
-    expect(card.parentElement!.contains(screen.getByText(text))).toBe(true);
-    act(() => { vi.advanceTimersByTime(3_000); });
-    expect(screen.queryByText(text)).toBeNull();
+    const [topBar, rail] = screen.getAllByRole("link", { name: en.Session.supportLabel });
+    expect(rail.getAttribute("href")).toBe(topBar.getAttribute("href"));
+    expect(rail.getAttribute("href")).toContain(`https://wa.me/${WHATSAPP}?text=`);
+    expect(rail.getAttribute("target")).toBe("_blank");
+    expect(rail.getAttribute("rel")).toBe("noopener noreferrer");
+    const box = rail.parentElement!;
+    const railSection = box.previousElementSibling!;
+    expect(railSection.tagName).toBe("SECTION");
+    for (const cls of ["rounded-xl", "border", "border-line", "bg-panel", "w-16"]) {
+      expect(box.classList.contains(cls)).toBe(true);
+      expect(railSection.classList.contains(cls)).toBe(true);
+    }
+    expect(box.textContent).toContain(en.Session.supportShort);
   });
 
-  it("keeps the top-bar icon when the lessons panel is open", async () => {
+  it("keeps the support box when the lessons dropdown opens, and the dropdown holds only the lessons", async () => {
     mount();
     await userEvent.setup().click(screen.getAllByRole("button", { name: ar.Session.openLessonsList })[0]);
-    expect(screen.getByRole("link", { name: ar.Session.supportLabel })).not.toBeNull();
+    const links = screen.getAllByRole("link", { name: ar.Session.supportLabel });
+    expect(links).toHaveLength(2);
+    expect(screen.queryByRole("link", { name: ar.Session.supportCard })).toBeNull();
   });
 
-  it("shows the support card inside the mobile lessons sheet", async () => {
+  it("moves the hint to the top-bar icon when the rail is hidden", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    mount();
+    await userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+      .click(screen.getByRole("button", { name: ar.Session.lessons }));
+    const links = screen.getAllByRole("link", { name: ar.Session.supportLabel });
+    expect(links).toHaveLength(1);
+    expect(links[0].parentElement!.contains(hint())).toBe(true);
+    act(() => { vi.advanceTimersByTime(3_000); });
+    expect(hint()).toBeNull();
+  });
+
+  it("puts the hint on the top-bar icon on mobile while the lessons sheet is closed", () => {
+    live.mobile = true;
+    mount();
+    expect(topBarLink(ar.Session.supportLabel).parentElement!.contains(hint())).toBe(true);
+  });
+
+  it("shows the support card inside the mobile lessons sheet and points the hint at it", async () => {
     live.mobile = true;
     mount();
     expect(screen.queryByRole("link", { name: ar.Session.supportCard })).toBeNull();
@@ -125,5 +145,23 @@ describe("Support entry in the session", () => {
     const card = await screen.findByRole("link", { name: ar.Session.supportCard });
     expect(card.getAttribute("href")).toContain(`https://wa.me/${WHATSAPP}?text=`);
     expect(card.getAttribute("href")).toContain(encodeURIComponent("Calculus"));
+    expect(card.parentElement!.contains(hint())).toBe(true);
+  });
+
+  it("starts the 3 seconds only once the rotate notice no longer covers the hint", async () => {
+    live.mobile = true;
+    live.portrait = true;
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    mount();
+    expect(screen.getByRole("dialog")).not.toBeNull();
+    act(() => { vi.advanceTimersByTime(10_000); });
+    expect(hint()).toBeNull();
+    await userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+      .click(screen.getByRole("button", { name: ar.Session.okay }));
+    expect(hint()).not.toBeNull();
+    act(() => { vi.advanceTimersByTime(2_900); });
+    expect(hint()).not.toBeNull();
+    act(() => { vi.advanceTimersByTime(200); });
+    expect(hint()).toBeNull();
   });
 });

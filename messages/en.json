@@ -707,6 +707,7 @@
     "supportLabel": "Contact support on WhatsApp",
     "supportContext": "Hello, I have a question during my session: {course}, chapter {number}",
     "supportCard": "Facing a problem? Contact us on WhatsApp",
+    "supportShort": "Help",
     "supportHint": "If anything goes wrong, contact us here",
     "exit": "Exit session",
     "lessons": "Lessons",

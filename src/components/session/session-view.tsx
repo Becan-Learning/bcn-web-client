@@ -71,6 +71,7 @@ import {
 } from "./parts";
 import { useIsMobile } from "./use-is-mobile";
 import { useReducedMotion } from "./use-reduced-motion";
+import { usePortraitPhone } from "./use-portrait-phone";
 import { useSupportHint } from "./use-support-hint";
 import { whatsappHref } from "@/lib/data/support";
 import { PacketRecorderButtons, usePacketRecorder } from "./use-packet-recorder";
@@ -184,7 +185,8 @@ function SessionScreen({
   const router = useRouter();
   const reduce = useReducedMotion();
   const isMobile = useIsMobile();
-  const supportHintShown = useSupportHint();
+  const portraitPhone = usePortraitPhone();
+  const [rotateDismissed, setRotateDismissed] = useState(false);
   const agent = useAgent(session);
   const [state, dispatch] = useReducer(sessionReducer, INITIAL_SESSION_STATE);
   const [endingAllowance, setEndingAllowance] = useState<Allowance | null>(null);
@@ -424,6 +426,10 @@ function SessionScreen({
   else if (agentListening) phase = checkpointShown(state, agent.state, studentQuestionStatus) ? "question" : "listening";
   else phase = "connecting";
 
+  /* فقاعة الدعم تبدأ عدّها حين لا يغطّيها تنبيه قلب الشاشة (رأسي على الجوال قبل البدء) */
+  const rotateNoticeShowing = phase === "idle" && !rotateDismissed && portraitPhone;
+  const supportHintShown = useSupportHint(!rotateNoticeShowing);
+
   /* ————— الدروس ————— */
   const titles = lessons.map((l) => l.name);
   const current = lessons.findIndex((l) => l.slug === state.lesson?.slug);
@@ -448,9 +454,12 @@ function SessionScreen({
 
   /* رابط الدعم بسياق الحصة نفسه في الشريط العلوي وبطاقة لوحة الدروس */
   const supportHref = whatsappHref(t("supportContext", { course: courseName, number: number(chapterNo) }));
-  /* الفقاعة تشير إلى المدخل الظاهر لحظتها: بطاقة اللوحة إن كانت اللوحة مرسومة
-     مفتوحة (ورقة الجوال، أو عمود الديسكتوب ما لم يُخفَ)، وإلا أيقونة الشريط */
-  const panelOpen = topicsOpen && (isMobile || showTopics);
+  /* الفقاعة تشير إلى المدخل الظاهر لحظتها: صندوق العمود على الديسكتوب ما دام
+     العمود ظاهرًا (فتح القائمة المنسدلة لا يغيّر شيئًا)، وبطاقة الورقة على
+     الجوال حين تكون مفتوحة، وإلا أيقونة الشريط العلوي */
+  const supportAnchor: "rail" | "sheet" | "topbar" = isMobile
+    ? topicsOpen ? "sheet" : "topbar"
+    : showTopics ? "rail" : "topbar";
 
   const onTopics = () =>
     isMobile ? setTopicsPref(!topicsOpen) : setShowTopics((v) => !v);
@@ -599,7 +608,7 @@ function SessionScreen({
         courseName={courseName}
         chapterNo={chapterNo}
         detail={detail}
-        supportHint={supportHintShown && !panelOpen}
+        supportHint={supportHintShown && supportAnchor === "topbar"}
         onExit={onExit}
       />
 
@@ -613,7 +622,7 @@ function SessionScreen({
         onToggle={() => setTopicsPref(!topicsOpen)}
       />
 
-      {phase === "idle" ? <RotateNotice /> : null}
+      {phase === "idle" ? <RotateNotice open={!rotateDismissed} onDismiss={() => setRotateDismissed(true)} /> : null}
 
       <div className="relative flex flex-1 flex-col gap-2 overflow-hidden p-2 md:flex-row md:p-3">
         {showTopics ? (
@@ -625,7 +634,7 @@ function SessionScreen({
             open={!isMobile && topicsOpen}
             onToggle={() => setTopicsPref(!topicsOpen)}
             supportHref={supportHref}
-            supportHint={supportHintShown}
+            supportHint={supportHintShown && supportAnchor === "rail"}
           />
         ) : null}
 
@@ -693,7 +702,7 @@ function SessionScreen({
         current={current}
         onPick={pickLesson}
         supportHref={supportHref}
-        supportHint={supportHintShown}
+        supportHint={supportHintShown && supportAnchor === "sheet"}
       />
 
       <CheckpointDialog

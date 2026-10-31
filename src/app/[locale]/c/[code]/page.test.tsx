@@ -214,6 +214,11 @@ describe("Course page after a session", () => {
       const html = (await render(locale, search)).replace(/&#x27;/g, "'");
       expect(html).toContain(label);
       expect(html).toContain("60");
+      const msgs = (locale === "ar" ? ar : en).Quota.usedUp;
+      expect(html).toContain(`href="/plans"`);
+      expect(html).toContain(msgs.compare);
+      expect(html).toContain(`href="https://wa.me/966501473370?text=${encodeURIComponent(msgs.whatsappMessage)}"`);
+      expect(html).toContain('target="_blank" rel="noopener noreferrer"');
       expect(html).not.toContain((locale === "ar" ? ar : en).Course.sessionLimit);
     }
   });

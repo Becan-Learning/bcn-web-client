@@ -252,7 +252,11 @@
       "progress": "ذاكرت {minutes, plural, zero {{minutesLabel} دقيقة} one {دقيقة واحدة} two {دقيقتين} few {{minutesLabel} دقائق} many {{minutesLabel} دقيقةً} other {{minutesLabel} دقيقة}} في {sessions, plural, zero {{sessionsLabel} حصة} one {حصة واحدة} two {حصتين} few {{sessionsLabel} حصص} many {{sessionsLabel} حصةً} other {{sessionsLabel} حصة}}",
       "renewal": "تتجدد حدود استخدامك في {date}",
       "limit": "وصلت لحدود استخدامك في دورة الاستخدام هذي",
-      "nextSession": "تقدر تبدأ حصتك الجاية في {date}"
+      "nextSession": "تقدر تبدأ حصتك الجاية في {date}",
+      "upgrade": "تبي تكمّل مذاكرتك من الحين؟ باقة أكبر تعطيك دقائق وحصص أكثر.",
+      "compare": "قارن الباقات",
+      "whatsapp": "كلّمنا على واتساب",
+      "whatsappMessage": "السلام عليكم، استهلكت حدود باقتي وأبي أنتقل لباقة أكبر"
     },
     "slotsFull": {
       "enrolled": "مسجّل في <courses></courses>",
@@ -671,7 +675,7 @@
       "expiredFix": "استخدم بطاقة سارية، أو ادفع من جوالك بلا كتابة أرقام.",
       "onlineWhy": "الشراء عبر الإنترنت غير مفعّل على بطاقتك.",
       "onlineFix": "فعّله من تطبيق بنكك — عادةً تحت «إعدادات البطاقة» — ثم أعد المحاولة.",
-      "successTitle": "شكرًا لك",
+      "successTitle": "شكرًا لاهتمامك",
       "home": "ارجع لمقرراتك",
       "failedTitle": "ما تمّ الدفع",
       "unchanged": "ما انخصم منك شيء، وباقتك ما تغيّرت.",
@@ -682,10 +686,13 @@
       "continueTitle": "تقدر تكمّل الحين",
       "pendingDefault": "دقائق باقتك الحالية باقية، وتقدر تذاكر بها إلى أن يكتمل الدفع.",
       "status": "تابع حالة الاشتراك",
-      "successBody": "استلمنا طلبك.",
       "help": "تكرّر معك؟ <contact>راسلنا على واتساب</contact> ونتابعها معك.",
-      "successBodyPlan": "استلمنا طلبك لباقة {plan}.",
-      "successSoon": "الدفع الإلكتروني يفتح قريبًا.",
+      "successDirect": "الدفع المباشر على المنصة غير متاح حاليًا.",
+      "successContact": "للاشتراك، تواصل مع خدمة العملاء على واتساب ونكمّل لك الاشتراك.",
+      "successContactPlan": "للاشتراك في {plan}، تواصل مع خدمة العملاء على واتساب ونكمّل لك الاشتراك.",
+      "whatsapp": "تواصل مع خدمة العملاء على واتساب",
+      "whatsappMessage": "السلام عليكم، أبي أشترك في إحدى الباقات",
+      "whatsappMessagePlan": "السلام عليكم، أبي أشترك في {plan}",
       "successNothing": "ما انخصم منك أي مبلغ، وباقتك الحالية ما تغيّرت.",
       "browse": "تصفّح المقررات",
       "backToPlans": "ارجع للباقات"

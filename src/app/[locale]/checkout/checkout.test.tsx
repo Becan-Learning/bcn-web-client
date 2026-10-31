@@ -78,26 +78,41 @@ describe("checkout page", () => {
 });
 
 describe("checkout result page", () => {
-  it.each(["ar", "en"] as const)("thanks the visitor, says nothing was charged and links no invoice in %s", async (locale) => {
+  it.each(["ar", "en"] as const)("says direct payment is unavailable and sends the visitor to WhatsApp with the Plan name in %s", async (locale) => {
     const html = await renderAsync(await ResultPage(props(locale, { s: "success", plan: "lite" })));
     const text = textOf(html);
     const messages = (locale === "ar" ? ar : en).Checkout.Result;
+    const name = locale === "ar" ? "باقة لايت" : "Lite plan";
     expect(text).toContain(messages.successTitle);
-    expect(text).toContain(locale === "ar" ? "استلمنا طلبك لباقة باقة لايت." : "We received your request for the Lite plan.");
-    expect(text).toContain(messages.successSoon);
+    expect(text).toContain(messages.successDirect);
+    expect(text).toContain(locale === "ar"
+      ? `للاشتراك في ${name}، تواصل مع خدمة العملاء على واتساب`
+      : `To subscribe to the ${name}, contact customer support on WhatsApp`);
     expect(text).toContain(messages.successNothing);
+    const message = locale === "ar" ? `السلام عليكم، أبي أشترك في ${name}` : `Hi, I’d like to subscribe to the ${name}`;
+    const whatsapp = html.match(/<a\b[^>]*wa\.me[^>]*>/)![0];
+    expect(whatsapp).toContain(`href="https://wa.me/966501473370?text=${encodeURIComponent(message)}"`);
+    expect(whatsapp).toContain('target="_blank"');
+    expect(whatsapp).toContain('rel="noopener noreferrer"');
+    expect(whatsapp).toContain("bg-pressable");
+    expect(text).toContain(messages.whatsapp);
+    expect(html).toContain("<svg");
+    expect(html).toContain('href="/courses"');
+    expect(html.match(/bg-pressable/g)).toHaveLength(1);
     expect(html).not.toContain("/settings/invoices");
     expect(html).not.toContain("/settings/subscription");
+    expect(text).not.toMatch(/قريبًا|opens soon|received your request|استلمنا/);
   });
 
   it("defaults to the thank-you state and drops the Plan name when it is unknown, free or unreadable", async () => {
     for (const search of [{ plan: "gold" }, { plan: "free" }, {}] as Record<string, string>[]) {
-      const text = textOf(await renderAsync(await ResultPage(props("en", search))));
-      expect(text).toContain("We received your request.");
-      expect(text).not.toContain("request for");
+      const html = await renderAsync(await ResultPage(props("en", search)));
+      expect(textOf(html)).toContain(en.Checkout.Result.successContact);
+      expect(textOf(html)).not.toContain("subscribe to the");
+      expect(html).toContain(`wa.me/966501473370?text=${encodeURIComponent(en.Checkout.Result.whatsappMessage)}`);
     }
     mocks.plans.mockResolvedValue({ ok: false });
-    expect(textOf(await renderAsync(await ResultPage(props("en", { s: "success", plan: "lite" }))))).toContain("We received your request.");
+    expect(textOf(await renderAsync(await ResultPage(props("en", { s: "success", plan: "lite" }))))).toContain(en.Checkout.Result.successContact);
   });
 
   it("keeps the failed and pending states, retrying the listed Plan or falling back to /plans", async () => {

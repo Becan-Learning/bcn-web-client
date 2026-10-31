@@ -5,7 +5,11 @@ import { useFormatter, useTranslations } from "next-intl";
 import type { ExplanationLanguage } from "./explanation-language";
 import { Dialog } from "radix-ui";
 import { AnimatePresence, motion } from "motion/react";
-import { useAudioWaveform, useTrackVolume, type useSession } from "@livekit/components-react";
+import {
+  useAudioWaveform,
+  useTrackVolume,
+  type useSession,
+} from "@livekit/components-react";
 import {
   ChatIcon,
   CheckIcon,
@@ -82,6 +86,105 @@ function SessionDialog({
   );
 }
 
+/* ————— الدعم عبر واتساب —————
+   أيقونة الشريط العلوي تبقى دائمًا (العمود قد يكون مخفيًا). وتحت عمود
+   الدروس صندوق مستقل بالسطح نفسه، وفي ورقة الجوال بطاقة بالحدّ نفسه. */
+
+/* فقاعة تشير إلى مدخل الدعم الظاهر — بنمط StartHint نفسه دون النبض. زخرفية
+   (aria-hidden) تختفي بعد 3 ثوانٍ، والمدخل نفسه له اسم دائم لقارئ الشاشة.
+   below: أسفل الأيقونة العلوية ونهايتها على نهاية الأيقونة كي لا تخرج من
+   الشاشة، والسهم وحده يتوسّط الأيقونة.
+   above: فوق بطاقة ورقة الجوال وسطها.
+   side: إلى نهاية صندوق العمود — العمود على حافة البداية وعرضه 64px، فالفقاعة
+   الموسّطة فوقه تنزلق خارج الشاشة، والسهم على جهة البداية يشير إليه.
+   التوسيط بـ inset-x-0 لا بـ start-1/2 مع إزاحة (تنقلب في RTL). */
+function SupportHint({ placement }: { placement: "below" | "above" | "side" }) {
+  const t = useTranslations("Session");
+  const bubble =
+    "whitespace-nowrap rounded-pill bg-ink px-3 py-1.5 text-xs font-bold text-ground shadow-lift";
+  if (placement === "below") {
+    return (
+      <>
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-full z-30 flex justify-center"
+        >
+          <span className="mt-[3px] h-2.5 w-2.5 rotate-45 rounded-[2px] bg-ink" />
+        </span>
+        <span
+          aria-hidden="true"
+          className={`pointer-events-none absolute end-0 top-full z-30 mt-2 ${bubble}`}
+        >
+          {t("supportHint")}
+        </span>
+      </>
+    );
+  }
+  if (placement === "side") {
+    return (
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute start-full top-1/2 z-40 ms-2 flex -translate-y-1/2 items-center"
+      >
+        <span className="-me-1 h-2.5 w-2.5 rotate-45 rounded-[2px] bg-ink" />
+        <span className={bubble}>{t("supportHint")}</span>
+      </span>
+    );
+  }
+  return (
+    <span
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-x-0 bottom-full z-30 flex justify-center pb-2"
+    >
+      <span className="flex flex-col items-center">
+        <span className={bubble}>{t("supportHint")}</span>
+        <span className="-mt-1 h-2.5 w-2.5 rotate-45 rounded-[2px] bg-ink" />
+      </span>
+    </span>
+  );
+}
+
+/** صندوق الدعم تحت عمود الدروس — حاوية مستقلة بسطح العمود وحدّه وزواياه،
+    ظاهرة ما دام العمود ظاهرًا. أيقونة بحجم زرّ التبديل وتحتها كلمة صغيرة
+    بنمط «دروس». */
+function SupportRailBox({ href, hint }: { href: string; hint?: boolean }) {
+  const t = useTranslations("Session");
+  return (
+    <div className="relative flex w-16 shrink-0 flex-col items-center rounded-xl border border-line bg-panel py-2">
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={t("supportLabel")}
+        title={t("supportLabel")}
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill text-ink-2 transition-colors hover:bg-surface hover:text-ink pointer-fine:h-8 pointer-fine:w-8"
+      >
+        <WhatsappIcon className="h-4 w-4" />
+      </a>
+      {hint ? <SupportHint placement="side" /> : null}
+    </div>
+  );
+}
+
+/** بطاقة الدعم أسفل ورقة الدروس على الجوال — بسطح الورقة وحدّ يفصلها. */
+function SupportCard({ href, hint }: { href: string; hint?: boolean }) {
+  const t = useTranslations("Session");
+  return (
+    <div className="relative shrink-0 rounded-xl border border-line bg-panel p-1.5">
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex min-h-11 items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm leading-base text-ink-2 transition-colors hover:bg-surface/60 hover:text-ink"
+      >
+        <WhatsappIcon className="h-4 w-4 shrink-0" />
+        <span className="min-w-0 flex-1">{t("supportCard")}</span>
+      </a>
+      {hint ? <SupportHint placement="above" /> : null}
+    </div>
+  );
+}
+
 /* ————— الشريط العلوي ————— */
 
 export function TopBar({
@@ -89,6 +192,7 @@ export function TopBar({
   courseName,
   chapterNo,
   detail,
+  supportHint,
   onExit,
 }: {
   phase: Phase;
@@ -96,11 +200,14 @@ export function TopBar({
   chapterNo: number;
   /** «الموضوع 2 من 5» — من رسالة set_topic */
   detail?: string;
+  /** فقاعة تشير إلى أيقونة الدعم — تظهر حين لا تكون بطاقة الدعم في لوحة الدروس ظاهرة */
+  supportHint?: boolean;
   onExit: () => void;
 }) {
   const t = useTranslations("Session");
   const format = useFormatter();
-  const number = (value: number) => format.number(value, { numberingSystem: "latn" });
+  const number = (value: number) =>
+    format.number(value, { numberingSystem: "latn" });
   const live = phase === "live";
   /* في السؤال تتوقف النبضة ويبقى النصّ «سؤال» (بريف الجلسة، الحالة 3) */
   const pulse = phase === "listening" || phase === "thinking";
@@ -129,7 +236,9 @@ export function TopBar({
 
       <p className="min-w-0 truncate text-xs text-ink-2">
         {t(detail ? "courseChapterDetail" : "courseChapter", {
-          course: courseName, number: number(chapterNo), ...(detail ? { detail } : {}),
+          course: courseName,
+          number: number(chapterNo),
+          ...(detail ? { detail } : {}),
         })}
       </p>
 
@@ -137,16 +246,24 @@ export function TopBar({
           الدعم رابط صغير لا قرصٌ طافٍ (النمط ١٠: تحكّم الجلسة في الثلث السفلي)،
           ويُفتح في تبويب جديد فتستمر الحصة. */}
       <div className="flex shrink-0 items-center">
-        <a
-          href={whatsappHref(t("supportContext", { course: courseName, number: number(chapterNo) }))}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={t("supportLabel")}
-          title={t("supportLabel")}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill text-ink-2 hover:bg-panel pointer-fine:md:h-8 pointer-fine:md:w-8"
-        >
-          <WhatsappIcon className="h-4 w-4" />
-        </a>
+        <span className="relative flex">
+          <a
+            href={whatsappHref(
+              t("supportContext", {
+                course: courseName,
+                number: number(chapterNo),
+              }),
+            )}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={t("supportLabel")}
+            title={t("supportLabel")}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill text-ink-2 hover:bg-panel pointer-fine:md:h-8 pointer-fine:md:w-8"
+          >
+            <WhatsappIcon className="h-4 w-4" />
+          </a>
+          {supportHint ? <SupportHint placement="below" /> : null}
+        </span>
         <button
           type="button"
           onClick={onExit}
@@ -212,9 +329,7 @@ export function TopicsList({ topics, stateOf, current, onPick }: TopicsProps) {
   const t = useTranslations("Session");
   if (topics.length === 0) {
     return (
-      <p className="p-4 text-sm leading-base text-ink-2">
-        {t("noLessons")}
-      </p>
+      <p className="p-4 text-sm leading-base text-ink-2">{t("noLessons")}</p>
     );
   }
 
@@ -240,7 +355,9 @@ export function TopicsList({ topics, stateOf, current, onPick }: TopicsProps) {
                 <span dir="auto" className="block truncate text-sm">
                   {topic}
                 </span>
-                <span className="block text-xs text-ink-2">{t(`lessonState.${st}`)}</span>
+                <span className="block text-xs text-ink-2">
+                  {t(`lessonState.${st}`)}
+                </span>
               </span>
             </button>
           </li>
@@ -263,7 +380,8 @@ export function TopicsTrack({
 }: TopicsProps & { open: boolean; onToggle: () => void }) {
   const t = useTranslations("Session");
   const format = useFormatter();
-  const number = (value: number) => format.number(value, { numberingSystem: "latn" });
+  const number = (value: number) =>
+    format.number(value, { numberingSystem: "latn" });
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -282,10 +400,15 @@ export function TopicsTrack({
         title={open ? t("closeLessonsList") : t("openLessonsList")}
         className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill text-ink-2 transition-colors hover:bg-surface hover:text-ink"
       >
-        <Chevron className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
+        <Chevron
+          className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`}
+        />
       </button>
 
-      <div ref={ref} className="no-scrollbar flex min-w-0 flex-1 items-center overflow-x-auto">
+      <div
+        ref={ref}
+        className="no-scrollbar flex min-w-0 flex-1 items-center overflow-x-auto"
+      >
         {topics.map((topic, i) => (
           <div key={`${i}-${topic}`} className="flex shrink-0 items-center">
             <button
@@ -293,7 +416,11 @@ export function TopicsTrack({
               data-current={i === current ? "true" : undefined}
               onClick={() => onPick(i)}
               aria-current={i === current ? "step" : undefined}
-              aria-label={t("lessonAccessible", { number: number(i + 1), lesson: topic, state: t(`lessonState.${stateOf(i)}`) })}
+              aria-label={t("lessonAccessible", {
+                number: number(i + 1),
+                lesson: topic,
+                state: t(`lessonState.${stateOf(i)}`),
+              })}
               title={t("lessonTitle", { number: number(i + 1), lesson: topic })}
               className="flex h-11 w-11 items-center justify-center"
             >
@@ -322,15 +449,23 @@ export function TopicsRail({
   onPick,
   open,
   onToggle,
-}: TopicsProps & { open: boolean; onToggle: () => void }) {
+  supportHref,
+  supportHint,
+}: TopicsProps & {
+  open: boolean;
+  onToggle: () => void;
+  supportHref: string;
+  supportHint?: boolean;
+}) {
   const t = useTranslations("Session");
   const format = useFormatter();
-  const number = (value: number) => format.number(value, { numberingSystem: "latn" });
+  const number = (value: number) =>
+    format.number(value, { numberingSystem: "latn" });
   const done = topics.filter((_, i) => stateOf(i) === "done").length;
 
   return (
-    <div className="relative hidden shrink-0 md:block">
-      <section className="flex h-full w-16 flex-col items-center overflow-hidden rounded-xl border border-line bg-panel py-2">
+    <div className="relative hidden shrink-0 flex-col gap-2 md:flex">
+      <section className="flex min-h-0 w-16 flex-1 flex-col items-center overflow-hidden rounded-xl border border-line bg-panel py-2">
         <button
           type="button"
           onClick={onToggle}
@@ -345,14 +480,21 @@ export function TopicsRail({
               (start-[…])، فالشيفرون ينعكس مع السطر. */}
           <Chevron
             className={`h-4 w-4 transition-transform ${
-              open ? "ltr:rotate-90 rtl:-rotate-90" : "ltr:-rotate-90 rtl:rotate-90"
+              open
+                ? "ltr:rotate-90 rtl:-rotate-90"
+                : "ltr:-rotate-90 rtl:rotate-90"
             }`}
           />
         </button>
 
-        <p className="mt-1 shrink-0 text-[10px] font-semibold text-ink-2">{t("lessonsShort")}</p>
+        <p className="mt-1 shrink-0 text-[10px] font-semibold text-ink-2">
+          {t("lessonsShort")}
+        </p>
         <p className="shrink-0 text-[10px] text-ink-2">
-          {t("lessonProgress", { done: number(done), total: number(topics.length) })}
+          {t("lessonProgress", {
+            done: number(done),
+            total: number(topics.length),
+          })}
         </p>
 
         <ol className="no-scrollbar mt-2 flex min-h-0 flex-1 flex-col items-center overflow-y-auto">
@@ -362,8 +504,15 @@ export function TopicsRail({
                 type="button"
                 onClick={() => onPick(i)}
                 aria-current={i === current ? "step" : undefined}
-                aria-label={t("lessonAccessible", { number: number(i + 1), lesson: topic, state: t(`lessonState.${stateOf(i)}`) })}
-                title={t("lessonTitle", { number: number(i + 1), lesson: topic })}
+                aria-label={t("lessonAccessible", {
+                  number: number(i + 1),
+                  lesson: topic,
+                  state: t(`lessonState.${stateOf(i)}`),
+                })}
+                title={t("lessonTitle", {
+                  number: number(i + 1),
+                  lesson: topic,
+                })}
                 className="flex h-6 w-6 items-center justify-center"
               >
                 <TopicPip n={i + 1} state={stateOf(i)} active={i === current} />
@@ -380,10 +529,17 @@ export function TopicsRail({
         </ol>
       </section>
 
+      <SupportRailBox href={supportHref} hint={supportHint} />
+
       {/* القائمة المنسدلة — تطفو فوق السبورة ولا توسّع العمود */}
       {open ? (
         <div className="absolute inset-y-0 start-[calc(100%+0.5rem)] z-30 w-64 overflow-hidden rounded-xl border border-line bg-panel shadow-lift">
-          <TopicsList topics={topics} stateOf={stateOf} current={current} onPick={onPick} />
+          <TopicsList
+            topics={topics}
+            stateOf={stateOf}
+            current={current}
+            onPick={onPick}
+          />
         </div>
       ) : null}
     </div>
@@ -394,8 +550,15 @@ export function TopicsRail({
 export function TopicsSheet({
   open,
   onClose,
+  supportHref,
+  supportHint,
   ...list
-}: TopicsProps & { open: boolean; onClose: () => void }) {
+}: TopicsProps & {
+  open: boolean;
+  onClose: () => void;
+  supportHref: string;
+  supportHint?: boolean;
+}) {
   const t = useTranslations("Session");
   return (
     <SessionDialog
@@ -416,8 +579,12 @@ export function TopicsSheet({
           <CloseIcon className="h-4 w-4" />
         </Dialog.Close>
       </div>
-      <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-3 pb-4">
+      <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-3 pb-2">
         <TopicsList {...list} />
+      </div>
+      {/* خارج الجزء المُمرَّر فتبقى في متناول الإبهام مهما طالت القائمة */}
+      <div className="shrink-0 px-3 pb-4">
+        <SupportCard href={supportHref} hint={supportHint} />
       </div>
     </SessionDialog>
   );
@@ -425,12 +592,18 @@ export function TopicsSheet({
 
 /* ————— تنبيه قلب الشاشة —————
    نافذة تظهر مرة واحدة قبل البدء وفي الوضع الرأسي وحده — `portrait:`
-   تُخفيها فور القلب بلا جافاسكربت ولا مستمع أحداث. */
+   تُخفيها فور القلب بلا جافاسكربت ولا مستمع أحداث. الإغلاق حالة في الشاشة
+   (لا هنا) كي تبدأ فقاعة الدعم عدّها بعد زوال ما يغطّيها. */
 
-export function RotateNotice() {
+export function RotateNotice({
+  open,
+  onDismiss,
+}: {
+  open: boolean;
+  onDismiss: () => void;
+}) {
   const t = useTranslations("Session");
-  const [shown, setShown] = useState(true);
-  if (!shown) return null;
+  if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-40 hidden items-center justify-center p-6 portrait:flex md:portrait:hidden">
@@ -439,7 +612,7 @@ export function RotateNotice() {
         type="button"
         tabIndex={-1}
         aria-label={t("close")}
-        onClick={() => setShown(false)}
+        onClick={onDismiss}
         className="absolute inset-0 bg-ground/85 backdrop-blur-sm"
       />
 
@@ -457,7 +630,7 @@ export function RotateNotice() {
         {/* مقلوب لا كهرماني — الكهرماني الوحيد في الشاشة زرّ البدء */}
         <button
           type="button"
-          onClick={() => setShown(false)}
+          onClick={onDismiss}
           className="mt-6 inline-flex h-11 w-full items-center justify-center rounded-pill bg-ink px-5 text-sm font-bold text-ground"
         >
           {t("okay")}
@@ -597,7 +770,12 @@ export function ChatPanel({
 /* ————— شريط الأدوات ————— */
 
 function IconBtn({
-  label, text, onClick, active, disabled, children,
+  label,
+  text,
+  onClick,
+  active,
+  disabled,
+  children,
 }: {
   label: string;
   /** كلمة ظاهرة بجانب الأيقونة؛ بدونها يبقى الزرّ أيقونة وحدها. */
@@ -609,7 +787,9 @@ function IconBtn({
 }) {
   const skin = disabled
     ? "bg-surface text-ink-2 opacity-45"
-    : active ? "bg-ink text-ground" : "bg-surface text-ink-2 hover:text-ink";
+    : active
+      ? "bg-ink text-ground"
+      : "bg-surface text-ink-2 hover:text-ink";
   return (
     <button
       type="button"
@@ -620,7 +800,9 @@ function IconBtn({
       disabled={disabled}
       className={`group/btn flex h-11 shrink-0 items-center justify-center rounded-pill pointer-fine:md:h-8 ${text ? "focus-visible:outline-none" : "w-11 pointer-fine:md:w-8"}`}
     >
-      <span className={`inline-flex h-[34px] items-center justify-center rounded-pill transition-colors md:h-8 [&_svg]:h-[18px] [&_svg]:w-[18px] md:[&_svg]:h-4 md:[&_svg]:w-4 ${text ? "gap-1 px-2.5 text-sm font-semibold group-focus-visible/btn:outline-2 group-focus-visible/btn:outline-offset-2 group-focus-visible/btn:outline-ring" : "w-[34px] md:w-8"} ${skin}`}>
+      <span
+        className={`inline-flex h-[34px] items-center justify-center rounded-pill transition-colors md:h-8 [&_svg]:h-[18px] [&_svg]:w-[18px] md:[&_svg]:h-4 md:[&_svg]:w-4 ${text ? "gap-1 px-2.5 text-sm font-semibold group-focus-visible/btn:outline-2 group-focus-visible/btn:outline-offset-2 group-focus-visible/btn:outline-ring" : "w-[34px] md:w-8"} ${skin}`}
+      >
         {children}
         {text}
       </span>
@@ -638,19 +820,40 @@ function StartHint() {
         <span className="whitespace-nowrap rounded-pill bg-ink px-3 py-1.5 text-xs font-bold text-ground shadow-lift">
           {t("startHint")}
         </span>
-        <span aria-hidden="true" className="-mt-1 h-2.5 w-2.5 rotate-45 rounded-[2px] bg-ink" />
+        <span
+          aria-hidden="true"
+          className="-mt-1 h-2.5 w-2.5 rotate-45 rounded-[2px] bg-ink"
+        />
       </span>
     </span>
   );
 }
 
-type MicrophoneTrack = ReturnType<typeof useSession>["local"]["microphoneTrack"];
+type MicrophoneTrack = ReturnType<
+  typeof useSession
+>["local"]["microphoneTrack"];
 
 export function Toolbar({
-  phase, canAsk, micUnavailable, studentQuestionStartedAt, microphoneTrack,
-  noSpeech, reduce, chat, slides, topics, hint,
-  onPrimary, onAsk, onSendStudentQuestion, onCancelStudentQuestion, onSpeech,
-  onChat, onSlides, onTopics, onEnd,
+  phase,
+  canAsk,
+  micUnavailable,
+  studentQuestionStartedAt,
+  microphoneTrack,
+  noSpeech,
+  reduce,
+  chat,
+  slides,
+  topics,
+  hint,
+  onPrimary,
+  onAsk,
+  onSendStudentQuestion,
+  onCancelStudentQuestion,
+  onSpeech,
+  onChat,
+  onSlides,
+  onTopics,
+  onEnd,
 }: {
   phase: Phase;
   canAsk: boolean;
@@ -680,7 +883,11 @@ export function Toolbar({
   const askRef = useRef<HTMLButtonElement>(null);
   const wasRecording = useRef(false);
   useEffect(() => {
-    if (wasRecording.current && !recording && !document.querySelector('[role="dialog"]')) {
+    if (
+      wasRecording.current &&
+      !recording &&
+      !document.querySelector('[role="dialog"]')
+    ) {
       askRef.current?.focus();
     }
     wasRecording.current = recording;
@@ -729,7 +936,11 @@ export function Toolbar({
                   type="button"
                   disabled={!canAsk}
                   onClick={onAsk}
-                  title={micUnavailable ? t("studentQuestionMicUnavailable") : t("studentQuestionShortcut")}
+                  title={
+                    micUnavailable
+                      ? t("studentQuestionMicUnavailable")
+                      : t("studentQuestionShortcut")
+                  }
                   className="group/ask flex h-11 shrink-0 items-center justify-center rounded-pill focus-visible:outline-none pointer-fine:md:h-8"
                 >
                   <span
@@ -739,7 +950,12 @@ export function Toolbar({
                     {t("studentQuestionAsk")}
                   </span>
                 </button>
-                <IconBtn label={t("chat")} text={t("chatShort")} onClick={onChat} active={chat}>
+                <IconBtn
+                  label={t("chat")}
+                  text={t("chatShort")}
+                  onClick={onChat}
+                  active={chat}
+                >
                   <ChatIcon />
                 </IconBtn>
               </div>
@@ -760,8 +976,14 @@ export function Toolbar({
                     </span>
                   </button>
                 ) : (
-                  <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center text-ink-2">
-                    <BecanGlyph speaking={phase === "live"} className="h-6 w-8" />
+                  <span
+                    aria-hidden="true"
+                    className="flex h-11 w-11 shrink-0 items-center justify-center text-ink-2"
+                  >
+                    <BecanGlyph
+                      speaking={phase === "live"}
+                      className="h-6 w-8"
+                    />
                   </span>
                 )}
               </span>
@@ -770,7 +992,11 @@ export function Toolbar({
                 <IconBtn label={t("slides")} onClick={onSlides} active={slides}>
                   <SlidesIcon />
                 </IconBtn>
-                <IconBtn label={t("lessons")} onClick={onTopics} active={topics}>
+                <IconBtn
+                  label={t("lessons")}
+                  onClick={onTopics}
+                  active={topics}
+                >
                   <ListIcon />
                 </IconBtn>
                 <IconBtn label={t("end")} onClick={onEnd} disabled={!inSession}>
@@ -787,7 +1013,12 @@ export function Toolbar({
 
 /** Audio subscriptions and clock stay here so they never re-render the teaching board. */
 function StudentQuestionRecorder({
-  startedAt, microphoneTrack, reduce, onSend, onCancel, onSpeech,
+  startedAt,
+  microphoneTrack,
+  reduce,
+  onSend,
+  onCancel,
+  onSpeech,
 }: {
   startedAt: number;
   microphoneTrack: MicrophoneTrack;
@@ -797,15 +1028,24 @@ function StudentQuestionRecorder({
   onSpeech: () => void;
 }) {
   const t = useTranslations("Session");
-  const { bars } = useAudioWaveform(reduce ? undefined : microphoneTrack ?? undefined, {
-    barCount: 24, updateInterval: 50,
-  });
+  const { bars } = useAudioWaveform(
+    reduce ? undefined : (microphoneTrack ?? undefined),
+    {
+      barCount: 24,
+      updateInterval: 50,
+    },
+  );
   const volume = useTrackVolume(microphoneTrack ?? undefined);
-  const [elapsed, setElapsed] = useState(() => Math.floor((Date.now() - startedAt) / 1000));
+  const [elapsed, setElapsed] = useState(() =>
+    Math.floor((Date.now() - startedAt) / 1000),
+  );
   const sendRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     sendRef.current?.focus();
-    const timer = setInterval(() => setElapsed(Math.floor((Date.now() - startedAt) / 1000)), 250);
+    const timer = setInterval(
+      () => setElapsed(Math.floor((Date.now() - startedAt) / 1000)),
+      250,
+    );
     return () => clearInterval(timer);
   }, [startedAt]);
   useEffect(() => {
@@ -823,16 +1063,21 @@ function StudentQuestionRecorder({
       >
         <CloseIcon className="h-4 w-4" />
       </button>
-      <span aria-hidden="true" className="flex h-8 min-w-0 flex-1 items-center justify-center gap-0.5 text-ink">
+      <span
+        aria-hidden="true"
+        className="flex h-8 min-w-0 flex-1 items-center justify-center gap-0.5 text-ink"
+      >
         {reduce ? (
           <span className="h-[3px] w-full rounded-pill bg-ink-2" />
-        ) : bars.map((bar, index) => (
-          <span
-            key={index}
-            className="w-[3px] shrink-0 rounded-pill bg-current"
-            style={{ height: `${4 + Math.min(1, Math.max(0, bar)) * 28}px` }}
-          />
-        ))}
+        ) : (
+          bars.map((bar, index) => (
+            <span
+              key={index}
+              className="w-[3px] shrink-0 rounded-pill bg-current"
+              style={{ height: `${4 + Math.min(1, Math.max(0, bar)) * 28}px` }}
+            />
+          ))
+        )}
       </span>
       <span dir="ltr" className="shrink-0 text-sm tabular-nums text-ink-2">
         {`${Math.floor(elapsed / 60)}:${String(elapsed % 60).padStart(2, "0")}`}
@@ -907,7 +1152,9 @@ export function CheckpointDialog({
         type="button"
         disabled={!canAnswerByVoice}
         onClick={onAnswerByVoice}
-        title={micUnavailable ? t("studentQuestionMicUnavailable") : t("answerVoice")}
+        title={
+          micUnavailable ? t("studentQuestionMicUnavailable") : t("answerVoice")
+        }
         className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-pill border border-ink-2 px-4 font-semibold text-ink transition-colors enabled:hover:bg-ground disabled:opacity-45"
       >
         <MicIcon className="h-4 w-4" />

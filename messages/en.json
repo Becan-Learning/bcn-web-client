@@ -40,6 +40,8 @@
     "description": "Becan explains your course by voice, asks questions to check your understanding, and identifies where you lose marks in exams."
   },
   "SiteHeader": {
+    "menu": "Menu",
+    "closeMenu": "Close menu",
     "login": "Sign in",
     "home": "Your courses"
   },
@@ -227,7 +229,7 @@
       "lede": "Your usage limits for this period and what you've used of them",
       "usedUp": "You've reached your usage limits for this period. You can't start a new session before {date}",
       "retry": "Try again",
-      "upgrade": "Upgrade your plan",
+      "upgrade": "Upgrade plan",
       "compare": "Compare plans",
       "paidTitle": "Your paid subscription",
       "paidPrice": "SAR {price} every 30 days",
@@ -252,7 +254,11 @@
       "progress": "You studied {minutes, plural, one {{minutesLabel} minute} other {{minutesLabel} minutes}} in {sessions, plural, one {{sessionsLabel} session} other {{sessionsLabel} sessions}}",
       "renewal": "Your usage limits renew on {date}",
       "limit": "You've reached your usage limits for this period",
-      "nextSession": "You can start your next session on {date}"
+      "nextSession": "You can start your next session on {date}",
+      "upgrade": "Want to keep studying now? A bigger plan gives you more minutes and sessions.",
+      "compare": "Compare plans",
+      "whatsapp": "Chat on WhatsApp",
+      "whatsappMessage": "Hi, I've used up my plan's limits and I'd like to move to a bigger plan"
     },
     "slotsFull": {
       "enrolled": "You're enrolled in <courses></courses>",
@@ -494,12 +500,8 @@
     "cancel": "Cancel renewal in one click. Your plan stays active until your paid period ends.",
     "refunds": "Refunds and cancellations",
     "pricingFaq": "Pricing questions",
-    "vatTitle": "VAT is included",
-    "vatBody": "You pay the price shown. No fees are added at checkout, and your invoice separates the net amount from VAT.",
     "intro": "You get the same explanations, board, questions and summaries on each plan. Plans differ in <strong>study time</strong>, <strong>number of sessions</strong> and <strong>number of courses</strong>.",
     "paymentMethods": "mada, <latin>Apple Pay</latin> and credit cards.",
-    "taxBreakdown": "SAR {net} + SAR {vat} VAT = <strong>SAR {gross}</strong>",
-    "vatRate": "VAT: {rate}%.",
     "sessions": "Sessions",
     "errorTitle": "We couldn’t load the plans",
     "errorBody": "We couldn’t get the plans and their prices right now. Try again.",
@@ -575,6 +577,7 @@
       "rating": "<strong>{rating}</strong> out of 5 · Session rating",
       "pricingBody": "Get the value of a private tutor — <strong>for the price of a single lesson with one</strong>.",
       "pricingNote": "Prices are per 30 days and include VAT · <refunds>Cancel anytime</refunds>",
+      "comparePlans": "Compare plans",
       "voice": "<hears>You can ask by voice</hears> <speaks>and hear the answer</speaks>"
     },
     "Demo": {
@@ -671,7 +674,7 @@
       "expiredFix": "Use a valid card, or pay from your phone without entering numbers.",
       "onlineWhy": "Online purchases aren’t enabled on your card.",
       "onlineFix": "Enable them in your bank’s app — usually under “Card settings” — then try again.",
-      "successTitle": "Thank you",
+      "successTitle": "Thanks for your interest",
       "home": "Back to your courses",
       "failedTitle": "Payment didn’t go through",
       "unchanged": "You haven’t been charged, and your plan hasn’t changed.",
@@ -682,10 +685,13 @@
       "continueTitle": "You can keep studying now",
       "pendingDefault": "Your current plan’s minutes are still available. You can study with them while payment is being processed.",
       "status": "Check subscription status",
-      "successBody": "We received your request.",
       "help": "Happening again? <contact>Message us on WhatsApp</contact> and we’ll help you follow it up.",
-      "successBodyPlan": "We received your request for the {plan}.",
-      "successSoon": "Online payment opens soon.",
+      "successDirect": "Direct payment on the platform isn’t available right now.",
+      "successContact": "To subscribe, contact customer support on WhatsApp and we’ll complete your subscription with you.",
+      "successContactPlan": "To subscribe to the {plan}, contact customer support on WhatsApp and we’ll complete your subscription with you.",
+      "whatsapp": "Contact customer support on WhatsApp",
+      "whatsappMessage": "Hi, I’d like to subscribe to a plan",
+      "whatsappMessagePlan": "Hi, I’d like to subscribe to the {plan}",
       "successNothing": "Nothing was charged, and your current plan hasn’t changed.",
       "browse": "Browse courses",
       "backToPlans": "Back to plans"
@@ -706,6 +712,9 @@
     "loadingSlides": "Preparing slides…",
     "supportLabel": "Contact support on WhatsApp",
     "supportContext": "Hello, I have a question during my session: {course}, chapter {number}",
+    "supportCard": "Facing a problem? Contact us on WhatsApp",
+    "supportShort": "Help",
+    "supportHint": "If anything goes wrong, contact us here",
     "exit": "Exit session",
     "lessons": "Lessons",
     "lessonsShort": "Lessons",
@@ -744,7 +753,6 @@
     "confirmEnd": "End session",
     "connectionCut": "Connection lost",
     "connectionFailed": "We couldn’t connect to the explanation. Check your connection and try again.",
-    "resume": "Continue where you left off",
     "retry": "Try again",
     "backCourse": "Back to course",
     "chooseLesson": "Or choose a lesson from the track to start there.",
@@ -958,13 +966,17 @@
           "title": "Applicable law",
           "paragraph1": "These terms are subject to the laws of the Kingdom of Saudi Arabia. Any dispute will be heard by the competent judicial authority there."
         },
+        "severability": {
+          "title": "Severability",
+          "paragraph1": "If any provision of these terms is found to be invalid or unenforceable, that does not affect the validity of the remaining provisions, which stay in full force and effect. The invalid provision will be applied to the maximum extent permitted by law, or replaced with a valid provision that is closest to its intent."
+        },
         "contact": {
           "title": "Contact us",
           "paragraph1": "For any question about these terms, contact us through the <contact>Contact page</contact>."
         }
       },
       "metadataDescription": "Written in everyday language so you can actually read them. If anything is unclear, contact us and we will explain it.",
-      "updated": "2026-08-23",
+      "updated": "2026-10-31",
       "translationNotice": "This is a translation for convenience. The Arabic version is the governing text. <arabic>Read the Arabic version</arabic>"
     },
     "Refunds": {

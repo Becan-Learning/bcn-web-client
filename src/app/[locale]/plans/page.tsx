@@ -8,7 +8,7 @@ import { PageShell, QuietLink, Section, SiteHeader } from "@/components/becan/ki
 import { CheckIcon } from "@/components/becan/icons";
 import { getPlans, getViewer } from "@/lib/plans/server";
 import { coursesLabel, hoursLabel, minutesLabel, sessionsLabel } from "@/lib/plans/labels";
-import { breakdown, formatPrice, VAT, type PlanView } from "@/lib/plans/view";
+import { type PlanView } from "@/lib/plans/view";
 import { PlanCard } from "./plan-card";
 import { RetryPlans } from "./retry-plans";
 
@@ -26,8 +26,8 @@ import { RetryPlans } from "./retry-plans";
    يفترق شكل التسعير بين موضعين. **زرّ كهرماني واحد** في الصفحة
    كلّها، على الخطة المميّزة. والخطة الحالية موسومة ومعطّلة الزرّ.
 
-   والتفصيل الضريبيّ مشتقّ من `breakdown` لا مكتوب: الطالب يرى 149
-   ويدفع 149، والصافي يُشتقّ منه لا يُضاف إليه.
+   والضريبة لا تُفصَّل هنا: السعر المعروض شامل لها (والبطاقة تقول
+   ذلك)، والتفصيل في الدفع وفي الفاتورة.
 
    **الباقات من الخادم** (`getPlans`)، وباقة الطالب الحالية من
    `/me/allowance`. لا تقدير لعدد الفصول: الدقائق لا تُترجَم إلى فصول.
@@ -162,45 +162,17 @@ export default async function PlansPage(props: PageProps<"/[locale]/plans">) {
           </table>
         </div>
 
-        {/* ————— الطمأنة والتفصيل الضريبي ————— */}
-        <div className="mt-10 grid gap-4 md:grid-cols-2">
-          <div className="rounded-xl bg-tint-walnut p-5 md:p-6">
-            <h2 className="font-bold text-ink">{t("beforePaying")}</h2>
-            <ul className="mt-3 flex flex-col gap-2 leading-base text-ink-2">
-              <li>{t("tryFree")}</li>
-              <li>{t("cancel")}</li>
-              <li>{t.rich("paymentMethods", { latin: (chunks) => <span dir="ltr">{chunks}</span> })}</li>
-            </ul>
-            <div className="mt-4 flex flex-wrap gap-x-6">
-              <QuietLink href="/refunds">{t("refunds")}</QuietLink>
-              <QuietLink href="/faq">{t("pricingFaq")}</QuietLink>
-            </div>
-          </div>
-
-          <div className="rounded-xl border border-line p-5 md:p-6">
-            <h2 className="font-bold text-ink">{t("vatTitle")}</h2>
-            <p className="mt-2 leading-base text-ink-2">
-              {t("vatBody")}</p>
-
-            <dl className="mt-4 flex flex-col gap-2 text-sm">
-              {plans.filter((p) => p.price > 0).map((p) => {
-                const b = breakdown(p.price);
-                return (
-                  <div
-                    key={p.id}
-                    className="flex items-baseline justify-between gap-3 border-t border-line pt-2 first:border-0 first:pt-0"
-                  >
-                    <dt className="text-ink-2">{localize(p.name, locale)}</dt>
-                    <dd className="text-end text-ink">
-                      {t.rich("taxBreakdown", { net: b.net.toFixed(2), vat: b.vat.toFixed(2), gross: formatPrice(b.gross), strong: (chunks) => <span className="font-semibold">{chunks}</span> })}
-                    </dd>
-                  </div>
-                );
-              })}
-            </dl>
-            <p className="mt-3 text-sm text-ink-2">
-              {t("vatRate", { rate: String(VAT * 100) })}
-            </p>
+        {/* ————— الطمأنة ————— */}
+        <div className="mt-10 rounded-xl bg-tint-walnut p-5 md:p-6">
+          <h2 className="font-bold text-ink">{t("beforePaying")}</h2>
+          <ul className="mt-3 flex flex-col gap-2 leading-base text-ink-2">
+            <li>{t("tryFree")}</li>
+            <li>{t("cancel")}</li>
+            <li>{t.rich("paymentMethods", { latin: (chunks) => <span dir="ltr">{chunks}</span> })}</li>
+          </ul>
+          <div className="mt-4 flex flex-wrap gap-x-6">
+            <QuietLink href="/refunds">{t("refunds")}</QuietLink>
+            <QuietLink href="/faq">{t("pricingFaq")}</QuietLink>
           </div>
         </div>
       </Section>

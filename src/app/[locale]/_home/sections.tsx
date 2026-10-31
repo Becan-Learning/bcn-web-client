@@ -14,7 +14,7 @@ import {
 } from "@/components/becan/icons";
 import { PrimaryButton, QuietLink, Section } from "@/components/becan/kit";
 import { BecanMorph } from "@/components/becan/becan-morph";
-import { getPlans } from "@/lib/plans/server";
+import { getPlans, getViewer } from "@/lib/plans/server";
 import { PlanCard } from "@/app/[locale]/plans/plan-card";
 import { FAQ } from "@/lib/data/faq";
 import { FaqItem } from "@/app/[locale]/faq/faq-item";
@@ -481,15 +481,20 @@ export async function Proof() {
    أدعى للشراء من الأعلى سعرًا.
 
    وبطاقةُ الخطة مشتركة مع `/plans` (‏`./plans/plan-card`) فلا يفترق
-   شكل التسعير بين موضعين. واللاندينج يقود إلى `/plans` لا إلى الدفع
-   مباشرةً: يعرض ولا يبيع.
+   شكل التسعير بين موضعين. والباقة المدفوعة تقود إلى الدفع مباشرةً،
+   والمقارنة الكاملة خلف رابط «قارن الباقات» تحت الشبكة. والمجانية
+   تقود الزائر إلى `/join` والطالب إلى مقرراته، كما في `/plans`.
 
    **لا عدد فصول في البطاقة**، والدقائق وترجمتها إلى ساعات باقيتان —
    البريف يشترط الترجمة. والباقات من الخادم (`getPlans`): إن تعذّرت
    قراءتها يختفي القسم كلّه ولا تتأثر بقية الصفحة. */
 
 export async function Pricing() {
-  const [t, result] = await Promise.all([getTranslations("Landing.Sections"), getPlans()]);
+  const [t, result, viewer] = await Promise.all([
+    getTranslations("Landing.Sections"),
+    getPlans(),
+    getViewer(),
+  ]);
   if (!result.ok) return null;
   return (
     <Section id="pricing" className="py-16 md:py-20">
@@ -503,12 +508,21 @@ export async function Pricing() {
       <ul className="mt-10 grid items-stretch gap-4 md:grid-cols-3 md:pt-3">
         {result.plans.map((plan) => (
           <li key={plan.id}>
-            <PlanCard plan={plan} href="/plans" showBadge={plan.featured} />
+            <PlanCard
+              plan={plan}
+              href={plan.price === 0 ? (viewer.signedIn ? "/home" : "/join") : `/checkout?plan=${plan.id}`}
+              showBadge={plan.featured}
+              freeAction={viewer.signedIn ? "home" : "start"}
+            />
           </li>
         ))}
       </ul>
 
-      <p className="mt-8 text-sm text-ink-2">
+      <div className="mt-6">
+        <QuietLink href="/plans">{t("comparePlans")}</QuietLink>
+      </div>
+
+      <p className="mt-4 text-sm text-ink-2">
         {t.rich("pricingNote", { refunds: (chunks) => <Link href="/refunds" className="font-semibold text-pressable underline underline-offset-4">{chunks}</Link> })}
       </p>
     </Section>

@@ -6,6 +6,7 @@ import { OfflineBar } from "./offline-bar";
 import { SupportButton } from "./support-button";
 import { LanguageSwitcher } from "./language-switcher";
 import { SiteAccountLink } from "./site-account-link";
+import { SiteMenu } from "./site-menu";
 
 /* عناصر التصميم المعتمد. كل شاشة جديدة تُبنى منها فلا تعيد اختراعها. */
 
@@ -175,7 +176,7 @@ export function Plain({ children }: { children: React.ReactNode }) {
    الخاصة داخلها، فلا يجتمع شريطان على شاشة واحدة. */
 const FOOTER_LINKS = [
   { href: "/#how", label: "how" },
-  { href: "/#pricing", label: "pricing" },
+  { href: "/plans", label: "pricing" },
   { href: "/faq", label: "faq" },
   { href: "/contact", label: "contact" },
   { href: "/status", label: "status" },
@@ -189,6 +190,11 @@ const LEGAL_LINKS = [
   { href: "/cookies", label: "cookies" },
 ] as const;
 
+/* الفوتر في أسفل الشاشة دائمًا حتى لو قصُر المحتوى: القشرة عمود
+   flex بحدّ أدنى بارتفاع الشاشة (`dvh` فيتبع شريط المتصفح على الجوال)،
+   والفوتر `mt-auto` يأخذ كل الفراغ الفائض فوقه. هذا بدل `flex-1` على
+   كل صفحة لأن الصفحات لا تتّفق على عنصر محتوى واحد تمدّه، و`mt-auto`
+   يعمل على أيّها دون أن تعرف الصفحة. */
 export function PageShell({
   children,
   withFooter = false,
@@ -197,7 +203,7 @@ export function PageShell({
   withFooter?: boolean;
 }) {
   return (
-    <div className="flex min-h-full flex-1 flex-col">
+    <div className="flex min-h-dvh flex-1 flex-col">
       <OfflineBar />
       {children}
       {withFooter ? <SiteFooter /> : null}
@@ -209,7 +215,7 @@ export function PageShell({
 export function SiteFooter() {
   const t = useTranslations("SiteFooter");
   return (
-    <footer data-theme="dark" className="bg-aubergine-deep">
+    <footer data-theme="dark" className="mt-auto bg-aubergine-deep">
       <div className="mx-auto w-full max-w-page px-4 py-12 md:px-8 xl:px-10">
         <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
           <BecanLogo height={56} onDark className="h-14 w-auto self-start" />
@@ -318,16 +324,21 @@ export function SiteHeader({
           <BecanLogo height={64} priority className="h-13 w-auto md:h-16" />
         </Link>
 
-        <div className="flex flex-wrap items-center justify-end gap-1">
-          {/* الروابط ظاهرة على الجوال أيضًا: المشروع mobile-first عند
-              390px، وطيّها خلف نقطة توقّف يترك الهيدر بلا محتواه */}
+        {/* الجوال: حساب + زرّ القائمة فقط. من `md` فصاعدًا كل شيء
+            في سطر واحد كما كان. الروابط ومبدّل اللغة كانت ظاهرة على
+            الجوال أيضًا (خمسة عناصر في 390px)، فتتراكب عند 320px وتلتفّ
+            سطرًا ثانيًا عند الحسابات الطويلة («Your courses»)؛ ولهذا
+            انتقلت إلى لوحة `SiteMenu` بدل أن تُقصّ أو تُصغَّر دون
+            الـ44px. رابط الحساب يبقى ظاهرًا لأنه الفعل الذي يحتاجه
+            الزائر في كل صفحة. */}
+        <div className="flex shrink-0 items-center justify-end gap-1">
           {nav?.length ? (
-            <nav className="flex items-center">
+            <nav className="hidden items-center md:flex">
               {nav.map((l) => (
                 <Link
                   key={l.href}
                   href={l.href}
-                  className="inline-flex min-h-11 items-center px-2 text-sm font-semibold text-ink-2 md:px-3 md:text-base"
+                  className="inline-flex min-h-11 items-center px-3 font-semibold text-ink-2"
                 >
                   {l.label}
                 </Link>
@@ -336,7 +347,11 @@ export function SiteHeader({
           ) : null}
 
           {minimal ? null : <SiteAccountLink asButton={loginAsButton} />}
-          <LanguageSwitcher />
+
+          <div className="hidden md:flex">
+            <LanguageSwitcher />
+          </div>
+          <SiteMenu nav={nav} />
         </div>
       </div>
     </header>

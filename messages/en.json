@@ -40,6 +40,8 @@
     "description": "Becan explains your course by voice, asks questions to check your understanding, and identifies where you lose marks in exams."
   },
   "SiteHeader": {
+    "menu": "Menu",
+    "closeMenu": "Close menu",
     "login": "Sign in",
     "home": "Your courses"
   },
@@ -227,7 +229,7 @@
       "lede": "Your usage limits for this period and what you've used of them",
       "usedUp": "You've reached your usage limits for this period. You can't start a new session before {date}",
       "retry": "Try again",
-      "upgrade": "Upgrade your plan",
+      "upgrade": "Upgrade plan",
       "compare": "Compare plans",
       "paidTitle": "Your paid subscription",
       "paidPrice": "SAR {price} every 30 days",
@@ -494,12 +496,8 @@
     "cancel": "Cancel renewal in one click. Your plan stays active until your paid period ends.",
     "refunds": "Refunds and cancellations",
     "pricingFaq": "Pricing questions",
-    "vatTitle": "VAT is included",
-    "vatBody": "You pay the price shown. No fees are added at checkout, and your invoice separates the net amount from VAT.",
     "intro": "You get the same explanations, board, questions and summaries on each plan. Plans differ in <strong>study time</strong>, <strong>number of sessions</strong> and <strong>number of courses</strong>.",
     "paymentMethods": "mada, <latin>Apple Pay</latin> and credit cards.",
-    "taxBreakdown": "SAR {net} + SAR {vat} VAT = <strong>SAR {gross}</strong>",
-    "vatRate": "VAT: {rate}%.",
     "sessions": "Sessions",
     "errorTitle": "We couldn’t load the plans",
     "errorBody": "We couldn’t get the plans and their prices right now. Try again.",
@@ -575,6 +573,7 @@
       "rating": "<strong>{rating}</strong> out of 5 · Session rating",
       "pricingBody": "Get the value of a private tutor — <strong>for the price of a single lesson with one</strong>.",
       "pricingNote": "Prices are per 30 days and include VAT · <refunds>Cancel anytime</refunds>",
+      "comparePlans": "Compare plans",
       "voice": "<hears>You can ask by voice</hears> <speaks>and hear the answer</speaks>"
     },
     "Demo": {

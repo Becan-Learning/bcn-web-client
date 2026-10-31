@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { getPlans } from "@/lib/plans/server";
 import { RotatingWords } from "./_home/rotating-words";
 import { SessionScene } from "./_home/session-scene";
 import {
@@ -41,13 +40,16 @@ export default async function Home(props: PageProps<"/[locale]">) {
   const { locale } = await props.params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  const [t, plans] = await Promise.all([getTranslations("Landing"), getPlans()]);
+  const t = await getTranslations("Landing");
   /** نصّ الفعل — مصدر واحد فلا يفترق بين موضعين. */
   const CTA = t("cta");
 
-  /* مدخل الأسعار يغيب مع القسم نفسه حين تتعذّر قراءة الباقات. */
+  /* «الأسعار» يقود إلى صفحة `/plans` لا إلى قسم في اللاندينج: هناك
+     المقارنة الكاملة، وهي تعالج تعذّر الباقات بحالة خطأ وإعادة محاولة
+     خاصة بها. لذا المدخل ثابت لا يغيب مع القسم، وإلا اختفى الطريق
+     إلى الأسعار حين يتعثّر الخادم ساعةً ثم يعود. */
   const NAV = [
-    ...(plans.ok ? [{ href: "#pricing", label: t("pricingNav") }] : []),
+    { href: "/plans", label: t("pricingNav") },
     { href: "#how", label: t("howNav") },
   ];
 

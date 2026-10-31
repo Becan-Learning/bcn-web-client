@@ -202,6 +202,14 @@ export function CloseIcon({ className = "h-5 w-5" }: P) {
   );
 }
 
+export function MenuIcon({ className = "h-5 w-5" }: P) {
+  return (
+    <svg {...base} viewBox="0 0 24 24" className={className}>
+      <path d="M4 7h16M4 12h16M4 17h16" />
+    </svg>
+  );
+}
+
 export function SkipIcon({ className = "h-4 w-4" }: P) {
   return (
     <svg {...base} viewBox="0 0 24 24" className={className}>

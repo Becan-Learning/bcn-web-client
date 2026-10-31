@@ -71,6 +71,9 @@ import {
 } from "./parts";
 import { useIsMobile } from "./use-is-mobile";
 import { useReducedMotion } from "./use-reduced-motion";
+import { usePortraitPhone } from "./use-portrait-phone";
+import { useSupportHint } from "./use-support-hint";
+import { whatsappHref } from "@/lib/data/support";
 import { PacketRecorderButtons, usePacketRecorder } from "./use-packet-recorder";
 
 /* شاشة الجلسة — تخطيط becan-design (عمود الدروس · السبورة · الشرائح)
@@ -182,6 +185,8 @@ function SessionScreen({
   const router = useRouter();
   const reduce = useReducedMotion();
   const isMobile = useIsMobile();
+  const portraitPhone = usePortraitPhone();
+  const [rotateDismissed, setRotateDismissed] = useState(false);
   const agent = useAgent(session);
   const [state, dispatch] = useReducer(sessionReducer, INITIAL_SESSION_STATE);
   const [endingAllowance, setEndingAllowance] = useState<Allowance | null>(null);
@@ -421,6 +426,10 @@ function SessionScreen({
   else if (agentListening) phase = checkpointShown(state, agent.state, studentQuestionStatus) ? "question" : "listening";
   else phase = "connecting";
 
+  /* فقاعة الدعم تبدأ عدّها حين لا يغطّيها تنبيه قلب الشاشة (رأسي على الجوال قبل البدء) */
+  const rotateNoticeShowing = phase === "idle" && !rotateDismissed && portraitPhone;
+  const supportHintShown = useSupportHint(!rotateNoticeShowing);
+
   /* ————— الدروس ————— */
   const titles = lessons.map((l) => l.name);
   const current = lessons.findIndex((l) => l.slug === state.lesson?.slug);
@@ -442,6 +451,15 @@ function SessionScreen({
       pendingLesson.current = slug;
     }
   };
+
+  /* رابط الدعم بسياق الحصة نفسه في الشريط العلوي وبطاقة لوحة الدروس */
+  const supportHref = whatsappHref(t("supportContext", { course: courseName, number: number(chapterNo) }));
+  /* الفقاعة تشير إلى المدخل الظاهر لحظتها: صندوق العمود على الديسكتوب ما دام
+     العمود ظاهرًا (فتح القائمة المنسدلة لا يغيّر شيئًا)، وبطاقة الورقة على
+     الجوال حين تكون مفتوحة، وإلا أيقونة الشريط العلوي */
+  const supportAnchor: "rail" | "sheet" | "topbar" = isMobile
+    ? topicsOpen ? "sheet" : "topbar"
+    : showTopics ? "rail" : "topbar";
 
   const onTopics = () =>
     isMobile ? setTopicsPref(!topicsOpen) : setShowTopics((v) => !v);
@@ -511,12 +529,14 @@ function SessionScreen({
         : t("topic", { number: number(state.topic.index) })
       : undefined;
 
-  /* ————— انقطاع ————— */
+  /* ————— انقطاع —————
+     إعادة الانضمام في مكانها (start) لا تتعافى عمليًا؛ لا يتعافى إلا تحميل
+     الصفحة من جديد، فالزرّ يعيد التحميل ويعود الطالب إلى شاشة البدء. */
   if (phase === "cut") {
     const lastLesson = lessons.find((l) => l.slug === state.lesson?.slug);
     return (
       <Shell reduce={reduce}>
-        <TopBar phase="cut" courseName={courseName} chapterNo={chapterNo} onExit={onExit} />
+        <TopBar phase="cut" courseName={courseName} chapterNo={chapterNo} supportHint={supportHintShown} onExit={onExit} />
         <div className="mx-auto flex w-full max-w-measure flex-1 flex-col justify-center px-5 py-10">
           <h1 className="text-3xl font-bold text-ink">{t("connectionCut")}</h1>
           <p className="mt-4 leading-base text-ink-2">
@@ -533,10 +553,10 @@ function SessionScreen({
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <button
               type="button"
-              onClick={() => void start(state.lesson?.slug ?? null)}
+              onClick={() => window.location.reload()}
               className="inline-flex h-12 items-center justify-center rounded-pill bg-pressable px-6 font-semibold text-on-pressable"
             >
-              {lastLesson ? t("resume") : t("retry")}
+              {t("retry")}
             </button>
             <button
               type="button"
@@ -588,6 +608,7 @@ function SessionScreen({
         courseName={courseName}
         chapterNo={chapterNo}
         detail={detail}
+        supportHint={supportHintShown && supportAnchor === "topbar"}
         onExit={onExit}
       />
 
@@ -601,7 +622,7 @@ function SessionScreen({
         onToggle={() => setTopicsPref(!topicsOpen)}
       />
 
-      {phase === "idle" ? <RotateNotice /> : null}
+      {phase === "idle" ? <RotateNotice open={!rotateDismissed} onDismiss={() => setRotateDismissed(true)} /> : null}
 
       <div className="relative flex flex-1 flex-col gap-2 overflow-hidden p-2 md:flex-row md:p-3">
         {showTopics ? (
@@ -612,6 +633,8 @@ function SessionScreen({
             onPick={pickLesson}
             open={!isMobile && topicsOpen}
             onToggle={() => setTopicsPref(!topicsOpen)}
+            supportHref={supportHref}
+            supportHint={supportHintShown && supportAnchor === "rail"}
           />
         ) : null}
 
@@ -678,6 +701,8 @@ function SessionScreen({
         stateOf={stateOf}
         current={current}
         onPick={pickLesson}
+        supportHref={supportHref}
+        supportHint={supportHintShown && supportAnchor === "sheet"}
       />
 
       <CheckpointDialog

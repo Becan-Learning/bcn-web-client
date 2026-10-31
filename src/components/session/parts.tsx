@@ -82,6 +82,68 @@ function SessionDialog({
   );
 }
 
+/* ————— الدعم عبر واتساب —————
+   أيقونة الشريط العلوي تبقى دائمًا (لوحة الدروس قد تكون مغلقة). وتحت لوحة
+   الدروس بطاقة مستقلة بالسطح نفسه، فيراها من فتح القائمة وهو عالق. */
+
+/* فقاعة تشير إلى مدخل الدعم الظاهر — بنمط StartHint نفسه دون النبض. زخرفية
+   (aria-hidden) تختفي بعد 3 ثوانٍ، والمدخل نفسه له اسم دائم لقارئ الشاشة.
+   below: أسفل الأيقونة العلوية ونهايتها على نهاية الأيقونة كي لا تخرج من
+   الشاشة، والسهم وحده يتوسّط الأيقونة. وإلا فوق البطاقة وسطها.
+   التوسيط بـ inset-x-0 لا بـ start-1/2 مع إزاحة (تنقلب في RTL). */
+function SupportHint({ below }: { below?: boolean }) {
+  const t = useTranslations("Session");
+  const bubble =
+    "whitespace-nowrap rounded-pill bg-ink px-3 py-1.5 text-xs font-bold text-ground shadow-lift";
+  if (below) {
+    return (
+      <>
+        <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-full z-30 flex justify-center">
+          <span className="mt-[3px] h-2.5 w-2.5 rotate-45 rounded-[2px] bg-ink" />
+        </span>
+        <span aria-hidden="true" className={`pointer-events-none absolute end-0 top-full z-30 mt-2 ${bubble}`}>
+          {t("supportHint")}
+        </span>
+      </>
+    );
+  }
+  return (
+    <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-full z-30 flex justify-center pb-2">
+      <span className="flex flex-col items-center">
+        <span className={bubble}>{t("supportHint")}</span>
+        <span className="-mt-1 h-2.5 w-2.5 rotate-45 rounded-[2px] bg-ink" />
+      </span>
+    </span>
+  );
+}
+
+/** بطاقة الدعم تحت لوحة الدروس — حاوية مستقلة بسطح اللوحة وحدّها وزواياها. */
+function SupportCard({
+  href,
+  hint,
+  className = "",
+}: {
+  href: string;
+  hint?: boolean;
+  className?: string;
+}) {
+  const t = useTranslations("Session");
+  return (
+    <div className={`relative shrink-0 rounded-xl border border-line bg-panel p-1.5 ${className}`}>
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex min-h-11 items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm leading-base text-ink-2 transition-colors hover:bg-surface/60 hover:text-ink"
+      >
+        <WhatsappIcon className="h-4 w-4 shrink-0" />
+        <span className="min-w-0 flex-1">{t("supportCard")}</span>
+      </a>
+      {hint ? <SupportHint /> : null}
+    </div>
+  );
+}
+
 /* ————— الشريط العلوي ————— */
 
 export function TopBar({
@@ -89,6 +151,7 @@ export function TopBar({
   courseName,
   chapterNo,
   detail,
+  supportHint,
   onExit,
 }: {
   phase: Phase;
@@ -96,6 +159,8 @@ export function TopBar({
   chapterNo: number;
   /** «الموضوع 2 من 5» — من رسالة set_topic */
   detail?: string;
+  /** فقاعة تشير إلى أيقونة الدعم — تظهر حين لا تكون بطاقة الدعم في لوحة الدروس ظاهرة */
+  supportHint?: boolean;
   onExit: () => void;
 }) {
   const t = useTranslations("Session");
@@ -137,16 +202,19 @@ export function TopBar({
           الدعم رابط صغير لا قرصٌ طافٍ (النمط ١٠: تحكّم الجلسة في الثلث السفلي)،
           ويُفتح في تبويب جديد فتستمر الحصة. */}
       <div className="flex shrink-0 items-center">
-        <a
-          href={whatsappHref(t("supportContext", { course: courseName, number: number(chapterNo) }))}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={t("supportLabel")}
-          title={t("supportLabel")}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill text-ink-2 hover:bg-panel pointer-fine:md:h-8 pointer-fine:md:w-8"
-        >
-          <WhatsappIcon className="h-4 w-4" />
-        </a>
+        <span className="relative flex">
+          <a
+            href={whatsappHref(t("supportContext", { course: courseName, number: number(chapterNo) }))}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={t("supportLabel")}
+            title={t("supportLabel")}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill text-ink-2 hover:bg-panel pointer-fine:md:h-8 pointer-fine:md:w-8"
+          >
+            <WhatsappIcon className="h-4 w-4" />
+          </a>
+          {supportHint ? <SupportHint below /> : null}
+        </span>
         <button
           type="button"
           onClick={onExit}
@@ -322,7 +390,14 @@ export function TopicsRail({
   onPick,
   open,
   onToggle,
-}: TopicsProps & { open: boolean; onToggle: () => void }) {
+  supportHref,
+  supportHint,
+}: TopicsProps & {
+  open: boolean;
+  onToggle: () => void;
+  supportHref: string;
+  supportHint?: boolean;
+}) {
   const t = useTranslations("Session");
   const format = useFormatter();
   const number = (value: number) => format.number(value, { numberingSystem: "latn" });
@@ -380,10 +455,14 @@ export function TopicsRail({
         </ol>
       </section>
 
-      {/* القائمة المنسدلة — تطفو فوق السبورة ولا توسّع العمود */}
+      {/* القائمة المنسدلة — تطفو فوق السبورة ولا توسّع العمود. تحتها بطاقة
+          الدعم حاوية مستقلة، فتبقى القائمة وحدها هي المُمرَّرة */}
       {open ? (
-        <div className="absolute inset-y-0 start-[calc(100%+0.5rem)] z-30 w-64 overflow-hidden rounded-xl border border-line bg-panel shadow-lift">
-          <TopicsList topics={topics} stateOf={stateOf} current={current} onPick={onPick} />
+        <div className="absolute inset-y-0 start-[calc(100%+0.5rem)] z-30 flex w-64 flex-col gap-2">
+          <div className="min-h-0 flex-1 overflow-hidden rounded-xl border border-line bg-panel shadow-lift">
+            <TopicsList topics={topics} stateOf={stateOf} current={current} onPick={onPick} />
+          </div>
+          <SupportCard href={supportHref} hint={supportHint} className="shadow-lift" />
         </div>
       ) : null}
     </div>
@@ -394,8 +473,15 @@ export function TopicsRail({
 export function TopicsSheet({
   open,
   onClose,
+  supportHref,
+  supportHint,
   ...list
-}: TopicsProps & { open: boolean; onClose: () => void }) {
+}: TopicsProps & {
+  open: boolean;
+  onClose: () => void;
+  supportHref: string;
+  supportHint?: boolean;
+}) {
   const t = useTranslations("Session");
   return (
     <SessionDialog
@@ -416,8 +502,12 @@ export function TopicsSheet({
           <CloseIcon className="h-4 w-4" />
         </Dialog.Close>
       </div>
-      <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-3 pb-4">
+      <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-3 pb-2">
         <TopicsList {...list} />
+      </div>
+      {/* خارج الجزء المُمرَّر فتبقى في متناول الإبهام مهما طالت القائمة */}
+      <div className="shrink-0 px-3 pb-4">
+        <SupportCard href={supportHref} hint={supportHint} />
       </div>
     </SessionDialog>
   );

@@ -15,6 +15,8 @@ import {
 } from "@/components/becan/kit";
 import { getPlans } from "@/lib/plans/server";
 import { planById } from "@/lib/plans/view";
+import { whatsappHref } from "@/lib/data/support";
+import { WhatsappIcon } from "@/components/becan/icons";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/checkout/result">): Promise<Metadata> {
   const { locale } = await params;
@@ -32,9 +34,11 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/checkout
    الفشل يذكر **سببًا محدّدًا** لا «حدث خطأ»: الطالب لا يستطيع تصحيح
    ما لا يعرفه. والسبب يأتي من البوابة في الإنتاج، ويُعايَن هنا بـ`?r=`.
 
-   **الدفع تجريبي حتى تتوفّر بوابة**، فالنجاح هنا شكر لا ترقية: استلمنا
-   الطلب، والدفع الإلكتروني يُفتح قريبًا، ولم يُخصم شيء، وباقته كما هي.
-   والفشل والمعلّق لا يبلغهما إلا من يكتب `?s=` بنفسه.
+   **الدفع تجريبي حتى تتوفّر بوابة**، فالنجاح هنا شكر لا ترقية: نقول صراحةً
+   إن الدفع المباشر على المنصة غير متاح الآن، ونحيله إلى خدمة العملاء على
+   واتساب ليكمل الاشتراك (الكهرماني الأساسي، برسالة جاهزة فيها اسم الباقة
+   إن عُرفت)، ونطمئنه أنه لم يُخصم شيء وباقته كما هي. «تصفّح المقررات»
+   محدّد الإطار. والفشل والمعلّق لا يبلغهما إلا من يكتب `?s=` بنفسه.
 
    الصفحة مفتوحة للزائر. والباقة تُقرأ من الخادم؛ إن غابت أو تعذّرت
    قراءتها يبقى الشكر بلا اسم باقة. */
@@ -114,15 +118,28 @@ async function Success({ plan }: { plan: string | null }) {
         {t("successTitle")}
       </h1>
 
-      <p className="mt-4 leading-base text-ink-2">
-        {plan ? t("successBodyPlan", { plan }) : t("successBody")}
+      <p className="mt-4 leading-base font-semibold text-ink">{t("successDirect")}</p>
+      <p className="mt-3 leading-base text-ink-2">
+        {plan ? t("successContactPlan", { plan }) : t("successContact")}
       </p>
-      <p className="mt-3 leading-base text-ink-2">{t("successSoon")}</p>
-      <p className="mt-3 leading-base font-semibold text-ink">{t("successNothing")}</p>
+      <p className="mt-3 leading-base text-ink-2">{t("successNothing")}</p>
 
-      <PrimaryButton href="/courses" className="mt-8 w-full sm:w-fit">
-        {t("browse")}
-      </PrimaryButton>
+      <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+        {/* الفعل الأول — الكهرماني الوحيد في الشاشة. رابط خارجي، فلا `PrimaryButton` (يمرّ بـ`Link` المترجَم). */}
+        <a
+          href={whatsappHref(plan ? t("whatsappMessagePlan", { plan }) : t("whatsappMessage"))}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex min-h-14 w-full items-center justify-center gap-3 rounded-pill bg-pressable px-8 text-lg font-semibold text-on-pressable transition-transform duration-200 hover:-translate-y-1 hover:shadow-lift sm:w-fit"
+        >
+          <WhatsappIcon className="h-6 w-6" />
+          {t("whatsapp")}
+        </a>
+
+        <GhostButton href="/courses" className="w-full sm:w-fit">
+          {t("browse")}
+        </GhostButton>
+      </div>
 
       <div className="mt-6">
         <QuietLink href="/plans">{t("backToPlans")}</QuietLink>

@@ -163,6 +163,13 @@ export default async function TermsPage(props: PageProps<"/[locale]/terms">) {
       ),
     },
     {
+      key: "severability",
+      id: "severability",
+      body: (
+        <P>{t.rich("sections.severability.paragraph1", richValues)}</P>
+      ),
+    },
+    {
       key: "contact",
       id: "contact",
       body: (

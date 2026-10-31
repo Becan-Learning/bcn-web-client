@@ -958,13 +958,17 @@
           "title": "Applicable law",
           "paragraph1": "These terms are subject to the laws of the Kingdom of Saudi Arabia. Any dispute will be heard by the competent judicial authority there."
         },
+        "severability": {
+          "title": "Severability",
+          "paragraph1": "If any provision of these terms is found to be invalid or unenforceable, that does not affect the validity of the remaining provisions, which stay in full force and effect. The invalid provision will be applied to the maximum extent permitted by law, or replaced with a valid provision that is closest to its intent."
+        },
         "contact": {
           "title": "Contact us",
           "paragraph1": "For any question about these terms, contact us through the <contact>Contact page</contact>."
         }
       },
       "metadataDescription": "Written in everyday language so you can actually read them. If anything is unclear, contact us and we will explain it.",
-      "updated": "2026-08-23",
+      "updated": "2026-10-31",
       "translationNotice": "This is a translation for convenience. The Arabic version is the governing text. <arabic>Read the Arabic version</arabic>"
     },
     "Refunds": {

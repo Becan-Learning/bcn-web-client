@@ -26,8 +26,28 @@ function expectQuiet(html: string, surface: "site" | "session" = "site") {
   } else {
     expect(html).toContain("bg-tint-amber");
   }
-  expect(html).not.toMatch(/<button|\/plans|\/checkout|SAR|ريال|ترقية|upgrade|للأسف|text-error|bg-error|bg-pressable/);
+  expect(html).not.toMatch(/<button|\/checkout|SAR|ريال|للأسف|text-error|bg-error/);
   expect(html).not.toMatch(/[٠-٩]/);
+}
+/* السلوك الجديد لـ«استُهلكت الحدود»: بلا سعر، والزرّان رابطان — مقارنة الباقات وواتساب. */
+function expectUpgradeActions(html: string, locale: "ar" | "en", surface: "site" | "session" = "site", primary = true) {
+  const msgs = (locale === "ar" ? ar : en).Quota.usedUp;
+  const anchors = html.match(/<a\b[^>]*>.*?<\/a>/g)!;
+  expect(anchors).toHaveLength(2);
+  const [compare, whatsapp] = anchors.map((a) => a.replace(/&#x27;/g, "'"));
+  expect(compare).toContain('href="/plans"');
+  expect(textOf(compare)).toBe(msgs.compare);
+  expect(compare.includes("bg-pressable")).toBe(primary);
+  expect(compare).toContain(surface === "session" ? "h-12" : "h-14");
+  expect(whatsapp).toContain(`href="https://wa.me/966501473370?text=${encodeURIComponent(msgs.whatsappMessage)}"`);
+  expect(whatsapp).toContain('target="_blank"');
+  expect(whatsapp).toContain('rel="noopener noreferrer"');
+  expect(whatsapp).toContain("<svg");
+  expect(whatsapp).not.toContain("bg-pressable");
+  expect(whatsapp).toContain(surface === "session" ? "border-line" : "border-aubergine-mid");
+  expect(textOf(whatsapp)).toBe(msgs.whatsapp);
+  expect(textOf(html)).toContain(msgs.upgrade);
+  expect(html).not.toMatch(/SAR|ريال|\d\s*(?:ر\.س|\$)/);
 }
 
 const plurals = [
@@ -52,15 +72,17 @@ describe("QuotaBlock", () => {
     const html = render(locale, { ...props, surface: "session" });
     const paragraphs = html.match(/<p\b[^>]*>.*?<\/p>/g)!;
     const siteParagraphs = render(locale, props).match(/<p\b[^>]*>.*?<\/p>/g)!;
-    expect(paragraphs).toHaveLength(2);
+    expect(paragraphs).toHaveLength(3);
     expect(paragraphs[0]).toBe(siteParagraphs[0]);
     expect(textOf(paragraphs[1])).toBe(locale === "ar"
       ? "تقدر تبدأ حصتك الجاية في 31 أكتوبر 2026"
       : "You can start your next session on October 31, 2026");
     expect(textOf(html)).not.toContain((locale === "ar" ? ar : en).Quota.usedUp.limit);
+    expect(textOf(paragraphs[2])).toBe((locale === "ar" ? ar : en).Quota.usedUp.upgrade);
     expect(html).toContain("text-ink");
     expect(html).toContain("text-ink-2");
     expectQuiet(html, "session");
+    expectUpgradeActions(html, locale, "session");
   });
 
   it.each(plurals)("renders Arabic plurals for %i minutes and sessions", (count, minutes, sessions) => {
@@ -69,7 +91,7 @@ describe("QuotaBlock", () => {
     expect(text).toContain(ar.Quota.usedUp.limit);
     expect(text).toContain(`ذاكرت ${minutes} في ${sessions}`);
     expect(text).toContain("تتجدد حدود استخدامك في 31 أكتوبر 2026");
-    expect(html).not.toContain("<a");
+    expectUpgradeActions(html, "ar");
     expect(html).not.toMatch(/<h[1-6]/);
     expect(html).toMatch(/<section[^>]*><p class="text-lg leading-base font-semibold">/);
     expect(text.indexOf("ذاكرت") < text.indexOf(ar.Quota.usedUp.limit)).toBe(true);
@@ -82,10 +104,29 @@ describe("QuotaBlock", () => {
     expect(text).toContain(en.Quota.usedUp.limit);
     expect(text).toContain(`You studied ${count} ${count === 1 ? "minute" : "minutes"} in ${count} ${count === 1 ? "session" : "sessions"}`);
     expect(text).toContain("Your usage limits renew on October 31, 2026");
-    expect(html).not.toContain("<a");
+    expectUpgradeActions(html, "en");
     expect(html).not.toMatch(/<h[1-6]/);
     expect(text.indexOf("You studied") < text.indexOf(en.Quota.usedUp.limit)).toBe(true);
     expectQuiet(html);
+  });
+
+  it.each(["ar", "en"] as const)("makes Compare plans outlined when the screen already has an amber primary in %s", (locale) => {
+    const html = render(locale, { kind: "used-up", minutesStudied: 38, sessionsUsed: 6, renewalDate: new Date("2026-10-30T22:00:00Z"), primary: false });
+    expectUpgradeActions(html, locale, "site", false);
+    expect(html).not.toContain("bg-pressable");
+    expect(html).toContain("border-aubergine-mid");
+  });
+
+  it.each(["ar", "en"] as const)("keeps the used-up warm in tone and still names the renewal date in %s", (locale) => {
+    const text = textOf(render(locale, { kind: "used-up", minutesStudied: 38, sessionsUsed: 6, renewalDate: new Date("2026-10-30T22:00:00Z") }));
+    expect(text).toContain(locale === "ar" ? "31 أكتوبر 2026" : "October 31, 2026");
+    expect(text).not.toMatch(/للأسف|unfortunately|expired|انتهت/i);
+  });
+
+  it("never offers upgrade actions on the slots-full block", () => {
+    const html = render("ar", { kind: "slots-full", courses: [{ id: "acct-101", name: "ACCT 101" }], limit: 1 });
+    expect(html).not.toContain("/plans");
+    expect(html).not.toContain("wa.me");
   });
 
   it.each(["ar", "en"] as const)("pluralizes minutes and sessions independently in %s", (locale) => {

@@ -71,7 +71,12 @@ describe("Home allowance notice", () => {
       expect(html.indexOf("</header>")).toBeLessThan(html.indexOf(label));
       expect(html.indexOf(label)).toBeLessThan(html.indexOf("<h1"));
       expect(html.indexOf(label)).toBeLessThan(html.indexOf("<ul"));
-      expect(html).not.toContain("/plans");
+      const msgs = (locale === "ar" ? ar : en).Quota.usedUp;
+      expect(html).toContain('href="/plans"');
+      expect(html).toContain(msgs.compare);
+      expect(html).toContain(`href="https://wa.me/966501473370?text=${encodeURIComponent(msgs.whatsappMessage)}"`);
+      expect(html).toContain('target="_blank" rel="noopener noreferrer"');
+      expect(html).toContain(msgs.upgrade);
       expect(html).not.toContain('data-theme="dark"');
       expect(html).not.toMatch(/[٠-٩]/);
     }
@@ -100,6 +105,14 @@ describe("Home allowance notice", () => {
     const html = await render();
     expect(html).toContain(ar.Quota.usedUp.limit);
     expect(html).toContain(kind === "empty" ? ar.Home.empty : ar.Home.loadError);
+  });
+
+  it("keeps a single amber primary: Compare plans is amber unless the empty state already has one", async () => {
+    backend.allowance.mockResolvedValue({ ok: true, data: { ...allowance, usage: { ...allowance.usage, sessions: 6 } } });
+    const compare = (html: string) => html.match(/<a\b[^>]*href="\/plans"[^>]*>/)![0];
+    expect(compare(await render())).toContain("bg-pressable");
+    backend.enrollments.mockResolvedValue({ ok: true, data: [] });
+    expect(compare(await render())).not.toContain("bg-pressable");
   });
 
   it("removes the notice when the next period's fresh allowance is available", async () => {

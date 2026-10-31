@@ -28,7 +28,8 @@ export async function HomeView({ name, enrollments, quota }: { name: string; enr
       </header>
 
       <main className="mx-auto w-full max-w-page px-4 pt-4 pb-16 md:px-8 xl:px-10">
-        {quota ? <div className="mb-6"><QuotaBlock {...quota} /></div> : null}
+        {/* الزر الكهرماني الأساسي للشاشة واحد: «تصفّح المقررات» حين لا مقررات يحجز الكهرماني */}
+        {quota ? <div className="mb-6"><QuotaBlock {...quota} primary={enrollments === null || enrollments.length > 0} /></div> : null}
 
         <h1 className="font-display text-3xl leading-tight font-bold text-ink md:text-4xl">
           {t("title")}

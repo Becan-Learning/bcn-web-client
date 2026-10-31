@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -16,7 +17,11 @@ vi.mock("@/lib/auth/session", () => ({ requireAccount: backend.account }));
 vi.mock("@/lib/allowance/server", () => ({ getAllowance: backend.allowance }));
 vi.mock("@/lib/session/lessons", () => ({ getLessons: backend.lessons }));
 vi.mock("next-intl/server", () => ({ setRequestLocale: vi.fn() }));
-vi.mock("@/i18n/navigation", () => ({ useRouter: () => ({ push: backend.push }), redirect: vi.fn() }));
+vi.mock("@/i18n/navigation", () => ({
+  useRouter: () => ({ push: backend.push }),
+  redirect: vi.fn(),
+  Link: (props: ComponentProps<"a">) => <a {...props} />,
+}));
 vi.mock("@/components/session/session-view", () => ({
   SessionView: vi.fn(({ minutesRemaining }: { minutesRemaining: number | null }) => (
     <div data-session-view="">{minutesRemaining !== null ? <RemainingMinutes count={minutesRemaining} /> : null}</div>
@@ -70,7 +75,15 @@ describe("Session page allowance gate", () => {
       expect(main).toContain("hover:bg-surface-2");
       expect(main).not.toContain("hover:bg-panel");
       expect(html).not.toContain("data-session-view");
-      expect(html).not.toContain("/plans");
+      const msgs = (locale === "ar" ? ar : en).Quota.usedUp;
+      expect(html).toContain('href="/plans"');
+      expect(html).toContain(msgs.compare);
+      expect(html).toContain(`href="https://wa.me/966501473370?text=${encodeURIComponent(msgs.whatsappMessage).replace(/'/g, "&#x27;")}"`);
+      expect(html).toContain('target="_blank" rel="noopener noreferrer"');
+      expect(html).toContain(msgs.whatsapp);
+      /* زرّ الكهرماني واحد في الحصة: «قارن الباقات»، و«ارجع للمقرر» وواتساب محدّدا الإطار */
+      expect(html.match(/bg-pressable/g)).toHaveLength(1);
+      expect(html).not.toMatch(/SAR|ريال/);
       expect(SessionView).not.toHaveBeenCalled();
       expect(backend.lessons).not.toHaveBeenCalled();
     }

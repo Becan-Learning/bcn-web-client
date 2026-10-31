@@ -28,7 +28,7 @@ import { formatPrice, type PlanView } from "@/lib/plans/view";
 
 export function PlanCard({
   plan,
-  /** اللاندينج يقود إلى `/plans`، وصفحة الخطط تقود إلى الدفع */
+  /** المدفوعة إلى الدفع، والمجانية إلى البدء أو إلى المقررات */
   href,
   /** الوسم يظهر على المميّزة وحدها في اللاندينج، وعلى الكلّ في `/plans` */
   showBadge = true,

@@ -12,8 +12,8 @@ export function SiteAccountLink({ asButton }: { asButton: boolean }) {
       href={account ? "/home" : "/sign-in"}
       className={
         asButton
-          ? "inline-flex min-h-11 min-w-11 items-center justify-center rounded-pill border border-line px-4 text-sm leading-base font-semibold text-ink md:text-base md:leading-base"
-          : "inline-flex min-h-11 min-w-11 items-center justify-center px-2 font-semibold text-ink-2"
+          ? "inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center whitespace-nowrap rounded-pill border border-line px-4 text-sm leading-base font-semibold text-ink md:text-base md:leading-base"
+          : "inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center whitespace-nowrap px-2 font-semibold text-ink-2"
       }
     >
       {t(account ? "home" : "login")}

@@ -184,6 +184,31 @@
   }
 }
 
+/* لوحة قائمة الهيدر على الجوال: تنزلق من حافة النهاية. الاتجاه
+   متغيّر لا قاعدتان: النهاية يسار في RTL فتبدأ من خارجه سالبةً. */
+.bcn-menu-panel {
+  --bcn-menu-from: 100%;
+}
+.bcn-menu-panel[dir="rtl"] {
+  --bcn-menu-from: -100%;
+}
+.bcn-menu-panel[data-state="open"] {
+  animation: bcn-menu-in var(--bcn-motion-base) ease-out;
+}
+.bcn-menu-overlay[data-state="open"] {
+  animation: bcn-menu-fade var(--bcn-motion-base) ease-out;
+}
+@keyframes bcn-menu-in {
+  from {
+    transform: translateX(var(--bcn-menu-from));
+  }
+}
+@keyframes bcn-menu-fade {
+  from {
+    opacity: 0;
+  }
+}
+
 @keyframes bcn-wave {
   0%,
   100% {
